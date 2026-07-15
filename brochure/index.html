@@ -1,0 +1,2972 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClinicaApp — Tríptico Profesional de Presentación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<style>
+    /* ═══════════════════════════════════════════════════════════════
+       CLINICAAPP — TRÍPTICO PROFESIONAL ULTRA-PREMIUM
+       Edición: AURORA PRO 2026
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* ── 1. Sistema de Diseño & Variables ─────────────────────── */
+    :root {
+        /* Paleta principal refinada */
+        --bg-void: #02040a;
+        --bg-surface: rgba(12, 20, 40, 0.55);
+        --bg-elevated: rgba(18, 28, 54, 0.7);
+
+        --border-subtle: rgba(255, 255, 255, 0.06);
+        --border-medium: rgba(255, 255, 255, 0.10);
+        --border-active: rgba(14, 165, 233, 0.35);
+        --border-glow: rgba(14, 165, 233, 0.15);
+
+        --cyan-400: #22d3ee;
+        --cyan-500: #0ea5e9;
+        --cyan-glow: rgba(14, 165, 233, 0.25);
+
+        --violet-400: #a78bfa;
+        --violet-500: #818cf8;
+        --violet-glow: rgba(129, 140, 248, 0.3);
+
+        --emerald-400: #34d399;
+        --emerald-500: #10b981;
+        --emerald-glow: rgba(16, 185, 129, 0.25);
+
+        --amber-400: #fbbf24;
+        --amber-500: #f59e0b;
+        --amber-glow: rgba(245, 158, 11, 0.25);
+
+        --rose-500: #f43f5e;
+        --rose-glow: rgba(244, 63, 94, 0.2);
+
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-tertiary: #64748b;
+        --text-inverse: #0f172a;
+
+        --font-display: 'Space Grotesk', sans-serif;
+        --font-body: 'Plus Jakarta Sans', sans-serif;
+
+        --panel-w: 340px;
+        --panel-h: 760px;
+        --radius-sm: 12px;
+        --radius-md: 16px;
+        --radius-lg: 20px;
+        --radius-xl: 24px;
+
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+        --shadow-glow-cyan: 0 0 40px rgba(14, 165, 233, 0.15);
+        --shadow-glow-violet: 0 0 40px rgba(129, 140, 248, 0.15);
+    }
+
+    /* ── 2. Reset & Base ──────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: var(--bg-void);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 14px;
+        line-height: 1.6;
+        overflow-x: hidden;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── 3. Fondo Aurora Animado Premium ─────────────────────── */
+    .aurora-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .aurora-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0;
+        animation: aurora-float 20s ease-in-out infinite;
+    }
+
+    .blob-1 {
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, var(--cyan-500) 0%, transparent 70%);
+        top: -15%;
+        left: -10%;
+        animation-delay: 0s;
+        opacity: 0.18;
+    }
+
+    .blob-2 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, var(--violet-500) 0%, transparent 70%);
+        bottom: -10%;
+        right: -5%;
+        animation-delay: -7s;
+        opacity: 0.15;
+    }
+
+    .blob-3 {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+        top: 40%;
+        left: 50%;
+        animation-delay: -14s;
+        opacity: 0.1;
+    }
+
+    .blob-4 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, var(--emerald-500) 0%, transparent 70%);
+        top: 60%;
+        left: 10%;
+        animation-delay: -10s;
+        opacity: 0.08;
+    }
+
+    @keyframes aurora-float {
+
+        0%,
+        100% {
+            transform: translate(0, 0) scale(1) rotate(0deg);
+        }
+
+        25% {
+            transform: translate(60px, -40px) scale(1.1) rotate(5deg);
+        }
+
+        50% {
+            transform: translate(-30px, 50px) scale(0.95) rotate(-3deg);
+        }
+
+        75% {
+            transform: translate(40px, 30px) scale(1.05) rotate(2deg);
+        }
+    }
+
+    /* Grid de puntos sutil */
+    .dot-grid {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+            radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.03) 1px, transparent 0);
+        background-size: 40px 40px;
+        mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+        -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+
+    /* ── 4. Barra de Control Superior ─────────────────────────── */
+    .control-bar {
+        width: 100%;
+        max-width: 1280px;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(8, 16, 36, 0.7);
+        backdrop-filter: blur(24px) saturate(1.2);
+        -webkit-backdrop-filter: blur(24px) saturate(1.2);
+        border-bottom: 1px solid var(--border-subtle);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, var(--cyan-500), var(--violet-500));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .brand-icon::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.2) 100%);
+    }
+
+    .brand-icon svg {
+        position: relative;
+        z-index: 1;
+    }
+
+    .brand-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .brand-title {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, var(--cyan-400), var(--violet-400));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .brand-sub {
+        font-size: 11px;
+        color: var(--text-tertiary);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Botones premium */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: var(--radius-md);
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.3px;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.35s ease;
+    }
+
+    .btn:hover::before {
+        opacity: 1;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--cyan-500), var(--violet-500));
+        color: #fff;
+        box-shadow: 0 4px 24px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary::before {
+        background: linear-gradient(135deg, var(--cyan-400), var(--violet-400));
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(14, 165, 233, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-primary);
+        border-color: var(--border-medium);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-secondary::before {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    /* Indicador de cara activa */
+    .face-badge {
+        margin-top: 24px;
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 10px 20px;
+        border-radius: 100px;
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 10;
+    }
+
+    .face-badge .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cyan-500);
+        box-shadow: 0 0 8px var(--cyan-glow);
+        animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .face-badge .dot.green {
+        background: var(--emerald-500);
+        box-shadow: 0 0 8px var(--emerald-glow);
+    }
+
+    @keyframes pulse-dot {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.6;
+            transform: scale(0.85);
+        }
+    }
+
+    .face-badge .label {
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    /* ── 5. Estructura 3D del Tríptico ────────────────────────── */
+    .stage {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        perspective: 2200px;
+        width: 100%;
+        z-index: 10;
+    }
+
+    .scene {
+        width: calc(var(--panel-w) * 3 + 32px);
+        height: var(--panel-h);
+        position: relative;
+        transform-style: preserve-3d;
+    }
+
+    .brochure {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 1.4s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+
+    .brochure.flipped {
+        transform: rotateY(180deg);
+    }
+
+    .face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        display: grid;
+        grid-template-columns: repeat(3, var(--panel-w));
+        gap: 16px;
+    }
+
+    .face-front {
+        z-index: 2;
+        transform: rotateY(0deg);
+    }
+
+    .face-back {
+        transform: rotateY(180deg);
+    }
+
+    /* Guías de plegado */
+    .fold-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        z-index: 20;
+        pointer-events: none;
+    }
+
+    .fold-line::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        bottom: 20px;
+        left: 0;
+        border-left: 1px dashed rgba(255, 255, 255, 0.12);
+    }
+
+    .fold-1 {
+        left: calc(var(--panel-w) + 8px);
+    }
+
+    .fold-2 {
+        left: calc(var(--panel-w) * 2 + 24px);
+    }
+
+    /* ── 6. Paneles del Folleto ───────────────────────────────── */
+    .panel {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        height: 100%;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(20px) saturate(1.1);
+        -webkit-backdrop-filter: blur(20px) saturate(1.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    }
+
+    .panel:hover {
+        border-color: var(--border-active);
+        box-shadow: var(--shadow-lg), var(--shadow-glow-cyan), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        transform: translateY(-4px);
+    }
+
+    /* Elementos comunes de panel */
+    .panel-tag {
+        align-self: flex-start;
+        font-family: var(--font-display);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--cyan-400);
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(129, 140, 248, 0.08));
+        padding: 6px 14px;
+        border-radius: 100px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(14, 165, 233, 0.15);
+    }
+
+    .panel-tag.accent {
+        color: var(--violet-400);
+        background: linear-gradient(135deg, rgba(129, 140, 248, 0.12), rgba(167, 139, 250, 0.08));
+        border-color: rgba(129, 140, 248, 0.15);
+    }
+
+    .panel-tag.orange {
+        color: var(--amber-400);
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08));
+        border-color: rgba(245, 158, 11, 0.15);
+    }
+
+    .panel-tag.red {
+        color: #fb7185;
+        background: linear-gradient(135deg, rgba(244, 63, 94, 0.12), rgba(251, 113, 133, 0.08));
+        border-color: rgba(244, 63, 94, 0.15);
+    }
+
+    .panel-headline {
+        font-family: var(--font-display);
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+    }
+
+    .panel-divider {
+        width: 48px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--cyan-500), var(--violet-500));
+        border-radius: 3px;
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .panel-divider::after {
+        content: '';
+        position: absolute;
+        right: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--violet-500);
+        box-shadow: 0 0 8px var(--violet-glow);
+    }
+
+    .panel-divider.accent {
+        background: linear-gradient(90deg, var(--violet-500), var(--cyan-500));
+    }
+
+    .panel-divider.orange {
+        background: linear-gradient(90deg, var(--amber-500), #f97316);
+    }
+
+    .panel-text {
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+    }
+
+    .panel-text.strong {
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 14.5px;
+    }
+
+    .panel-text.small {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    /* Mini features con iconos */
+    .mini-feature {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 20px;
+        align-items: flex-start;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-subtle);
+        transition: all 0.3s ease;
+    }
+
+    .mini-feature:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--border-medium);
+    }
+
+    .mini-icon-wrap {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .mini-icon-wrap::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        opacity: 0.15;
+    }
+
+    .icon-cyan::before {
+        background: var(--cyan-500);
+    }
+
+    .icon-violet::before {
+        background: var(--violet-500);
+    }
+
+    .icon-emerald::before {
+        background: var(--emerald-500);
+    }
+
+    .icon-amber::before {
+        background: var(--amber-500);
+    }
+
+    .mini-icon-wrap svg {
+        position: relative;
+        z-index: 1;
+    }
+
+    .mini-body h4 {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .mini-body p {
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-tertiary);
+    }
+
+    .panel-footer {
+        margin-top: auto;
+        width: 100%;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-tertiary);
+        border-top: 1px solid var(--border-subtle);
+        padding-top: 18px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CARA A — EXTERIOR (Portada, Contraportada, Solapa)
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Panel Portada (Derecho en cara A) */
+    .panel-cover {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(2, 6, 23, 0.9) 100%);
+        padding: 36px 32px;
+        justify-content: space-between;
+    }
+
+    .cover-glow-orb {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
+        filter: blur(60px);
+        top: -60px;
+        right: -60px;
+        border-radius: 50%;
+        animation: glow-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
+
+        0%,
+        100% {
+            opacity: 0.6;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+    }
+
+    .cover-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 18px;
+        color: var(--text-primary);
+        position: relative;
+        z-index: 2;
+    }
+
+    .cover-brand-symbol {
+        color: var(--cyan-400);
+        font-size: 22px;
+        text-shadow: 0 0 20px var(--cyan-glow);
+    }
+
+    .cover-visual {
+        width: 100%;
+        height: 220px;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        position: relative;
+        border: 1px solid var(--border-subtle);
+        margin: 24px 0;
+        z-index: 2;
+    }
+
+    .cover-visual::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 40%, rgba(2, 6, 23, 0.8) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .cover-visual img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.02);
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .panel-cover:hover .cover-visual img {
+        transform: scale(1.1);
+    }
+
+    .cover-body {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .cover-title {
+        font-family: var(--font-display);
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        color: var(--text-primary);
+    }
+
+    .cover-title .gradient {
+        background: linear-gradient(135deg, var(--cyan-400) 20%, var(--violet-400));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .cover-sub {
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+    }
+
+    .cover-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 4px;
+    }
+
+    .cover-badge {
+        font-size: 10px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-subtle);
+        padding: 5px 12px;
+        border-radius: 100px;
+        color: var(--text-tertiary);
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .cover-badge:hover {
+        background: rgba(14, 165, 233, 0.1);
+        border-color: rgba(14, 165, 233, 0.2);
+        color: var(--cyan-400);
+    }
+
+    /* Feature strip en portada */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 20px 0 12px;
+    }
+
+    .feature-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 16px 8px;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-cell::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--cyan-500), var(--violet-500));
+        opacity: 0;
+        transition: opacity 0.35s ease;
+    }
+
+    .feature-cell:hover {
+        background: rgba(14, 165, 233, 0.06);
+        border-color: rgba(14, 165, 233, 0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.1);
+    }
+
+    .feature-cell:hover::before {
+        opacity: 1;
+    }
+
+    .feature-cell .cell-icon {
+        font-size: 24px;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .feature-cell .cell-label {
+        font-size: 9.5px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--text-tertiary);
+    }
+
+    .feature-cell .cell-label strong {
+        color: var(--text-primary);
+        display: block;
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    .cover-premium {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 14px;
+        padding: 10px 18px;
+        border-radius: 100px;
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(129, 140, 248, 0.08));
+        border: 1px solid rgba(14, 165, 233, 0.18);
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--cyan-400);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cover-premium::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            left: -100%;
+        }
+
+        100% {
+            left: 100%;
+        }
+    }
+
+    /* Panel Contraportada (Centro en cara A) */
+    .panel-about {
+        padding: 28px;
+    }
+
+    .panel-flap {
+        padding: 28px;
+    }
+
+    .download-block {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        margin-top: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .download-block::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--cyan-500), var(--violet-500));
+        opacity: 0.5;
+    }
+
+    .qr-wrap {
+        width: 80px;
+        height: 80px;
+        background: rgba(8, 16, 36, 0.9);
+        border: 1px solid var(--border-active);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(14, 165, 233, 0.05);
+    }
+
+    .qr-scan {
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--cyan-400), transparent);
+        box-shadow: 0 0 12px var(--cyan-glow);
+        top: 5%;
+        animation: qr-scan 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes qr-scan {
+        0% {
+            top: 5%;
+            opacity: 1;
+        }
+
+        100% {
+            top: 92%;
+            opacity: 0.6;
+        }
+    }
+
+    .qr-corner {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-color: var(--cyan-400);
+        border-style: solid;
+        border-width: 0;
+    }
+
+    .qr-corner.tl {
+        top: 4px;
+        left: 4px;
+        border-top-width: 2px;
+        border-left-width: 2px;
+    }
+
+    .qr-corner.tr {
+        top: 4px;
+        right: 4px;
+        border-top-width: 2px;
+        border-right-width: 2px;
+    }
+
+    .qr-corner.bl {
+        bottom: 4px;
+        left: 4px;
+        border-bottom-width: 2px;
+        border-left-width: 2px;
+    }
+
+    .qr-corner.br {
+        bottom: 4px;
+        right: 4px;
+        border-bottom-width: 2px;
+        border-right-width: 2px;
+    }
+
+    .qr-wrap svg {
+        position: relative;
+        z-index: 1;
+    }
+
+    .download-info h4 {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .download-info p {
+        font-size: 11.5px;
+        color: var(--text-tertiary);
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+
+    .store-pills {
+        display: flex;
+        gap: 8px;
+    }
+
+    .store-pill {
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 5px 10px;
+        border-radius: 8px;
+        color: var(--text-primary);
+        border: 1px solid var(--border-subtle);
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+    }
+
+    .store-pill:hover {
+        background: rgba(14, 165, 233, 0.15);
+        border-color: rgba(14, 165, 233, 0.3);
+        color: var(--cyan-400);
+    }
+
+    .contact-block {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 11.5px;
+        color: var(--text-tertiary);
+        border-top: 1px solid var(--border-subtle);
+        padding-top: 16px;
+    }
+
+    .contact-block span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CARA B — INTERIOR (Detalles completos)
+       ═══════════════════════════════════════════════════════════════ */
+
+    .section-label {
+        font-family: var(--font-display);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    .text-cyan {
+        color: var(--cyan-400);
+    }
+
+    .text-violet {
+        color: var(--violet-400);
+    }
+
+    .text-amber {
+        color: var(--amber-400);
+    }
+
+    .inside-title {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+        line-height: 1.25;
+    }
+
+    .inside-title.center {
+        text-align: center;
+    }
+
+    .inside-divider {
+        width: 40px;
+        height: 3px;
+        border-radius: 3px;
+        margin-bottom: 28px;
+    }
+
+    .inside-divider.cyan {
+        background: linear-gradient(90deg, var(--cyan-500), var(--cyan-400));
+    }
+
+    .inside-divider.violet {
+        background: linear-gradient(90deg, var(--violet-500), var(--violet-400));
+    }
+
+    .inside-divider.amber {
+        background: linear-gradient(90deg, var(--amber-500), var(--amber-400));
+    }
+
+    .inside-divider.center {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Feature boxes premium */
+    .feature-card {
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 0;
+        transition: height 0.4s ease;
+    }
+
+    .feature-card:hover {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: var(--border-medium);
+        transform: translateX(4px);
+    }
+
+    .feature-card:hover::before {
+        height: 100%;
+    }
+
+    .feature-card.cyan::before {
+        background: linear-gradient(180deg, var(--cyan-500), transparent);
+    }
+
+    .feature-card.violet::before {
+        background: linear-gradient(180deg, var(--violet-500), transparent);
+    }
+
+    .feature-card.emerald::before {
+        background: linear-gradient(180deg, var(--emerald-500), transparent);
+    }
+
+    .feature-card.amber::before {
+        background: linear-gradient(180deg, var(--amber-500), transparent);
+    }
+
+    .feature-card-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .feature-icon-box {
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .feature-icon-box::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        opacity: 0.12;
+    }
+
+    .bg-cyan::before {
+        background: var(--cyan-500);
+    }
+
+    .bg-violet::before {
+        background: var(--violet-500);
+    }
+
+    .bg-emerald::before {
+        background: var(--emerald-500);
+    }
+
+    .bg-amber::before {
+        background: var(--amber-500);
+    }
+
+    .feature-icon-box svg {
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-card-header h4 {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .feature-sub {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        letter-spacing: 0.3px;
+    }
+
+    .feature-card p {
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: var(--text-secondary);
+    }
+
+    /* Tag clouds */
+    .tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .tag-cloud span {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 8px;
+        line-height: 1.4;
+        letter-spacing: 0.2px;
+    }
+
+    .tag-cyan {
+        color: var(--cyan-400);
+        background: rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(14, 165, 233, 0.15);
+    }
+
+    .tag-violet {
+        color: var(--violet-400);
+        background: rgba(129, 140, 248, 0.1);
+        border: 1px solid rgba(129, 140, 248, 0.15);
+    }
+
+    .tag-amber {
+        color: var(--amber-400);
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.15);
+    }
+
+    .tag-emerald {
+        color: var(--emerald-400);
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    /* Panel Centro — Mockup */
+    .panel-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .mockup-stage {
+        width: 100%;
+        height: 260px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .mockup-img {
+        height: 100%;
+        max-width: 90%;
+        object-fit: contain;
+        z-index: 2;
+        filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .panel-center:hover .mockup-img {
+        transform: translateY(-10px) scale(1.04);
+    }
+
+    .mockup-glow {
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        background: radial-gradient(circle, var(--violet-500) 0%, transparent 70%);
+        filter: blur(30px);
+        z-index: 1;
+        opacity: 0.4;
+        animation: mockup-breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes mockup-breathe {
+
+        0%,
+        100% {
+            opacity: 0.3;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(1.15);
+        }
+    }
+
+    /* SOS Banner */
+    .sos-block {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(244, 63, 94, 0.04));
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        padding: 16px 18px;
+        border-radius: var(--radius-lg);
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sos-block::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ef4444, transparent);
+        opacity: 0.5;
+    }
+
+    .sos-icon {
+        font-size: 24px;
+        animation: sos-flash 1.2s ease-in-out infinite alternate;
+        filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4));
+    }
+
+    @keyframes sos-flash {
+        0% {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+    }
+
+    .sos-body h4 {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        color: #f87171;
+        margin-bottom: 4px;
+    }
+
+    .sos-body p {
+        font-size: 11.5px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+    }
+
+    .sos-badge {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 9px;
+        font-weight: 800;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        padding: 3px 10px;
+        border-radius: 6px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    /* Clinic cards */
+    .clinic-list {
+        margin-top: 16px;
+        width: 100%;
+    }
+
+    .list-header {
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        margin-bottom: 12px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .clinic-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .clinic-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .clinic-item:hover {
+        border-color: rgba(14, 165, 233, 0.2);
+        background: rgba(14, 165, 233, 0.04);
+        transform: translateX(3px);
+    }
+
+    .clinic-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .clinic-name {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+    }
+
+    .clinic-meta {
+        font-size: 10.5px;
+        color: var(--text-tertiary);
+    }
+
+    .clinic-meta .open {
+        color: var(--emerald-400);
+        font-weight: 600;
+    }
+
+    /* Reminder strip */
+    .reminder-bar {
+        display: flex;
+        gap: 12px;
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.05), rgba(16, 185, 129, 0.03));
+        border: 1px solid rgba(52, 211, 153, 0.12);
+        padding: 14px 16px;
+        border-radius: var(--radius-md);
+        margin-top: auto;
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: var(--text-secondary);
+    }
+
+    .reminder-bar strong {
+        color: var(--emerald-400);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       COMPONENTES ADICIONALES PREMIUM
+       ═══════════════════════════════════════════════════════════════ */
+
+    /* Vision box */
+    .vision-block {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: linear-gradient(135deg, rgba(129, 140, 248, 0.06), rgba(167, 139, 250, 0.03));
+        border: 1px solid rgba(129, 140, 248, 0.12);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        margin-bottom: 14px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .vision-block::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--violet-500), transparent);
+    }
+
+    .vision-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+        filter: drop-shadow(0 2px 4px rgba(129, 140, 248, 0.3));
+    }
+
+    .vision-body h4 {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--violet-400);
+        margin-bottom: 4px;
+    }
+
+    .vision-body p {
+        font-size: 11.5px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+    }
+
+    /* Values grid */
+    .values-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .value-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 14px 6px;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-tertiary);
+        transition: all 0.3s ease;
+    }
+
+    .value-cell:hover {
+        background: rgba(129, 140, 248, 0.06);
+        border-color: rgba(129, 140, 248, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .value-cell .val-icon {
+        font-size: 20px;
+    }
+
+    /* Timeline */
+    .timeline {
+        margin: 12px 0 14px;
+        padding: 16px 18px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+    }
+
+    .timeline h4 {
+        font-family: var(--font-display);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--violet-400);
+        margin-bottom: 16px;
+        letter-spacing: 0.5px;
+    }
+
+    .timeline-node {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 14px;
+        position: relative;
+    }
+
+    .timeline-node:last-child {
+        margin-bottom: 0;
+    }
+
+    .timeline-node:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 18px;
+        bottom: -14px;
+        width: 1px;
+        background: linear-gradient(180deg, var(--violet-500), transparent);
+        opacity: 0.3;
+    }
+
+    .t-marker {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--violet-500);
+        flex-shrink: 0;
+        margin-top: 3px;
+        box-shadow: 0 0 10px var(--violet-glow);
+        position: relative;
+        z-index: 2;
+    }
+
+    .t-marker.active {
+        background: var(--cyan-500);
+        box-shadow: 0 0 10px var(--cyan-glow);
+    }
+
+    .t-marker.active::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 1px solid var(--cyan-500);
+        opacity: 0.4;
+        animation: marker-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes marker-pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+            opacity: 0.4;
+        }
+
+        50% {
+            transform: scale(1.3);
+            opacity: 0;
+        }
+    }
+
+    .t-data .t-year {
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--violet-400);
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+    }
+
+    .t-data p {
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: var(--text-secondary);
+    }
+
+    .t-data p strong {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 12px 0;
+    }
+
+    .stat-cell {
+        text-align: center;
+        padding: 14px 8px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        transition: all 0.3s ease;
+    }
+
+    .stat-cell:hover {
+        background: rgba(14, 165, 233, 0.05);
+        border-color: rgba(14, 165, 233, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .stat-value {
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--cyan-400), var(--violet-400));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Social bar */
+    .social-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin: 12px 0;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        font-size: 11px;
+    }
+
+    .social-label {
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .social-chip {
+        background: rgba(14, 165, 233, 0.08);
+        border: 1px solid rgba(14, 165, 233, 0.12);
+        padding: 4px 10px;
+        border-radius: 8px;
+        color: var(--cyan-400);
+        font-weight: 600;
+        font-size: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .social-chip:hover {
+        background: rgba(14, 165, 233, 0.15);
+        transform: translateY(-1px);
+    }
+
+    /* Mission tag */
+    .mission-block {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 16px 0 0;
+        padding: 14px 16px;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(129, 140, 248, 0.03));
+        border: 1px solid rgba(14, 165, 233, 0.1);
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: var(--text-secondary);
+    }
+
+    .mission-block strong {
+        color: var(--cyan-400);
+    }
+
+    /* Creators section */
+    .creators-block {
+        margin: 20px 0;
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.01);
+    }
+
+    .creators-block h4 {
+        font-family: var(--font-display);
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--violet-400);
+        margin-bottom: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .creators-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .creator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 10px;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .creator::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        transition: width 0.4s ease;
+        opacity: 0.08;
+    }
+
+    .creator:hover::before {
+        width: 100%;
+    }
+
+    .creator:hover {
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .creator-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        position: relative;
+        z-index: 1;
+    }
+
+    .creator-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .creator-name {
+        font-family: var(--font-display);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+    .creator-role {
+        font-size: 9px;
+        color: var(--text-tertiary);
+        font-weight: 500;
+        line-height: 1.2;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+
+    /* Creator variants */
+    .creator.lead {
+        border-color: rgba(14, 165, 233, 0.3);
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(129, 140, 248, 0.02) 100%);
+        box-shadow: 0 4px 16px rgba(14, 165, 233, 0.06);
+    }
+
+    .creator.lead::before {
+        background: linear-gradient(90deg, var(--cyan-500), var(--violet-500));
+    }
+
+    .creator.lead .creator-avatar {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(14, 165, 233, 0.12));
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .creator:nth-child(2):hover {
+        border-color: rgba(167, 139, 250, 0.4);
+        box-shadow: 0 6px 20px rgba(167, 139, 250, 0.1);
+    }
+
+    .creator:nth-child(2)::before {
+        background: var(--violet-500);
+    }
+
+    .creator:nth-child(3):hover {
+        border-color: rgba(236, 72, 153, 0.4);
+        box-shadow: 0 6px 20px rgba(236, 72, 153, 0.1);
+    }
+
+    .creator:nth-child(3)::before {
+        background: #ec4899;
+    }
+
+    .creator:nth-child(4):hover {
+        border-color: rgba(52, 211, 153, 0.4);
+        box-shadow: 0 6px 20px rgba(52, 211, 153, 0.1);
+    }
+
+    .creator:nth-child(4)::before {
+        background: var(--emerald-500);
+    }
+
+    /* Pricing */
+    .pricing-block {
+        margin-top: 16px;
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+    }
+
+    .pricing-block h4 {
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 14px;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+
+    .price-row {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .price-card {
+        flex: 1;
+        text-align: center;
+        padding: 14px 8px;
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        transition: all 0.3s ease;
+    }
+
+    .price-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .price-card.popular {
+        border-color: rgba(14, 165, 233, 0.25);
+        background: linear-gradient(180deg, rgba(14, 165, 233, 0.06), rgba(129, 140, 248, 0.03));
+        position: relative;
+        overflow: hidden;
+    }
+
+    .price-card.popular::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--cyan-500), var(--violet-500));
+    }
+
+    .price-card .plan-title {
+        font-family: var(--font-display);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    .price-card.popular .plan-title {
+        color: var(--cyan-400);
+    }
+
+    .price-card p {
+        font-size: 9.5px;
+        color: var(--text-tertiary);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Community */
+    .community-block {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: linear-gradient(135deg, rgba(129, 92, 234, 0.04), rgba(167, 139, 250, 0.02));
+        border: 1px solid rgba(129, 92, 234, 0.1);
+        border-radius: var(--radius-lg);
+    }
+
+    .community-block .com-icon {
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .community-block h4 {
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--violet-400);
+        margin-bottom: 4px;
+    }
+
+    .community-block p {
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: var(--text-secondary);
+    }
+
+    /* Red badge */
+    .badge-red {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 9px;
+        font-weight: 800;
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        padding: 3px 10px;
+        border-radius: 6px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FOOTER DE PÁGINA
+       ═══════════════════════════════════════════════════════════════ */
+    .site-footer {
+        width: 100%;
+        max-width: 900px;
+        text-align: center;
+        padding: 32px 24px;
+        font-size: 12px;
+        color: var(--text-tertiary);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border-top: 1px solid var(--border-subtle);
+        margin-top: auto;
+        z-index: 10;
+    }
+
+    .site-footer p {
+        line-height: 1.7;
+    }
+
+    .site-footer strong {
+        color: var(--text-secondary);
+    }
+
+    .footer-links {
+        font-size: 11px;
+        color: var(--text-tertiary);
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .footer-links span {
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .footer-links span:hover {
+        color: var(--cyan-400);
+    }
+
+    .copyright {
+        font-size: 10.5px;
+        opacity: 0.6;
+        margin-top: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+        .scene {
+            transform: scale(0.85);
+        }
+    }
+
+    @media (max-width: 900px) {
+        .scene {
+            transform: scale(0.7);
+        }
+
+        .control-bar {
+            padding: 16px 20px;
+        }
+
+        .btn span {
+            display: none;
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       HOJA DE ESTILOS DE IMPRESIÓN PROFESIONAL
+       ═══════════════════════════════════════════════════════════════ */
+    @media print {
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        html,
+        body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-size: 11pt !important;
+            width: 297mm !important;
+            height: 210mm !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .aurora-bg,
+        .dot-grid,
+        .control-bar,
+        .face-badge,
+        .site-footer,
+        #btn-flip,
+        #btn-print,
+        .fold-line {
+            display: none !important;
+        }
+
+        .stage {
+            padding: 0 !important;
+            margin: 0 !important;
+            display: block !important;
+            perspective: none !important;
+            width: 297mm !important;
+            height: 420mm !important;
+        }
+
+        .scene {
+            width: 297mm !important;
+            height: 420mm !important;
+            transform-style: flat !important;
+        }
+
+        .brochure {
+            transform: none !important;
+            transition: none !important;
+            transform-style: flat !important;
+            width: 297mm !important;
+            height: 420mm !important;
+            display: block !important;
+        }
+
+        .face {
+            position: relative !important;
+            width: 297mm !important;
+            height: 210mm !important;
+            page-break-after: always !important;
+            break-after: page !important;
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 0 !important;
+            border: none !important;
+        }
+
+        .face-back {
+            transform: none !important;
+            top: 0 !important;
+        }
+
+        .panel {
+            background: #ffffff !important;
+            border: none !important;
+            border-right: 1px dashed #d1d5db !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            padding: 10mm 8mm !important;
+            height: 210mm !important;
+            color: #0f172a !important;
+            overflow: visible !important;
+        }
+
+        .panel:nth-child(3) {
+            border-right: none !important;
+        }
+
+        .panel-headline,
+        .inside-title,
+        .mini-body h4,
+        .feature-card-header h4,
+        .cover-title,
+        .panel-text.strong {
+            color: #0f172a !important;
+        }
+
+        .panel-text,
+        .panel-text.small,
+        .mini-body p,
+        .feature-card p,
+        .download-info p,
+        .contact-block,
+        .reminder-bar,
+        .cover-sub,
+        .feature-sub {
+            color: #475569 !important;
+        }
+
+        .feature-card,
+        .download-block {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .panel-tag {
+            color: #0369a1 !important;
+            background: #f0f9ff !important;
+            border: 1px solid #bae6fd !important;
+        }
+
+        .panel-tag.accent {
+            color: #4338ca !important;
+            background: #eef2ff !important;
+            border: 1px solid #c7d2fe !important;
+        }
+
+        .panel-tag.orange {
+            color: #b45309 !important;
+            background: #fffbeb !important;
+            border: 1px solid #fde68a !important;
+        }
+
+        .cover-visual,
+        .mockup-stage {
+            border: 1px solid #e2e8f0 !important;
+            background: #f1f5f9 !important;
+            height: 160px !important;
+            margin: 12px 0 !important;
+        }
+
+        .cover-visual img,
+        .mockup-img {
+            object-fit: contain !important;
+            max-width: 100% !important;
+            height: 100% !important;
+        }
+
+        .cover-visual::before,
+        .mockup-glow {
+            display: none !important;
+        }
+
+        .cover-title {
+            font-size: 20pt !important;
+        }
+
+        .cover-title .gradient,
+        .stat-value {
+            background: none !important;
+            color: #0284c7 !important;
+            -webkit-text-fill-color: initial !important;
+        }
+
+        .sos-block {
+            background: #fef2f2 !important;
+            border: 1px solid #fecaca !important;
+        }
+
+        .sos-body h4 {
+            color: #dc2626 !important;
+        }
+
+        .reminder-bar {
+            background: #f0fdf4 !important;
+            border: 1px solid #bbf7d0 !important;
+        }
+
+        .reminder-bar strong {
+            color: #059669 !important;
+        }
+
+        .qr-wrap {
+            background: #0f172a !important;
+        }
+
+        .qr-svg {
+            fill: #ffffff !important;
+        }
+
+        .store-pill {
+            background: #0f172a !important;
+            color: #ffffff !important;
+        }
+    }
+</style>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         FONDO AURORA PREMIUM
+         ═══════════════════════════════════════════════════════════════ -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+        <div class="aurora-blob blob-4"></div>
+    </div>
+    <div class="dot-grid"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         BARRA DE CONTROL SUPERIOR
+         ═══════════════════════════════════════════════════════════════ -->
+    <header class="control-bar">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+                    <path fill="#ffffff"
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-title">ClinicaApp</span>
+                <span class="brand-sub">Tríptico Oficial · 2026</span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button id="btn-flip" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6" />
+                    <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+                <span>Voltear Tríptico</span>
+            </button>
+            <button id="btn-print" class="btn btn-secondary" onclick="window.print()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9" />
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                    <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                <span>Imprimir</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Indicador de cara activa -->
+    <div class="face-badge">
+        <span class="dot" id="face-dot"></span>
+        Visualizando: <span class="label" id="face-label">Cara A — Exterior</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ESCENARIO 3D DEL TRÍPTICO
+         ═══════════════════════════════════════════════════════════════ -->
+    <main class="stage">
+        <div class="scene">
+            <div class="brochure" id="brochure">
+
+                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                     CARA A: EXTERIOR
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+                <div class="face face-front">
+                    <div class="fold-line fold-1"></div>
+                    <div class="fold-line fold-2"></div>
+
+                    <!-- ▓▓▓ PANEL IZQUIERDO: Solapa Interna ▓▓▓ -->
+                    <section class="panel panel-flap">
+                        <div class="panel-tag">Innovación y Cuidado</div>
+                        <h2 class="panel-headline">Salud Inteligente en tu Bolsillo</h2>
+                        <div class="panel-divider"></div>
+                        <p class="panel-text">
+                            ClinicaApp redefine el cuidado de tus mascotas combinando medicina veterinaria avanzada con
+                            Inteligencia Artificial. No más esperas ni pérdidas de documentos: todo el historial, citas
+                            y asesoramiento en una sola plataforma unificada y segura.
+                        </p>
+
+                        <div class="creators-block">
+                            <h4>💻 Creadores y Fundadores</h4>
+                            <div class="creators-row">
+                                <div class="creator lead">
+                                    <div class="creator-avatar">👑</div>
+                                    <div class="creator-info">
+                                        <span class="creator-name">Luis Cárdenas</span>
+                                        <span class="creator-role">Lead Full Stack Developer</span>
+                                    </div>
+                                </div>
+                                <div class="creator">
+                                    <div class="creator-avatar">🎨</div>
+                                    <div class="creator-info">
+                                        <span class="creator-name">María Salas</span>
+                                        <span class="creator-role">UI/UX Designer & Co-Founder</span>
+                                    </div>
+                                </div>
+                                <div class="creator">
+                                    <div class="creator-avatar">🧠</div>
+                                    <div class="creator-info">
+                                        <span class="creator-name">Cristóbal Villamil</span>
+                                        <span class="creator-role">AI Engineer & Backend</span>
+                                    </div>
+                                </div>
+                                <div class="creator">
+                                    <div class="creator-avatar">🛡️</div>
+                                    <div class="creator-info">
+                                        <span class="creator-name">Dianel Gutiérrez</span>
+                                        <span class="creator-role">QA & Product Manager</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mission-block">
+                            <span>🎯</span>
+                            <span><strong>Misión:</strong> Cuidar a cada mascota como si fuera la única, con prevención,
+                                tecnología y corazón.</span>
+                        </div>
+
+                        <div class="panel-footer">
+                            Sencillo · Rápido · Preventivo · Confiable
+                        </div>
+                    </section>
+
+                    <!-- ▓▓▓ PANEL CENTRAL: Contraportada ▓▓▓ -->
+                    <section class="panel panel-about">
+                        <div class="panel-tag accent">Nosotros</div>
+                        <h2 class="panel-headline">Trayectoria y Visión</h2>
+                        <div class="panel-divider accent"></div>
+
+                        <div class="vision-block">
+                            <div class="vision-icon">💡</div>
+                            <div class="vision-body">
+                                <h4>Nuestra Visión</h4>
+                                <p>Convertir a ClinicaApp en el ecosistema veterinario digital más completo y cercano de
+                                    Latinoamérica, donde cada familia encuentre la salud y el bienestar de sus mascotas
+                                    en un solo lugar.</p>
+                            </div>
+                        </div>
+
+                        <div class="values-row">
+                            <div class="value-cell">
+                                <div class="val-icon">🤝</div>
+                                <span>Cercanía</span>
+                            </div>
+                            <div class="value-cell">
+                                <div class="val-icon">🧬</div>
+                                <span>Innovación</span>
+                            </div>
+                            <div class="value-cell">
+                                <div class="val-icon">🛡️</div>
+                                <span>Confianza</span>
+                            </div>
+                            <div class="value-cell">
+                                <div class="val-icon">🌱</div>
+                                <span>Prevención</span>
+                            </div>
+                        </div>
+
+                        <div class="timeline">
+                            <h4>📌 Nuestra Historia</h4>
+                            <div class="timeline-node">
+                                <span class="t-marker"></span>
+                                <div class="t-data">
+                                    <div class="t-year">2023</div>
+                                    <p>Lanzamiento de la versión beta con Nova AI, atendiendo a las primeras 500
+                                        mascotas.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-node">
+                                <span class="t-marker"></span>
+                                <div class="t-data">
+                                    <div class="t-year">2024</div>
+                                    <p>Expansión a red de clínicas aliadas y lanzamiento de la Tienda Premium (Pet
+                                        Shop).</p>
+                                </div>
+                            </div>
+                            <div class="timeline-node">
+                                <span class="t-marker"></span>
+                                <div class="t-data">
+                                    <div class="t-year">2025</div>
+                                    <p>Lanzamiento oficial con más de <strong>50,000 usuarios activos</strong> y +200
+                                        clínicas asociadas.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-node">
+                                <span class="t-marker active"></span>
+                                <div class="t-data">
+                                    <div class="t-year">2026</div>
+                                    <p>Nuevas funcionalidades: historial genético inteligente, comunidad de tutores y
+                                        programa de lealtad.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descarga y QR -->
+                        <div class="download-block">
+                            <div class="qr-wrap">
+                                <div class="qr-scan"></div>
+                                <div class="qr-corner tl"></div>
+                                <div class="qr-corner tr"></div>
+                                <div class="qr-corner bl"></div>
+                                <div class="qr-corner br"></div>
+                                <svg viewBox="0 0 100 100" class="qr-svg" width="58" height="58">
+                                    <rect x="10" y="10" width="22" height="22" fill="#ffffff" rx="2" />
+                                    <rect x="14" y="14" width="14" height="14" fill="#0EA5E9" rx="1" />
+                                    <rect x="68" y="10" width="22" height="22" fill="#ffffff" rx="2" />
+                                    <rect x="72" y="14" width="14" height="14" fill="#0EA5E9" rx="1" />
+                                    <rect x="10" y="68" width="22" height="22" fill="#ffffff" rx="2" />
+                                    <rect x="14" y="72" width="14" height="14" fill="#0EA5E9" rx="1" />
+                                    <rect x="40" y="40" width="20" height="20" fill="#ffffff" rx="2" />
+                                    <path
+                                        d="M46 10h8v8h-8zm0 26h8v8h-8zm26 26h8v8h-8zm-12 12h8v8h-8zm12 0h8v8h-8zM10 42h8v8h-8zm0 14h8v8h-8zm28 14h8v8h-8z"
+                                        fill="#818CF8" />
+                                </svg>
+                            </div>
+                            <div class="download-info">
+                                <h4>¡Escanea y Descarga!</h4>
+                                <p>Disponible en iOS y Android.<br>Versión gratuita y Premium.</p>
+                                <div class="store-pills">
+                                    <span class="store-pill">App Store</span>
+                                    <span class="store-pill">Google Play</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-cell">
+                                <div class="stat-value">50K+</div>
+                                <div class="stat-label">Usuarios</div>
+                            </div>
+                            <div class="stat-cell">
+                                <div class="stat-value">200+</div>
+                                <div class="stat-label">Clínicas</div>
+                            </div>
+                            <div class="stat-cell">
+                                <div class="stat-value">4.8★</div>
+                                <div class="stat-label">Rating</div>
+                            </div>
+                            <div class="stat-cell">
+                                <div class="stat-value">24/7</div>
+                                <div class="stat-label">Soporte AI</div>
+                            </div>
+                        </div>
+
+                        <div class="social-row">
+                            <span class="social-label">🌏 Síguenos:</span>
+                            <span class="social-chip">📸 @clinicaapp_oficial</span>
+                            <span class="social-chip">🐦 @clinicaapp</span>
+                            <span class="social-chip">▶️ ClinicaAppTV</span>
+                        </div>
+
+                        <div class="contact-block">
+                            <span>🌐 www.clinicaapp.com</span>
+                            <span>📋 ID: ClinicaApp Oficial</span>
+                            <span>✉️ soporte@clinicaapp.com</span>
+                        </div>
+                    </section>
+
+                    <!-- ▓▓▓ PANEL DERECHO: Portada ▓▓▓ -->
+                    <section class="panel panel-cover">
+                        <div class="cover-glow-orb"></div>
+                        <div class="cover-brand">
+                            <span class="cover-brand-symbol">✦</span>
+                            <span>ClinicaApp</span>
+                        </div>
+
+                        <div class="cover-visual">
+                            <img src="assets/brochure_cover.png" alt="ClinicaApp Portada" class="cover-image">
+                        </div>
+
+                        <div class="cover-body">
+                            <h1 class="cover-title">Tu Mascota,<br><span class="gradient">En Las Mejores Manos</span>
+                            </h1>
+                            <p class="cover-sub">La primera plataforma de salud veterinaria de alta gama impulsada
+                                por Inteligencia Artificial y cuidado preventivo integral.</p>
+
+                            <div class="cover-badges">
+                                <span class="cover-badge">Clínicas</span>
+                                <span class="cover-badge">Nova AI</span>
+                                <span class="cover-badge">Tienda</span>
+                                <span class="cover-badge">SOS</span>
+                            </div>
+                        </div>
+
+                        <div class="feature-grid">
+                            <div class="feature-cell">
+                                <span class="cell-icon">🧠</span>
+                                <span class="cell-label"><strong>AI Nova</strong><br>Diagnóstico Predictivo</span>
+                            </div>
+                            <div class="feature-cell">
+                                <span class="cell-icon">📄</span>
+                                <span class="cell-label"><strong>Historial</strong><br>Expediente Digital</span>
+                            </div>
+                            <div class="feature-cell">
+                                <span class="cell-icon">📅</span>
+                                <span class="cell-label"><strong>Citas</strong><br>Presenciales & Online</span>
+                            </div>
+                            <div class="feature-cell">
+                                <span class="cell-icon">🚨</span>
+                                <span class="cell-label"><strong>SOS</strong><br>Emergencias 24h</span>
+                            </div>
+                        </div>
+
+                        <div class="cover-premium">
+                            <span>⭐</span>
+                            <span>Proceso de Fabricación y Desarrollo de Alta Tecnología</span>
+                        </div>
+                    </section>
+
+                </div>
+
+                <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                     CARA B: INTERIOR
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+                <div class="face face-back">
+                    <div class="fold-line fold-1"></div>
+                    <div class="fold-line fold-2"></div>
+
+                    <!-- ▓▓▓ PANEL IZQUIERDO: Nova AI e Historial ▓▓▓ -->
+                    <section class="panel panel-inside-left">
+                        <div class="section-label text-cyan">Inteligencia Preventiva</div>
+                        <h2 class="inside-title">Nova AI & Ficha Médica</h2>
+                        <div class="inside-divider cyan"></div>
+
+                        <div class="feature-card cyan">
+                            <div class="feature-card-header">
+                                <div class="feature-icon-box bg-cyan">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0EA5E9"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path
+                                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Nova AI Assistant</h4>
+                                    <span class="feature-sub">Salud Predictiva 24/7</span>
+                                </div>
+                            </div>
+                            <p>Interactúa con nuestro bot de IA Nova AI para evaluar síntomas inusuales en segundos.
+                                Recibe consejos valiosos de nutrición, primeros auxilios y sugerencias médicas
+                                personalizadas según la raza y edad de tu mascota.</p>
+                            <div class="tag-cloud">
+                                <span class="tag-cyan">💬 Chatbot Veterinario</span>
+                                <span class="tag-cyan">🧬 Análisis de Síntomas</span>
+                                <span class="tag-cyan">🥗 Plan Nutricional</span>
+                                <span class="tag-cyan">📊 Predicción de Salud</span>
+                            </div>
+                        </div>
+
+                        <div class="feature-card violet">
+                            <div class="feature-card-header">
+                                <div class="feature-icon-box bg-violet">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#A78BFA"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="16" y1="13" x2="8" y2="13" />
+                                        <line x1="16" y1="17" x2="8" y2="17" />
+                                        <polyline points="10 9 9 9 8 9" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Expediente Clínico Digital</h4>
+                                    <span class="feature-sub">Historial Unificado Completo</span>
+                                </div>
+                            </div>
+                            <p>Registra alergias, peso, patologías anteriores y vacunas en fichas interactivas hermosas.
+                                Exporta el historial clínico completo con un clic para presentarlo a cualquier
+                                veterinario externo al instante.</p>
+                            <div class="tag-cloud">
+                                <span class="tag-violet">💉 Vacunas</span>
+                                <span class="tag-violet">🧪 Análisis</span>
+                                <span class="tag-violet">⚕️ Cirugías</span>
+                                <span class="tag-violet">🌿 Alergias</span>
+                            </div>
+                        </div>
+
+                        <div class="feature-card emerald">
+                            <div class="feature-card-header">
+                                <div class="feature-icon-box bg-emerald">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#34D399"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M9 12l2 2 4-4" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Alerta de Enfermedades</h4>
+                                    <span class="feature-sub">Prevención Total</span>
+                                </div>
+                            </div>
+                            <p>Nova IA revisa tu historia médica y detecta tendencias de peso, signos tempranos de
+                                enfermedades comunes y te notifica antes de que se conviertan en algo grave. Una alerta
+                                a tiempo puede marcar la diferencia.</p>
+                        </div>
+                    </section>
+
+                    <!-- ▓▓▓ PANEL CENTRAL: Mockup App y SOS ▓▓▓ -->
+                    <section class="panel panel-center">
+                        <div class="section-label text-violet">Seguridad Inmediata</div>
+                        <h2 class="inside-title center">Explorador & SOS</h2>
+                        <div class="inside-divider violet center"></div>
+
+                        <div class="mockup-stage">
+                            <img src="assets/brochure_mockup.png" alt="ClinicaApp Mockup" class="mockup-img">
+                            <div class="mockup-glow"></div>
+                        </div>
+
+                        <div class="sos-block">
+                            <div class="sos-icon">🚨</div>
+                            <div class="sos-body">
+                                <h4>Botón SOS de Emergencia</h4>
+                                <p>Pulsa el SOS para conectar al instante con las clínicas de urgencia abiertas más
+                                    cercanas y alertar al personal médico enviando la ficha de tu mascota
+                                    automáticamente.</p>
+                                <span class="sos-badge">Activo 24 Horas</span>
+                            </div>
+                        </div>
+
+                        <div class="clinic-list">
+                            <div class="list-header">🏥 Clínicas Aliadas Premium</div>
+                            <div class="clinic-item">
+                                <div class="clinic-icon">🩺</div>
+                                <div>
+                                    <div class="clinic-name">Clínica VetAlta</div>
+                                    <div class="clinic-meta">⭐ 4.9★ &nbsp;•&nbsp; <span class="open">🟢 Abierta</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clinic-item">
+                                <div class="clinic-icon">🌡️</div>
+                                <div>
+                                    <div class="clinic-name">Centro Veterinario Nova</div>
+                                    <div class="clinic-meta">⭐ 4.8★ &nbsp;•&nbsp; <span class="open">🟢 Abierta</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clinic-item">
+                                <div class="clinic-icon">🩻</div>
+                                <div>
+                                    <div class="clinic-name">PetCare 24h</div>
+                                    <div class="clinic-meta">⭐ 4.7★ &nbsp;•&nbsp; <span class="open">🟢 Abierta</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ▓▓▓ PANEL DERECHO: Citas, Shop y Comunidad ▓▓▓ -->
+                    <section class="panel panel-inside-right">
+                        <div class="section-label text-amber">Servicios Integrales</div>
+                        <h2 class="inside-title">Citas, Alertas & Shop</h2>
+                        <div class="inside-divider amber"></div>
+
+                        <div class="feature-card amber">
+                            <div class="feature-card-header">
+                                <div class="feature-icon-box bg-amber">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FBBF24"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Gestión Inteligente de Citas</h4>
+                                    <span class="feature-sub">Videollamada & Presencial</span>
+                                </div>
+                            </div>
+                            <p>Encuentra consultorios médicos premium, califica especialistas y agenda turnos con
+                                facilidad. Elige entre consultas presenciales rápidas o videollamadas con veterinarios
+                                expertos desde la app.</p>
+                            <div class="tag-cloud">
+                                <span class="tag-amber">📅 Agenda Online</span>
+                                <span class="tag-amber">📼 Videoconsulta IA</span>
+                                <span class="tag-amber">⭐ Califica Doctores</span>
+                                <span class="tag-amber">🔔 Recordatorios</span>
+                            </div>
+                        </div>
+
+                        <div class="feature-card emerald">
+                            <div class="feature-card-header">
+                                <div class="feature-icon-box bg-emerald">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#34D369"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                                        <line x1="3" y1="6" x2="21" y2="6" />
+                                        <path d="M16 10a4 4 0 0 1-8 0" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Tienda Premium Integrada</h4>
+                                    <span class="feature-sub">Pet Shop Express</span>
+                                </div>
+                            </div>
+                            <p>Adquiere alimentos especializados recetados por la IA o tu veterinario, medicamentos
+                                certificados, vacunas, juguetes interactivos, collares inteligentes y más. Todo con
+                                entregas express a domicilio y descuentos exclusivos para usuarios ClinicaApp.</p>
+                            <div class="tag-cloud">
+                                <span class="tag-emerald">🍖 Alimentos Premium</span>
+                                <span class="tag-emerald">💊 Medicamentos</span>
+                                <span class="tag-emerald">🎾 Juguetes</span>
+                                <span class="tag-emerald">🏷️ Suscripción VIP</span>
+                            </div>
+                        </div>
+
+                        <div class="pricing-block">
+                            <h4>💎 Plan ClinicaApp</h4>
+                            <div class="price-row">
+                                <div class="price-card">
+                                    <div class="plan-title">Gratis</div>
+                                    <p>Citas básicas · Nova IA limitada · 1 mascota</p>
+                                </div>
+                                <div class="price-card popular">
+                                    <div class="plan-title">👑 Premium</div>
+                                    <p>$9.99/mes · Citas ilimitadas · Shop +SOS · Multi-mascota</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reminder-bar">
+                            <span>🔔</span>
+                            <span><strong>Notificaciones Inteligentes:</strong> Recordatorios
+                                automáticos de vacunas, desparasitación, revisiones médicas y horas exactas de
+                                administración de medicamentos. ¡No te olvides de nada nunca!</span>
+                        </div>
+
+                        <div class="community-block">
+                            <div class="com-icon">🐕‍🦺</div>
+                            <div>
+                                <h4>Comunidad de Tutores</h4>
+                                <p>Únete a la red social de amantes de animales. Comparte experiencias, consejos, fotos
+                                    de tu mascota y recibe apoyo de miles de tutores en todo el mundo.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         FOOTER
+         ═══════════════════════════════════════════════════════════════ -->
+    <footer class="site-footer">
+        <p>Diseño web optimizado para pantallas retina. Presiona <strong>Imprimir Tríptico</strong> o haz clic derecho
+            en el navegador y selecciona <strong>"Imprimir"</strong> para guardarlo en PDF o imprimir en papel físico
+            tamaño Carta/A4 apaisado.</p>
+        <div class="footer-links">
+            <span>Términos de Servicio</span> · <span>Política de Privacidad</span> · <span>Aviso Legal</span> ·
+            <span>Licencia de Uso</span>
+        </div>
+        <p class="copyright">&copy; 2026 ClinicaApp. Todos los derechos reservados. Desarrollado con pasión por Luis y
+            su Equipo. Versión 3.0 — Mayo 2026</p>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SCRIPT DE INTERACTIVIDAD
+         ═══════════════════════════════════════════════════════════════ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnFlip = document.getElementById('btn-flip');
+            const brochure = document.getElementById('brochure');
+            const faceLabel = document.getElementById('face-label');
+            const faceDot = document.getElementById('face-dot');
+
+            let isFlipped = false;
+
+            btnFlip.addEventListener('click', () => {
+                isFlipped = !isFlipped;
+
+                if (isFlipped) {
+                    brochure3d.classList.add('flipped');
+                    indicatorText.textContent = "Cara B (Interior Desplegado)";
+                    indicatorText.classList.remove('highlight');
+                    indicatorText.classList.add('highlight-green');
+                } else {
+                    brochure3d.classList.remove('flipped');
+                    indicatorText.textContent = "Cara A (Exterior)";
+                    indicatorText.classList.remove('highlight-green');
+                    indicatorText.classList.add('highlight');
+                }
+            });
+
+            // Efecto parallax sutil en mouse move (solo en desktop)
+            const scene = document.querySelector('.scene');
+            if (window.matchMedia('(pointer: fine)').matches) {
+                document.addEventListener('mousemove', (e) => {
+                    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+                    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+                    if (!isFlipped) {
+                        scene.style.transform = `rotateY(${x * 2}deg) rotateX(${-y * 1}deg)`;
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
+
+<!-- Script de interactividad -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnFlip = document.getElementById('btn-flip');
+        const brochure3d = document.getElementById('brochure-3d');
+        const indicatorText = document.getElementById('indicator-text');
+
+        let isFlipped = false;
+
+        btnFlip.addEventListener('click', () => {
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                brochure3d.classList.add('flipped');
+                indicatorText.textContent = "Cara B (Interior Desplegado)";
+                indicatorText.classList.remove('highlight');
+                indicatorText.classList.add('highlight-green');
+            } else {
+                brochure3d.classList.remove('flipped');
+                indicatorText.textContent = "Cara A (Exterior)";
+                indicatorText.classList.remove('highlight-green');
+                indicatorText.classList.add('highlight');
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

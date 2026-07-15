@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestiona la información y salud de tus mascotas en Clínica App.">
+    <title>Mis Mascotas | Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════
+           LUXURY AURORA DESIGN SYSTEM
+           ═══════════════════════════════════════ */
+        :root {
+            /* Primary Aurora Gradient */
+            --aurora-start: #6366f1;
+            --aurora-mid: #8b5cf6;
+            --aurora-end: #d946ef;
+
+            /* Secondary Palette */
+            --ocean: #06b6d4;
+            --ocean-light: rgba(6, 182, 212, 0.1);
+            --mint: #10b981;
+            --mint-light: rgba(16, 185, 129, 0.1);
+            --sunset: #f59e0b;
+            --sunset-light: rgba(245, 158, 11, 0.1);
+            --rose: #f43f5e;
+            --rose-light: rgba(244, 63, 94, 0.1);
+
+            /* Neutrals */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --border-light: rgba(226, 232, 240, 0.6);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            /* Shadows - Soft & Layered */
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+
+            /* Radius */
+            --r-sm: 10px;
+            --r-md: 16px;
+            --r-lg: 20px;
+            --r-xl: 24px;
+            --r-full: 9999px;
+
+            /* Transitions */
+            --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: rgba(30, 41, 59, 0.8);
+            --surface-hover: rgba(51, 65, 85, 0.6);
+            --border: rgba(148, 163, 184, 0.2);
+            --border-light: rgba(148, 163, 184, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            background-attachment: fixed;
+            color: var(--text-secondary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+        }
+
+        /* ═══════════════════════════════════════
+           ANIMATIONS
+           ═══════════════════════════════════════ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes pulse-soft {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.6s var(--ease-out) forwards;
+        }
+
+        .animate-fade-scale {
+            animation: fadeInScale 0.5s var(--ease-out) forwards;
+        }
+
+        .animate-slide-right {
+            animation: slideInRight 0.5s var(--ease-out) forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+
+        .delay-400 {
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
+
+        .delay-500 {
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        /* ═══════════════════════════════════════
+           GLASSMORPHISM UTILITIES
+           ═══════════════════════════════════════ */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        [data-theme="dark"] .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* ═══════════════════════════════════════
+           AURORA HEADER
+           ═══════════════════════════════════════ */
+        .aurora-header {
+            position: relative;
+            padding: 3.5rem 0 4rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--aurora-start) 0%, var(--aurora-mid) 50%, var(--aurora-end) 100%);
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        .aurora-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.6;
+        }
+
+        .aurora-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, var(--bg), transparent);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--r-full);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.5s var(--ease-out) forwards;
+        }
+
+        .header-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title span {
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1.05rem;
+            font-weight: 400;
+            margin-top: 0.75rem;
+            max-width: 420px;
+            line-height: 1.6;
+        }
+
+        /* Aurora Button */
+        .btn-aurora {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--aurora-start);
+            border: none;
+            border-radius: var(--r-md);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-aurora::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .btn-aurora:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+        .btn-aurora:hover::before {
+            opacity: 1;
+        }
+
+        .btn-aurora span,
+        .btn-aurora i {
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+
+        .btn-aurora:hover i {
+            transform: rotate(90deg);
+        }
+
+        /* ═══════════════════════════════════════
+           BREADCRUMB GLASS
+           ═══════════════════════════════════════ */
+        .breadcrumb-glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--r-md);
+            padding: 0.875rem 1.5rem;
+            margin: -1.5rem auto 2rem;
+            max-width: calc(100% - 2rem);
+            position: relative;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--aurora-start);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            content: '›';
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        /* ═══════════════════════════════════════
+           ALERTS AURORA
+           ═══════════════════════════════════════ */
+        .alert-aurora {
+            border: none;
+            border-radius: var(--r-lg);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s var(--ease-out);
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-aurora::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .alert-aurora-danger {
+            background: linear-gradient(135deg, #fef2f2, #fff1f2);
+            color: #be123c;
+        }
+
+        .alert-aurora-danger::before {
+            background: linear-gradient(to bottom, var(--rose), #be123c);
+        }
+
+        .alert-aurora-success {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            color: #047857;
+        }
+
+        .alert-aurora-success::before {
+            background: linear-gradient(to bottom, var(--mint), #047857);
+        }
+
+        .alert-aurora i {
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .alert-aurora-danger {
+            background: rgba(190, 18, 60, 0.15);
+            color: #fb7185;
+        }
+
+        [data-theme="dark"] .alert-aurora-success {
+            background: rgba(4, 120, 87, 0.15);
+            color: #34d399;
+        }
+
+        /* ═══════════════════════════════════════
+           STATS CARDS - GLASS
+           ═══════════════════════════════════════ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--r-lg);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .stat-icon-wrap.aurora {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+            color: var(--aurora-start);
+        }
+
+        .stat-icon-wrap.mint {
+            background: linear-gradient(135deg, var(--mint-light), rgba(16, 185, 129, 0.2));
+            color: var(--mint);
+        }
+
+        .stat-icon-wrap.sunset {
+            background: linear-gradient(135deg, var(--sunset-light), rgba(245, 158, 11, 0.2));
+            color: var(--sunset);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* ═══════════════════════════════════════
+           FILTER BAR - GLASS
+           ═══════════════════════════════════════ */
+        .filter-glass {
+            background: var(--surface);
+            border-radius: var(--r-lg);
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-aurora {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .search-aurora input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s var(--ease-out);
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .search-aurora input:focus {
+            outline: none;
+            border-color: var(--aurora-start);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: var(--surface);
+        }
+
+        .search-aurora input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-aurora i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .search-aurora input:focus+i,
+        .search-aurora:focus-within i {
+            color: var(--aurora-start);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.625rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--r-full);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--bg);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .filter-chip:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--aurora-start);
+            transform: translateY(-1px);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            border-color: transparent;
+        }
+
+        .filter-chip.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* ═══════════════════════════════════════
+           PETS GRID
+           ═══════════════════════════════════════ */
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.75rem;
+        }
+
+        @media (max-width: 576px) {
+            .pets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           PET CARD - LUXURY
+           ═══════════════════════════════════════ */
+        .pet-luxury-card {
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: all 0.5s var(--ease-spring);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .pet-luxury-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .pet-luxury-card:hover {
+            box-shadow: var(--shadow-xl), var(--shadow-glow);
+            transform: translateY(-8px);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .pet-luxury-card:hover::before {
+            opacity: 1;
+        }
+
+        .pet-card-header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 50%, rgba(217, 70, 239, 0.03) 100%);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pet-card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: var(--surface);
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        }
+
+        .pet-avatar-luxury {
+            width: 110px;
+            height: 110px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-size: 3rem;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2), 0 0 0 4px rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            border: 4px solid white;
+            transition: all 0.4s var(--ease-spring);
+        }
+
+        .pet-luxury-card:hover .pet-avatar-luxury {
+            transform: scale(1.08);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.3), 0 0 0 4px rgba(255, 255, 255, 0.9);
+        }
+
+        .pet-avatar-luxury img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s var(--ease-out);
+        }
+
+        .pet-luxury-card:hover .pet-avatar-luxury img {
+            transform: scale(1.12);
+        }
+
+        .pet-avatar-luxury i {
+            color: var(--aurora-start);
+            font-size: 2.75rem;
+        }
+
+        .pet-species-badge {
+            position: absolute;
+            bottom: 0.5rem;
+            right: calc(50% - 55px + 2.5rem);
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            z-index: 3;
+            transition: all 0.4s var(--ease-spring);
+        }
+
+        .pet-luxury-card:hover .pet-species-badge {
+            transform: scale(1.15) rotate(12deg);
+        }
+
+        .pet-card-body {
+            padding: 1.75rem 1.75rem 1.25rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .pet-name-luxury {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.375rem;
+            letter-spacing: -0.01em;
+        }
+
+        .pet-breed-luxury {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .pet-meta-luxury {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 1rem;
+            border-radius: var(--r-full);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .meta-tag.species {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08));
+            color: var(--aurora-start);
+        }
+
+        .meta-tag.age {
+            background: linear-gradient(135deg, var(--mint-light), rgba(16, 185, 129, 0.08));
+            color: var(--mint);
+        }
+
+        .health-section {
+            background: var(--bg);
+            border-radius: var(--r-md);
+            padding: 1.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .health-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .health-label-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .health-status {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--mint);
+            background: var(--mint-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--r-full);
+        }
+
+        .health-track {
+            height: 10px;
+            background: var(--border);
+            border-radius: var(--r-full);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .health-track::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .health-fill {
+            height: 100%;
+            border-radius: var(--r-full);
+            background: linear-gradient(90deg, var(--mint), #34d399);
+            transition: width 1.2s var(--ease-out);
+            position: relative;
+            z-index: 1;
+        }
+
+        .pet-actions-luxury {
+            padding: 1rem 1.75rem 1.75rem;
+            display: flex;
+            gap: 0.625rem;
+        }
+
+        .btn-luxury {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            border-radius: var(--r-md);
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-luxury::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-luxury:hover::before {
+            left: 100%;
+        }
+
+        .btn-luxury i {
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-luxury span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-album {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08));
+            color: var(--aurora-start);
+        }
+
+        .btn-album:hover {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-history {
+            background: linear-gradient(135deg, var(--ocean-light), rgba(6, 182, 212, 0.08));
+            color: var(--ocean);
+        }
+
+        .btn-history:hover {
+            background: linear-gradient(135deg, var(--ocean), #0891b2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-edit-luxury {
+            background: linear-gradient(135deg, var(--sunset-light), rgba(245, 158, 11, 0.08));
+            color: var(--sunset);
+        }
+
+        .btn-edit-luxury:hover {
+            background: linear-gradient(135deg, var(--sunset), #d97706);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-delete-luxury {
+            background: linear-gradient(135deg, var(--rose-light), rgba(244, 63, 94, 0.08));
+            color: var(--rose);
+            padding: 0.75rem;
+            flex: 0 0 auto;
+        }
+
+        .btn-delete-luxury:hover {
+            background: linear-gradient(135deg, var(--rose), #be123c);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+        }
+
+        /* ═══════════════════════════════════════
+           EMPTY STATE - LUXURY
+           ═══════════════════════════════════════ */
+        .empty-luxury {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            border: 2px dashed var(--border);
+            max-width: 520px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-luxury::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.04) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .empty-icon-luxury {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--bg), #f1f5f9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: var(--text-muted);
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+            box-shadow: var(--shadow-md);
+        }
+
+        .empty-icon-luxury::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            border: 2px dashed var(--border);
+            animation: spin-slow 25s linear infinite;
+        }
+
+        .empty-title-luxury {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .empty-text-luxury {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .btn-aurora-solid {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            border-radius: var(--r-md);
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-aurora-solid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-aurora-solid:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        .btn-aurora-solid:hover::before {
+            left: 100%;
+        }
+
+        /* ═══════════════════════════════════════
+           FLOATING ACTION BUTTONS
+           ═══════════════════════════════════════ */
+        .fab-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+        }
+
+        .fab-aurora {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            text-decoration: none;
+        }
+
+        .fab-aurora:hover {
+            transform: scale(1.12) rotate(8deg);
+        }
+
+        .fab-primary {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            animation: float 4s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .fab-secondary {
+            background: linear-gradient(135deg, var(--mint), #059669);
+            font-size: 1.25rem;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .fab-tooltip {
+            position: absolute;
+            right: 75px;
+            background: var(--text-primary);
+            color: white;
+            padding: 0.5rem 0.875rem;
+            border-radius: var(--r-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(12px);
+            transition: all 0.3s var(--ease-out);
+            pointer-events: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .fab-aurora:hover .fab-tooltip {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ═══════════════════════════════════════
+           MODALS - LUXURY
+           ═══════════════════════════════════════ */
+        .modal-luxury .modal-content {
+            border: none;
+            border-radius: var(--r-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            background: var(--surface);
+        }
+
+        .modal-luxury .modal-header {
+            background: linear-gradient(135deg, var(--rose), #be123c);
+            color: white;
+            padding: 1.75rem;
+            border: none;
+        }
+
+        .modal-luxury .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .modal-luxury .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-luxury .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .btn-luxury-light {
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+            padding: 0.75rem 1.75rem;
+            border-radius: var(--r-md);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-luxury-light:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-luxury-danger {
+            background: linear-gradient(135deg, var(--rose), #be123c);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.75rem;
+            border-radius: var(--r-md);
+            font-weight: 600;
+            transition: all 0.3s var(--ease-spring);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-luxury-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(244, 63, 94, 0.4);
+        }
+
+        /* Album Modal */
+        .album-modal-luxury .modal-content {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 32px;
+        }
+
+        [data-theme="dark"] .album-modal-luxury .modal-content {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .album-modal-luxury .modal-header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9));
+            padding: 1.75rem;
+        }
+
+        .upload-zone-luxury {
+            border: 2px dashed var(--border);
+            border-radius: var(--r-lg);
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s var(--ease-spring);
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone-luxury:hover,
+        .upload-zone-luxury.dragover {
+            border-color: var(--aurora-start);
+            background: rgba(99, 102, 241, 0.05);
+            transform: scale(1.01);
+        }
+
+        .upload-zone-luxury i {
+            font-size: 2.75rem;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .album-photo-luxury {
+            position: relative;
+            border-radius: var(--r-lg);
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.5s var(--ease-spring);
+            cursor: pointer;
+        }
+
+        .album-photo-luxury img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s var(--ease-out);
+        }
+
+        .album-photo-luxury:hover {
+            transform: scale(1.06) translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            z-index: 10;
+        }
+
+        .album-photo-luxury:hover img {
+            transform: scale(1.2);
+        }
+
+        .photo-overlay-luxury {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.7), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .album-photo-luxury:hover .photo-overlay-luxury {
+            opacity: 1;
+        }
+
+        .btn-zoom-luxury {
+            background: white;
+            color: var(--text-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: all 0.4s var(--ease-spring);
+            border: none;
+        }
+
+        .album-photo-luxury:hover .btn-zoom-luxury {
+            transform: translateY(0);
+        }
+
+        /* Lightbox */
+        .lightbox-luxury {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .lightbox-luxury.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .lightbox-img-luxury {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: var(--r-lg);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.5s var(--ease-spring);
+        }
+
+        .lightbox-luxury.show .lightbox-img-luxury {
+            transform: scale(1);
+        }
+
+        .close-lightbox-luxury {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .close-lightbox-luxury:hover {
+            transform: scale(1.15) rotate(90deg);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ═══════════════════════════════════════
+           NO RESULTS
+           ═══════════════════════════════════════ */
+        .no-results-luxury {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            border: 2px dashed var(--border);
+            margin-top: 2rem;
+        }
+
+        .no-results-luxury i {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .aurora-header {
+                padding: 2.5rem 0 3rem;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-glass {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-aurora {
+                min-width: auto;
+            }
+
+            .pets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pet-luxury-card {
+                max-width: 420px;
+                margin: 0 auto;
+            }
+
+            .fab-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .fab-aurora {
+                width: 52px;
+                height: 52px;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           SCROLLBAR
+           ═══════════════════════════════════════ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--r-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* ═══════════════════════════════════════
+           TOOLTIP
+           ═══════════════════════════════════════ */
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            padding: 0.5rem 0.875rem;
+            background: var(--text-primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--r-sm);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s var(--ease-out);
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+
+        [data-tooltip]:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Dark mode overrides for cards */
+        [data-theme="dark"] .pet-luxury-card,
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .filter-glass,
+        [data-theme="dark"] .empty-luxury,
+        [data-theme="dark"] .breadcrumb-glass {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(148, 163, 184, 0.15);
+        }
+
+        [data-theme="dark"] .pet-card-header::after {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        [data-theme="dark"] .pet-avatar-luxury {
+            background: #1e293b;
+            border-color: #1e293b;
+        }
+
+        [data-theme="dark"] .search-aurora input {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(148, 163, 184, 0.2);
+            color: white;
+        }
+
+        [data-theme="dark"] .filter-chip {
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        [data-theme="dark"] .health-section {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        [data-theme="dark"] .stat-number,
+        [data-theme="dark"] .pet-name-luxury,
+        [data-theme="dark"] .empty-title-luxury {
+            color: white;
+        }
+
+        [data-theme="dark"] .alert-aurora-danger {
+            background: rgba(190, 18, 60, 0.12);
+            color: #fb7185;
+        }
+
+        [data-theme="dark"] .alert-aurora-success {
+            background: rgba(4, 120, 87, 0.12);
+            color: #34d399;
+        }
+
+        [data-theme="dark"] .upload-zone-luxury {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        /* ═══════════════════════════════════════
+           AI HEALTH HUB - STYLES
+           ═══════════════════════════════════════ */
+        .btn-weka-ia {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1));
+            color: var(--aurora-mid);
+            border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .btn-weka-ia:hover {
+            background: linear-gradient(135deg, var(--aurora-mid), var(--aurora-start));
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .ai-modal .modal-content {
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        [data-theme="dark"] .ai-modal .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .ai-modal .modal-header {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            border: none;
+            padding: 1.5rem 2rem;
+        }
+
+        .ai-step {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .ai-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .q-card {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+        }
+
+        .q-card:hover {
+            border-color: var(--aurora-start);
+            transform: scale(1.02);
+            background: var(--surface);
+        }
+
+        .q-card.selected {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .processing-brain {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            animation: pulse-brain 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-brain {
+            0%, 100% { transform: scale(1); opacity: 0.8; filter: drop-shadow(0 0 0px var(--aurora-start)); }
+            50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px var(--aurora-start)); }
+        }
+
+        .result-badge {
+            font-size: 1.5rem;
+            font-weight: 800;
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Partículas Globales Nova -->
+    <canvas id="global-particles"></canvas>
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- ═══════════════════════════════════════
+         AURORA HEADER
+         ═══════════════════════════════════════ -->
+    <div class="aurora-header">
+        <div class="container">
+            <div class="header-content animate-fade-up">
+                <div>
+                    <div class="header-badge">
+                        <i class="bi bi-shield-check"></i>
+                        Panel de Usuario
+                    </div>
+                    <h1 class="header-title">
+                        <span>Mis Mascotas</span>
+                    </h1>
+                    <p class="header-subtitle">Gestiona la información, salud y bienestar de todos tus compañeros
+                        peludos en un solo lugar</p>
+                </div>
+                <a th:href="@{/usuario/mascotas/nueva}" class="btn-aurora animate-slide-right delay-200">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Añadir Mascota</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         BREADCRUMB GLASS
+         ═══════════════════════════════════════ -->
+    <div class="container">
+        <div class="breadcrumb-glass animate-fade-up delay-100">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}"><i class="bi bi-house-door-fill"></i>Inicio</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#"><i class="bi bi-person-fill"></i>Mi Cuenta</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="bi bi-heart-pulse"></i>Mis Mascotas
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <main class="container pb-5">
+
+        <!-- ═══════════════════════════════════════
+             ALERTS AURORA
+             ═══════════════════════════════════════ -->
+        <div th:if="${param.error == 'noauth'}" class="alert-aurora alert-aurora-danger alert-dismissible fade show">
+            <i class="bi bi-shield-exclamation-fill"></i>
+            <span>Acción no autorizada. No tienes permisos para realizar esta operación.</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${success}" class="alert-aurora alert-aurora-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             STATS ROW - GLASS CARDS
+             ═══════════════════════════════════════ -->
+        <div class="stats-grid animate-fade-up delay-100" th:if="${!mascotas.isEmpty()}">
+            <div class="stat-card">
+                <div class="stat-icon-wrap aurora">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${mascotas.size()}">0</span>
+                    <span class="stat-label">Total Mascotas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrap mint">
+                    <i class="bi bi-emoji-smile"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${mascotas.?[especie?.toString() == 'PERRO'].size()}">0</span>
+                    <span class="stat-label">Perros</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrap sunset">
+                    <i class="bi bi-emoji-heart-eyes"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${mascotas.?[especie?.toString() == 'GATO'].size()}">0</span>
+                    <span class="stat-label">Gatos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             FILTER BAR - GLASS
+             ═══════════════════════════════════════ -->
+        <div class="filter-glass animate-fade-up delay-200" th:if="${!mascotas.isEmpty()}">
+            <div class="search-aurora">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchMascotas" placeholder="Buscar por nombre, raza o especie..."
+                    autocomplete="off">
+            </div>
+            <div class="filter-chips">
+                <button class="filter-chip active" data-filter="all">
+                    <i class="bi bi-grid-fill"></i> Todas
+                </button>
+                <button class="filter-chip" data-filter="perro">
+                    <i class="bi bi-emoji-smile"></i> Perros
+                </button>
+                <button class="filter-chip" data-filter="gato">
+                    <i class="bi bi-emoji-heart-eyes"></i> Gatos
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             GRID DE MASCOTAS - LUXURY CARDS
+             ═══════════════════════════════════════ -->
+        <div th:if="${!mascotas.isEmpty()}" class="pets-grid" id="petsGrid">
+            <div th:each="mascota, iterStat : ${mascotas}" class="pet-luxury-card animate-fade-up"
+                th:attr="data-search=${mascota.nombre + ' ' + mascota.getRaza() + ' ' + mascota.especie}, data-especie=${mascota.especie?.toString()?.toLowerCase()}"
+                th:style="'animation-delay: ' + ${iterStat.index * 0.1} + 's'">
+
+                <div class="pet-card-header">
+                    <div class="pet-avatar-luxury">
+                        <img th:if="${mascota.fotoUrl != null}" th:src="${mascota.fotoUrl}" alt="Foto de mascota">
+                        <i th:if="${mascota.fotoUrl == null}" class="bi bi-heart-pulse-fill"></i>
+                    </div>
+                    <div class="pet-species-badge">
+                        <i
+                            th:class="${mascota.especie?.toString() == 'PERRO'} ? 'bi bi-emoji-smile' : 'bi bi-emoji-heart-eyes'"></i>
+                    </div>
+                </div>
+
+                <div class="pet-card-body">
+                    <h4 class="pet-name-luxury" th:text="${mascota.nombre}">Firulais</h4>
+                    <p class="pet-breed-luxury" th:text="${mascota.getRaza()}">Golden Retriever</p>
+
+                    <div class="pet-meta-luxury">
+                        <span class="meta-tag species">
+                            <i
+                                th:class="${mascota.especie?.toString() == 'PERRO'} ? 'bi bi-emoji-smile' : 'bi bi-emoji-heart-eyes'"></i>
+                            <span th:text="${mascota.especie}">PERRO</span>
+                        </span>
+                        <span class="meta-tag age" th:if="${mascota.edad != null}">
+                            <i class="bi bi-calendar3"></i>
+                            <span th:text="${mascota.edad + ' años'}">3 años</span>
+                        </span>
+                    </div>
+
+                    <!-- Barra de Salud -->
+                    <div class="health-section">
+                        <div class="health-header">
+                            <span class="health-label-text">
+                                <i class="bi bi-heart-fill text-danger me-1"></i>Salud General
+                            </span>
+                            <span class="health-status">Excelente</span>
+                        </div>
+                        <div class="health-track">
+                            <div class="health-fill" style="width: 0%;" data-width="92%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-actions-luxury">
+                    <button type="button" class="btn-luxury btn-album"
+                        th:data-album-photos="${mascota.albumFotos != null ? #strings.arrayJoin(mascota.albumFotos.toArray(), ',') : ''}"
+                        th:data-pet-name="${mascota.nombre}" th:data-mascota-id="${mascota.id}"
+                        onclick="openAlbum(this)" data-tooltip="Ver álbum de fotos">
+                        <i class="bi bi-images"></i>
+                        <span>Álbum</span>
+                    </button>
+                    <a th:href="@{/usuario/historial/{id}(id=${mascota.id})}" class="btn-luxury btn-history"
+                        data-tooltip="Ver historial médico">
+                        <i class="bi bi-file-medical-fill"></i>
+                        <span>Historial</span>
+                    </a>
+                    <a th:href="@{/usuario/mascotas/editar/{id}(id=${mascota.id})}" class="btn-luxury btn-edit-luxury"
+                        data-tooltip="Editar información">
+                        <i class="bi bi-pencil-fill"></i>
+                        <span>Editar</span>
+                    </a>
+                    <button type="button" class="btn-luxury btn-weka-ia"
+                        th:data-mascota-id="${mascota.id}" th:data-mascota-nombre="${mascota.nombre}"
+                        onclick="startAIHealthScan(this)" data-tooltip="Escaneo de Salud Avanzado (IA)">
+                        <i class="bi bi-robot"></i>
+                        <span>IA Scan</span>
+                    </button>
+                    <button type="button" class="btn-luxury btn-delete-luxury" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal" th:data-mascota-id="${mascota.id}"
+                        th:data-mascota-nombre="${mascota.nombre}" data-tooltip="Eliminar mascota">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             ESTADO VACÍO - LUXURY
+             ═══════════════════════════════════════ -->
+        <div th:if="${mascotas.isEmpty()}" class="empty-luxury animate-fade-scale">
+            <div class="empty-icon-luxury">
+                <i class="bi bi-emoji-frown"></i>
+            </div>
+            <h3 class="empty-title-luxury">Aún no has registrado mascotas</h3>
+            <p class="empty-text-luxury">¡Añade a tu primer compañero para comenzar a gestionar su salud y bienestar!
+            </p>
+            <a th:href="@{/usuario/mascotas/nueva}" class="btn-aurora-solid">
+                <i class="bi bi-plus-circle-fill"></i> Añadir Primera Mascota
+            </a>
+        </div>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════
+         MODAL IA HEALTH SCAN
+         ═══════════════════════════════════════ -->
+    <div class="modal fade ai-modal" id="modalWekaIA" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white">
+                        <i class="bi bi-robot me-2"></i>
+                        Escaneo de Salud Inteligente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center" id="aiModalContent">
+                    
+                    <!-- STEP 1: INTRO -->
+                    <div class="ai-step active" id="step-intro">
+                        <div class="py-4">
+                            <i class="bi bi-activity text-primary mb-3" style="font-size: 3.5rem;"></i>
+                            <h3 class="fw-bold mb-3">Análisis Biométrico de <span id="scan-pet-name"></span></h3>
+                            <p class="text-muted mb-4">Nuestro motor de IA Weka procesará los datos biológicos y de comportamiento para detectar riesgos preventivos.</p>
+                            <button class="btn btn-aurora-solid" onclick="goToStep(2)">
+                                Comenzar Escaneo <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: QUESTIONNAIRE -->
+                    <div class="ai-step" id="step-questions">
+                        <div class="text-start">
+                            <div class="mb-4 d-flex justify-content-between align-items-center">
+                                <h5 class="fw-bold m-0">Comportamiento Reciente</h5>
+                                <span class="badge bg-primary rounded-pill">Paso 1 de 2</span>
+                            </div>
+                            
+                            <div class="question-box mb-4">
+                                <label class="form-label fw-bold mb-3">¿Cómo calificarías su nivel de energía?</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('energia', 'ALTA', this)">
+                                            <i class="bi bi-lightning-charge-fill mb-2 d-block fs-4"></i>
+                                            Muy Activo
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('energia', 'NORMAL', this)">
+                                            <i class="bi bi-hand-thumbs-up-fill mb-2 d-block fs-4"></i>
+                                            Normal
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('energia', 'BAJA', this)">
+                                            <i class="bi bi-moon-stars-fill mb-2 d-block fs-4"></i>
+                                            Decaído
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-box mb-4">
+                                <label class="form-label fw-bold mb-3">¿Has notado alguna rigidez o dificultad al caminar?</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('movilidad', 'FLUIDA', this)">
+                                            <i class="bi bi-check-circle-fill mb-2 d-block fs-4"></i>
+                                            Ninguna
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('movilidad', 'LEVE_RIGIDEZ', this)">
+                                            <i class="bi bi-exclamation-circle-fill mb-2 d-block fs-4"></i>
+                                            Leve Rigidez
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('movilidad', 'DIFICULTAD_MARCADA', this)">
+                                            <i class="bi bi-x-circle-fill mb-2 d-block fs-4"></i>
+                                            Dificultad
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex justify-content-between">
+                                <button class="btn btn-light" onclick="goToStep(1)">Atrás</button>
+                                <button class="btn btn-primary px-4" id="btnNextQuestions" onclick="goToStep(3)">Continuar <i class="bi bi-arrow-right ms-2"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: VITAL SIGNS -->
+                    <div class="ai-step" id="step-questions-2">
+                        <div class="text-start">
+                            <div class="mb-4 d-flex justify-content-between align-items-center">
+                                <h5 class="fw-bold m-0">Signos Vitales</h5>
+                                <span class="badge bg-primary rounded-pill">Paso 2 de 2</span>
+                            </div>
+                            
+                            <div class="question-box mb-4">
+                                <label class="form-label fw-bold mb-3">¿Cómo ha estado su apetito últimamente?</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('apetito', 'AUMENTADO', this)">
+                                            <i class="bi bi-plus-circle-fill mb-2 d-block fs-4"></i>
+                                            Aumentado
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('apetito', 'NORMAL', this)">
+                                            <i class="bi bi-check-circle-fill mb-2 d-block fs-4"></i>
+                                            Normal
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="q-card text-center" onclick="selectOption('apetito', 'DISMINUIDO', this)">
+                                            <i class="bi bi-dash-circle-fill mb-2 d-block fs-4"></i>
+                                            Poco Apetito
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-box mb-4">
+                                <label class="form-label fw-bold mb-3">¿Bebe agua en exceso frecuentemente?</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="q-card text-center" onclick="selectOption('sed', 'NORMAL', this)">
+                                            <i class="bi bi-droplet-fill mb-2 d-block fs-4"></i>
+                                            Normal
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="q-card text-center" onclick="selectOption('sed', 'EXCESIVA', this)">
+                                            <i class="bi bi-droplet-half mb-2 d-block fs-4"></i>
+                                            Mucho Exceso
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex justify-content-between">
+                                <button class="btn btn-light" onclick="goToStep(2)">Atrás</button>
+                                <button class="btn btn-aurora-solid" id="btnProcessIA" onclick="processHealthScan()">Procesar Diagnóstico <i class="bi bi-robot ms-2"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: PROCESSING -->
+                    <div class="ai-step" id="step-processing">
+                        <div class="py-5">
+                            <i class="bi bi-cpu processing-brain"></i>
+                            <h4 class="fw-bold">Procesando Modelos J48</h4>
+                            <p class="text-muted">Conectando con el motor de IA Weka...</p>
+                            <div class="progress mt-4 mx-auto" style="width: 200px; height: 6px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: RESULTS -->
+                    <div class="ai-step" id="step-results">
+                        <div class="py-4">
+                            <div id="result-icon-container"></div>
+                            <h3 class="fw-bold mb-1">Estado Detectado: <span id="result-status"></span></h3>
+                            <p class="text-muted mb-4">Confianza de IA: <span id="result-confidence"></span>%</p>
+                            
+                            <div class="card bg-light border-0 rounded-4 p-4 mb-4 text-start shadow-sm">
+                                <h6 class="fw-bold text-primary mb-2">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Recomendación del Motor Weka:
+                                </h6>
+                                <p class="mb-0" id="result-recommendation"></p>
+                            </div>
+
+                            <button class="btn btn-aurora-solid w-100" data-bs-dismiss="modal">
+                                Finalizar Análisis
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS PARA IA HEALTH SCAN -->
+    <script th:inline="javascript">
+        let currentPetId = null;
+        let selectedOptions = {
+            energia: null,
+            movilidad: null,
+            apetito: null,
+            sed: null
+        };
+
+        function startAIHealthScan(btn) {
+            currentPetId = btn.getAttribute('data-mascota-id');
+            document.getElementById('scan-pet-name').innerText = btn.getAttribute('data-mascota-nombre');
+            
+            // Reset modal
+            goToStep(1);
+            selectedOptions = { energia: null, movilidad: null, apetito: null, sed: null };
+            document.querySelectorAll('.q-card').forEach(c => c.classList.remove('selected'));
+            
+            const modalElement = document.getElementById('modalWekaIA');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        }
+
+        function goToStep(stepNum) {
+            document.querySelectorAll('.ai-step').forEach(step => step.classList.remove('active'));
+            if (stepNum === 1) document.getElementById('step-intro').classList.add('active');
+            if (stepNum === 2) document.getElementById('step-questions').classList.add('active');
+            if (stepNum === 3) document.getElementById('step-questions-2').classList.add('active');
+            if (stepNum === 4) document.getElementById('step-processing').classList.add('active');
+            if (stepNum === 5) document.getElementById('step-results').classList.add('active');
+        }
+
+        function selectOption(category, value, element) {
+            selectedOptions[category] = value;
+            
+            // UI visual feedback
+            const siblings = element.closest('.row').querySelectorAll('.q-card');
+            siblings.forEach(s => s.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        async function processHealthScan() {
+            if (!selectedOptions.energia || !selectedOptions.movilidad || !selectedOptions.apetito || !selectedOptions.sed) {
+                alert("Por favor responde todas las preguntas para un diagnóstico preciso.");
+                return;
+            }
+
+            goToStep(4);
+
+            try {
+                const response = await fetch(`/api/weka/predict-health/${currentPetId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(selectedOptions)
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    goToStep(1);
+                    return;
+                }
+
+                setTimeout(() => {
+                    document.getElementById('result-status').innerText = data.status;
+                    document.getElementById('result-status').style.color = data.color;
+                    document.getElementById('result-confidence').innerText = data.confidence.toFixed(1);
+                    document.getElementById('result-recommendation').innerText = data.recomendaciones;
+                    
+                    document.getElementById('result-icon-container').innerHTML = `
+                        <i class="bi ${data.icon}" style="font-size: 5rem; color: ${data.color};"></i>
+                    `;
+                    
+                    goToStep(5);
+                }, 2000);
+
+            } catch (error) {
+                console.error("Error en el escaneo:", error);
+                alert("Hubo un error al conectar con el servidor de IA.");
+                goToStep(1);
+            }
+        }
+    </script>
+
+    <!-- ═══════════════════════════════════════
+         MODAL ÁLBUM DE FOTOS - LUXURY
+         ═══════════════════════════════════════ -->
+    <div class="modal fade album-modal-luxury" id="albumModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0" style="border-radius: 32px; overflow: hidden;">
+                <div class="modal-header border-0 p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <i class="bi bi-images text-primary fs-4"
+                                style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title text-white fw-bold mb-0" style="font-family: 'Outfit', sans-serif;">
+                                Álbum de Recuerdos</h5>
+                            <p class="text-white-50 small mb-0" id="albumPetNameSub"></p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Zona de Carga Directa -->
+                    <div class="upload-zone-luxury" id="albumUploadZone"
+                        onclick="document.getElementById('directAlbumInput').click()">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                        <h6 class="fw-bold mb-1" style="color: var(--text-primary);">Agregar fotos al álbum</h6>
+                        <p class="text-secondary small mb-0">Haz clic o arrastra imágenes aquí para subirlas
+                            instantáneamente</p>
+                        <input type="file" id="directAlbumInput" multiple accept="image/*" style="display: none;"
+                            onchange="handleDirectUpload(this)">
+                    </div>
+
+                    <!-- Indicador de Carga -->
+                    <div id="uploadProgress" class="mb-4" style="display: none;">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small fw-bold" style="color: var(--aurora-start);">Subiendo fotos...</span>
+                            <span class="small fw-bold" style="color: var(--aurora-start);"
+                                id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 10px; background: var(--border);">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                style="width: 0%; border-radius: 10px; background: linear-gradient(90deg, var(--aurora-start), var(--aurora-mid));">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="albumGrid" class="row g-3">
+                        <!-- Las fotos se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn-luxury-light w-100 py-3" style="border-radius: 16px;"
+                        data-bs-dismiss="modal">Cerrar Galería</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Overlay -->
+    <div class="lightbox-luxury" id="lightbox">
+        <i class="bi bi-x-lg close-lightbox-luxury" onclick="closeLightbox()"></i>
+        <img src="" class="lightbox-img-luxury" id="lightboxImg">
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         MODAL ELIMINAR - LUXURY
+         ═══════════════════════════════════════ -->
+    <div class="modal fade modal-luxury" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">¿Estás seguro de que deseas eliminar a <strong id="deleteMascotaNombre"
+                            class="text-danger"></strong>?</p>
+                    <div class="alert alert-warning d-flex align-items-center gap-2"
+                        style="border-radius: var(--r-md); background: var(--sunset-light); border: none; color: #92400e;">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <small>Esta acción eliminará también todo el historial médico asociado. Esta acción no se puede
+                            deshacer.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-luxury-light" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </button>
+                    <form id="deleteForm" method="post" style="display: inline;">
+                        <button type="submit" class="btn-luxury-danger">
+                            <i class="bi bi-trash-fill me-1"></i> Sí, Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer-usuario}"></div>
+
+    <!-- ═══════════════════════════════════════
+         FLOATING ACTION BUTTONS
+         ═══════════════════════════════════════ -->
+    <div class="fab-container" th:if="${!mascotas.isEmpty()}">
+        <button class="fab-aurora fab-secondary" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            data-tooltip="Volver arriba">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+        <a th:href="@{/usuario/mascotas/nueva}" class="fab-aurora fab-primary" data-tooltip="Añadir mascota">
+            <i class="bi bi-plus-lg"></i>
+        </a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ===== CONTADORES ANIMADOS =====
+            document.querySelectorAll('.stat-value').forEach(stat => {
+                const target = parseInt(stat.textContent) || 0;
+                if (target > 0) {
+                    stat.textContent = '0';
+                    let current = 0;
+                    const increment = target / 30;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            stat.textContent = target;
+                            clearInterval(timer);
+                        } else {
+                            stat.textContent = Math.floor(current);
+                        }
+                    }, 30);
+                }
+            });
+
+            // ===== LÓGICA DEL ÁLBUM PREMIUM =====
+            let currentPetIdForAlbum = null;
+
+            window.openAlbum = function (btn) {
+                currentPetIdForAlbum = btn.closest('.pet-luxury-card').getAttribute('data-mascota-id') || btn.getAttribute('data-mascota-id');
+
+                if (!currentPetIdForAlbum) {
+                    const deleteBtn = btn.closest('.pet-luxury-card').querySelector('.btn-delete-luxury');
+                    currentPetIdForAlbum = deleteBtn ? deleteBtn.getAttribute('data-mascota-id') : null;
+                }
+
+                const photosStr = btn.getAttribute('data-album-photos');
+                const petName = btn.getAttribute('data-pet-name');
+                const photos = photosStr ? photosStr.split(',') : [];
+
+                document.getElementById('albumPetNameSub').textContent = `Recuerdos de ${petName}`;
+                renderAlbumGrid(photos);
+
+                const albumModal = new bootstrap.Modal(document.getElementById('albumModal'));
+                albumModal.show();
+            };
+
+            function renderAlbumGrid(photos) {
+                const grid = document.getElementById('albumGrid');
+                grid.innerHTML = '';
+
+                if (photos.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-camera-fill text-secondary fs-1 mb-3 d-block"></i>
+                            <p class="text-secondary">Aún no hay fotos en este álbum. ¡Sube la primera!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                photos.forEach((photo, index) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-md-4 col-lg-3';
+                    col.style.animation = `fadeInScale 0.5s ease-out ${index * 0.05}s forwards`;
+                    col.style.opacity = '0';
+                    col.innerHTML = `
+                        <div class="album-photo-luxury" onclick="openLightbox('${photo}')">
+                            <img src="${photo}" alt="Foto de mascota">
+                            <div class="photo-overlay-luxury">
+                                <div class="btn-zoom-luxury">
+                                    <i class="bi bi-zoom-in"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(col);
+                });
+            }
+
+            // --- Carga Directa AJAX ---
+            window.handleDirectUpload = function (input) {
+                if (!input.files || input.files.length === 0) return;
+                uploadFiles(input.files);
+            };
+
+            function uploadFiles(files) {
+                const formData = new FormData();
+                for (let i = 0; i < files.length; i++) {
+                    formData.append('files', files[i]);
+                }
+
+                const progressArea = document.getElementById('uploadProgress');
+                const progressBar = progressArea.querySelector('.progress-bar');
+                const progressPercent = document.getElementById('progressPercent');
+
+                progressArea.style.display = 'block';
+                progressBar.style.width = '0%';
+                progressPercent.textContent = '0%';
+
+                fetch(`/usuario/mascotas/${currentPetIdForAlbum}/album/agregar`, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const currentGrid = document.getElementById('albumGrid');
+                            if (currentGrid.querySelector('.text-center.py-5')) currentGrid.innerHTML = '';
+
+                            data.nuevasFotos.forEach(photo => {
+                                const col = document.createElement('div');
+                                col.className = 'col-6 col-md-4 col-lg-3';
+                                col.style.animation = `fadeInScale 0.5s ease-out forwards`;
+                                col.style.opacity = '0';
+                                col.innerHTML = `
+                                <div class="album-photo-luxury" onclick="openLightbox('${photo}')">
+                                    <img src="${photo}" alt="Foto de mascota">
+                                    <div class="photo-overlay-luxury">
+                                        <div class="btn-zoom-luxury">
+                                            <i class="bi bi-zoom-in"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                                currentGrid.appendChild(col);
+                            });
+
+                            updateOriginalButtonData(data.nuevasFotos);
+
+                            document.getElementById('directAlbumInput').value = '';
+                            setTimeout(() => { progressArea.style.display = 'none'; }, 1000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Hubo un error al subir las fotos');
+                        progressArea.style.display = 'none';
+                    });
+            }
+
+            function updateOriginalButtonData(newPhotos) {
+                const buttons = document.querySelectorAll('.btn-luxury[data-pet-name]');
+                buttons.forEach(btn => {
+                    const deleteBtn = btn.closest('.pet-luxury-card').querySelector('.btn-delete-luxury');
+                    const id = deleteBtn ? deleteBtn.getAttribute('data-mascota-id') : null;
+                    if (id === currentPetIdForAlbum) {
+                        let currentPhotos = btn.getAttribute('data-album-photos');
+                        if (currentPhotos) {
+                            btn.setAttribute('data-album-photos', currentPhotos + ',' + newPhotos.join(','));
+                        } else {
+                            btn.setAttribute('data-album-photos', newPhotos.join(','));
+                            btn.style.display = '';
+                        }
+                    }
+                });
+            }
+
+            // --- Lightbox ---
+            window.openLightbox = function (url) {
+                const lightbox = document.getElementById('lightbox');
+                const img = document.getElementById('lightboxImg');
+                img.src = url;
+                lightbox.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.closeLightbox = function () {
+                document.getElementById('lightbox').classList.remove('show');
+                document.body.style.overflow = '';
+            };
+
+            // Cerrar lightbox con Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeLightbox();
+            });
+
+            // --- Drag and Drop ---
+            const zone = document.getElementById('albumUploadZone');
+            if (zone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    zone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+                });
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    zone.addEventListener(eventName, () => zone.classList.add('dragover'), false);
+                });
+                ['dragleave', 'drop'].forEach(eventName => {
+                    zone.addEventListener(eventName, () => zone.classList.remove('dragover'), false);
+                });
+                zone.addEventListener('drop', e => {
+                    const dt = e.dataTransfer;
+                    uploadFiles(dt.files);
+                }, false);
+            }
+
+            // ===== BARRAS DE SALUD ANIMADAS =====
+            setTimeout(() => {
+                document.querySelectorAll('.health-fill').forEach(bar => {
+                    const width = bar.getAttribute('data-width');
+                    if (width) {
+                        bar.style.width = width;
+                    }
+                });
+            }, 600);
+
+            // ===== BÚSQUEDA EN TIEMPO REAL =====
+            const searchInput = document.getElementById('searchMascotas');
+            const petCards = document.querySelectorAll('.pet-luxury-card');
+
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        const query = this.value.toLowerCase().trim();
+                        let visibleCount = 0;
+
+                        petCards.forEach(card => {
+                            const searchData = card.getAttribute('data-search').toLowerCase();
+                            const show = query === '' || searchData.includes(query);
+
+                            if (show) {
+                                card.style.display = '';
+                                card.style.animation = `fadeInUp 0.5s ease-out ${visibleCount * 0.1}s forwards`;
+                                visibleCount++;
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+
+                        updateNoResults(visibleCount);
+                    }, 200);
+                });
+            }
+
+            // ===== FILTROS POR ESPECIE =====
+            const filterChips = document.querySelectorAll('.filter-chip');
+
+            function applyFilter(filter) {
+                let visibleCount = 0;
+
+                petCards.forEach(card => {
+                    const especie = card.getAttribute('data-especie');
+                    let show = true;
+
+                    if (filter === 'perro') {
+                        show = especie === 'perro';
+                    } else if (filter === 'gato') {
+                        show = especie === 'gato';
+                    }
+
+                    if (show) {
+                        card.style.display = '';
+                        card.style.animation = `fadeInUp 0.5s ease-out ${visibleCount * 0.1}s forwards`;
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                updateNoResults(visibleCount);
+            }
+
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    filterChips.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    applyFilter(this.getAttribute('data-filter'));
+                });
+            });
+
+            // ===== UPDATE NO RESULTS =====
+            function updateNoResults(count) {
+                let noResults = document.getElementById('no-results-message');
+                if (count === 0) {
+                    if (!noResults) {
+                        noResults = document.createElement('div');
+                        noResults.id = 'no-results-message';
+                        noResults.className = 'no-results-luxury animate-fade-up mt-4';
+                        noResults.innerHTML = `
+                            <i class="bi bi-search"></i>
+                            <h3 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--text-primary); font-size: 1.25rem; margin-bottom: 0.5rem;">No se encontraron mascotas</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Intenta con otros términos de búsqueda o filtros</p>
+                            <button onclick="resetFilters()" class="btn-aurora-solid" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">
+                                <i class="bi bi-arrow-counterclockwise"></i> Limpiar filtros
+                            </button>
+                        `;
+                        document.querySelector('main .container').appendChild(noResults);
+                    }
+                    noResults.style.display = '';
+                } else if (noResults) {
+                    noResults.style.display = 'none';
+                }
+            }
+
+            window.resetFilters = function () {
+                if (searchInput) searchInput.value = '';
+                filterChips.forEach(c => c.classList.remove('active'));
+                filterChips[0].classList.add('active');
+                petCards.forEach((card, i) => {
+                    card.style.display = '';
+                    card.style.animation = `fadeInUp 0.5s ease-out ${i * 0.1}s forwards`;
+                });
+                const noResults = document.getElementById('no-results-message');
+                if (noResults) noResults.style.display = 'none';
+            };
+
+            // ===== MODAL ELIMINAR =====
+            const deleteModal = document.getElementById('deleteModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const mascotaId = button.getAttribute('data-mascota-id');
+                    const mascotaNombre = button.getAttribute('data-mascota-nombre');
+
+                    document.getElementById('deleteMascotaNombre').textContent = mascotaNombre;
+                    document.getElementById('deleteForm').action = `/usuario/mascotas/eliminar/${mascotaId}`;
+                });
+            }
+
+            // ===== ANIMACIONES SCROLL =====
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            petCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(card);
+            });
+        });
+    </script>
+
+    <!-- Lógica Global y Partículas -->
+    <script th:replace="~{fragments/header :: activeLinkScript}"></script>
+    <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
+</body>
+</html>

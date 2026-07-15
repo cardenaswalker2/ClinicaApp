@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClínicaApp - Documentación Oficial</title>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Reutilizamos el favicon y estilos globales base si existen -->
+    <link th:replace="~{fragments/header :: favIcon}">
+    <style th:replace="~{fragments/header :: headerStyles}"></style>
+
+    <style>
+        :root {
+            --primary-bg: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --accent-blue: #0ea5e9;
+            --accent-indigo: #6366f1;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --sidebar-width: 300px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            position: relative;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Ambient Backgrounds */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: -1;
+            opacity: 0.35;
+            animation: float 10s ease-in-out infinite alternate;
+        }
+        .orb-1 {
+            width: 450px; height: 450px;
+            background: var(--accent-blue);
+            top: -100px; left: -100px;
+        }
+        .orb-2 {
+            width: 550px; height: 550px;
+            background: var(--accent-indigo);
+            bottom: -150px; right: -100px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(30px) scale(1.05); }
+        }
+
+        /* Navbar */
+        .docs-navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Layout */
+        .docs-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .docs-sidebar {
+            width: var(--sidebar-width);
+            background: transparent;
+            padding: 2.5rem 1.5rem;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Ocultar scrollbar de sidebar para estética más limpia */
+        .docs-sidebar::-webkit-scrollbar { width: 4px; }
+        .docs-sidebar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+        .docs-sidebar .nav-link {
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .docs-sidebar .nav-link:hover, .docs-sidebar .nav-link.active {
+            color: var(--accent-indigo);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateX(3px);
+        }
+
+        /* Main Content */
+        .docs-content {
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 900px;
+        }
+
+        .doc-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--accent-indigo), var(--accent-blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .doc-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+        .doc-section:hover::before { opacity: 1; }
+
+        h1, h2, h3, h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-dark);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-dark), var(--accent-indigo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-indigo);
+        }
+
+        p, li {
+            line-height: 1.8;
+            color: #475569;
+            font-size: 1.05rem;
+        }
+
+        ul { padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* Highlights */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(99, 102, 241, 0.08));
+            border-left: 4px solid var(--accent-indigo);
+            padding: 1.5rem 2rem;
+            border-radius: 0 1rem 1rem 0;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .docs-sidebar { display: none; }
+            .docs-content { padding: 2rem 1.5rem; max-width: 100%; }
+            h1 { font-size: 2.5rem; }
+            .doc-section { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Background -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg docs-navbar py-3">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <i class="bi bi-heart-pulse-fill text-primary"></i>
+                ClínicaApp Docs
+            </a>
+            <div class="d-flex gap-3">
+                <a href="/" class="btn btn-outline-secondary rounded-pill px-4 fw-medium">Volver al inicio</a>
+                <a href="/login" class="btn btn-primary rounded-pill px-4 fw-medium" style="background: var(--accent-indigo); border: none; box-shadow: 0 4px 14px 0 rgba(99,102,241,0.39);">Iniciar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <!-- Sidebar Navigation -->
+        <aside class="docs-sidebar">
+            <h6 class="text-uppercase text-muted fw-bold mb-3 px-3" style="font-size: 0.75rem; letter-spacing: 1px;">Contenido</h6>
+            <nav class="nav flex-column" id="docs-nav">
+                <a class="nav-link active" href="#introduccion"><i class="bi bi-rocket-takeoff me-2"></i> 1. Introducción</a>
+                <a class="nav-link" href="#objetivos"><i class="bi bi-bullseye me-2"></i> 2. Objetivos</a>
+                <a class="nav-link" href="#descripcion"><i class="bi bi-display me-2"></i> 3. Descripción General</a>
+                <a class="nav-link" href="#funcionalidades"><i class="bi bi-stars me-2"></i> 4. Funcionalidades</a>
+                <a class="nav-link" href="#arquitectura"><i class="bi bi-diagram-3 me-2"></i> 5. Arquitectura</a>
+                <a class="nav-link" href="#tecnologias"><i class="bi bi-cpu me-2"></i> 6. Tecnologías</a>
+                <a class="nav-link" href="#ia"><i class="bi bi-robot me-2"></i> 7. Inteligencia Artificial</a>
+                <a class="nav-link" href="#seguridad"><i class="bi bi-shield-check me-2"></i> 8. Seguridad</a>
+                <a class="nav-link" href="#uiux"><i class="bi bi-palette me-2"></i> 9. Diseño UI/UX</a>
+                <a class="nav-link" href="#metodologia"><i class="bi bi-kanban me-2"></i> 10. Metodología</a>
+                <a class="nav-link" href="#futuro"><i class="bi bi-rocket me-2"></i> 11. Futuras Mejoras</a>
+                <a class="nav-link" href="#conclusion"><i class="bi bi-check-circle me-2"></i> 12. Conclusión</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="docs-content" data-bs-spy="scroll" data-bs-target="#docs-nav" data-bs-smooth-scroll="true" tabindex="0">
+            
+            <div class="text-center mb-5 pb-3">
+                <span class="badge rounded-pill mb-3" style="background: rgba(99, 102, 241, 0.1); color: var(--accent-indigo); padding: 0.5rem 1rem;">Documentación Técnica 2026</span>
+                <h1>Documentación Oficial</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 600px;">Plataforma integral, inteligente y accesible para la salud digital del futuro.</p>
+            </div>
+
+            <section id="introduccion" class="doc-section">
+                <h2>1. Introducción</h2>
+                <h3>1.1 ¿Qué es ClinicApp?</h3>
+                <p><strong>ClinicApp</strong> es una plataforma web integral de salud digital (e-Health) diseñada para revolucionar la interacción entre pacientes, profesionales médicos y la administración clínica. Combina la gestión médica tradicional con capacidades avanzadas de Inteligencia Artificial para ofrecer diagnósticos predictivos y una experiencia de usuario excepcional.</p>
+                
+                <h3>1.2 ¿Para qué sirve?</h3>
+                <p>Sirve como un ecosistema centralizado donde los pacientes pueden gestionar sus citas, consultar historiales y aprender sobre salud; los médicos pueden administrar diagnósticos asistidos por IA; y los administradores pueden gestionar la operatividad del centro de salud de forma eficiente.</p>
+                
+                <div class="highlight-box">
+                    <h4 class="h5 mb-2 fw-bold text-dark"><i class="bi bi-lightbulb-fill text-warning me-2"></i>¿Qué problema resuelve?</h4>
+                    <p class="mb-0">El sector salud frecuentemente sufre de sistemas fragmentados, tiempos de espera prolongados, falta de educación en salud para el paciente y diagnósticos tardíos. ClinicApp resuelve esto unificando los procesos, automatizando la comunicación y empoderando el diagnóstico médico con modelos predictivos de Machine Learning.</p>
+                </div>
+            </section>
+
+            <section id="objetivos" class="doc-section">
+                <h2>2. Objetivos</h2>
+                <h3>2.1 Objetivo General</h3>
+                <p>Desarrollar e implementar una plataforma médica integral, segura e inteligente que optimice la gestión clínica, mejore la experiencia del paciente y asista a los profesionales de la salud mediante herramientas predictivas de Inteligencia Artificial.</p>
+                
+                <h3>2.2 Objetivos Específicos</h3>
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card">
+                            <i class="bi bi-cloud-arrow-up text-primary fs-3 mb-2"></i>
+                            <h5 class="fw-bold">Digitalizar</h5>
+                            <p class="small text-muted mb-0">Los procesos de agendamiento y gestión de historias clínicas de forma rápida y segura.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card">
+                            <i class="bi bi-cpu text-indigo fs-3 mb-2" style="color: var(--accent-indigo);"></i>
+                            <h5 class="fw-bold">Implementar IA</h5>
+                            <p class="small text-muted mb-0">Modelos de Machine Learning para predecir posibles riesgos de salud basados en síntomas.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card">
+                            <i class="bi bi-controller text-success fs-3 mb-2"></i>
+                            <h5 class="fw-bold">Fidelizar</h5>
+                            <p class="small text-muted mb-0">Educar a los usuarios a través de un sistema interactivo (Quiz) con recompensas premium.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card">
+                            <i class="bi bi-shield-lock text-danger fs-3 mb-2"></i>
+                            <h5 class="fw-bold">Garantizar</h5>
+                            <p class="small text-muted mb-0">La seguridad de los datos médicos mediante protocolos de encriptación y OAuth2.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="descripcion" class="doc-section">
+                <h2>3. Descripción General del Sistema</h2>
+                <h3>3.1 Explicación de la Plataforma</h3>
+                <p>ClinicApp es una aplicación basada en arquitectura cliente-servidor construida sobre el ecosistema Java (Spring Boot) con persistencia NoSQL. La plataforma se divide en portales de acceso según el rol del usuario (Paciente, Médico, Administrador), garantizando flujos de trabajo especializados para cada perfil.</p>
+                
+                <h3>3.2 Flujo General</h3>
+                <p>Al ingresar, el sistema enruta al usuario según su nivel de acceso:</p>
+                <ul class="mt-3">
+                    <li><i class="bi bi-person-heart text-primary me-2"></i><strong>Flujo del Paciente:</strong> Registro, agendamiento de citas, visualización de historial, participación en campañas interactivas (Quiz de salud).</li>
+                    <li><i class="bi bi-bandaid text-danger me-2"></i><strong>Flujo del Médico:</strong> Revisión de agendas, carga de historias clínicas, ejecución de algoritmos de soporte diagnóstico (Weka IA).</li>
+                    <li><i class="bi bi-ticket-perforated text-success me-2"></i><strong>Sistema de Recompensas:</strong> Un módulo de fidelización integrado con un servidor de correos para emitir cupones digitales premium a los pacientes.</li>
+                </ul>
+            </section>
+
+            <section id="funcionalidades" class="doc-section">
+                <h2>4. Funcionalidades Principales</h2>
+                <div class="accordion" id="accordionFuncionalidades">
+                    <!-- Pacientes -->
+                    <div class="accordion-item border-0 mb-3 rounded" style="box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button fw-bold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true">
+                                4.1 Módulo de Pacientes
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionFuncionalidades">
+                            <div class="accordion-body text-muted bg-white">
+                                <ul class="mb-0">
+                                    <li><strong>Dashboard Personal:</strong> Resumen de citas próximas e historial médico.</li>
+                                    <li><strong>Sistema Interactivo (Quiz):</strong> Evaluaciones dinámicas de 5 preguntas aleatorias con feedback visual que otorgan cupones de descuento.</li>
+                                    <li><strong>Gestión de Recompensas:</strong> Envío automático de cupones digitales premium por correo electrónico con códigos de barras.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Médicos -->
+                    <div class="accordion-item border-0 mb-3 rounded" style="box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                4.2 Módulo de Médicos
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFuncionalidades">
+                            <div class="accordion-body text-muted bg-white">
+                                <ul class="mb-0">
+                                    <li><strong>Agenda Inteligente:</strong> Gestión de turnos y visualización rápida del estado de los pacientes.</li>
+                                    <li><strong>Soporte Diagnóstico:</strong> Interfaz de evaluación de síntomas conectada al motor de Machine Learning.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Admin -->
+                    <div class="accordion-item border-0 rounded" style="box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                4.3 Módulo Administrativo y Core
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFuncionalidades">
+                            <div class="accordion-body text-muted bg-white">
+                                <ul class="mb-0">
+                                    <li><strong>Notificaciones Automáticas:</strong> Integración con servicio de Email para confirmación de citas y envío de premios.</li>
+                                    <li><strong>Gestión de Usuarios:</strong> Panel de control de roles y permisos.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="arquitectura" class="doc-section">
+                <h2>5. Arquitectura del Sistema</h2>
+                <p>La arquitectura de ClinicApp sigue el patrón <strong>MVC (Model-View-Controller)</strong> y una arquitectura de N capas para asegurar mantenibilidad y escalabilidad:</p>
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card d-flex align-items-start">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                                <i class="bi bi-browser-chrome text-primary fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Presentación</h5>
+                                <p class="small text-muted mb-0">Thymeleaf, HTML5, CSS3 Glassmorphism, JS (Web Audio API, LocalStorage).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card d-flex align-items-start">
+                            <div class="bg-indigo p-3 rounded-circle me-3" style="background: rgba(99, 102, 241, 0.1);">
+                                <i class="bi bi-diagram-2 text-indigo fs-4" style="color: var(--accent-indigo);"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Control</h5>
+                                <p class="small text-muted mb-0">Controladores RESTful que exponen los endpoints y manejan peticiones HTTP.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card d-flex align-items-start">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
+                                <i class="bi bi-gear-fill text-warning fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Negocio</h5>
+                                <p class="small text-muted mb-0">Lógica de negocio encapsulada (IEmailService, WekaPredictionService).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card d-flex align-items-start">
+                            <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3">
+                                <i class="bi bi-database-fill text-success fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Persistencia</h5>
+                                <p class="small text-muted mb-0">Spring Data MongoDB para interactuar con bases de datos NoSQL.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tecnologias" class="doc-section">
+                <h2>6. Tecnologías Utilizadas</h2>
+                <div class="table-responsive">
+                    <table class="table table-borderless bg-white rounded shadow-sm">
+                        <tbody class="text-muted">
+                            <tr class="border-bottom">
+                                <td class="py-3 px-4" style="width: 50px;"><i class="bi bi-filetype-java text-danger fs-3"></i></td>
+                                <td class="py-3 align-middle"><strong class="text-dark">Java & Spring Boot</strong></td>
+                                <td class="py-3 align-middle">Framework principal que garantiza robustez y despliegue rápido.</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="py-3 px-4"><i class="bi bi-shield-lock text-success fs-3"></i></td>
+                                <td class="py-3 align-middle"><strong class="text-dark">Spring Security & OAuth2</strong></td>
+                                <td class="py-3 align-middle">Para autenticación segura y control de acceso basado en roles.</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="py-3 px-4"><i class="bi bi-envelope-paper text-primary fs-3"></i></td>
+                                <td class="py-3 align-middle"><strong class="text-dark">JavaMailSender</strong></td>
+                                <td class="py-3 align-middle">Para el envío dinámico de correos electrónicos interactivos en HTML.</td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td class="py-3 px-4"><i class="bi bi-layout-text-window text-info fs-3"></i></td>
+                                <td class="py-3 align-middle"><strong class="text-dark">Thymeleaf & UI Moderno</strong></td>
+                                <td class="py-3 align-middle">Bootstrap 5, animaciones e interactividad del lado del cliente.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4"><i class="bi bi-database-fill text-success fs-3"></i></td>
+                                <td class="py-3 align-middle"><strong class="text-dark">MongoDB</strong></td>
+                                <td class="py-3 align-middle">Base de datos orientada a documentos, ideal para historias clínicas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="ia" class="doc-section">
+                <h2>7. Inteligencia Artificial y Machine Learning</h2>
+                <p>ClinicApp no es un software médico convencional; es una plataforma verdaderamente inteligente.</p>
+                <div class="highlight-box border-success" style="background: rgba(16, 185, 129, 0.08); border-color: var(--medical-emerald) !important;">
+                    <h4 class="h5 mb-2 fw-bold text-dark"><i class="bi bi-cpu-fill text-success me-2"></i>Predicción con Weka</h4>
+                    <p class="mb-0">El sistema carga archivos <code>.model</code> pre-entrenados con datasets clínicos (<code>.arff</code>) para evaluar instantáneamente los signos vitales y síntomas ingresados por el médico, proporcionando una <strong>segunda opinión algorítmica</strong> y alertando sobre posibles patologías antes de que se agraven.</p>
+                </div>
+            </section>
+
+            <section id="seguridad" class="doc-section">
+                <h2>8. Seguridad y Privacidad</h2>
+                <ul class="list-unstyled">
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-primary fs-5 me-3"></i>
+                        <span><strong>Protección de Datos Sensibles:</strong> Uso de protocolos de encriptación para contraseñas (BCrypt) y datos clínicos, cumpliendo con estándares de privacidad en salud.</span>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-primary fs-5 me-3"></i>
+                        <span><strong>Autenticación Moderna:</strong> Implementación de OAuth2 y filtros de Spring Security (<code>SecurityFilterChain</code>) para asegurar endpoints.</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="uiux" class="doc-section">
+                <h2>9. Diseño UI/UX</h2>
+                <p>La interfaz fue diseñada bajo los principios de <strong>Modern Web Design</strong>:</p>
+                <ul>
+                    <li><strong>Estética Premium:</strong> Uso de paletas de colores armoniosas, sombras suaves, y efectos <em>glassmorphism</em>.</li>
+                    <li><strong>Gamificación UI:</strong> El módulo de "Quiz" incorpora animaciones en tiempo real, efectos de sonido (Web Audio API) y generación visual de tickets tipo "Boarding Pass".</li>
+                    <li><strong>Responsive Design:</strong> Totalmente adaptable a dispositivos móviles, tablets y monitores de escritorio.</li>
+                </ul>
+            </section>
+
+            <section id="metodologia" class="doc-section">
+                <h2>10. Metodología de Desarrollo</h2>
+                <p>El proyecto se desarrolla utilizando principios de <strong>Metodologías Ágiles (Scrum / Kanban)</strong>:</p>
+                <ul>
+                    <li><strong>Iteración Continua:</strong> Entregas modulares e incrementales.</li>
+                    <li><strong>Pruebas (Testing):</strong> Validación constante mediante la suite de tests de Spring Boot (<code>mvn test</code>), asegurando calidad en integraciones como el EmailService.</li>
+                    <li><strong>Control de Versiones:</strong> Manejo estructurado de código fuente.</li>
+                </ul>
+            </section>
+
+            <section id="futuro" class="doc-section">
+                <h2>11. Futuras Mejoras</h2>
+                <div class="row mt-3">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="p-4 bg-white rounded shadow-sm border border-light h-100">
+                            <i class="bi bi-camera-video text-primary fs-1 mb-2 d-block"></i>
+                            <strong>Telemedicina</strong>
+                            <p class="small text-muted mt-2">Integrada vía WebRTC nativo.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="p-4 bg-white rounded shadow-sm border border-light h-100">
+                            <i class="bi bi-robot text-indigo fs-1 mb-2 d-block" style="color: var(--accent-indigo);"></i>
+                            <strong>Chatbot LLM</strong>
+                            <p class="small text-muted mt-2">Asistente virtual 24/7 para pre-triage.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="p-4 bg-white rounded shadow-sm border border-light h-100">
+                            <i class="bi bi-smartwatch text-danger fs-1 mb-2 d-block"></i>
+                            <strong>Wearables</strong>
+                            <p class="small text-muted mt-2">Sincronización con dispositivos de salud.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusion" class="doc-section" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(99, 102, 241, 0.05)); border: 1px solid rgba(99, 102, 241, 0.2);">
+                <h2>12. Conclusión</h2>
+                <p><strong>ClinicApp</strong> representa el futuro de la administración hospitalaria y la atención al paciente. Al unificar un diseño de usuario excepcional, la robustez de arquitecturas Java empresariales y el poder predictivo del Machine Learning, la plataforma no solo optimiza el tiempo de los profesionales, sino que empodera al paciente mediante el conocimiento y la interactividad. Es una solución tecnológica moderna, altamente escalable y preparada para liderar el ecosistema de la salud digital.</p>
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-primary rounded-pill px-5 py-2 fw-bold" style="background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue)); border: none; box-shadow: 0 4px 15px rgba(99,102,241,0.4);">
+                        Explorar ClínicaApp <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </section>
+
+            <footer class="text-center mt-5 mb-4 pb-3">
+                <hr class="text-muted opacity-25 mb-4">
+                <h5 class="fw-bold" style="font-family: 'Space Grotesk', sans-serif;">
+                    <i class="bi bi-heart-pulse-fill text-primary me-2"></i>ClínicaApp
+                </h5>
+                <p class="text-muted small">&copy; 2026. Innovación en Salud Digital. Todos los derechos reservados.</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple scrollspy activation and link highlighting for sidebar
+        document.addEventListener("DOMContentLoaded", () => {
+            const sections = document.querySelectorAll("section.doc-section");
+            const navLinks = document.querySelectorAll(".docs-sidebar .nav-link");
+
+            window.addEventListener("scroll", () => {
+                let current = "";
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    // Detect current section
+                    if (scrollY >= (sectionTop - 250)) {
+                        current = section.getAttribute("id");
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove("active");
+                    if (link.getAttribute("href").includes(current) && current !== "") {
+                        link.classList.add("active");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

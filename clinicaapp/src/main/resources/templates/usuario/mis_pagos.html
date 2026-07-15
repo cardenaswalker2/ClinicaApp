@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Consulta tu historial de pagos y descarga tus facturas en Clínica App.">
+    <title>Historial de Pagos | Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════
+           LUXURY AURORA DESIGN SYSTEM
+           ═══════════════════════════════════════ */
+        :root {
+            /* Primary Aurora Gradient */
+            --aurora-start: #6366f1;
+            --aurora-mid: #8b5cf6;
+            --aurora-end: #d946ef;
+
+            /* Secondary Palette */
+            --ocean: #06b6d4;
+            --ocean-light: rgba(6, 182, 212, 0.1);
+            --mint: #10b981;
+            --mint-light: rgba(16, 185, 129, 0.1);
+            --sunset: #f59e0b;
+            --sunset-light: rgba(245, 158, 11, 0.1);
+            --rose: #f43f5e;
+            --rose-light: rgba(244, 63, 94, 0.1);
+
+            /* Neutrals */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --border-light: rgba(226, 232, 240, 0.6);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            /* Shadows - Soft & Layered */
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+
+            /* Radius */
+            --r-sm: 10px;
+            --r-md: 16px;
+            --r-lg: 20px;
+            --r-xl: 24px;
+            --r-full: 9999px;
+
+            /* Transitions */
+            --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: rgba(30, 41, 59, 0.8);
+            --surface-hover: rgba(51, 65, 85, 0.6);
+            --border: rgba(148, 163, 184, 0.2);
+            --border-light: rgba(148, 163, 184, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            background-attachment: fixed;
+            color: var(--text-secondary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+        }
+
+        /* ═══════════════════════════════════════
+           ANIMATIONS
+           ═══════════════════════════════════════ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes pulse-soft {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.6s var(--ease-out) forwards;
+        }
+
+        .animate-fade-scale {
+            animation: fadeInScale 0.5s var(--ease-out) forwards;
+        }
+
+        .animate-slide-right {
+            animation: slideInRight 0.5s var(--ease-out) forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+
+        .delay-400 {
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
+
+        .delay-500 {
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        /* ═══════════════════════════════════════
+           GLASSMORPHISM UTILITIES
+           ═══════════════════════════════════════ */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        [data-theme="dark"] .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ═══════════════════════════════════════
+           AURORA HEADER
+           ═══════════════════════════════════════ */
+        .aurora-header {
+            position: relative;
+            padding: 3.5rem 0 4rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--aurora-start) 0%, var(--aurora-mid) 50%, var(--aurora-end) 100%);
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        .aurora-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.6;
+        }
+
+        .aurora-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, var(--bg), transparent);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--r-full);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.5s var(--ease-out) forwards;
+        }
+
+        .header-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title span {
+            background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1.05rem;
+            font-weight: 400;
+            margin-top: 0.75rem;
+            max-width: 420px;
+            line-height: 1.6;
+        }
+
+        /* Aurora Button */
+        .btn-aurora {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--aurora-start);
+            border: none;
+            border-radius: var(--r-md);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-aurora::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .btn-aurora:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+        .btn-aurora:hover::before {
+            opacity: 1;
+        }
+
+        .btn-aurora span,
+        .btn-aurora i {
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+
+        .btn-aurora:hover i {
+            transform: translateX(-4px);
+        }
+
+        /* ═══════════════════════════════════════
+           BREADCRUMB GLASS
+           ═══════════════════════════════════════ */
+        .breadcrumb-glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--r-md);
+            padding: 0.875rem 1.5rem;
+            margin: -1.5rem auto 2rem;
+            max-width: calc(100% - 2rem);
+            position: relative;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--aurora-start);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            content: '›';
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        /* ═══════════════════════════════════════
+           ALERTS AURORA
+           ═══════════════════════════════════════ */
+        .alert-aurora {
+            border: none;
+            border-radius: var(--r-lg);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s var(--ease-out);
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-aurora::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .alert-aurora-danger {
+            background: linear-gradient(135deg, #fef2f2, #fff1f2);
+            color: #be123c;
+        }
+
+        .alert-aurora-danger::before {
+            background: linear-gradient(to bottom, var(--rose), #be123c);
+        }
+
+        .alert-aurora-success {
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            color: #047857;
+        }
+
+        .alert-aurora-success::before {
+            background: linear-gradient(to bottom, var(--mint), #047857);
+        }
+
+        .alert-aurora i {
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .alert-aurora-danger {
+            background: rgba(190, 18, 60, 0.15);
+            color: #fb7185;
+        }
+
+        [data-theme="dark"] .alert-aurora-success {
+            background: rgba(4, 120, 87, 0.15);
+            color: #34d399;
+        }
+
+        /* ═══════════════════════════════════════
+           STATS CARDS - GLASS
+           ═══════════════════════════════════════ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--r-lg);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .stat-icon-wrap.aurora {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+            color: var(--aurora-start);
+        }
+
+        .stat-icon-wrap.mint {
+            background: linear-gradient(135deg, var(--mint-light), rgba(16, 185, 129, 0.2));
+            color: var(--mint);
+        }
+
+        .stat-icon-wrap.sunset {
+            background: linear-gradient(135deg, var(--sunset-light), rgba(245, 158, 11, 0.2));
+            color: var(--sunset);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* ═══════════════════════════════════════
+           SUMMARY BAR - AURORA
+           ═══════════════════════════════════════ */
+        .summary-aurora {
+            background: linear-gradient(135deg, var(--mint), #059669);
+            color: white;
+            padding: 1.25rem 1.75rem;
+            border-radius: var(--r-lg);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-aurora::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .summary-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-amount {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════
+           FILTER BAR - GLASS
+           ═══════════════════════════════════════ */
+        .filter-glass {
+            background: var(--surface);
+            border-radius: var(--r-lg);
+            padding: 1rem 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-aurora {
+            position: relative;
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .search-aurora input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: var(--r-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s var(--ease-out);
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .search-aurora input:focus {
+            outline: none;
+            border-color: var(--aurora-start);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: var(--surface);
+        }
+
+        .search-aurora input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-aurora i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .search-aurora input:focus+i,
+        .search-aurora:focus-within i {
+            color: var(--aurora-start);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.625rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--r-full);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: var(--bg);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .filter-chip:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--aurora-start);
+            transform: translateY(-1px);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            border-color: transparent;
+        }
+
+        .filter-chip.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* ═══════════════════════════════════════
+           TABLE CARD - LUXURY
+           ═══════════════════════════════════════ */
+        .table-luxury {
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: all 0.4s var(--ease-out);
+        }
+
+        .table-luxury:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .table-header-luxury {
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.03), rgba(139, 92, 246, 0.02));
+        }
+
+        .table-title-luxury {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .table-title-luxury i {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .table-actions-luxury {
+            display: flex;
+            gap: 0.625rem;
+        }
+
+        .btn-export-luxury {
+            padding: 0.625rem 1.25rem;
+            background: var(--bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+        }
+
+        .btn-export-luxury:hover {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Table Styling */
+        .table-aurora {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .table-aurora thead th {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(139, 92, 246, 0.03));
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        .table-aurora tbody td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+
+        .table-aurora tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table-aurora tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-aurora tbody tr:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.02), rgba(139, 92, 246, 0.01));
+            transform: scale(1.002);
+            box-shadow: 0 2px 12px rgba(99, 102, 241, 0.06);
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Cells */
+        .cell-date-luxury {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .date-main-luxury {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .date-time-luxury {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .cell-service-luxury {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .service-icon-luxury {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08));
+            color: var(--aurora-start);
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s var(--ease-spring);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+
+        .table-aurora tbody tr:hover .service-icon-luxury {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+        }
+
+        .service-name-luxury {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .cell-pet-luxury,
+        .cell-clinic-luxury {
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .cell-pet-luxury i {
+            color: var(--rose);
+            font-size: 1rem;
+        }
+
+        .cell-clinic-luxury i {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .cell-amount-luxury {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--mint);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.25rem;
+        }
+
+        .cell-amount-luxury::before {
+            content: '$';
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .btn-invoice-luxury {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08));
+            color: var(--aurora-start);
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--r-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-invoice-luxury::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.4s;
+        }
+
+        .btn-invoice-luxury:hover {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-invoice-luxury:hover::before {
+            left: 100%;
+        }
+
+        /* Status Badges */
+        .status-luxury {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--r-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-completed-luxury {
+            background: linear-gradient(135deg, var(--mint-light), rgba(16, 185, 129, 0.15));
+            color: var(--mint);
+        }
+
+        .status-pending-luxury {
+            background: linear-gradient(135deg, var(--sunset-light), rgba(245, 158, 11, 0.15));
+            color: #92400e;
+        }
+
+        .status-failed-luxury {
+            background: linear-gradient(135deg, var(--rose-light), rgba(244, 63, 94, 0.15));
+            color: #be123c;
+        }
+
+        /* Pagination */
+        .pagination-luxury {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .page-item-luxury {
+            min-width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--r-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-spring);
+            text-decoration: none;
+        }
+
+        .page-item-luxury:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--aurora-start);
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .page-item-luxury.active {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .page-item-luxury.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ═══════════════════════════════════════
+           EMPTY STATE - LUXURY
+           ═══════════════════════════════════════ */
+        .empty-luxury {
+            text-align: center;
+            padding: 5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empty-luxury::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.04) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .empty-icon-luxury {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--bg), #f1f5f9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: var(--text-muted);
+            position: relative;
+            animation: float 4s ease-in-out infinite;
+            box-shadow: var(--shadow-md);
+        }
+
+        .empty-icon-luxury::after {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            border: 2px dashed var(--border);
+            animation: spin-slow 25s linear infinite;
+        }
+
+        .empty-title-luxury {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .empty-text-luxury {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            position: relative;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-aurora-solid {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            border-radius: var(--r-md);
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-aurora-solid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-aurora-solid:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        .btn-aurora-solid:hover::before {
+            left: 100%;
+        }
+
+        /* ═══════════════════════════════════════
+           FLOATING ACTION BUTTONS
+           ═══════════════════════════════════════ */
+        .fab-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+        }
+
+        .fab-aurora {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            text-decoration: none;
+        }
+
+        .fab-aurora:hover {
+            transform: scale(1.12) rotate(8deg);
+        }
+
+        .fab-primary {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            animation: float 4s ease-in-out infinite;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .fab-secondary {
+            background: linear-gradient(135deg, var(--mint), #059669);
+            font-size: 1.25rem;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .fab-tooltip {
+            position: absolute;
+            right: 75px;
+            background: var(--text-primary);
+            color: white;
+            padding: 0.5rem 0.875rem;
+            border-radius: var(--r-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(12px);
+            transition: all 0.3s var(--ease-out);
+            pointer-events: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .fab-aurora:hover .fab-tooltip {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ═══════════════════════════════════════
+           NO RESULTS
+           ═══════════════════════════════════════ */
+        .no-results-luxury {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border-radius: var(--r-xl);
+            border: 2px dashed var(--border);
+            margin-top: 2rem;
+        }
+
+        .no-results-luxury i {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* ═══════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .aurora-header {
+                padding: 2.5rem 0 3rem;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-glass {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-aurora {
+                min-width: auto;
+            }
+
+            .table-aurora thead {
+                display: none;
+            }
+
+            .table-aurora tbody tr {
+                display: block;
+                padding: 1.25rem;
+                border-bottom: 1px solid var(--border);
+                margin-bottom: 0.5rem;
+                border-radius: var(--r-lg);
+                background: var(--surface);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .table-aurora tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 0;
+                border: none;
+            }
+
+            .table-aurora tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .cell-amount-luxury {
+                justify-content: space-between;
+                font-size: 1.25rem;
+            }
+
+            .cell-amount-luxury::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+            }
+
+            .fab-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .fab-aurora {
+                width: 52px;
+                height: 52px;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           SCROLLBAR
+           ═══════════════════════════════════════ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--r-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* ═══════════════════════════════════════
+           TOOLTIP
+           ═══════════════════════════════════════ */
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            padding: 0.5rem 0.875rem;
+            background: var(--text-primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--r-sm);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s var(--ease-out);
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+
+        [data-tooltip]:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Dark mode overrides */
+        [data-theme="dark"] .table-luxury,
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .filter-glass,
+        [data-theme="dark"] .breadcrumb-glass {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(148, 163, 184, 0.15);
+        }
+
+        [data-theme="dark"] .table-aurora thead th {
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom-color: rgba(148, 163, 184, 0.2);
+        }
+
+        [data-theme="dark"] .table-aurora tbody td {
+            border-bottom-color: rgba(148, 163, 184, 0.1);
+        }
+
+        [data-theme="dark"] .search-aurora input {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(148, 163, 184, 0.2);
+            color: white;
+        }
+
+        [data-theme="dark"] .filter-chip {
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        [data-theme="dark"] .stat-number,
+        [data-theme="dark"] .date-main-luxury,
+        [data-theme="dark"] .service-name-luxury,
+        [data-theme="dark"] .empty-title-luxury {
+            color: white;
+        }
+
+        [data-theme="dark"] .page-item-luxury {
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        /* Print styles */
+        @media print {
+
+            .aurora-header,
+            .breadcrumb-glass,
+            .filter-glass,
+            .fab-container,
+            .btn-export-luxury {
+                display: none !important;
+            }
+
+            .table-luxury {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+
+            .table-aurora tbody tr:hover {
+                background: none !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- ═══════════════════════════════════════
+         AURORA HEADER
+         ═══════════════════════════════════════ -->
+    <div class="aurora-header">
+        <div class="container">
+            <div class="header-content animate-fade-up">
+                <div>
+                    <div class="header-badge">
+                        <i class="bi bi-shield-check"></i>
+                        Panel de Usuario
+                    </div>
+                    <h1 class="header-title">
+                        <span>Historial de Pagos</span>
+                    </h1>
+                    <p class="header-subtitle">Consulta todas tus transacciones, descarga tus facturas y lleva el
+                        control de tus gastos veterinarios</p>
+                </div>
+                <a th:href="@{/usuario/dashboard}" class="btn-aurora animate-slide-right delay-200">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Volver al Panel</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         BREADCRUMB GLASS
+         ═══════════════════════════════════════ -->
+    <div class="container">
+        <div class="breadcrumb-glass animate-fade-up delay-100">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}"><i class="bi bi-house-door-fill"></i>Inicio</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#"><i class="bi bi-person-fill"></i>Mi Cuenta</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="bi bi-wallet2"></i>Historial de Pagos
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <main class="container pb-5">
+
+        <!-- ═══════════════════════════════════════
+             STATS ROW - GLASS CARDS
+             ═══════════════════════════════════════ -->
+        <div class="stats-grid animate-fade-up delay-100" th:if="${!pagos.isEmpty()}">
+            <div class="stat-card">
+                <div class="stat-icon-wrap aurora">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number" th:text="${pagos.size()}">0</span>
+                    <span class="stat-label">Total Pagos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrap mint">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number"
+                        th:text="${#numbers.formatCurrency(#aggregates.sum(pagos.![monto]))}">$0</span>
+                    <span class="stat-label">Monto Total</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon-wrap sunset">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-number" th:text="${pagos.?[fecha != null].size()}">0</span>
+                    <span class="stat-label">Este Año</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             SUMMARY BAR - AURORA
+             ═══════════════════════════════════════ -->
+        <div class="summary-aurora animate-fade-up delay-200" th:if="${!pagos.isEmpty()}">
+            <div class="summary-text">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Total invertido en la salud de tu mascota</span>
+            </div>
+            <div class="summary-amount" th:text="${#numbers.formatCurrency(#aggregates.sum(pagos.![monto]))}">$0.00
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             FILTER BAR - GLASS
+             ═══════════════════════════════════════ -->
+        <div class="filter-glass animate-fade-up delay-300" th:if="${!pagos.isEmpty()}">
+            <div class="search-aurora">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchPagos" placeholder="Buscar por servicio, clínica, mascota o fecha..."
+                    autocomplete="off">
+            </div>
+            <div class="filter-chips">
+                <button class="filter-chip active" data-filter="all">
+                    <i class="bi bi-grid-fill"></i> Todos
+                </button>
+                <button class="filter-chip" data-filter="this-month">
+                    <i class="bi bi-calendar-month"></i> Este Mes
+                </button>
+                <button class="filter-chip" data-filter="last-month">
+                    <i class="bi bi-calendar"></i> Mes Pasado
+                </button>
+                <button class="filter-chip" data-filter="this-year">
+                    <i class="bi bi-calendar-year"></i> Este Año
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             TABLA PREMIUM - LUXURY
+             ═══════════════════════════════════════ -->
+        <div class="table-luxury animate-fade-up delay-400" th:if="${!pagos.isEmpty()}">
+            <div class="table-header-luxury">
+                <h3 class="table-title-luxury">
+                    <i class="bi bi-receipt-cutoff"></i> Transacciones
+                </h3>
+                <div class="table-actions-luxury">
+                    <button class="btn-export-luxury" onclick="window.print()" data-tooltip="Imprimir historial">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                    <button class="btn-export-luxury" onclick="exportToCSV()" data-tooltip="Descargar CSV">
+                        <i class="bi bi-download"></i> CSV
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-aurora" id="paymentsTable">
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-calendar3 me-1"></i> Fecha</th>
+                            <th><i class="bi bi-heart-pulse me-1"></i> Servicio</th>
+                            <th><i class="bi bi-heart-fill me-1"></i> Mascota</th>
+                            <th><i class="bi bi-hospital me-1"></i> Clínica</th>
+                            <th class="text-end"><i class="bi bi-cash me-1"></i> Monto</th>
+                            <th class="text-center"><i class="bi bi-file-earmark-text me-1"></i> Estado</th>
+                            <th class="text-center"><i class="bi bi-receipt me-1"></i> Factura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="pago, iterStat : ${pagos}" class="payment-row"
+                            th:attr="data-fecha=${pago.fecha}, data-search=${pago.nombreServicio + ' ' + pago.nombreClinica + ' ' + pago.nombreMascota + ' ' + pago.fecha}"
+                            th:style="'animation-delay: ' + ${iterStat.index * 0.03} + 's'">
+
+                            <td data-label="Fecha">
+                                <div class="cell-date-luxury">
+                                    <span class="date-main-luxury"
+                                        th:text="${pago.fecha != null} ? ${#temporals.format(pago.fecha, 'dd MMM yyyy')} : 'N/A'">01
+                                        Ene 2024</span>
+                                    <span class="date-time-luxury">
+                                        <i class="bi bi-clock"></i>
+                                        <span
+                                            th:text="${pago.fecha != null} ? ${#temporals.format(pago.fecha, 'HH:mm')} : ''">14:30</span>
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td data-label="Servicio">
+                                <div class="cell-service-luxury">
+                                    <div class="service-icon-luxury">
+                                        <img th:if="${pago.imagenClinicaUrl != null}" th:src="${pago.imagenClinicaUrl}"
+                                            class="clinic-img-mini" alt="Logo">
+                                        <i th:unless="${pago.imagenClinicaUrl != null}" class="bi bi-hospital"></i>
+                                    </div>
+                                    <span class="service-name-luxury"
+                                        th:text="${pago.nombreServicio ?: 'N/A'}">Consulta</span>
+                                </div>
+                            </td>
+
+                            <td data-label="Mascota">
+                                <div class="cell-pet-luxury">
+                                    <i class="bi bi-heart-fill"></i>
+                                    <span th:text="${pago.nombreMascota ?: 'N/A'}">Firulais</span>
+                                </div>
+                            </td>
+
+                            <td data-label="Clínica">
+                                <div class="cell-clinic-luxury">
+                                    <i class="bi bi-hospital"></i>
+                                    <span th:text="${pago.nombreClinica ?: 'N/A'}">Clínica</span>
+                                </div>
+                            </td>
+
+                            <td data-label="Monto" class="text-end">
+                                <span class="cell-amount-luxury"
+                                    th:text="${#numbers.formatDecimal(pago.monto, 0, 'COMMA', 0, 'POINT')}">35.000</span>
+                            </td>
+
+                            <td data-label="Estado" class="text-center">
+                                <span class="status-luxury status-completed-luxury"
+                                    th:if="${pago.estado == 'COMPLETADO' or pago.estado == null}">
+                                    <i class="bi bi-check-circle-fill"></i> Completado
+                                </span>
+                                <span class="status-luxury status-pending-luxury" th:if="${pago.estado == 'PENDIENTE'}">
+                                    <i class="bi bi-hourglass-split"></i> Pendiente
+                                </span>
+                                <span class="status-luxury status-failed-luxury" th:if="${pago.estado == 'FALLIDO'}">
+                                    <i class="bi bi-x-circle-fill"></i> Fallido
+                                </span>
+                            </td>
+
+                            <td data-label="Factura" class="text-center">
+                                <a th:href="@{/usuario/pagos/factura/{citaId}/pdf(citaId=${pago.citaId})}"
+                                    class="btn-invoice-luxury" target="_blank" data-tooltip="Descargar factura PDF">
+                                    <i class="bi bi-receipt-cutoff"></i> Ver
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-luxury" th:if="${pagos.size() > 10}">
+                <a href="#" class="page-item-luxury disabled"><i class="bi bi-chevron-left"></i></a>
+                <a href="#" class="page-item-luxury active">1</a>
+                <a href="#" class="page-item-luxury">2</a>
+                <a href="#" class="page-item-luxury">3</a>
+                <a href="#" class="page-item-luxury"><i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════
+             ESTADO VACÍO - LUXURY
+             ═══════════════════════════════════════ -->
+        <div th:if="${pagos.isEmpty()}" class="table-luxury animate-fade-scale">
+            <div class="empty-luxury">
+                <div class="empty-icon-luxury">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <h3 class="empty-title-luxury">No tienes pagos registrados</h3>
+                <p class="empty-text-luxury">Cuando completes el pago de una cita, aparecerá aquí con tu factura para
+                    que puedas descargarla cuando quieras</p>
+                <a th:href="@{/usuario/citas/solicitar}" class="btn-aurora-solid">
+                    <i class="bi bi-calendar-plus-fill"></i> Agendar una Cita
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer-usuario}"></div>
+
+    <!-- ═══════════════════════════════════════
+         FLOATING ACTION BUTTONS
+         ═══════════════════════════════════════ -->
+    <div class="fab-container" th:if="${!pagos.isEmpty()}">
+        <button class="fab-aurora fab-secondary" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            data-tooltip="Volver arriba">
+            <i class="bi bi-arrow-up"></i>
+        </button>
+        <a th:href="@{/usuario/citas/solicitar}" class="fab-aurora fab-primary" data-tooltip="Nueva cita">
+            <i class="bi bi-plus-lg"></i>
+        </a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ===== CONTADORES ANIMADOS =====
+            document.querySelectorAll('.stat-number').forEach(stat => {
+                const text = stat.textContent.trim();
+                const numMatch = text.match(/[\d.,]+/);
+                if (numMatch) {
+                    const target = parseFloat(numMatch[0].replace(/\./g, '').replace(/,/g, '')) || 0;
+                    if (target > 0) {
+                        const prefix = text.match(/^[^\d]*/)[0] || '';
+                        const suffix = text.match(/[^\d]*$/)[0] || '';
+                        let current = 0;
+                        const increment = target / 40;
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                stat.textContent = text;
+                                clearInterval(timer);
+                            } else {
+                                stat.textContent = prefix + Math.floor(current).toLocaleString('es-CO') + suffix;
+                            }
+                        }, 25);
+                    }
+                }
+            });
+
+            // ===== BÚSQUEDA EN TIEMPO REAL =====
+            const searchInput = document.getElementById('searchPagos');
+            const tableRows = document.querySelectorAll('.payment-row');
+
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        const query = this.value.toLowerCase().trim();
+                        let visibleCount = 0;
+
+                        tableRows.forEach(row => {
+                            const searchData = row.getAttribute('data-search').toLowerCase();
+                            const show = query === '' || searchData.includes(query);
+
+                            if (show) {
+                                row.style.display = '';
+                                row.style.animation = `fadeInUp 0.4s ease-out ${visibleCount * 0.03}s forwards`;
+                                visibleCount++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+
+                        updateNoResults(visibleCount);
+                        updateSummaryBar(visibleCount);
+                    }, 200);
+                });
+            }
+
+            // ===== FILTROS POR FECHA =====
+            const filterChips = document.querySelectorAll('.filter-chip');
+
+            function parseDate(str) {
+                if (!str) return null;
+                try {
+                    const d = new Date(str);
+                    return isNaN(d.getTime()) ? null : d;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function isThisMonth(date) {
+                const now = new Date();
+                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+            }
+
+            function isLastMonth(date) {
+                const now = new Date();
+                const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                return date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
+            }
+
+            function isThisYear(date) {
+                const now = new Date();
+                return date.getFullYear() === now.getFullYear();
+            }
+
+            function applyFilter(filter) {
+                let visibleCount = 0;
+                let totalAmount = 0;
+
+                tableRows.forEach(row => {
+                    const fechaStr = row.getAttribute('data-fecha');
+                    const fecha = parseDate(fechaStr);
+                    let show = true;
+
+                    if (filter === 'this-month') {
+                        show = fecha && isThisMonth(fecha);
+                    } else if (filter === 'last-month') {
+                        show = fecha && isLastMonth(fecha);
+                    } else if (filter === 'this-year') {
+                        show = fecha && isThisYear(fecha);
+                    }
+
+                    if (show) {
+                        row.style.display = '';
+                        row.style.animation = `fadeInUp 0.4s ease-out ${visibleCount * 0.03}s forwards`;
+                        visibleCount++;
+
+                        const amountCell = row.querySelector('.cell-amount-luxury');
+                        if (amountCell) {
+                            const amount = parseFloat(amountCell.textContent.replace(/\./g, '').replace(/,/g, '')) || 0;
+                            totalAmount += amount;
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                updateNoResults(visibleCount);
+                updateSummaryBar(visibleCount, totalAmount);
+            }
+
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    filterChips.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    applyFilter(this.getAttribute('data-filter'));
+                });
+            });
+
+            // ===== UPDATE NO RESULTS =====
+            function updateNoResults(count) {
+                let noResults = document.getElementById('no-results-message');
+                if (count === 0) {
+                    if (!noResults) {
+                        noResults = document.createElement('div');
+                        noResults.id = 'no-results-message';
+                        noResults.className = 'no-results-luxury animate-fade-up mt-4';
+                        noResults.innerHTML = `
+                            <i class="bi bi-search"></i>
+                            <h3 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--text-primary); font-size: 1.25rem; margin-bottom: 0.5rem;">No se encontraron pagos</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Intenta con otros términos de búsqueda o filtros</p>
+                            <button onclick="resetFilters()" class="btn-aurora-solid" style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">
+                                <i class="bi bi-arrow-counterclockwise"></i> Limpiar filtros
+                            </button>
+                        `;
+                        document.querySelector('.table-luxury').appendChild(noResults);
+                    }
+                    noResults.style.display = '';
+                } else if (noResults) {
+                    noResults.style.display = 'none';
+                }
+            }
+
+            // ===== UPDATE SUMMARY BAR =====
+            function updateSummaryBar(count, amount) {
+                const summaryBar = document.querySelector('.summary-aurora');
+                if (summaryBar) {
+                    if (count === 0) {
+                        summaryBar.style.display = 'none';
+                    } else {
+                        summaryBar.style.display = 'flex';
+                        const amountEl = summaryBar.querySelector('.summary-amount');
+                        if (amountEl && amount !== undefined) {
+                            amountEl.textContent = '$' + amount.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                        }
+                    }
+                }
+            }
+
+            window.resetFilters = function () {
+                if (searchInput) searchInput.value = '';
+                filterChips.forEach(c => c.classList.remove('active'));
+                filterChips[0].classList.add('active');
+                tableRows.forEach((row, i) => {
+                    row.style.display = '';
+                    row.style.animation = `fadeInUp 0.4s ease-out ${i * 0.03}s forwards`;
+                });
+                const noResults = document.getElementById('no-results-message');
+                if (noResults) noResults.style.display = 'none';
+
+                const summaryBar = document.querySelector('.summary-aurora');
+                if (summaryBar) summaryBar.style.display = 'flex';
+            };
+
+            // ===== ANIMACIONES SCROLL =====
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            tableRows.forEach(row => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                row.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(row);
+            });
+
+            // ===== EXPORT TO CSV =====
+            window.exportToCSV = function () {
+                const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+                if (visibleRows.length === 0) {
+                    alert('No hay datos para exportar');
+                    return;
+                }
+
+                let csv = 'Fecha,Servicio,Mascota,Clinica,Monto\n';
+
+                visibleRows.forEach(row => {
+                    const fecha = row.querySelector('.date-main-luxury')?.textContent?.trim() || '';
+                    const hora = row.querySelector('.date-time-luxury span')?.textContent?.trim() || '';
+                    const servicio = row.querySelector('.service-name-luxury')?.textContent?.trim() || '';
+                    const mascota = row.querySelector('.cell-pet-luxury span')?.textContent?.trim() || '';
+                    const clinica = row.querySelector('.cell-clinic-luxury span')?.textContent?.trim() || '';
+                    const monto = row.querySelector('.cell-amount-luxury')?.textContent?.trim() || '';
+
+                    csv += `"${fecha} ${hora}","${servicio}","${mascota}","${clinica}","${monto}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'historial_pagos_clinicaapp.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+        });
+    </script>
+    <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
+</body>
+</html>

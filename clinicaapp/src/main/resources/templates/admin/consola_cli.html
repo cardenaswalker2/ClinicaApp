@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI Hacker Console | HEX Infrastructure</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --hex-bg: #010409;
+            --hex-surface: #0d1117;
+            --hex-terminal-green: #39ff14;
+            --hex-terminal-green-dim: rgba(57, 255, 20, 0.12);
+            --hex-terminal-cyan: #00f0ff;
+            --hex-terminal-cyan-dim: rgba(0, 240, 255, 0.12);
+            --hex-terminal-amber: #ffb700;
+            --hex-terminal-red: #ff3366;
+            --hex-terminal-purple: #bd00ff;
+            --hex-text: #e1e8f0;
+            --hex-text-secondary: #7d8b9e;
+            --hex-border: rgba(57, 255, 20, 0.12);
+            --hex-glow: rgba(57, 255, 20, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== CRT EFFECTS ===== */
+        .crt-overlay {
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.015), rgba(0, 0, 255, 0.04));
+            background-size: 100% 3px, 4px 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.6;
+        }
+
+        .crt-flicker {
+            position: fixed;
+            inset: 0;
+            background: rgba(18, 16, 16, 0.02);
+            pointer-events: none;
+            z-index: 9998;
+            animation: flicker 0.12s infinite;
+        }
+
+        .crt-vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+            pointer-events: none;
+            z-index: 9997;
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 0.22;
+            }
+
+            50% {
+                opacity: 0.18;
+            }
+
+            100% {
+                opacity: 0.22;
+            }
+        }
+
+        /* ===== SCANLINES ANIMATED ===== */
+        .scanline-h {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.08), transparent);
+            animation: scanH 6s linear infinite;
+            pointer-events: none;
+            z-index: 9996;
+        }
+
+        @keyframes scanH {
+            0% {
+                top: -2%;
+            }
+
+            100% {
+                top: 102%;
+            }
+        }
+
+        /* ===== AMBIENT GLOW ===== */
+        .ambient-glow {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(57, 255, 20, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: rgba(1, 4, 9, 0.95);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px var(--hex-terminal-green-dim);
+        }
+
+        .status-left,
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--hex-terminal-green);
+            box-shadow: 0 0 10px var(--hex-terminal-green);
+            animation: dotPulse 2s infinite;
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+
+        .status-sep {
+            color: var(--hex-border);
+        }
+
+        .status-label {
+            color: var(--hex-text-secondary);
+        }
+
+        .status-value {
+            color: var(--hex-terminal-green);
+            font-weight: 600;
+        }
+
+        /* ===== HEADER ===== */
+        .hex-header {
+            position: fixed;
+            top: 32px;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: rgba(1, 4, 9, 0.9);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 999;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border: 1.5px solid var(--hex-terminal-green);
+            background: var(--hex-terminal-green-dim);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--hex-terminal-green);
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px var(--hex-terminal-green-dim);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(57, 255, 20, 0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        .brand-text h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--hex-terminal-green);
+            text-shadow: 0 0 8px var(--hex-terminal-green-dim);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            font-size: 0.6rem;
+            color: var(--hex-text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link-hex {
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--hex-text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        .nav-link-hex:hover {
+            color: var(--hex-terminal-green);
+            background: var(--hex-terminal-green-dim);
+            border-color: var(--hex-border);
+            box-shadow: 0 0 15px var(--hex-terminal-green-dim);
+        }
+
+        /* ===== TERMINAL ===== */
+        .terminal-wrap {
+            position: absolute;
+            top: 88px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-history {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 12px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+        }
+
+        .terminal-history::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .terminal-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .terminal-history::-webkit-scrollbar-thumb {
+            background: var(--hex-border);
+            border-radius: 3px;
+        }
+
+        .terminal-history::-webkit-scrollbar-thumb:hover {
+            background: var(--hex-terminal-green);
+        }
+
+        /* Line types */
+        .t-line {
+            margin-bottom: 2px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .t-line.banner {
+            color: var(--hex-terminal-cyan);
+            text-shadow: 0 0 5px var(--hex-terminal-cyan-dim);
+        }
+
+        .t-line.info {
+            color: var(--hex-terminal-cyan);
+        }
+
+        .t-line.success {
+            color: var(--hex-terminal-green);
+            text-shadow: 0 0 3px var(--hex-terminal-green-dim);
+        }
+
+        .t-line.warning {
+            color: var(--hex-terminal-amber);
+        }
+
+        .t-line.error {
+            color: var(--hex-terminal-red);
+            text-shadow: 0 0 3px rgba(255, 51, 102, 0.3);
+        }
+
+        .t-line.muted {
+            color: var(--hex-text-secondary);
+        }
+
+        .t-line.cmd {
+            color: var(--hex-terminal-green);
+            font-weight: 600;
+        }
+
+        .t-line.output {
+            color: var(--hex-text);
+        }
+
+        /* ASCII Art */
+        .ascii-art {
+            font-size: 0.75rem;
+            line-height: 1.3;
+            color: var(--hex-terminal-cyan);
+            text-shadow: 0 0 5px var(--hex-terminal-cyan-dim);
+            margin: 8px 0;
+        }
+
+        .ascii-art .highlight {
+            color: var(--hex-terminal-green);
+            text-shadow: 0 0 5px var(--hex-terminal-green-dim);
+        }
+
+        /* Separator */
+        .t-sep {
+            color: var(--hex-border);
+            margin: 8px 0;
+            letter-spacing: 2px;
+        }
+
+        /* Input line */
+        .input-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .prompt {
+            color: var(--hex-terminal-cyan);
+            text-shadow: 0 0 5px var(--hex-terminal-cyan-dim);
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .prompt-user {
+            color: var(--hex-terminal-green);
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--hex-terminal-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-shadow: 0 0 3px var(--hex-terminal-green-dim);
+            flex: 1;
+            caret-color: var(--hex-terminal-green);
+            padding: 0;
+            min-width: 0;
+        }
+
+        .cursor {
+            width: 8px;
+            height: 16px;
+            background: var(--hex-terminal-green);
+            display: inline-block;
+            vertical-align: middle;
+            animation: cursorBlink 1.1s infinite;
+            box-shadow: 0 0 8px var(--hex-terminal-green);
+        }
+
+        @keyframes cursorBlink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Processing indicator */
+        .processing-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--hex-text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .processing-spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--hex-border);
+            border-top-color: var(--hex-terminal-green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Glitch effect on hover for header */
+        .glitch-hover:hover {
+            animation: glitch 0.3s ease;
+        }
+
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+
+            20% {
+                transform: translate(-2px, 2px);
+            }
+
+            40% {
+                transform: translate(-2px, -2px);
+            }
+
+            60% {
+                transform: translate(2px, 2px);
+            }
+
+            80% {
+                transform: translate(2px, -2px);
+            }
+
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        /* Boot sequence animation */
+        @keyframes bootReveal {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .boot-line {
+            animation: bootReveal 0.1s ease forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- CRT Effects -->
+    <div class="crt-overlay"></div>
+    <div class="crt-flicker"></div>
+    <div class="crt-vignette"></div>
+    <div class="scanline-h"></div>
+    <div class="ambient-glow"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-dot"></div>
+            <span class="status-value">HEX CORE MAIN NODE</span>
+            <span class="status-sep">|</span>
+            <span class="status-label">SECURE TERMINAL</span>
+            <span class="status-sep">|</span>
+            <span class="status-label">ENCRYPTED SESSION</span>
+        </div>
+        <div class="status-right">
+            <span class="status-label">LATENCY: <span class="status-value">12ms</span></span>
+            <span class="status-sep">|</span>
+            <span id="liveClock" class="status-value">00:00:00</span>
+            <span class="status-label">UTC</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="hex-header">
+        <a th:href="@{/admin/dashboard}" class="header-brand glitch-hover">
+            <div class="brand-icon">
+                <i class="bi bi-terminal-fill"></i>
+            </div>
+            <div class="brand-text">
+                <h1>HEX Core Shell</h1>
+                <span>Interactive Admin CLI v3.4.1</span>
+            </div>
+        </a>
+
+        <nav class="header-nav">
+            <a th:href="@{/admin/centro-control}" class="nav-link-hex">
+                <i class="bi bi-arrow-left"></i>
+                Volver a Control Core
+            </a>
+        </nav>
+    </header>
+
+    <!-- Terminal -->
+    <div class="terminal-wrap" id="terminalWrap" onclick="focusInput()">
+        <div class="terminal-history" id="terminalHistory">
+            <!-- Welcome banner injected by JS -->
+        </div>
+
+        <div class="input-line">
+            <span class="prompt"><span class="prompt-user">admin</span>@hex-core:~$</span>
+            <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false" autofocus
+                onkeydown="handleInput(event)" oninput="playKeySound()">
+            <span class="cursor" id="inputCursor"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ===== CONFIG =====
+        const CONFIG = {
+            typeSpeed: 25,
+            bootDelay: 80,
+            soundEnabled: true,
+            maxHistory: 100
+        };
+
+        // ===== STATE =====
+        const commandHistory = [];
+        let historyIndex = -1;
+        let isProcessing = false;
+        let bootComplete = false;
+
+        // ===== AUDIO SYNTHESIS (Mechanical Keyboard) =====
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playKeySound() {
+            if (!CONFIG.soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                // Randomize for realism
+                const baseFreq = 750 + Math.random() * 300;
+                const type = ['triangle', 'square'][Math.floor(Math.random() * 2)];
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, audioCtx.currentTime + 0.03);
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(3000, audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) { }
+        }
+
+        function playEnterSound() {
+            if (!CONFIG.soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch (e) { }
+        }
+
+        function playErrorSound() {
+            if (!CONFIG.soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.2);
+
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } catch (e) { }
+        }
+
+        // ===== BOOT SEQUENCE =====
+        const BOOT_LINES = [
+            { text: "================================================================================", type: "sep", delay: 0 },
+            { text: "", type: "blank", delay: 50 },
+            { text: "  _    _ _______  __   __", type: "ascii", delay: 100 },
+            { text: " | |  | |__   __| \\ \\ / /", type: "ascii", delay: 150 },
+            { text: " | |__| |  | |     \\ V / ", type: "ascii", delay: 200 },
+            { text: " |  __  |  | |      > <  ", type: "ascii", delay: 250 },
+            { text: " | |  | |  | |     / . \\ ", type: "ascii", delay: 300 },
+            { text: " |_|  |_|  |_|    /_/ \\_\\", type: "ascii", delay: 350 },
+            { text: "", type: "blank", delay: 400 },
+            { text: "  HEX CORE OPERATING SYSTEM v3.4.1", type: "info", delay: 450 },
+            { text: "  BUILD: 2024.11.24-STABLE", type: "muted", delay: 500 },
+            { text: "", type: "blank", delay: 550 },
+            { text: "  [OK] Kernel initialization", type: "success", delay: 600 },
+            { text: "  [OK] Memory integrity check", type: "success", delay: 700 },
+            { text: "  [OK] MongoDB cluster connection", type: "success", delay: 800 },
+            { text: "  [OK] Encryption modules loaded", type: "success", delay: 900 },
+            { text: "  [OK] Security protocols active", type: "success", delay: 1000 },
+            { text: "", type: "blank", delay: 1050 },
+            { text: "  AUTHENTICATION: SUPERUSER / INFRASTRUCTURE CONTROL", type: "warning", delay: 1100 },
+            { text: "", type: "blank", delay: 1150 },
+            { text: "  Type 'help' for available commands.", type: "info", delay: 1200 },
+            { text: "", type: "blank", delay: 1250 },
+            { text: "================================================================================", type: "sep", delay: 1300 }
+        ];
+
+        function bootSequence() {
+            const history = document.getElementById('terminalHistory');
+            let index = 0;
+
+            function nextLine() {
+                if (index >= BOOT_LINES.length) {
+                    bootComplete = true;
+                    focusInput();
+                    return;
+                }
+
+                const line = BOOT_LINES[index];
+                const div = document.createElement('div');
+
+                div.className = `t-line ${line.type} boot-line`;
+                div.style.animationDelay = '0s';
+
+                if (line.type === 'ascii') {
+                    // Highlight specific chars in ASCII
+                    div.innerHTML = line.text.replace(/(_|H|E|X)/g, '<span class="highlight">$1</span>');
+                } else {
+                    div.textContent = line.text;
+                }
+
+                history.appendChild(div);
+                scrollToBottom();
+
+                // Play subtle sound for each line
+                if (index % 3 === 0) playKeySound();
+
+                index++;
+                setTimeout(nextLine, CONFIG.bootDelay);
+            }
+
+            nextLine();
+        }
+
+        // ===== DOM READY =====
+        document.addEventListener('DOMContentLoaded', function () {
+            // Clock
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Start boot
+            setTimeout(bootSequence, 300);
+
+            // Random glitch on header
+            setInterval(randomGlitch, 8000);
+
+            // Console branding
+            console.log('%c ⚡ HEX CORE SHELL ', 'background: #39ff14; color: #000; font-size: 18px; font-weight: bold; padding: 8px 16px; border-radius: 8px; text-shadow: none;');
+            console.log('%c v3.4.1 - Secure Terminal Active ', 'color: #39ff14; font-size: 11px;');
+        });
+
+        // ===== CLOCK =====
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
+            const el = document.getElementById('liveClock');
+            if (el) el.textContent = `${h}:${m}:${s}`;
+        }
+
+        // ===== FOCUS INPUT =====
+        function focusInput() {
+            if (isProcessing) return;
+            const input = document.getElementById('terminalInput');
+            if (input) {
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // ===== SCROLL =====
+        function scrollToBottom() {
+            const history = document.getElementById('terminalHistory');
+            if (history) history.scrollTop = history.scrollHeight;
+        }
+
+        // ===== RANDOM GLITCH =====
+        function randomGlitch() {
+            const header = document.querySelector('.hex-header');
+            if (!header || Math.random() > 0.3) return;
+
+            header.style.transform = 'translateX(2px)';
+            header.style.filter = 'hue-rotate(90deg)';
+            setTimeout(() => {
+                header.style.transform = '';
+                header.style.filter = '';
+            }, 100);
+        }
+
+        // ===== HANDLE INPUT =====
+        function handleInput(e) {
+            const input = document.getElementById('terminalInput');
+
+            if (e.key === 'Enter') {
+                const cmd = input.value.trim();
+                input.value = '';
+
+                if (cmd !== '') {
+                    playEnterSound();
+                    commandHistory.push(cmd);
+                    if (commandHistory.length > CONFIG.maxHistory) {
+                        commandHistory.shift();
+                    }
+                    historyIndex = commandHistory.length;
+
+                    appendLine(`admin@hex-core:~$ ${cmd}`, 'cmd');
+                    dispatchCommand(cmd);
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (commandHistory.length > 0 && historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                    // Move cursor to end
+                    setTimeout(() => {
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }, 0);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                // Simple tab completion hint
+                playKeySound();
+            } else if (e.key === 'l' && e.ctrlKey) {
+                e.preventDefault();
+                // Ctrl+L to clear
+                document.getElementById('terminalHistory').innerHTML = '';
+            }
+        }
+
+        // ===== APPEND LINE =====
+        function appendLine(text, type = 'output') {
+            const history = document.getElementById('terminalHistory');
+            const div = document.createElement('div');
+            div.className = `t-line ${type}`;
+            div.innerHTML = text;
+            history.appendChild(div);
+            scrollToBottom();
+        }
+
+        // ===== DISPATCH COMMAND =====
+        function dispatchCommand(cmd) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const input = document.getElementById('terminalInput');
+            const cursor = document.getElementById('inputCursor');
+
+            // Hide input during processing
+            input.style.opacity = '0.3';
+            cursor.style.display = 'none';
+
+            // Show processing indicator
+            const processingId = 'proc-' + Date.now();
+            appendLine(`<span id="${processingId}" class="processing-line"><span class="processing-spinner"></span> Executing directive...</span>`, 'muted');
+
+            const formData = new FormData();
+            formData.append('comando', cmd);
+
+            fetch('/admin/consola-cli/ejecutar', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    // Remove processing line
+                    const procLine = document.getElementById(processingId);
+                    if (procLine) procLine.remove();
+
+                    if (data.clear) {
+                        // Clear screen with effect
+                        const history = document.getElementById('terminalHistory');
+                        history.style.opacity = '0';
+                        setTimeout(() => {
+                            history.innerHTML = '';
+                            history.style.opacity = '1';
+                            appendLine('Screen cleared.', 'muted');
+                        }, 200);
+                    } else if (data.output && Array.isArray(data.output)) {
+                        data.output.forEach((line, i) => {
+                            setTimeout(() => {
+                                // Detect line type by content
+                                let type = 'output';
+                                if (line.includes('[OK]') || line.includes('SUCCESS')) type = 'success';
+                                else if (line.includes('[ERROR]') || line.includes('FATAL')) type = 'error';
+                                else if (line.includes('[WARN]')) type = 'warning';
+                                else if (line.includes('===') || line.includes('---')) type = 'sep';
+
+                                appendLine(line, type);
+                                if (i % 2 === 0) playKeySound();
+                            }, i * 30);
+                        });
+                    } else {
+                        appendLine('Command executed successfully.', 'success');
+                    }
+                })
+                .catch(err => {
+                    const procLine = document.getElementById(processingId);
+                    if (procLine) procLine.remove();
+
+                    playErrorSound();
+                    appendLine(`[FATAL ERROR] ${err.message}`, 'error');
+                    appendLine('Connection to HEX Core node failed. Retry or check network.', 'muted');
+                })
+                .finally(() => {
+                    isProcessing = false;
+                    input.style.opacity = '1';
+                    cursor.style.display = 'inline-block';
+                    focusInput();
+                    scrollToBottom();
+                });
+        }
+
+        // ===== CLICK ANYWHERE TO FOCUS =====
+        document.getElementById('terminalWrap').addEventListener('click', function (e) {
+            if (e.target.tagName !== 'A') {
+                focusInput();
+            }
+        });
+
+        // ===== PREVENT LOSING FOCUS =====
+        document.addEventListener('click', function (e) {
+            const wrap = document.getElementById('terminalWrap');
+            const input = document.getElementById('terminalInput');
+            if (wrap.contains(e.target) && !isProcessing) {
+                setTimeout(() => input.focus(), 0);
+            }
+        });
+
+        // ===== KEYBOARD SHORTCUTS HELP =====
+        document.addEventListener('keydown', function (e) {
+            // Prevent F5 from losing focus
+            if (e.key === 'F5') {
+                e.preventDefault();
+                focusInput();
+            }
+        });
+    </script>
+</body>
+
+</html>

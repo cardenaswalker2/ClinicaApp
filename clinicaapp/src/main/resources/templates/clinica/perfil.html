@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.1);
+            --shadow-xl: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --shadow-primary: 0 8px 24px rgba(79, 70, 229, 0.18);
+            --shadow-success: 0 8px 24px rgba(16, 185, 129, 0.18);
+            --shadow-warning: 0 8px 24px rgba(245, 158, 11, 0.18);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--gray-50);
+            min-height: 100vh;
+            color: var(--gray-700);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar .container {
+            padding-top: 0.875rem;
+            padding-bottom: 0.875rem;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .btn-back {
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ===== ALERT SUCCESS ===== */
+        .alert-custom {
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: #065f46;
+            border: 1.5px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .alert-custom i {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .btn-close-custom {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: currentColor;
+            opacity: 0.5;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== MAIN CARD ===== */
+        .main-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.1s;
+        }
+
+        /* Card Header */
+        .card-header-custom {
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            background: linear-gradient(135deg, #fafafa, #f8f9fa);
+        }
+
+        .card-header-custom h5 {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .card-header-custom h5 i {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .card-body-custom {
+            padding: 1.75rem;
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label-custom {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .form-label-custom i {
+            color: var(--primary);
+            font-size: 0.875rem;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+            background: var(--gray-50);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-control-custom:hover {
+            border-color: var(--gray-300);
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-control-custom::placeholder {
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        textarea.form-control-custom {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        /* Readonly Input */
+        .form-control-readonly {
+            background: var(--gray-100);
+            border-color: var(--gray-200);
+            color: var(--gray-500);
+            cursor: not-allowed;
+        }
+
+        .form-control-readonly:focus {
+            border-color: var(--gray-200);
+            box-shadow: none;
+        }
+
+        /* Helper Text */
+        .form-helper {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            font-weight: 500;
+            margin-top: 0.375rem;
+            display: block;
+        }
+
+        /* ===== FORM FOOTER ===== */
+        .form-footer {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1.5px solid var(--gray-100);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border: 1.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 0.875rem 1.75rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            transform: translateY(-1px);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.875rem 2rem;
+            font-weight: 800;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-primary);
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-save i {
+            font-size: 1.1rem;
+        }
+
+        /* ===== WARNING CARD ===== */
+        .warning-card {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border: 1.5px solid rgba(245, 158, 11, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .warning-card i {
+            color: var(--warning);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .warning-card span {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #92400e;
+            line-height: 1.5;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 575.98px) {
+            .card-header-custom {
+                padding: 1.25rem;
+            }
+
+            .card-body-custom {
+                padding: 1.25rem;
+            }
+
+            .form-footer {
+                flex-direction: column;
+            }
+
+            .btn-cancel,
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="bi bi-building-gear"></i>
+                Configuración de la Sede
+            </span>
+            <a href="/clinica/dashboard" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                <span class="d-none d-sm-inline">Volver al Panel</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- Alerta de éxito -->
+        <div th:if="${param.success}" class="alert-custom alert-success-custom alert-dismissible fade show"
+            role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>¡Perfil actualizado correctamente!</span>
+            <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Main Card -->
+                <div class="main-card">
+                    <!-- Header -->
+                    <div class="card-header-custom">
+                        <h5>
+                            <i class="bi bi-pencil-square"></i>
+                            Editar Información Pública
+                        </h5>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body-custom">
+                        <form th:action="@{/clinica/perfil/actualizar}" th:object="${clinica}" method="post">
+
+                            <!-- Campo oculto para el ID -->
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-building"></i>
+                                            Nombre de la Clínica
+                                        </label>
+                                        <input type="text" class="form-control-custom" th:field="*{nombre}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label-custom">
+                                            <i class="bi bi-envelope"></i>
+                                            Correo Electrónico
+                                        </label>
+                                        <input type="email" class="form-control-custom form-control-readonly"
+                                            th:field="*{email}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label-custom">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Dirección Completa
+                                </label>
+                                <input type="text" class="form-control-custom" th:field="*{direccion}" required>
+                                <span class="form-helper">Esta dirección aparecerá en el mapa para los clientes.</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label-custom">
+                                    <i class="bi bi-telephone"></i>
+                                    Teléfono de Contacto
+                                </label>
+                                <input type="text" class="form-control-custom" th:field="*{telefono}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label-custom">
+                                    <i class="bi bi-card-text"></i>
+                                    Descripción de la Clínica
+                                </label>
+                                <textarea class="form-control-custom" th:field="*{descripcion}" rows="4"
+                                    placeholder="Cuéntale a tus clientes sobre tus servicios y especialidades..."></textarea>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="form-footer">
+                                <a href="/clinica/dashboard" class="btn-cancel">
+                                    <i class="bi bi-x-lg"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn-save">
+                                    <i class="bi bi-save"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Warning Card -->
+                <div class="warning-card">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span>Recuerda mantener tus datos actualizados para que los clientes puedan encontrarte
+                        fácilmente.</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

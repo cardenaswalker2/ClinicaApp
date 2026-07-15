@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garena FairPlay & Player Analytics Portal</title>
+    <!-- Import Google Fonts for a premium tech look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #080a0f;
+            --bg-surface: #0f131a;
+            --bg-card: #151b26;
+            --border-color: #222c3c;
+            --primary: #ff512f;
+            --primary-glow: rgba(255, 81, 47, 0.4);
+            --accent: #dd2476;
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 81, 47, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(221, 36, 118, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Top Header/Navbar */
+        header {
+            background-color: rgba(15, 19, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-shield {
+            width: 32px;
+            height: 32px;
+            fill: var(--primary);
+            filter: drop-shadow(0 0 8px var(--primary));
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: var(--success);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* Main Workspace Container */
+        .app-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Set up Victim details tool */
+        .setup-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .setup-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 81, 47, 0.6);
+        }
+
+        /* Analysis Dashboard (Initially Hidden or Mocking) */
+        .dashboard-layout {
+            display: none; /* Controlled by JS */
+            grid-template-columns: 1fr;
+            gap: 24px;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @media (min-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 320px 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sidebar Profile Card */
+        .profile-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: fit-content;
+        }
+
+        .avatar-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .avatar-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: var(--danger-glow);
+            border-radius: 50%;
+            filter: blur(15px);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { width: 120px; height: 120px; opacity: 0.6; }
+            50% { width: 140px; height: 140px; opacity: 0.9; }
+        }
+
+        .player-avatar {
+            width: 100px;
+            height: 100px;
+            background: #252f3f;
+            border-radius: 50%;
+            border: 3px solid var(--danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .player-avatar svg {
+            width: 60px;
+            height: 60px;
+            fill: var(--text-muted);
+        }
+
+        .player-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .player-id {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .badge-list {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge-item {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .badge-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .profile-divider {
+            width: 100%;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 20px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+        }
+
+        .detail-val {
+            font-weight: 600;
+        }
+
+        /* Main Performance / Scan Area */
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Security Alert Banner */
+        .alert-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(221, 36, 118, 0.05) 100%);
+            border: 1px solid var(--danger);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px var(--danger-glow);
+        }
+
+        .alert-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--danger);
+        }
+
+        .alert-icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .alert-icon-container svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--danger);
+            animation: pulse-danger 1s infinite alternate;
+        }
+
+        @keyframes pulse-danger {
+            from { transform: scale(0.95); filter: drop-shadow(0 0 2px var(--danger)); }
+            to { transform: scale(1.08); filter: drop-shadow(0 0 12px var(--danger)); }
+        }
+
+        .alert-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--danger);
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .alert-content p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-val-danger {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-footer {
+            font-size: 0.75rem;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Log / Diagnostics Console */
+        .console-panel {
+            background: #06080c;
+            border: 1px solid #1c2330;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .console-line {
+            margin-bottom: 6px;
+            line-height: 1.4;
+            display: flex;
+            gap: 10px;
+        }
+
+        .console-timestamp {
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .console-tag-err {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .console-tag-warn {
+            color: var(--warning);
+            font-weight: bold;
+        }
+
+        .console-tag-info {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Recent Activity / Evidence Logs */
+        .activity-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .activity-panel h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 8px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px 8px;
+            border-bottom: 1px solid rgba(34, 44, 60, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .suspect-cell {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        /* Realtime scanning overlay */
+        .scanner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(8, 10, 15, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
+        }
+
+        .scanner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-top-color: var(--primary);
+            border-bottom-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+        }
+
+        .scanner-ring-inner {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 3px solid transparent;
+            border-left-color: #38bdf8;
+            border-right-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin-reverse 1.5s linear infinite;
+        }
+
+        .scanner-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .scanner-icon svg {
+            width: 48px;
+            height: 48px;
+            fill: #fff;
+            animation: pulse-icon 1s infinite alternate;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes spin-reverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes pulse-icon {
+            from { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .scan-status-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .scan-progress-bar {
+            width: 300px;
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scan-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.1s linear;
+        }
+
+        .scan-detail-log {
+            margin-top: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="logo-area">
+            <svg class="logo-shield" viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span class="logo-text">FAIRPLAY GLOBAL</span>
+        </div>
+        <div class="status-badge-nav">
+            <div class="status-dot"></div>
+            <span>Servidor Activo</span>
+        </div>
+    </header>
+
+    <div class="app-container">
+        
+        <!-- Generator / Setup card -->
+        <section class="setup-card" id="setupSection">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--primary)" style="vertical-align: middle;">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                Ficha de Escaneo de Cuenta Oficial
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+                Ingrese los datos reales del jugador para generar el reporte de base de datos integrado del sistema Anti-Cheat.
+            </p>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="inputNick">Nickname de la Víctima</label>
+                    <input type="text" id="inputNick" placeholder="Ej: Zeus_Xit" value="Zeus_Xit">
+                </div>
+                <div class="form-group">
+                    <label for="inputId">ID de Jugador (UID)</label>
+                    <input type="text" id="inputId" placeholder="Ej: 482910394" value="482910394">
+                </div>
+                <div class="form-group">
+                    <label for="inputRegion">Región de la Cuenta</label>
+                    <input type="text" id="inputRegion" placeholder="Ej: EE.UU / Sudamérica" value="Sudamérica">
+                </div>
+                <div class="form-group">
+                    <label for="inputClan">Clan de Registro</label>
+                    <input type="text" id="inputClan" placeholder="Ej: LosInsanos" value="LosInsanos">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="launchScanner()">Analizar e Investigar Jugador</button>
+        </section>
+
+        <!-- Main Dashboard View (Shown after scanning) -->
+        <div class="dashboard-layout" id="dashboardLayout">
+            
+            <!-- Left Profile Column -->
+            <aside class="profile-panel">
+                <div class="avatar-container">
+                    <div class="avatar-glow"></div>
+                    <div class="player-avatar">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="player-name">
+                    <span id="cardNick">Zeus_Xit</span>
+                    <!-- Verified red warning badge -->
+                    <span style="color: var(--danger); font-size: 0.9rem; vertical-align: middle;">⚠️</span>
+                </div>
+                <div class="player-id">UID: <span id="cardId">482910394</span></div>
+
+                <div class="badge-list">
+                    <span class="badge-item">Nivel 68</span>
+                    <span class="badge-item badge-danger">Banned Flagged</span>
+                    <span class="badge-item">Clasificatoria DE-Clan</span>
+                </div>
+
+                <div class="profile-divider"></div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Estado de Cuenta</span>
+                    <span class="detail-val" style="color: var(--danger);">Bajo Investigación</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Región</span>
+                    <span class="detail-val" id="cardRegion">Sudamérica</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Clan</span>
+                    <span class="detail-val" id="cardClan">LosInsanos</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Historial Limpio</span>
+                    <span class="detail-val" style="color: var(--danger);">FALSO</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Nivel de Reportes</span>
+                    <span class="detail-val" style="color: var(--danger);">CRÍTICO</span>
+                </div>
+            </aside>
+
+            <!-- Right Content Column -->
+            <main class="main-panel">
+                
+                <!-- Anti-Cheat Verdict -->
+                <section class="alert-banner">
+                    <div class="alert-icon-container">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                    </div>
+                    <div class="alert-content">
+                        <h3>Detección Confirmada: Manipulación de Cliente</h3>
+                        <p>
+                            El motor automatizado anti-trampas de Garena FairPlay ha verificado la inyección de librerías dinámicas no autorizadas en el archivo raíz del dispositivo. Se ha detectado la presencia activa de <strong>Aimbot (Auto-Apuntado)</strong> y manipulación de colisiones <strong>(Wallhack/Antena)</strong>. El ID del dispositivo (UUID) ha sido registrado y puesto en cola para baneo permanente en la próxima ola de suspensiones automáticas.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Suspect Stats Cards -->
+                <section class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-title">Headshot Rate (KD)</span>
+                        <div class="stat-value stat-val-danger">91.4%</div>
+                        <div class="stat-footer">
+                            <span>Promedio Normal: 22.4%</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">K/D General</span>
+                        <div class="stat-value stat-val-danger">12.80</div>
+                        <div class="stat-footer">
+                            <span>Historial Sospechoso</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-title">Tasa de Victorias</span>
+                        <div class="stat-value stat-val-danger">94.2%</div>
+                        <div class="stat-footer">
+                            <span>Rango: Heroico ⭐50</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Terminal / Log Console -->
+                <section>
+                    <div style="font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: bold; margin-bottom: 10px; color: var(--text-muted); text-transform: uppercase;">
+                        Logs de Memoria del Dispositivo
+                    </div>
+                    <div class="console-panel" id="consoleLogs">
+                        <!-- Filled by JS -->
+                    </div>
+                </section>
+
+                <!-- Match Log List -->
+                <section class="activity-panel">
+                    <h3>Registros Recientes de Partida (Evidencia)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID Partida</th>
+                                    <th>Modo</th>
+                                    <th>Kills (HS)</th>
+                                    <th>Precisión</th>
+                                    <th>Reportes</th>
+                                    <th>Estado de Verificación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matchLogBody">
+                                <!-- Filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- Scanner Overlay -->
+    <div class="scanner-overlay" id="scannerOverlay">
+        <div class="spinner-container">
+            <div class="scanner-ring"></div>
+            <div class="scanner-ring-inner"></div>
+            <div class="scanner-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2v-4h2v4zm0-6h-2V7h2v2z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="scan-status-text" id="scanStatus">INICIANDO DIAGNÓSTICO</div>
+        <div class="scan-progress-bar">
+            <div class="scan-progress-fill" id="scanProgress"></div>
+        </div>
+        <div class="scan-detail-log" id="scanDetail">Estableciendo túnel encriptado de base de datos...</div>
+    </div>
+
+    <script>
+        function launchScanner() {
+            // Get values from inputs
+            const nickname = document.getElementById('inputNick').value || 'Zeus_Xit';
+            const playerId = document.getElementById('inputId').value || '482910394';
+            const region = document.getElementById('inputRegion').value || 'Sudamérica';
+            const clan = document.getElementById('inputClan').value || 'LosInsanos';
+
+            // Show scanner overlay
+            const overlay = document.getElementById('scannerOverlay');
+            overlay.style.display = 'flex';
+
+            const statusText = document.getElementById('scanStatus');
+            const progressBar = document.getElementById('scanProgress');
+            const detailText = document.getElementById('scanDetail');
+
+            // Steps and delays for the scanning process
+            const scanSteps = [
+                { percent: 10, status: "CONECTANDO...", detail: "Apuntando a los servidores regionales de Garena..." },
+                { percent: 25, status: "BUSCANDO PERFIL...", detail: `Buscando perfil de usuario con ID ${playerId} en DB...` },
+                { percent: 40, status: "EXTRAYENDO HISTORIAL...", detail: "Analizando registros de telemetría de apuntado en tiempo real..." },
+                { percent: 55, status: "VERIFICANDO INTEGRIDAD...", detail: "Comparando hashes de archivos de instalación del cliente..." },
+                { percent: 70, status: "EXTRAYENDO CACHÉ...", detail: "Encontrada firma inusual en el vector de apuntado (DLL injection)..." },
+                { percent: 85, status: "PROCESANDO REPORTES...", detail: "Consolidando denuncias por abuso de hacks de la última semana..." },
+                { percent: 100, status: "INFORME COMPLETO", detail: "Generando veredicto del Sistema Anti-Cheat..." }
+            ];
+
+            let stepIndex = 0;
+
+            function runStep() {
+                if (stepIndex < scanSteps.length) {
+                    const step = scanSteps[stepIndex];
+                    statusText.innerText = step.status;
+                    progressBar.style.width = step.percent + "%";
+                    detailText.innerText = step.detail;
+                    stepIndex++;
+                    
+                    // Random time for each step to look extremely realistic
+                    setTimeout(runStep, 800 + Math.random() * 800);
+                } else {
+                    // Finished scanning
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        renderDashboard(nickname, playerId, region, clan);
+                    }, 500);
+                }
+            }
+
+            runStep();
+        }
+
+        function renderDashboard(nick, id, region, clan) {
+            // Fill profile data
+            document.getElementById('cardNick').innerText = nick;
+            document.getElementById('cardId').innerText = id;
+            document.getElementById('cardRegion').innerText = region;
+            document.getElementById('cardClan').innerText = clan;
+
+            // Generate realistic memory console logs
+            const consolePanel = document.getElementById('consoleLogs');
+            consolePanel.innerHTML = '';
+            
+            const timestamp = () => {
+                const now = new Date();
+                return now.toLocaleTimeString() + "." + String(now.getMilliseconds()).padStart(3, '0');
+            };
+
+            const consoleData = [
+                { type: 'info', text: "Conexión de telemetría segura establecida con Garena API" },
+                { type: 'info', text: `Verificando firma digital de cuenta UID: ${id}` },
+                { type: 'warn', text: "Inconsistencia de hardware detectada (UUID de emulador no registrado)" },
+                { type: 'info', text: "Descargando logs de apuntado automático (últimas 5 partidas)..." },
+                { type: 'err', text: "CRITICAL: Ángulo de mira instantáneo de 180° detectado en Partida #7291823" },
+                { type: 'err', text: "CRITICAL: Registro de disparos a la cabeza modificado por memoria de dispositivo" },
+                { type: 'warn', text: "Advertencia: Archivo de datos de configuración del juego contiene líneas externas (LUA Injection)" },
+                { type: 'info', text: "Firma de cheat identificada: 'AutoAim_FF_V3_Elite.dylib'" },
+                { type: 'err', text: "FATAL: Código de error de juego alterado (BYPASS_VERDICT: FALSO)" },
+                { type: 'info', text: "Encolando reporte a la base de datos de baneo inmediato en masa." }
+            ];
+
+            consoleData.forEach((log, index) => {
+                setTimeout(() => {
+                    let tag = '';
+                    if (log.type === 'err') tag = '<span class="console-tag-err">[CRÍTICO]</span>';
+                    else if (log.type === 'warn') tag = '<span class="console-tag-warn">[ADVERTENCIA]</span>';
+                    else tag = '<span class="console-tag-info">[OK]</span>';
+
+                    consolePanel.innerHTML += `
+                        <div class="console-line">
+                            <span class="console-timestamp">[${timestamp()}]</span>
+                            ${tag}
+                            <span>${log.text}</span>
+                        </div>
+                    `;
+                    consolePanel.scrollTop = consolePanel.scrollHeight;
+                }, index * 200);
+            });
+
+            // Generate recent match logs (suspicious matches)
+            const matchBody = document.getElementById('matchLogBody');
+            matchBody.innerHTML = '';
+
+            const matches = [
+                { matchId: "DE-389102", mode: "Duelo de Escuadras", kills: "16 (16 HS)", accuracy: "100%", reports: "4 Reports", status: "Confirmado Hack" },
+                { matchId: "BR-921820", mode: "Clasificatorio BR", kills: "28 (26 HS)", accuracy: "92.8%", reports: "6 Reports", status: "Confirmado Hack" },
+                { matchId: "DE-389018", mode: "Duelo de Escuadras", kills: "18 (17 HS)", accuracy: "94.4%", reports: "3 Reports", status: "Confirmado Hack" },
+                { matchId: "DE-388910", mode: "Duelo de Escuadras", kills: "14 (14 HS)", accuracy: "100%", reports: "5 Reports", status: "Confirmado Hack" }
+            ];
+
+            matches.forEach((m, idx) => {
+                setTimeout(() => {
+                    matchBody.innerHTML += `
+                        <tr>
+                            <td style="font-family: monospace;">#${m.matchId}</td>
+                            <td>${m.mode}</td>
+                            <td class="suspect-cell">${m.kills}</td>
+                            <td class="suspect-cell">${m.accuracy}</td>
+                            <td><span style="color: var(--warning); font-weight: bold;">${m.reports}</span></td>
+                            <td><span style="color: var(--danger); background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">${m.status}</span></td>
+                        </tr>
+                    `;
+                }, idx * 150);
+            });
+
+            // Show dashboard and hide setup form
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('dashboardLayout').style.display = 'grid';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova-Pet | Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style th:replace="~{fragments/header :: headerStyles}"></style>
+
+    <style>
+        :root {
+            --nova-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --nova-gradient-2: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+            --nova-gradient-3: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --nova-gradient-success: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 60px rgba(99, 102, 241, 0.2);
+            --radius-sm: 16px;
+            --radius-md: 24px;
+            --radius-lg: 32px;
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg-body-custom, linear-gradient(135deg, #f8fafc 0%, #e0e7ff 30%, #fce7f3 70%, #fef3c7 100%));
+            background-size: 400% 400%;
+            animation: gradientShift 25s ease infinite;
+            min-height: 100vh;
+            color: var(--text-main-custom, #1e293b);
+            overflow-x: hidden;
+        }
+
+        [data-theme="dark"] {
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] .premium-card {
+            background: rgba(30, 41, 59, 0.7) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        [data-theme="dark"] .stat-label {
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .btn-royale {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #94a3b8 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 10px 0 rgba(15, 23, 42, 1) !important;
+        }
+
+        [data-theme="dark"] .btn-royale:hover:not(:disabled) {
+            background: rgba(30, 41, 59, 0.9) !important;
+            color: #6366f1 !important;
+            border-color: #6366f1 !important;
+        }
+
+        [data-theme="dark"] .thought-bubble {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        [data-theme="dark"] .thought-bubble::after {
+            background: #1e293b !important;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ============================================
+           HEADER PREMIUM CON EFECTO AURORA
+           ============================================ */
+        .page-header {
+            position: relative;
+            padding: 3rem 0 2rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            animation: aurora 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes aurora {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(5deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(-5deg);
+            }
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: var(--nova-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--nova-gradient);
+            border-radius: 2px;
+        }
+
+        /* ============================================
+           TARJETAS PREMIUM CON GLASSMORPHISM
+           ============================================ */
+        .premium-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--nova-gradient);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .premium-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: var(--shadow-premium), var(--shadow-glow);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .premium-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ============================================
+           ENTORNO ANIMADO DE LA MASCOTA
+           ============================================ */
+        #pet-environment {
+            position: relative;
+            border-radius: var(--radius-md);
+            height: 650px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        /* Fondo dinámico con partículas */
+        .env-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .env-particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float-particle 20s infinite linear;
+        }
+
+        .env-particle:nth-child(1) {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            top: 10%;
+            left: 10%;
+            animation-duration: 15s;
+        }
+
+        .env-particle:nth-child(2) {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            top: 20%;
+            left: 80%;
+            animation-duration: 20s;
+            animation-delay: -5s;
+        }
+
+        .env-particle:nth-child(3) {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.7);
+            top: 60%;
+            left: 15%;
+            animation-duration: 18s;
+            animation-delay: -10s;
+        }
+
+        .env-particle:nth-child(4) {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.4);
+            top: 80%;
+            left: 70%;
+            animation-duration: 22s;
+            animation-delay: -3s;
+        }
+
+        .env-particle:nth-child(5) {
+            width: 14px;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.3);
+            top: 40%;
+            left: 50%;
+            animation-duration: 25s;
+            animation-delay: -8s;
+        }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Nubes decorativas */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 100px;
+            opacity: 0.6;
+            animation: cloud-drift 30s infinite linear;
+        }
+
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 100px;
+        }
+
+        .cloud:nth-child(1) {
+            width: 100px;
+            height: 40px;
+            top: 15%;
+            left: -100px;
+        }
+
+        .cloud:nth-child(1)::before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud:nth-child(2) {
+            width: 80px;
+            height: 35px;
+            top: 25%;
+            left: -80px;
+            animation-delay: -10s;
+            animation-duration: 35s;
+        }
+
+        .cloud:nth-child(2)::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 15px;
+        }
+
+        @keyframes cloud-drift {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(calc(100vw + 200px));
+            }
+        }
+
+        /* Estrellas para modo noche */
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 1s;
+            animation: twinkle 3s infinite;
+        }
+
+        .star.visible {
+            opacity: 0.8;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Badge de fase del día */
+        .phase-badge {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .phase-badge:hover {
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .phase-badge i {
+            font-size: 1.1rem;
+        }
+
+        /* ============================================
+           MASCOTA FLOTANTE CON EFECTOS
+           ============================================ */
+        .pet-wrapper {
+            position: relative;
+            animation: floating 4s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-15px) rotate(1deg);
+            }
+
+            75% {
+                transform: translateY(-10px) rotate(-1deg);
+            }
+        }
+
+        .pet-glow {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 40px;
+            background: radial-gradient(ellipse, rgba(0, 0, 0, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(8px);
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+
+            0%,
+            100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* Imagen de mascota con transiciones */
+        #pet-image {
+            max-height: 300px;
+            filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.15));
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom center;
+        }
+
+        #pet-image:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.2));
+        }
+
+        /* Burbuja de pensamiento mejorada */
+        .thought-bubble {
+            background: white;
+            padding: 16px 28px;
+            border-radius: 24px;
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1e293b;
+            opacity: 0;
+            transform: scale(0.6) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 20;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .thought-bubble.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        /* ============================================
+           BARRAS DE PROGRESO PREMIUM
+           ============================================ */
+        .stat-bar-container {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #475569;
+        }
+
+        .stat-label i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .progress-premium {
+            height: 14px;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 50px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progress-shine 2s infinite;
+        }
+
+        @keyframes progress-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .bg-health {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .bg-hunger {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .bg-happiness {
+            background: linear-gradient(90deg, #06b6d4, #22d3ee);
+        }
+
+        .bg-energy {
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+        }
+
+        /* ============================================
+           BOTONES ROYALE CON EFECTOS 3D
+           ============================================ */
+        .btn-royale {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            font-weight: 800;
+            color: #64748b;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 0 rgba(226, 232, 240, 1);
+            transform: translateY(0);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn-royale::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-royale:hover::before {
+            left: 100%;
+        }
+
+        .btn-royale:hover:not(:disabled) {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.2), 0 16px 0 rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .btn-royale:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 4px 0 rgba(226, 232, 240, 1);
+        }
+
+        .btn-royale i {
+            font-size: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-royale:hover:not(:disabled) i {
+            transform: scale(1.2) rotate(-5deg);
+        }
+
+        .btn-royale:disabled {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+            transform: translateY(4px);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 4px 0 rgba(226, 232, 240, 1);
+        }
+
+        /* Colores específicos por acción */
+        .btn-royale[data-action="FEED"]:hover:not(:disabled) {
+            border-color: #10b981;
+            color: #10b981;
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.2), 0 16px 0 rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-royale[data-action="PLAY"]:hover:not(:disabled) {
+            border-color: #06b6d4;
+            color: #06b6d4;
+            box-shadow: 0 10px 20px -5px rgba(6, 182, 212, 0.2), 0 16px 0 rgba(6, 182, 212, 0.1);
+        }
+
+        .btn-royale[data-action="HEAL"]:hover:not(:disabled) {
+            border-color: #ef4444;
+            color: #ef4444;
+            box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.2), 0 16px 0 rgba(239, 68, 68, 0.1);
+        }
+
+        .btn-royale[data-action="SLEEP"]:hover:not(:disabled) {
+            border-color: #6366f1;
+            color: #6366f1;
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.2), 0 16px 0 rgba(99, 102, 241, 0.1);
+        }
+
+        /* ============================================
+           ANIMACIÓN DE ACCIÓN VIBRANTE
+           ============================================ */
+        .action-vibrant {
+            animation: vibrant 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes vibrant {
+            0% {
+                transform: scale(1);
+            }
+
+            30% {
+                transform: scale(1.15) rotate(5deg);
+            }
+
+            60% {
+                transform: scale(0.95) rotate(-3deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* Partículas de celebración */
+        .celebration-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: celebrate 1s ease-out forwards;
+        }
+
+        @keyframes celebrate {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* ============================================
+           BADGES Y ETIQUETAS PREMIUM
+           ============================================ */
+        .badge-premium {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            color: var(--primary-dark);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ============================================
+           TEXTO DE ESTADO CON GLOW
+           ============================================ */
+        .status-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            #pet-environment {
+                height: 450px;
+            }
+
+            .thought-bubble {
+                right: 0;
+                max-width: 150px;
+                font-size: 0.85rem;
+            }
+
+            .btn-royale {
+                padding: 16px;
+            }
+
+            .btn-royale i {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--nova-gradient);
+            border-radius: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+
+    <!-- ============================================
+         HEADER PREMIUM CON AURORA
+         ============================================ -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="badge-premium">
+                            <i class="bi bi-stars text-primary"></i>
+                            Simulador Nova-Pet v2.0
+                        </span>
+                        <span
+                            class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"
+                            style="padding: 8px 16px; border-radius: 50px; font-weight: 700; font-size: 0.8rem;">
+                            <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; 
+                                       margin-right: 6px; animation: pulse-dot 2s infinite;"></span>
+                            En Vivo
+                        </span>
+                    </div>
+                    <h1 class="page-title mb-2">Nova-Pet</h1>
+                    <p class="text-muted mb-0" style="font-size: 1.1rem; max-width: 500px;">
+                        Tu compañero virtual inteligente. Cuida de él, juega y manténlo feliz en tiempo real.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <div class="d-inline-flex align-items-center gap-3 p-3 rounded-4"
+                        style="background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5);">
+                        <div class="text-center">
+                            <div class="fw-bold text-primary"
+                                style="font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif;" id="streak-count"
+                                th:text="${mascotaVirtual.racha}">7</div>
+                            <small class="text-muted" style="font-size: 0.75rem;">Días racha</small>
+                        </div>
+                        <div style="width: 1px; height: 40px; background: rgba(0,0,0,0.1);"></div>
+                        <div class="text-center">
+                            <div class="fw-bold text-warning"
+                                style="font-size: 1.5rem; font-family: 'Space Grotesk', sans-serif;" id="coins-count"
+                                th:text="${#numbers.formatInteger(mascotaVirtual.monedas, 0, 'POINT')}">
+                                1,250</div>
+                            <small class="text-muted" style="font-size: 0.75rem;">Nova Coins</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container pb-5">
+        <div class="row g-5">
+
+            <!-- ============================================
+                 COLUMNA IZQUIERDA: LA MASCOTA
+                 ============================================ -->
+            <div class="col-lg-7">
+                <div id="pet-environment"
+                    style="background: linear-gradient(180deg, #87CEEB 0%, #E0F2FE 50%, #BAE6FD 100%);">
+
+                    <!-- Partículas flotantes -->
+                    <div class="env-particles">
+                        <div class="env-particle"></div>
+                        <div class="env-particle"></div>
+                        <div class="env-particle"></div>
+                        <div class="env-particle"></div>
+                        <div class="env-particle"></div>
+                    </div>
+
+                    <!-- Nubes decorativas -->
+                    <div class="cloud"></div>
+                    <div class="cloud"></div>
+
+                    <!-- Estrellas (modo noche) -->
+                    <div id="stars-container" style="position: absolute; inset: 0; pointer-events: none;"></div>
+
+                    <!-- Badge de fase del día -->
+                    <div class="phase-badge">
+                        <i class="bi bi-sun-fill" id="phase-icon"></i>
+                        <span id="time-display">08:00</span>
+                        <span style="width: 1px; height: 16px; background: rgba(255,255,255,0.3);"></span>
+                        <span id="day-phase" class="text-uppercase"
+                            style="font-size: 0.8rem; letter-spacing: 1px;">Mañana</span>
+                    </div>
+
+                    <!-- Indicador de clima -->
+                    <div class="phase-badge"
+                        style="left: auto; right: 24px; background: rgba(255,255,255,0.2); color: white;">
+                        <i class="bi bi-cloud-sun" id="weather-icon"></i>
+                        <span id="weather-text">24°C</span>
+                    </div>
+
+                    <!-- Mascota -->
+                    <div class="pet-wrapper" id="pet-display">
+                        <div id="thought-bubble" class="thought-bubble">¡Hola! Soy tu mejor amigo 🐾</div>
+
+                        <img id="pet-image"
+                            th:src="${mascotaVirtual.salud > 30 ? 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop' : 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=400&h=400&fit=crop'}"
+                            src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop"
+                            alt="Nova Pet" style="max-height: 280px; border-radius: 20px; object-fit: cover;">
+
+                        <div class="pet-glow"></div>
+                    </div>
+
+                    <!-- Texto de estado -->
+                    <div class="mt-5 text-center px-4" style="position: relative; z-index: 5;">
+                        <h2 id="pet-status-text" class="status-text text-white mb-2">
+                            ¡<span th:text="${mascotaVirtual.nombre}">Rocky</span> está radiante!
+                        </h2>
+                        <p class="text-white-50 mb-0"
+                            style="font-size: 0.95rem; text-shadow: 0 1px 10px rgba(0,0,0,0.2);">
+                            Mantén sus estadísticas altas para desbloquear recompensas
+                        </p>
+                    </div>
+
+                    <!-- Barra de nivel de mascota -->
+                    <div class="position-absolute bottom-0 start-0 end-0 p-4" style="z-index: 5;">
+                        <div class="d-flex align-items-center gap-3 justify-content-center">
+                            <div
+                                style="background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-trophy-fill text-warning"></i>
+                                    <span class="text-white fw-bold">Nivel <span id="pet-level" th:text="${mascotaVirtual.nivel}">5</span></span>
+                                </div>
+                                <div class="progress mt-2"
+                                    style="height: 6px; width: 150px; background: rgba(255,255,255,0.2); border-radius: 50px;">
+                                    <div id="xp-bar" class="progress-bar bg-warning" 
+                                         th:style="'width: ' + (${mascotaVirtual.experiencia} * 100 / (${mascotaVirtual.nivel} * 100)) + '%; border-radius: 50px;'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logros recientes -->
+                <div class="mt-4 d-flex gap-3 overflow-auto pb-2" style="scrollbar-width: none;">
+                    <div class="flex-shrink-0 p-3 rounded-4 text-center"
+                        style="background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.1)); border: 1px solid rgba(251,191,36,0.2); min-width: 120px;">
+                        <i class="bi bi-award-fill text-warning fs-3"></i>
+                        <div class="fw-bold mt-2" style="font-size: 0.85rem;">Cuidador</div>
+                        <small class="text-muted">7 días</small>
+                    </div>
+                    <div class="flex-shrink-0 p-3 rounded-4 text-center"
+                        style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1)); border: 1px solid rgba(99,102,241,0.2); min-width: 120px;">
+                        <i class="bi bi-heart-fill text-danger fs-3"></i>
+                        <div class="fw-bold mt-2" style="font-size: 0.85rem;">Amigo</div>
+                        <small class="text-muted">100+ juegos</small>
+                    </div>
+                    <div class="flex-shrink-0 p-3 rounded-4 text-center"
+                        style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.1)); border: 1px solid rgba(16,185,129,0.2); min-width: 120px;">
+                        <i class="bi bi-shield-check text-success fs-3"></i>
+                        <div class="fw-bold mt-2" style="font-size: 0.85rem;">Saludable</div>
+                        <small class="text-muted">Salud 100%</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 COLUMNA DERECHA: CONTROL
+                 ============================================ -->
+            <div class="col-lg-5">
+
+                <!-- Tarjeta principal de control -->
+                <div class="premium-card p-4 mb-4">
+                    <div class="text-center mb-5">
+                        <div class="position-relative d-inline-block mb-3">
+                            <div style="width: 80px; height: 80px; background: var(--nova-gradient); border-radius: 24px; 
+                                        display: flex; align-items: center; justify-content: center; margin: 0 auto;
+                                        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.3);">
+                                <i class="bi bi-egg-fried text-white fs-2"></i>
+                            </div>
+                            <span class="position-absolute top-0 end-0 badge rounded-pill bg-danger border border-white"
+                                style="font-size: 0.7rem; padding: 6px 10px;">
+                                <i class="bi bi-heart-fill me-1"></i>Live
+                            </span>
+                        </div>
+                        <h1 class="fw-bold mb-1" style="font-size: 1.8rem; font-family: 'Space Grotesk', sans-serif;"
+                            th:text="${mascotaVirtual.nombre}">Nova-Pet</h1>
+                        <p class="text-muted mb-0" style="font-size: 0.9rem;">Cuida de tu compañero virtual</p>
+                    </div>
+
+                    <!-- Stats con barras premium -->
+                    <div class="stats-panel mb-5">
+
+                        <!-- Salud -->
+                        <div class="stat-bar-container">
+                            <div class="stat-label">
+                                <span>
+                                    <i class="bi bi-heart-fill text-danger"></i>
+                                    Salud
+                                </span>
+                                <span id="label-health" class="fw-bold" style="color: #ef4444;"
+                                    th:text="${#numbers.formatDecimal(mascotaVirtual.salud, 0, 0)} + '%'">100%</span>
+                            </div>
+                            <div class="progress-premium">
+                                <div id="bar-health" class="progress-fill bg-health"
+                                    th:style="'width: ' + ${mascotaVirtual.salud} + '%'"></div>
+                            </div>
+                        </div>
+
+                        <!-- Hambre -->
+                        <div class="stat-bar-container">
+                            <div class="stat-label">
+                                <span>
+                                    <i class="bi bi-egg-fried text-warning"></i>
+                                    Hambre
+                                </span>
+                                <span id="label-hunger" class="fw-bold" style="color: #f59e0b;"
+                                    th:text="${#numbers.formatDecimal(mascotaVirtual.hambre, 0, 0)} + '%'">0%</span>
+                            </div>
+                            <div class="progress-premium">
+                                <div id="bar-hunger" class="progress-fill bg-hunger"
+                                    th:style="'width: ' + ${mascotaVirtual.hambre} + '%'"></div>
+                            </div>
+                        </div>
+
+                        <!-- Felicidad -->
+                        <div class="stat-bar-container">
+                            <div class="stat-label">
+                                <span>
+                                    <i class="bi bi-stars text-info"></i>
+                                    Felicidad
+                                </span>
+                                <span id="label-happiness" class="fw-bold" style="color: #06b6d4;"
+                                    th:text="${#numbers.formatDecimal(mascotaVirtual.felicidad, 0, 0)} + '%'">100%</span>
+                            </div>
+                            <div class="progress-premium">
+                                <div id="bar-happiness" class="progress-fill bg-happiness"
+                                    th:style="'width: ' + ${mascotaVirtual.felicidad} + '%'"></div>
+                            </div>
+                        </div>
+
+                        <!-- Energía -->
+                        <div class="stat-bar-container">
+                            <div class="stat-label">
+                                <span>
+                                    <i class="bi bi-lightning-charge-fill text-primary"></i>
+                                    Energía
+                                </span>
+                                <span id="label-energy" class="fw-bold" style="color: #6366f1;"
+                                    th:text="${#numbers.formatDecimal(mascotaVirtual.energia, 0, 0)} + '%'">100%</span>
+                            </div>
+                            <div class="progress-premium">
+                                <div id="bar-energy" class="progress-fill bg-energy"
+                                    th:style="'width: ' + ${mascotaVirtual.energia} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid de acciones -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <button onclick="realizarAccion('FEED', event)" class="btn-royale" data-action="FEED">
+                                <i class="bi bi-apple text-success"></i>
+                                <span>Alimentar</span>
+                                <small class="text-muted" style="font-size: 0.7rem; font-weight: 500;">+20 Salud</small>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button onclick="realizarAccion('PLAY', event)" class="btn-royale" data-action="PLAY">
+                                <i class="bi bi-controller text-info"></i>
+                                <span>Jugar</span>
+                                <small class="text-muted" style="font-size: 0.7rem; font-weight: 500;">+30
+                                    Felicidad</small>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button onclick="realizarAccion('HEAL', event)" class="btn-royale" data-action="HEAL">
+                                <i class="bi bi-heart-pulse text-danger"></i>
+                                <span>Curar</span>
+                                <small class="text-muted" style="font-size: 0.7rem; font-weight: 500;">+40 Salud</small>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button onclick="realizarAccion('SLEEP', event)" class="btn-royale" data-action="SLEEP">
+                                <i class="bi bi-moon-stars text-primary"></i>
+                                <span>Dormir</span>
+                                <small class="text-muted" style="font-size: 0.7rem; font-weight: 500;">+50
+                                    Energía</small>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tip del día -->
+                    <div class="mt-4 p-4 rounded-4" style="background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(168,85,247,0.05)); 
+                                border: 1px solid rgba(99,102,241,0.1);">
+                        <div class="d-flex align-items-start gap-3">
+                            <div style="width: 48px; height: 48px; background: var(--nova-gradient); border-radius: 16px; 
+                                        display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="bi bi-lightbulb-fill text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1" style="font-size: 0.95rem;">Tip del día</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.85rem; line-height: 1.5;">
+                                    Alimenta a tu mascota antes de jugar para obtener el doble de puntos de felicidad.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mini estadísticas -->
+                <div class="premium-card p-4">
+                    <h6 class="fw-bold mb-4 text-uppercase"
+                        style="font-size: 0.8rem; letter-spacing: 2px; color: #94a3b8;">Actividad Reciente</h6>
+
+                    <div class="d-flex align-items-center gap-3 mb-3 p-3 rounded-4"
+                        style="background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.1);">
+                        <div style="width: 40px; height: 40px; background: rgba(16,185,129,0.1); border-radius: 12px; 
+                                    display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" style="font-size: 0.9rem;">Alimentado</div>
+                            <small class="text-muted">Hace 2 horas</small>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success">+20</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 mb-3 p-3 rounded-4"
+                        style="background: rgba(99,102,241,0.05); border: 1px solid rgba(99,102,241,0.1);">
+                        <div style="width: 40px; height: 40px; background: rgba(99,102,241,0.1); border-radius: 12px; 
+                                    display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-controller text-primary"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" style="font-size: 0.9rem;">Jugó</div>
+                            <small class="text-muted">Hace 5 horas</small>
+                        </div>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">+30</span>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-4"
+                        style="background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.1);">
+                        <div style="width: 40px; height: 40px; background: rgba(6,182,212,0.1); border-radius: 12px; 
+                                    display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-moon-stars text-info"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" style="font-size: 0.9rem;">Durmió</div>
+                            <small class="text-muted">Ayer</small>
+                        </div>
+                        <span class="badge bg-info bg-opacity-10 text-info">+50</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast de notificación -->
+    <div id="toast-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 3000;"></div>
+    
+    <canvas id="global-particles"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // URLs de imágenes por estado de ánimo
+        const petImages = {
+            happy: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop',
+            sad: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=400&h=400&fit=crop',
+            sick: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop',
+            sleepy: 'https://images.unsplash.com/photo-1517331156700-3c241d2b4d83?w=400&h=400&fit=crop',
+            playing: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop',
+            eating: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop'
+        };
+
+        // Mensajes por estado
+        const petMessages = {
+            happy: ['¡Estoy muy feliz! 🎉', '¡Eres el mejor! ❤️', '¡Guau guau! 🐕', '¡Me encanta jugar! 🎾'],
+            sad: ['Me siento solo... 😢', '¿Jugamos un rato? 🥺', 'Necesito cariño... 🤗'],
+            sick: ['No me siento bien... 🤒', '¿Puedes curarme? 💊', 'Me duele algo... 😷'],
+            sleepy: ['Tengo sueño... 😴', 'Buenas noches... 🌙', 'Zzz... 💤'],
+            hungry: ['Tengo hambre... 🍖', '¿Hay comida? 🦴', '¡Yummy yummy! 😋']
+        };
+
+        function getPetImage(salud, hambre, energia, felicidad, accion) {
+            if (accion === 'FEED') return petImages.eating;
+            if (accion === 'PLAY') return petImages.playing;
+            if (accion === 'SLEEP') return petImages.sleepy;
+            if (accion === 'HEAL') return petImages.happy;
+            if (salud < 30) return petImages.sick;
+            if (hambre > 70) return petImages.sad;
+            if (energia < 20) return petImages.sleepy;
+            if (felicidad > 70) return petImages.happy;
+            return petImages.happy;
+        }
+
+        function getRandomMessage(estado) {
+            const msgs = petMessages[estado] || petMessages.happy;
+            return msgs[Math.floor(Math.random() * msgs.length)];
+        }
+
+        function createCelebrationParticles(x, y) {
+            const colors = ['#6366f1', '#a855f7', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'celebration-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.width = (Math.random() * 10 + 5) + 'px';
+                particle.style.height = particle.style.width;
+                const angle = (Math.PI * 2 * i) / 12;
+                const distance = Math.random() * 100 + 50;
+                particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                document.getElementById('pet-environment').appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        async function realizarAccion(tipo, event) {
+            const btn = event ? event.currentTarget : null;
+            if (btn) btn.disabled = true;
+
+            // Efecto visual inmediato
+            const petDisplay = document.getElementById('pet-display');
+            petDisplay.classList.add('action-vibrant');
+            setTimeout(() => petDisplay.classList.remove('action-vibrant'), 600);
+
+            // Cambiar imagen según acción
+            const petImage = document.getElementById('pet-image');
+            petImage.style.opacity = '0';
+            petImage.style.transform = 'scale(0.8)';
+
+            setTimeout(() => {
+                petImage.src = getPetImage(100, 0, 100, 100, tipo);
+                petImage.style.opacity = '1';
+                petImage.style.transform = 'scale(1)';
+            }, 300);
+
+            // Mostrar burbuja de pensamiento
+            const mensajes = {
+                'FEED': ['¡Ñam ñam! 🍖', '¡Qué rico! 😋', '¡Gracias! 🦴'],
+                'PLAY': ['¡Yuhu! 🎾', '¡Corre! 🏃', '¡Diversión! 🎉'],
+                'HEAL': ['¡Mejor! 💊', '¡Gracias! ❤️', '¡Sanado! ✨'],
+                'SLEEP': ['Zzz... 😴', 'Buenas noches 🌙', 'A descansar 💤']
+            };
+            const msg = mensajes[tipo][Math.floor(Math.random() * mensajes[tipo].length)];
+            showThought(msg);
+
+            // Partículas de celebración
+            const rect = petDisplay.getBoundingClientRect();
+            createCelebrationParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            try {
+                const response = await fetch(`/usuario/api/juego/accion?accion=${tipo}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                setTimeout(() => {
+                    actualizarUI(data);
+
+                    // Actualizar imagen según nuevo estado
+                    const newImage = getPetImage(data.salud, data.hambre, data.energia, data.felicidad, null);
+                    if (petImage.src !== newImage) {
+                        petImage.style.opacity = '0';
+                        setTimeout(() => {
+                            petImage.src = newImage;
+                            petImage.style.opacity = '1';
+                        }, 300);
+                    }
+
+                    // Mostrar toast de éxito
+                    showToast(tipo === 'FEED' ? '¡Alimentado con éxito!' :
+                        tipo === 'PLAY' ? '¡Qué divertido!' :
+                            tipo === 'HEAL' ? '¡Curado!' : '¡A descansar!', 'success');
+                }, 500);
+
+            } catch (error) {
+                console.error("Error al realizar acción:", error);
+                showToast('Error al realizar la acción', 'error');
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                }, 1000);
+            }
+        }
+
+        function actualizarUI(data) {
+            // Actualizar barras con animación
+            updateBar('health', data.salud, '%');
+            updateBar('hunger', data.hambre, '%');
+            updateBar('happiness', data.felicidad, '%');
+            updateBar('energy', data.energia, '%');
+
+            // Actualizar texto de estado
+            const statusText = document.getElementById('pet-status-text');
+            if (data.salud < 30) {
+                statusText.innerHTML = `¡Cuidado! <span style="color: #fca5a5;">${data.nombre}</span> se siente mal.`;
+                showThought('No me siento bien... 🤒');
+            } else if (data.hambre > 70) {
+                statusText.innerHTML = `<span style="color: #fde047;">${data.nombre}</span> tiene mucha hambre.`;
+                showThought('Tengo hambre... 🍖');
+            } else if (data.energia < 20) {
+                statusText.innerHTML = `<span style="color: #93c5fd;">${data.nombre}</span> está cansado.`;
+                showThought('Tengo sueño... 😴');
+            } else {
+                statusText.innerHTML = `¡<span style="color: #fde047;">${data.nombre}</span> está muy feliz!`;
+            }
+
+            // Actualizar nivel y racha
+            document.getElementById('pet-level').textContent = data.nivel;
+            document.getElementById('streak-count').textContent = data.racha;
+            document.getElementById('coins-count').textContent = data.monedas.toLocaleString();
+            
+            // Actualizar barra de XP
+            const xpBar = document.getElementById('xp-bar');
+            const xpNeeded = data.nivel * 100;
+            const xpPercent = (data.experiencia / xpNeeded) * 100;
+            xpBar.style.width = xpPercent + '%';
+        }
+
+        function updateBar(id, value, suffix) {
+            const label = document.getElementById(`label-${id}`);
+            const bar = document.getElementById(`bar-${id}`);
+
+            label.textContent = Math.round(value) + suffix;
+            bar.style.width = value + '%';
+
+            // Cambiar color según valor
+            if (value < 30) {
+                bar.style.filter = 'brightness(0.8)';
+            } else {
+                bar.style.filter = 'brightness(1)';
+            }
+        }
+
+        function showThought(text) {
+            const bubble = document.getElementById('thought-bubble');
+            bubble.textContent = text;
+            bubble.classList.add('visible');
+            setTimeout(() => bubble.classList.remove('visible'), 4000);
+        }
+
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            const colors = {
+                success: 'linear-gradient(135deg, #10b981, #059669)',
+                error: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                info: 'linear-gradient(135deg, #6366f1, #4f46e5)'
+            };
+
+            const icons = {
+                success: 'bi-check-circle-fill',
+                error: 'bi-x-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            toast.style.cssText = `
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 16px;
+                margin-top: 12px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 600;
+                animation: toastSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                min-width: 280px;
+            `;
+
+            toast.innerHTML = `
+                <i class="bi ${icons[type] || icons.info} fs-5"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toastHide 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Simulación de tiempo visual mejorada
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time-display').textContent = timeStr;
+
+            const hour = now.getHours();
+            const env = document.getElementById('pet-environment');
+            const phase = document.getElementById('day-phase');
+            const phaseIcon = document.getElementById('phase-icon');
+            const weatherIcon = document.getElementById('weather-icon');
+            const starsContainer = document.getElementById('stars-container');
+
+            // Generar estrellas si es de noche
+            if (hour >= 18 || hour < 6) {
+                if (starsContainer.children.length === 0) {
+                    for (let i = 0; i < 50; i++) {
+                        const star = document.createElement('div');
+                        star.className = 'star visible';
+                        star.style.left = Math.random() * 100 + '%';
+                        star.style.top = Math.random() * 100 + '%';
+                        star.style.animationDelay = Math.random() * 3 + 's';
+                        starsContainer.appendChild(star);
+                    }
+                }
+            } else {
+                starsContainer.innerHTML = '';
+            }
+
+            if (hour >= 6 && hour < 12) {
+                env.style.background = 'linear-gradient(180deg, #87CEEB 0%, #E0F2FE 50%, #BAE6FD 100%)';
+                phase.textContent = "Mañana";
+                phaseIcon.className = 'bi bi-sun-fill text-warning';
+                weatherIcon.className = 'bi bi-cloud-sun';
+            } else if (hour >= 12 && hour < 18) {
+                env.style.background = 'linear-gradient(180deg, #60A5FA 0%, #93C5FD 50%, #BFDBFE 100%)';
+                phase.textContent = "Tarde";
+                phaseIcon.className = 'bi bi-sun text-warning';
+                weatherIcon.className = 'bi bi-sun-fill';
+            } else if (hour >= 18 && hour < 21) {
+                env.style.background = 'linear-gradient(180deg, #F59E0B 0%, #F97316 30%, #7C3AED 100%)';
+                phase.textContent = "Atardecer";
+                phaseIcon.className = 'bi bi-sunset-fill text-warning';
+                weatherIcon.className = 'bi bi-moon-stars';
+            } else {
+                env.style.background = 'linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #312e81 100%)';
+                phase.textContent = "Noche";
+                phaseIcon.className = 'bi bi-moon-stars-fill text-info';
+                weatherIcon.className = 'bi bi-stars';
+            }
+        }, 1000);
+
+        // Polling de estado cada 10 segundos
+        setInterval(async () => {
+            try {
+                const response = await fetch('/usuario/api/juego/estado');
+                const data = await response.json();
+                actualizarUI(data);
+
+                // Actualizar imagen según estado
+                const petImage = document.getElementById('pet-image');
+                const newImage = getPetImage(data.salud, data.hambre, data.energia, data.felicidad, null);
+                if (petImage.src !== newImage) {
+                    petImage.style.opacity = '0';
+                    setTimeout(() => {
+                        petImage.src = newImage;
+                        petImage.style.opacity = '1';
+                    }, 300);
+                }
+            } catch (e) { console.warn("Error al sincronizar estado"); }
+        }, 10000);
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.premium-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(40px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+
+            // Animación del entorno
+            const env = document.getElementById('pet-environment');
+            env.style.opacity = '0';
+            env.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                env.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                env.style.opacity = '1';
+                env.style.transform = 'scale(1)';
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>

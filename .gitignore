@@ -1,0 +1,20 @@
+# Java / Maven
+clinicaapp/target/
+clinicaapp/.mvn/wrapper/maven-wrapper.jar
+**/target/
+**/build/
+*.class
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+
+# System files
+.DS_Store
+Thumbs.db

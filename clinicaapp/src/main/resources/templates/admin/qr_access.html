@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Connection Center | HEX Infrastructure</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- QR Code Library via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --hex-bg: #020617;
+            --hex-surface: #0f172a;
+            --hex-elevated: #1e293b;
+            --hex-primary: #00d4ff;
+            --hex-primary-dim: rgba(0, 212, 255, 0.1);
+            --hex-accent: #a855f7;
+            --hex-accent-dim: rgba(168, 85, 247, 0.1);
+            --hex-danger: #f43f5e;
+            --hex-danger-dim: rgba(244, 63, 94, 0.1);
+            --hex-warning: #f59e0b;
+            --hex-warning-dim: rgba(245, 158, 11, 0.1);
+            --hex-success: #10b981;
+            --hex-success-dim: rgba(16, 185, 129, 0.1);
+            --hex-text: #f1f5f9;
+            --hex-text-secondary: #94a3b8;
+            --hex-border: rgba(148, 163, 184, 0.1);
+            --hex-glow-primary: rgba(0, 212, 255, 0.4);
+            --hex-glow-accent: rgba(168, 85, 247, 0.4);
+        }
+
+        [data-theme="light"] {
+            --hex-bg: #f8fafc;
+            --hex-surface: #ffffff;
+            --hex-elevated: #f1f5f9;
+            --hex-text: #0f172a;
+            --hex-text-secondary: #64748b;
+            --hex-border: rgba(100, 116, 139, 0.15);
+            --hex-glow-primary: rgba(0, 212, 255, 0.2);
+            --hex-glow-accent: rgba(168, 85, 247, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'Space Grotesk', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.6s ease, color 0.6s ease;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .hex-bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .hex-bg-grid::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(60px, 60px);
+            }
+        }
+
+        .orb-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-glow-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+            top: -200px;
+            right: -100px;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .orb-glow-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, transparent 70%);
+            bottom: -150px;
+            left: -100px;
+            animation: orbFloat 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+        }
+
+        /* ===== TOP STATUS BAR ===== */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        .status-bar-left,
+        .status-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--hex-success);
+            box-shadow: 0 0 8px var(--hex-success);
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ===== HEADER ===== */
+        .hex-header {
+            position: fixed;
+            top: 36px;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 999;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        .brand-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            font-size: 0.7rem;
+            color: var(--hex-text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-btn {
+            width: 42px;
+            height: 42px;
+            background: var(--hex-surface);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            color: var(--hex-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover {
+            border-color: var(--hex-primary);
+            box-shadow: 0 0 20px var(--hex-glow-primary);
+            transform: rotate(180deg);
+        }
+
+        .btn-exit-core-premium {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(56, 189, 248, 0.25) 100%);
+            border: 1.5px solid rgba(14, 165, 233, 0.4);
+            color: #0ea5e9;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.1);
+        }
+
+        .btn-exit-core-premium:hover {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white !important;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--hex-surface);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            width: 42px;
+            height: 42px;
+            background: rgba(244, 63, 94, 0.05);
+            border: 1px solid rgba(244, 63, 94, 0.15);
+            border-radius: 12px;
+            color: var(--hex-danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--hex-danger);
+            color: white;
+            box-shadow: 0 0 20px var(--hex-danger-dim);
+            transform: scale(1.05);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: 130px 32px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero-section {
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--hex-primary-dim);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--hex-primary);
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--hex-text-secondary);
+            max-width: 600px;
+        }
+
+        /* ===== CONNECTIVITY STATUS ===== */
+        .connection-badge-pulse {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: var(--hex-success);
+            font-weight: 700;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .connection-badge-pulse.offline {
+            background: var(--hex-danger-dim);
+            border-color: rgba(244, 63, 94, 0.25);
+            color: var(--hex-danger);
+        }
+
+        .pulse-dot-green {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--hex-success);
+            box-shadow: 0 0 10px var(--hex-success);
+            animation: liveBlink 1.5s infinite;
+        }
+
+        .pulse-dot-green.offline {
+            background: var(--hex-danger);
+            box-shadow: 0 0 10px var(--hex-danger);
+        }
+
+        @keyframes liveBlink {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(1.2);
+            }
+        }
+
+        /* ===== GRID LAYOUT ===== */
+        .connection-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        /* ===== CARDS ===== */
+        .hex-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--hex-border);
+            border-radius: 24px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="light"] .hex-card {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .hex-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--hex-primary), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .hex-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 30px var(--hex-glow-primary);
+        }
+
+        .hex-card:hover::before {
+            opacity: 1;
+        }
+
+        .hex-card.col-grid-3 { grid-column: span 3; }
+        .hex-card.col-grid-4 { grid-column: span 4; }
+        .hex-card.col-grid-5 { grid-column: span 5; }
+        .hex-card.col-grid-7 { grid-column: span 7; }
+        .hex-card.col-grid-8 { grid-column: span 8; }
+        .hex-card.col-grid-12 { grid-column: span 12; }
+
+        @media (max-width: 992px) {
+            .connection-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+
+        .card-header-hex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--hex-primary-dim), var(--hex-accent-dim));
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--hex-primary);
+        }
+
+        .card-title-group h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .card-title-group p {
+            font-size: 0.78rem;
+            color: var(--hex-text-secondary);
+            margin: 2px 0 0;
+        }
+
+        /* ===== QR DISPLAY CARD ===== */
+        .qr-viewport {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            position: relative;
+        }
+
+        .qr-wrapper {
+            position: relative;
+            background: #ffffff; /* White background for maximum compatibility */
+            padding: 16px;
+            border-radius: 20px;
+            border: 2.5px solid var(--hex-primary);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.25);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .qr-wrapper.glow-purple {
+            border-color: var(--hex-accent);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.25);
+        }
+        .qr-wrapper.glow-red {
+            border-color: var(--hex-danger);
+            box-shadow: 0 0 25px rgba(244, 63, 94, 0.25);
+        }
+        .qr-wrapper.glow-green {
+            border-color: var(--hex-success);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Laser Scan Line */
+        .qr-scanner-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--hex-primary), transparent);
+            box-shadow: 0 0 10px var(--hex-primary);
+            animation: scanAnimation 3s ease-in-out infinite;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .qr-wrapper.glow-purple .qr-scanner-line {
+            background: linear-gradient(90deg, transparent, var(--hex-accent), transparent);
+            box-shadow: 0 0 10px var(--hex-accent);
+        }
+        .qr-wrapper.glow-red .qr-scanner-line {
+            background: linear-gradient(90deg, transparent, var(--hex-danger), transparent);
+            box-shadow: 0 0 10px var(--hex-danger);
+        }
+        .qr-wrapper.glow-green .qr-scanner-line {
+            background: linear-gradient(90deg, transparent, var(--hex-success), transparent);
+            box-shadow: 0 0 10px var(--hex-success);
+        }
+
+        @keyframes scanAnimation {
+            0% { top: 0%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .qr-canvas-holder {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.01);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-loading-spinner {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #0f172a; /* Dark slate text for white background contrast */
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .connection-url-box {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-top: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .url-text {
+            color: var(--hex-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            user-select: all;
+        }
+
+        /* ===== WIDGETS ===== */
+        .mini-stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--hex-border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.3s;
+        }
+
+        .mini-stat-card:hover {
+            border-color: rgba(0, 212, 255, 0.15);
+            background: rgba(0, 212, 255, 0.01);
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--hex-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .stat-icon.accent {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--hex-accent);
+        }
+
+        .stat-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--hex-success);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            font-size: 0.68rem;
+            color: var(--hex-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== PHONE PREVIEW MOCKUP ===== */
+        .phone-frame {
+            width: 220px;
+            height: 440px;
+            border: 10px solid #1e293b;
+            border-radius: 36px;
+            position: relative;
+            background: #020617;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 20px rgba(0, 212, 255, 0.15);
+            margin: 0 auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 18px;
+            background: #1e293b;
+            border-bottom-left-radius: 14px;
+            border-bottom-right-radius: 14px;
+            z-index: 100;
+        }
+
+        .phone-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            position: relative;
+        }
+
+        .phone-header-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: var(--hex-text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 12px;
+            padding: 0 4px;
+            z-index: 90;
+        }
+
+        .phone-status-icons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .phone-browser-address {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--hex-border);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 0.6rem;
+            color: var(--hex-text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .phone-browser-address i {
+            color: var(--hex-success);
+        }
+
+        .phone-viewport {
+            flex: 1;
+            background: linear-gradient(135deg, #090d22 0%, #15102a 100%);
+            border-radius: 18px;
+            border: 1px solid var(--hex-border);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .mock-app-welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .mock-app-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .mock-app-welcome h2 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+
+        .mock-app-welcome p {
+            font-size: 0.6rem;
+            color: var(--hex-text-secondary);
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .mock-route-indicator {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: var(--hex-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.58rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 8px;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mock-app-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--hex-border);
+            border-radius: 10px;
+            padding: 8px;
+            width: 100%;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mock-line {
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            width: 80%;
+        }
+
+        .mock-line.short {
+            width: 40%;
+        }
+
+        .mock-app-btn {
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: auto;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 212, 255, 0.2);
+        }
+
+        /* ===== NETWORKING DETAILS & FORM CONTROL ===== */
+        .network-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--hex-border);
+            border-radius: 14px;
+            margin-bottom: 12px;
+        }
+
+        .network-row label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--hex-text-secondary);
+        }
+
+        .network-row span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--hex-text);
+        }
+
+        .btn-hex {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-hex-primary {
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-hex-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.45);
+        }
+
+        .btn-hex-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text);
+        }
+
+        .btn-hex-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--hex-primary);
+        }
+
+        .btn-hex-outline {
+            background: transparent;
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            border-radius: 8px;
+            width: auto;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-hex-outline:hover {
+            border-color: var(--hex-primary);
+            color: var(--hex-primary);
+            box-shadow: 0 0 10px var(--hex-primary-dim);
+        }
+
+        /* ===== CONTROLS ===== */
+        .hex-switch {
+            appearance: none;
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--hex-border);
+            flex-shrink: 0;
+        }
+
+        .hex-switch:checked {
+            background: var(--hex-primary);
+            border-color: var(--hex-primary);
+            box-shadow: 0 0 15px var(--hex-glow-primary);
+        }
+
+        .hex-switch::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hex-switch:checked::before {
+            left: 22px;
+        }
+
+        .hex-select {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hex-border);
+            border-radius: 10px;
+            padding: 6px 12px;
+            color: var(--hex-text);
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .hex-select:focus {
+            border-color: var(--hex-primary);
+        }
+
+        /* ===== CONNECTED DEVICES TABLE ===== */
+        .device-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .device-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--hex-text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--hex-border);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .device-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--hex-border);
+            vertical-align: middle;
+        }
+
+        .device-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .device-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .device-icon-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--hex-text-secondary);
+        }
+
+        .device-table tr:hover {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .device-table tr:hover .device-icon-wrap {
+            background: var(--hex-primary-dim);
+            border-color: rgba(0, 212, 255, 0.25);
+            color: var(--hex-primary);
+        }
+
+        .badge-dev-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-dev-status.active {
+            background: var(--hex-success-dim);
+            color: var(--hex-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-dev-status.idle {
+            background: var(--hex-warning-dim);
+            color: var(--hex-warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        /* ===== TERMINAL GRAPHIC ===== */
+        .terminal-box {
+            background: #020617;
+            border: 1px solid var(--hex-border);
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 16px;
+            font-size: 0.72rem;
+            color: #38bdf8;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-time {
+            color: var(--hex-text-secondary);
+            flex-shrink: 0;
+        }
+
+        .terminal-cmd {
+            color: #38bdf8;
+        }
+
+        .terminal-success {
+            color: var(--hex-success);
+        }
+
+        .terminal-warning {
+            color: var(--hex-warning);
+        }
+
+        /* Color Theme Options */
+        .color-theme-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .color-dot.active {
+            border-color: white;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* Banner Notification */
+        .notification-banner {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid var(--hex-primary);
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3), 0 0 20px rgba(0, 212, 255, 0.1);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(20px);
+        }
+
+        .notification-banner.active {
+            top: 50px;
+        }
+
+        .notification-banner i {
+            color: var(--hex-primary);
+            font-size: 1.3rem;
+            animation: liveBlink 1s infinite;
+        }
+
+        /* ===== FOOTER ===== */
+        .hex-footer {
+            margin-top: 48px;
+            padding: 24px;
+            text-align: center;
+            border-top: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Grid -->
+    <div class="hex-bg-grid"></div>
+    <div class="orb-glow orb-glow-1"></div>
+    <div class="orb-glow orb-glow-2"></div>
+
+    <!-- Notification Banner -->
+    <div id="connNotification" class="notification-banner">
+        <i class="bi bi-phone-vibrate-fill"></i>
+        <div>
+            <strong id="connNotifDevice">iPhone 15 Pro</strong>
+            <span style="color: var(--hex-text-secondary);"> se ha conectado a la red local.</span>
+        </div>
+    </div>
+
+    <!-- Top Status Bar -->
+    <div class="status-bar">
+        <div class="status-bar-left">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>CONEXIÓN REMOTA</span>
+            </div>
+            <span style="color: var(--hex-text-secondary);">|</span>
+            <span style="color: var(--hex-text-secondary);">V1.2</span>
+            <span style="color: var(--hex-text-secondary);">|</span>
+            <span style="color: var(--hex-text-secondary);">IP DETECTOR ACTIVE</span>
+        </div>
+        <div class="status-bar-right">
+            <span id="liveClock" style="color: var(--hex-text-secondary);">00:00:00</span>
+            <span style="color: var(--hex-text-secondary);">UTC</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="hex-header">
+        <div class="header-brand">
+            <a th:href="@{/admin/centro-control}" style="text-decoration: none; display: flex; align-items: center; gap: 14px;">
+                <div class="brand-icon">
+                    <i class="bi bi-hexagon-fill"></i>
+                </div>
+                <div class="brand-text">
+                    <h1 style="color: var(--hex-text); margin: 0;">HEX Infrastructure</h1>
+                    <span>Connection Center v1.2</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="header-actions">
+            <button type="button" class="theme-btn" id="themeToggle" title="Cambiar tema">
+                <i class="bi bi-sun-fill" id="themeIcon"></i>
+            </button>
+            
+            <a th:href="@{/admin/centro-control}" class="btn-exit-core-premium" style="text-decoration: none;">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Volver al Centro de Control</span>
+            </a>
+
+            <div class="user-badge">
+                <div class="user-avatar">AD</div>
+                <span>Admin Principal</span>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="logout-btn" title="Cerrar Sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-badge">
+                <i class="bi bi-qr-code-scan"></i>
+                Local QR Router
+            </div>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <h1 class="hero-title">
+                        QR <span class="gradient-text">Access Center</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Conecta dispositivos externos a la red local escaneando un código QR adaptativo de alta fidelidad.
+                    </p>
+                </div>
+                <div>
+                    <div id="connectionStatusBadge" class="connection-badge-pulse">
+                        <div class="pulse-dot-green"></div>
+                        <span>NETWORK: READY TO CONNECT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Stats Widgets -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="mini-stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span id="statActiveUsers" class="stat-value">3</span>
+                        <span class="stat-label">Usuarios Conectados</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="mini-stat-card">
+                    <div class="stat-icon accent">
+                        <i class="bi bi-qr-code"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span id="statTotalScans" class="stat-value">47</span>
+                        <span class="stat-label">Escaneos del QR</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="mini-stat-card">
+                    <div class="stat-icon success">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span id="statUptime" class="stat-value">0h 0m</span>
+                        <span class="stat-label">Tiempo Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="mini-stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span id="statNetworkLoad" class="stat-value">1.2 Mbps</span>
+                        <span class="stat-label">Ancho de Banda</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Layout -->
+        <div class="connection-grid">
+
+            <!-- Card 1: Generador de QR (col-5) -->
+            <div class="hex-card col-grid-5">
+                <div class="card-header-hex">
+                    <div class="card-header-left">
+                        <div class="card-icon">
+                            <i class="bi bi-qr-code"></i>
+                        </div>
+                        <div class="card-title-group">
+                            <h3>Acceso QR Dinámico</h3>
+                            <p>Escanee para acceder instantáneamente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="qr-viewport">
+                    <div id="qrWrapper" class="qr-wrapper">
+                        <div class="qr-scanner-line"></div>
+                        <div id="qrSpinner" class="qr-loading-spinner" style="display: none;">
+                            <div class="spinner-border text-info" role="status"></div>
+                            <span>Cargando IP local...</span>
+                        </div>
+                        <div class="qr-canvas-holder">
+                            <canvas id="qrCanvas"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-url-box">
+                        <span id="urlDisplay" class="url-text">Cargando...</span>
+                        <button type="button" class="btn btn-sm text-info p-0" id="btnCopyUrl" title="Copiar enlace">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn-hex btn-hex-primary flex-fill" id="btnGenerateQr">
+                        <i class="bi bi-arrow-repeat"></i> Regenerar QR
+                    </button>
+                    <button type="button" class="btn-hex btn-hex-secondary" id="btnDownloadQr" title="Descargar QR">
+                        <i class="bi bi-download"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: Phone Preview & Security Hub (col-4) -->
+            <div class="hex-card col-grid-4">
+                <div class="card-header-hex">
+                    <div class="card-header-left">
+                        <div class="card-icon">
+                            <i class="bi bi-phone"></i>
+                        </div>
+                        <div class="card-title-group">
+                            <h3>Previsualización Móvil</h3>
+                            <p>Vista del dispositivo cliente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <div class="phone-screen">
+                        <div class="phone-header-bar">
+                            <span id="phoneTime">13:06</span>
+                            <div class="phone-status-icons">
+                                <i class="bi bi-wifi"></i>
+                                <i class="bi bi-battery-full"></i>
+                            </div>
+                        </div>
+                        <div class="phone-browser-address">
+                            <i class="bi bi-lock-fill"></i>
+                            <span id="phoneAddressUrl">http://127.0.0.1:8080</span>
+                        </div>
+                        <div class="phone-viewport">
+                            <div class="mock-app-welcome">
+                                <div class="mock-app-logo">
+                                    <i class="bi bi-hexagon-fill"></i>
+                                </div>
+                                <h2>ClínicaApp</h2>
+                                <p>Portal Veterinario Integral</p>
+                                <div class="mock-route-indicator" id="mockRouteText">Inicio (/)</div>
+                                <div class="mock-app-card">
+                                    <div class="mock-line"></div>
+                                    <div class="mock-line short"></div>
+                                </div>
+                                <div class="mock-app-card">
+                                    <div class="mock-line"></div>
+                                    <div class="mock-line short"></div>
+                                </div>
+                            </div>
+                            <div class="mock-app-btn">Entrar a ClínicaApp</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Network Config & Diagnostics (col-3) -->
+            <div class="hex-card col-grid-3">
+                <div class="card-header-hex">
+                    <div class="card-header-left">
+                        <div class="card-icon">
+                            <i class="bi bi-hdd-network"></i>
+                        </div>
+                        <div class="card-title-group">
+                            <h3>Info de Red & Config</h3>
+                            <p>Telemetría de la interfaz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="network-row flex-column align-items-stretch gap-2" style="background: rgba(255,255,255,0.02); border: 1px solid var(--hex-border); border-radius: 14px; padding: 12px 16px; margin-bottom: 12px;">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <label class="m-0" style="font-size: 0.8rem; font-weight: 600; color: var(--hex-text-secondary);">IP Servidor (Interfaz)</label>
+                        <button type="button" class="btn btn-sm text-info p-0" id="btnEditIp" title="Editar IP manualmente" style="background: none; border: none;">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </div>
+                    <select class="form-select hex-select w-100" id="ipSelector" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--hex-border); border-radius: 10px; padding: 6px 12px; color: var(--hex-text); font-size: 0.8rem; outline: none; cursor: pointer;">
+                        <option value="127.0.0.1">Cargando interfaces...</option>
+                    </select>
+                    <input type="text" class="form-control hex-select w-100" id="manualIpInput" placeholder="Ej. 192.168.1.100 o midominio.com" style="display: none; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; margin-top: 5px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--hex-border); border-radius: 10px; padding: 6px 12px; color: var(--hex-text);">
+                </div>
+                <div class="network-row">
+                    <label>Puerto Activo</label>
+                    <span id="netPort">8080</span>
+                </div>
+                <div class="network-row">
+                    <label>Nombre de Red</label>
+                    <span id="netInterface" style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right;">Cargando...</span>
+                </div>
+                <div class="network-row">
+                    <label>Tipo Conexión</label>
+                    <span>Local (Wi-Fi)</span>
+                </div>
+
+                <!-- Session Router Select -->
+                <div class="mb-3">
+                    <label class="form-label text-secondary small fw-bold" style="font-size: 0.68rem; letter-spacing: 0.5px;">RUTA DESTINO DEL QR</label>
+                    <select class="form-select hex-select w-100" id="routeSelector">
+                        <option value="/">Página de Inicio</option>
+                        <option value="/login">Pantalla de Login</option>
+                        <option value="/registro">Registro de Paciente</option>
+                        <option value="/admin/dashboard">Dashboard de Admin</option>
+                    </select>
+                </div>
+
+                <div class="mt-4">
+                    <button type="button" class="btn-hex btn-hex-secondary w-100 py-3" id="btnDiagnosticar">
+                        <i class="bi bi-activity"></i> Diagnóstico de Red
+                    </button>
+                    
+                    <div class="terminal-box" id="diagnosticTerminal" style="display: none;">
+                        <!-- Diagnostic Lines will render here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Seguridad & Expiración (col-4) -->
+            <div class="hex-card col-grid-4">
+                <div class="card-header-hex">
+                    <div class="card-header-left">
+                        <div class="card-icon">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <div class="card-title-group">
+                            <h3>Seguridad & Expiración</h3>
+                            <p>Controles de protección del QR</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="network-row">
+                    <div class="d-flex flex-column">
+                        <label class="m-0" style="color: var(--hex-text);">Expiración del QR</label>
+                        <small class="text-secondary" style="font-size: 0.65rem;">Renovar acceso periódicamente</small>
+                    </div>
+                    <select class="hex-select" id="expirationSelector">
+                        <option value="900">15 Minutos</option>
+                        <option value="1800">30 Minutos</option>
+                        <option value="3600">1 Hora</option>
+                        <option value="0">Nunca</option>
+                    </select>
+                </div>
+
+                <div class="network-row">
+                    <div class="d-flex flex-column">
+                        <label class="m-0" style="color: var(--hex-text);">Protección PIN</label>
+                        <small class="text-secondary" style="font-size: 0.65rem;">Exigir PIN en dispositivo móvil</small>
+                    </div>
+                    <input class="hex-switch" type="checkbox" id="pinToggle">
+                </div>
+
+                <div class="network-row" id="pinDisplayRow" style="display: none; transition: all 0.3s ease;">
+                    <label>Código PIN de Acceso</label>
+                    <span class="text-warning fw-bold fs-5" id="securePin">1428</span>
+                </div>
+
+                <div class="network-row">
+                    <div class="d-flex flex-column">
+                        <label class="m-0" style="color: var(--hex-text);">Sonidos del Sistema</label>
+                        <small class="text-secondary" style="font-size: 0.65rem;">Efectos de sonido de conexión</small>
+                    </div>
+                    <input class="hex-switch" type="checkbox" id="soundToggle" checked>
+                </div>
+
+                <div class="network-row">
+                    <div class="d-flex flex-column">
+                        <label class="m-0" style="color: var(--hex-text);">Láser de Escaneo</label>
+                        <small class="text-secondary" style="font-size: 0.65rem;">Línea láser animada sobre el código QR</small>
+                    </div>
+                    <input class="hex-switch" type="checkbox" id="laserToggle" checked>
+                </div>
+
+                <!-- Color Theme for QR -->
+                <div class="network-row">
+                    <div class="d-flex flex-column">
+                        <label class="m-0" style="color: var(--hex-text);">Estilo Neon QR</label>
+                        <small class="text-secondary" style="font-size: 0.65rem;">Glow del código de barras</small>
+                    </div>
+                    <div class="color-theme-wrapper">
+                        <div class="color-dot active" style="background: #00d4ff; color: #00d4ff;" data-color="#00d4ff" data-theme="cyan"></div>
+                        <div class="color-dot" style="background: #a855f7; color: #a855f7;" data-color="#a855f7" data-theme="purple"></div>
+                        <div class="color-dot" style="background: #f43f5e; color: #f43f5e;" data-color="#f43f5e" data-theme="red"></div>
+                        <div class="color-dot" style="background: #10b981; color: #10b981;" data-color="#10b981" data-theme="green"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Dispositivos Conectados (col-8) -->
+            <div class="hex-card col-grid-8">
+                <div class="card-header-hex">
+                    <div class="card-header-left">
+                        <div class="card-icon">
+                            <i class="bi bi-phone-flip"></i>
+                        </div>
+                        <div class="card-title-group">
+                            <h3>Dispositivos en la Red</h3>
+                            <p>Gestión de sesiones activas conectadas al servidor</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-hex-outline" id="btnSimulateScan">
+                        <i class="bi bi-plus-circle"></i> Simular Escaneo
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="device-table">
+                        <thead>
+                            <tr>
+                                <th>Dispositivo</th>
+                                <th>Dirección IP</th>
+                                <th>Latencia</th>
+                                <th>Hora Acceso</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deviceTableBody">
+                            <!-- Injected dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="hex-footer">
+            <div>
+                <i class="bi bi-shield-check"></i>
+                HEX INFRASTRUCTURE QR CENTER • SISTEMA SEGURO DIOS-MÓVIL •
+                <span id="footerYear">2026</span>
+            </div>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // Web Audio API Synthesizer
+            const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+            let audioCtx = null;
+
+            function playTechBeep(type) {
+                const soundEnabled = document.getElementById('soundToggle').checked;
+                if (!soundEnabled) return;
+                
+                try {
+                    if (!AudioCtxClass) return;
+                    if (!audioCtx) {
+                        audioCtx = new AudioCtxClass();
+                    }
+                    
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    if (type === 'success') {
+                        // High pitch double beep
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                        osc.frequency.setValueAtTime(1320, audioCtx.currentTime + 0.08);
+                        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.2);
+                    } else if (type === 'scan') {
+                        // Scanner laser sweep sound
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime + 0.15);
+                        gain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.15);
+                    } else if (type === 'action') {
+                        // Soft blip
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.06);
+                    } else if (type === 'alert') {
+                        // Error alert
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.35);
+                    }
+                } catch (e) {
+                    console.log("Audio Context initialization blocked or failed", e);
+                }
+            }
+
+            // Theme configuration
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+
+            function initTheme() {
+                const savedTheme = localStorage.getItem('hex-theme');
+                if (savedTheme === 'light') {
+                    body.setAttribute('data-theme', 'light');
+                    if (themeIcon) themeIcon.className = 'bi bi-moon-stars-fill';
+                } else {
+                    body.removeAttribute('data-theme');
+                    if (themeIcon) themeIcon.className = 'bi bi-sun-fill';
+                }
+            }
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const isLight = body.getAttribute('data-theme') === 'light';
+                    if (isLight) {
+                        body.removeAttribute('data-theme');
+                        localStorage.setItem('hex-theme', 'dark');
+                        themeIcon.className = 'bi bi-sun-fill';
+                    } else {
+                        body.setAttribute('data-theme', 'light');
+                        localStorage.setItem('hex-theme', 'light');
+                        themeIcon.className = 'bi bi-moon-stars-fill';
+                    }
+                    playTechBeep('action');
+                });
+            }
+            initTheme();
+
+            // Clock update
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                
+                const clockEl = document.getElementById('liveClock');
+                if (clockEl) clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+                const phoneClock = document.getElementById('phoneTime');
+                if (phoneClock) phoneClock.textContent = `${hours}:${minutes}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Network data fetching and QR generation
+            let currentIp = "127.0.0.1";
+            let currentPort = "8080";
+            let currentRoute = "/";
+            let currentQrColor = "#00d4ff";
+            
+            // Pre-populate with standard devices so layout is never empty
+            let currentDevices = [
+                {
+                    id: "dev_1",
+                    name: "iPhone 15 Pro",
+                    ip: "192.168.1.50",
+                    mac: "BC:D1:EC:11:A2:3B",
+                    status: "ACTIVE",
+                    os: "iOS",
+                    type: "Mobile",
+                    latency: "12ms",
+                    accessTime: "Hace 2 minutos"
+                },
+                {
+                    id: "dev_2",
+                    name: "Samsung Galaxy S24",
+                    ip: "192.168.1.62",
+                    mac: "48:5F:99:A5:72:0D",
+                    status: "ACTIVE",
+                    os: "Android",
+                    type: "Mobile",
+                    latency: "18ms",
+                    accessTime: "Hace 5 minutos"
+                },
+                {
+                    id: "dev_3",
+                    name: "iPad Pro M4",
+                    ip: "192.168.1.15",
+                    mac: "D4:A3:3D:88:2E:FF",
+                    status: "IDLE",
+                    os: "iPadOS",
+                    type: "Tablet",
+                    latency: "15ms",
+                    accessTime: "Hace 15 minutos"
+                }
+            ];
+
+            const qrCanvas = document.getElementById('qrCanvas');
+            const urlDisplay = document.getElementById('urlDisplay');
+            const qrSpinner = document.getElementById('qrSpinner');
+            const routeSelector = document.getElementById('routeSelector');
+            const netPort = document.getElementById('netPort');
+            const netInterface = document.getElementById('netInterface');
+            
+            const ipSelector = document.getElementById('ipSelector');
+            const manualIpInput = document.getElementById('manualIpInput');
+            const btnEditIp = document.getElementById('btnEditIp');
+            let isManualIp = false;
+
+            function getAccessUrl() {
+                let route = routeSelector.value;
+                return `http://${currentIp}:${currentPort}${route}`;
+            }
+
+            function generateQRCode() {
+                const accessUrl = getAccessUrl();
+                urlDisplay.textContent = accessUrl;
+                
+                // Update simulated phone UI
+                document.getElementById('phoneAddressUrl').textContent = accessUrl;
+                
+                // Show route on mock screen
+                let routeName = routeSelector.options[routeSelector.selectedIndex].text;
+                document.getElementById('mockRouteText').textContent = `Ruta: ${routeName}`;
+
+                if (qrSpinner) qrSpinner.style.display = 'flex';
+                
+                // Generate using node-qrcode canvas rendering
+                setTimeout(() => {
+                    QRCode.toCanvas(qrCanvas, accessUrl, {
+                        width: 200,
+                        margin: 4, // standard quiet zone margin
+                        color: {
+                            dark: '#000000', // high contrast black
+                            light: '#ffffff' // white background
+                        }
+                    }, function (error) {
+                        if (qrSpinner) qrSpinner.style.display = 'none';
+                        if (error) {
+                            console.error(error);
+                            playTechBeep('alert');
+                        } else {
+                            // QR generated successfully
+                        }
+                    });
+                }, 200);
+            }
+
+            function loadNetworkData() {
+                if (qrSpinner) qrSpinner.style.display = 'flex';
+                
+                // Initial render of pre-populated table
+                renderDeviceTable();
+
+                fetch('/api/system/network')
+                    .then(response => response.json())
+                    .then(data => {
+                        currentIp = data.ip || "127.0.0.1";
+                        currentPort = data.port || "8080";
+                        
+                        netPort.textContent = currentPort;
+                        netInterface.textContent = data.networkName || "Wi-Fi Interface";
+                        document.getElementById('statUptime').textContent = data.uptime || "24h 0m";
+                        document.getElementById('statNetworkLoad').textContent = data.stats.networkLoad || "1.5 Mbps";
+                        document.getElementById('statTotalScans').textContent = data.stats.totalScans || "47";
+                        document.getElementById('statActiveUsers').textContent = data.stats.activeUsers || "0";
+                        
+                        // Set PIN toggle switch state from backend
+                        if (pinToggle) {
+                            pinToggle.checked = data.pinRequired || false;
+                            if (pinToggle.checked) {
+                                pinDisplayRow.style.display = 'flex';
+                            } else {
+                                pinDisplayRow.style.display = 'none';
+                            }
+                        }
+                        
+                        // Populate IP Selector if not in manual edit mode
+                        if (!isManualIp && ipSelector && data.allIps) {
+                            ipSelector.innerHTML = "";
+                            data.allIps.forEach(item => {
+                                const opt = document.createElement('option');
+                                opt.value = item.ip;
+                                opt.textContent = `${item.ip} (${item.name})`;
+                                if (item.ip === currentIp) {
+                                    opt.selected = true;
+                                }
+                                ipSelector.appendChild(opt);
+                            });
+                        }
+                        
+                        if (data.connectedDevices) {
+                            currentDevices = data.connectedDevices;
+                        }
+                        renderDeviceTable();
+                        generateQRCode();
+                    })
+                    .catch(error => {
+                        console.error("Error loading network config", error);
+                        netPort.textContent = "8080";
+                        netInterface.textContent = "Loopback Interface";
+                        renderDeviceTable();
+                        generateQRCode();
+                        playTechBeep('alert');
+                    });
+            }
+
+            // IP Selector change
+            ipSelector.addEventListener('change', function() {
+                playTechBeep('action');
+                currentIp = this.value;
+                generateQRCode();
+            });
+
+            // Manual IP Override toggle
+            btnEditIp.addEventListener('click', function() {
+                playTechBeep('action');
+                isManualIp = !isManualIp;
+                if (isManualIp) {
+                    manualIpInput.style.display = 'block';
+                    ipSelector.style.display = 'none';
+                    if (manualIpInput.value) {
+                        currentIp = manualIpInput.value;
+                    }
+                    this.innerHTML = '<i class="bi bi-list-stars"></i>'; // switch to list icon
+                } else {
+                    manualIpInput.style.display = 'none';
+                    ipSelector.style.display = 'block';
+                    currentIp = ipSelector.value;
+                    this.innerHTML = '<i class="bi bi-pencil-square"></i>';
+                }
+                generateQRCode();
+            });
+
+            manualIpInput.addEventListener('input', function() {
+                if (isManualIp && this.value.trim() !== "") {
+                    currentIp = this.value.trim();
+                    generateQRCode();
+                }
+            });
+
+            // Laser Line Toggle
+            const laserToggle = document.getElementById('laserToggle');
+            const scanLine = document.querySelector('.qr-scanner-line');
+            laserToggle.addEventListener('change', function() {
+                playTechBeep('action');
+                if (this.checked) {
+                    scanLine.style.display = 'block';
+                } else {
+                    scanLine.style.display = 'none';
+                }
+            });
+
+            // Copy url button
+            document.getElementById('btnCopyUrl').addEventListener('click', function() {
+                const accessUrl = getAccessUrl();
+                navigator.clipboard.writeText(accessUrl).then(() => {
+                    playTechBeep('success');
+                    const origIcon = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = origIcon;
+                    }, 1500);
+                });
+            });
+
+            // Regenerate QR Button
+            document.getElementById('btnGenerateQr').addEventListener('click', function() {
+                playTechBeep('action');
+                generateQRCode();
+            });
+
+            // Route selector change
+            routeSelector.addEventListener('change', function() {
+                playTechBeep('action');
+                generateQRCode();
+            });
+
+            // Expiration and PIN toggles
+            const pinToggle = document.getElementById('pinToggle');
+            const pinDisplayRow = document.getElementById('pinDisplayRow');
+            pinToggle.addEventListener('change', function() {
+                playTechBeep('action');
+                const isEnabled = this.checked;
+                
+                fetch(`/api/system/pin-toggle?enabled=${isEnabled}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (isEnabled) {
+                            pinDisplayRow.style.display = 'flex';
+                        } else {
+                            pinDisplayRow.style.display = 'none';
+                        }
+                        generateQRCode();
+                    })
+                    .catch(err => {
+                        console.error("Error toggling PIN state", err);
+                    });
+            });
+
+            // Sound toggle click
+            document.getElementById('soundToggle').addEventListener('change', function() {
+                playTechBeep('action');
+            });
+
+            // Neon color theme dots
+            const colorDots = document.querySelectorAll('.color-dot');
+            colorDots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    colorDots.forEach(d => d.classList.remove('active'));
+                    this.classList.add('active');
+                    currentQrColor = this.getAttribute('data-color');
+                    
+                    const qrWrapper = document.getElementById('qrWrapper');
+                    qrWrapper.className = 'qr-wrapper'; // reset
+                    
+                    const themeName = this.getAttribute('data-theme');
+                    if (themeName !== 'cyan') {
+                        qrWrapper.classList.add('glow-' + themeName);
+                    }
+                    
+                    playTechBeep('action');
+                    generateQRCode();
+                });
+            });
+
+            // Download QR Code
+            document.getElementById('btnDownloadQr').addEventListener('click', function() {
+                playTechBeep('success');
+                const link = document.createElement('a');
+                link.download = `ClinicaApp-QR-Access-${currentIp}.png`;
+                link.href = qrCanvas.toDataURL();
+                link.click();
+            });
+
+            // Diagnostic Terminal Simulation
+            document.getElementById('btnDiagnosticar').addEventListener('click', function() {
+                playTechBeep('action');
+                const terminal = document.getElementById('diagnosticTerminal');
+                terminal.style.display = 'block';
+                terminal.innerHTML = "";
+                
+                const steps = [
+                    { t: 0, cmd: "check-interface --active", msg: "Analizando interfaces de red inalámbricas...", status: "normal" },
+                    { t: 600, cmd: "", msg: "✓ Interfaz inalámbrica activa: " + netInterface.textContent, status: "success" },
+                    { t: 1200, cmd: "resolv-ip --local", msg: "Buscando dirección IPv4 en la subred...", status: "normal" },
+                    { t: 1800, cmd: "", msg: "✓ IPv4 detectada: " + currentIp, status: "success" },
+                    { t: 2400, cmd: "port-audit --num " + currentPort, msg: "Verificando puertos expuestos localmente...", status: "normal" },
+                    { t: 2800, cmd: "", msg: "✓ Puerto " + currentPort + " ACCESIBLE y escuchando peticiones.", status: "success" },
+                    { t: 3400, cmd: "ping -c 3 192.168.1.1", msg: "Enviando paquetes de telemetría a la puerta de enlace...", status: "normal" },
+                    { t: 4000, cmd: "", msg: "✓ Enlace estable. Latencia promedio: 4.8ms. Peticiones de red operacionales.", status: "success" },
+                    { t: 4600, cmd: "connection-status", msg: "Ready for mobile handshake. Diagnostics complete.", status: "success" }
+                ];
+
+                steps.forEach(step => {
+                    setTimeout(() => {
+                        const now = new Date();
+                        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                        
+                        let line = document.createElement('div');
+                        line.className = 'terminal-line';
+                        
+                        let timeSpan = document.createElement('span');
+                        timeSpan.className = 'terminal-time';
+                        timeSpan.textContent = `[${timeStr}]`;
+                        line.appendChild(timeSpan);
+                        
+                        let textSpan = document.createElement('span');
+                        if (step.cmd) {
+                            textSpan.className = 'terminal-cmd';
+                            textSpan.textContent = `admin$ ${step.cmd} - ${step.msg}`;
+                        } else if (step.status === 'success') {
+                            textSpan.className = 'terminal-success';
+                            textSpan.textContent = step.msg;
+                            playTechBeep('success');
+                        } else {
+                            textSpan.textContent = step.msg;
+                        }
+                        line.appendChild(textSpan);
+                        
+                        terminal.appendChild(line);
+                        terminal.scrollTop = terminal.scrollHeight;
+                    }, step.t);
+                });
+            });
+
+            // Simular Escaneo
+            document.getElementById('btnSimulateScan').addEventListener('click', function() {
+                playTechBeep('success');
+                
+                fetch('/api/system/simulate-scan', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(newDevice => {
+                    // Trigger top slide notification banner
+                    const banner = document.getElementById('connNotification');
+                    document.getElementById('connNotifDevice').textContent = newDevice.name;
+                    banner.classList.add('active');
+                    
+                    setTimeout(() => {
+                        banner.classList.remove('active');
+                    }, 4000);
+                    
+                    loadNetworkData();
+                })
+                .catch(err => {
+                    console.error("Error simulating scan", err);
+                    playTechBeep('alert');
+                });
+            });
+
+            function renderDeviceTable() {
+                const tbody = document.getElementById('deviceTableBody');
+                tbody.innerHTML = "";
+
+                if (currentDevices.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-secondary py-4">No hay dispositivos vinculados</td></tr>`;
+                    return;
+                }
+
+                currentDevices.forEach(device => {
+                    const tr = document.createElement('tr');
+                    tr.id = `device-row-${device.id}`;
+                    tr.style.transition = 'all 0.5s ease';
+
+                    let iconClass = "bi-phone";
+                    if (device.type === 'PC') iconClass = "bi-laptop";
+                    if (device.type === 'Tablet') iconClass = "bi-tablet";
+
+                    tr.innerHTML = `
+                        <td>
+                            <div class="device-info-cell">
+                                <div class="device-icon-wrap">
+                                    <i class="bi ${iconClass}"></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">${device.name}</span>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">${device.os} • MAC: ${device.mac}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="font-monospace">${device.ip}</span></td>
+                        <td><span class="text-info">${device.latency}</span></td>
+                        <td><span>${device.accessTime}</span></td>
+                        <td>
+                            <span class="badge-dev-status ${device.status.toLowerCase()}">
+                                <span class="pulse-dot-green ${device.status === 'IDLE' ? 'offline' : ''}" style="width: 5px; height: 5px;"></span>
+                                ${device.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 disconnect-btn" data-id="${device.id}" style="border-radius: 8px; font-size: 0.72rem;">
+                                <i class="bi bi-x-circle"></i> Revocar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.querySelectorAll('.disconnect-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        revokeDevice(id);
+                    });
+                });
+            }
+
+            function revokeDevice(id) {
+                playTechBeep('alert');
+                
+                const row = document.getElementById(`device-row-${id}`);
+                if (row) {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(50px)';
+                }
+                
+                fetch(`/api/system/revoke?id=${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        loadNetworkData();
+                    }, 500);
+                })
+                .catch(err => {
+                    console.error("Error revoking device", err);
+                    loadNetworkData();
+                });
+            }
+
+            // Initial load
+            loadNetworkData();
+
+            // Footer year update
+            const footerYear = document.getElementById('footerYear');
+            if (footerYear) {
+                footerYear.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
+</body>
+
+</html>

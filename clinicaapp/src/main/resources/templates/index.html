@@ -1,0 +1,3836 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Clínica App - La plataforma veterinaria más avanzada de Colombia. Agenda citas en tiempo real, historial médico digital y telemedicina 24/7.">
+    <title>ClínicaApp | Plataforma Veterinaria Premium - Cartagena</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Favicon SVG Premium -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%230ea5e9'/%3E%3Cstop offset='100%25' style='stop-color:%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='28' fill='url(%23g)'/%3E%3Cpath d='M50 78c-15-10-28-22-28-38 0-12 8-18 15-12 3 2 6 4 13 4s10-2 13-4c7-6 15 0 15 12 0 16-13 28-28 38z' fill='white' opacity='0.95'/%3E%3Cpath d='M35 48c2-3 5-5 8-5s6 2 7 5M50 48c1-3 4-5 7-5s6 2 8 5' stroke='white' stroke-width='2.5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='38' cy='38' r='2.5' fill='white'/%3E%3Ccircle cx='62' cy='38' r='2.5' fill='white'/%3E%3C/svg%3E">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Three.js para efectos 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            purple: '#8b5cf6',
+                            emerald: '#10b981',
+                            rose: '#f43f5e',
+                            amber: '#f59e0b',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'gradient-x': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f5f5f4;
+            --text-primary: #1c1917;
+            --text-secondary: #78716c;
+            --text-tertiary: #a8a29e;
+            --border-color: #e7e5e4;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow-soft: 0 4px 20px rgba(14, 165, 233, 0.08);
+            --shadow-medium: 0 8px 30px rgba(14, 165, 233, 0.12);
+            --shadow-strong: 0 20px 50px rgba(14, 165, 233, 0.15);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-color: #334155;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --shadow-strong: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #0ea5e9, #8b5cf6);
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        [data-theme="dark"] .glass-strong {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradient-x 5s ease infinite;
+        }
+
+        /* Premium Button */
+        .btn-premium {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            background-size: 200% 200%;
+            animation: gradient-x 3s ease infinite;
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-premium:active {
+            transform: translateY(-1px);
+        }
+
+        /* 3D Card Tilt */
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .tilt-card .card-content {
+            transform: translateZ(50px);
+        }
+
+        .tilt-card .card-shine {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        .tilt-card:hover .card-shine {
+            opacity: 1;
+        }
+
+        /* Particle Canvas */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
+        }
+
+        .toast-item {
+            background: var(--glass-strong);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-strong);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: all;
+        }
+
+        .toast-item.show {
+            transform: translateX(0);
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            color: white;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1) rotate(-10deg);
+        }
+
+        .chat-panel {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 550px;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            box-shadow: var(--shadow-strong);
+            border: 1px solid var(--border-color);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: bottom right;
+            animation: chatSlide 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes chatSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--bg-primary);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-bot {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .message-user {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #0ea5e9;
+        }
+
+        .chat-send {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-send:hover {
+            transform: scale(1.05);
+        }
+
+        /* Map Section */
+        .map-container {
+            position: relative;
+            height: 500px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+        }
+
+        .map-pin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            transform: translate(-50%, -100%);
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 10;
+        }
+
+        .map-pin:hover {
+            transform: translate(-50%, -100%) scale(1.2);
+            z-index: 20;
+        }
+
+        .map-pin-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+        }
+
+        .map-pin-icon i {
+            transform: rotate(45deg);
+            font-size: 1rem;
+        }
+
+        .map-tooltip {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .map-pin:hover .map-tooltip {
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* Testimonial Carousel 3D */
+        .testimonial-carousel {
+            perspective: 1000px;
+            height: 400px;
+            position: relative;
+        }
+
+        .testimonial-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .testimonial-card {
+            position: absolute;
+            width: 350px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            backface-visibility: hidden;
+            transition: all 0.5s;
+        }
+
+        /* Calendar Widget */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover:not(.disabled) {
+            background: var(--bg-tertiary);
+            border-color: #0ea5e9;
+        }
+
+        .calendar-day.active {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+        }
+
+        .calendar-day.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Navigation */
+        .nav-premium {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.4s ease;
+        }
+
+        .nav-premium.scrolled {
+            background: var(--glass-strong);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-soft);
+            padding: 0.75rem 0;
+        }
+
+        .nav-link-premium {
+            position: relative;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-link-premium::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0ea5e9, #8b5cf6);
+            transition: all 0.3s;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-link-premium:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link-premium:hover::after {
+            width: 80%;
+        }
+
+        /* Search Expand */
+        .search-expand {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+        }
+
+        .search-expand.active {
+            width: 300px;
+            background: var(--bg-secondary);
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .search-expand input {
+            position: absolute;
+            left: 48px;
+            width: calc(100% - 60px);
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .search-expand.active input {
+            opacity: 1;
+        }
+
+        /* Stats Counter Animation */
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-panel {
+                width: calc(100vw - 40px);
+                height: 60vh;
+                right: -10px;
+            }
+
+            .testimonial-card {
+                width: 280px;
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .marquee-track {
+            display: inline-flex;
+            animation: marquee 30s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .marquee-container:hover .marquee-track {
+            animation-play-state: paused;
+        }
+
+        /* Floating Elements */
+        .float-element {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .float-element:nth-child(2) {
+            animation-delay: -2s;
+        }
+
+        .float-element:nth-child(3) {
+            animation-delay: -4s;
+        }
+
+        /* Gradient Border */
+        .gradient-border {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6, #10b981);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .gradient-border:hover::before {
+            opacity: 1;
+        }
+
+        /* Progress Ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s;
+        }
+
+        /* Ripple Effect */
+        /* ripple */
+
+        /* Security Showcase 3D Carousel */
+        .security-showcase-container {
+            perspective: 2000px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .phone-carousel-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .phone-card {
+            position: absolute;
+            width: 280px;
+            height: 580px;
+            border-radius: 40px;
+            overflow: hidden;
+            background: #000;
+            border: 8px solid #1e293b;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-origin: center center;
+            cursor: pointer;
+        }
+
+        .phone-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: opacity 0.5s;
+        }
+
+        .phone-card.active {
+            z-index: 30;
+            transform: translate3d(0, 0, 100px) scale(1);
+            border-color: #334155;
+            box-shadow: 0 0 80px rgba(14, 165, 233, 0.3);
+        }
+
+        .phone-card.active video {
+            opacity: 1;
+        }
+
+        .phone-card.prev {
+            z-index: 20;
+            transform: translate3d(-200px, 0, -150px) rotateY(35deg) scale(0.85);
+            opacity: 0.6;
+            filter: blur(2px);
+        }
+
+        .phone-card.next {
+            z-index: 20;
+            transform: translate3d(200px, 0, -150px) rotateY(-35deg) scale(0.85);
+            opacity: 0.6;
+            filter: blur(2px);
+        }
+
+        .phone-card.hidden {
+            opacity: 0;
+            transform: translate3d(0, 0, -400px) scale(0.5);
+            pointer-events: none;
+        }
+
+        .phone-reflection {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Carousel Navigation */
+        .carousel-nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .carousel-nav-btn:hover {
+            background: rgba(14, 165, 233, 0.2);
+            border-color: #0ea5e9;
+            transform: scale(1.1);
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .carousel-dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: #0ea5e9;
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+
+        .ripple:active::after {
+            transform: scale(0, 0);
+            opacity: 0.3;
+            transition: 0s;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .custom-checkbox:checked {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            border-color: transparent;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Badge Premium */
+        .badge-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(139, 92, 246, 0.1));
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+
+        /* Section Reveal */
+        .reveal {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger children */
+        .stagger-children>* {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-children.active>* {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .stagger-children.active>*:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .stagger-children.active>*:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .stagger-children.active>*:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+
+        .stagger-children.active>*:nth-child(4) {
+            transition-delay: 0.4s;
+        }
+
+        .stagger-children.active>*:nth-child(5) {
+            transition-delay: 0.5s;
+        }
+
+        .stagger-children.active>*:nth-child(6) {
+            transition-delay: 0.6s;
+        }
+
+        /* Image mask */
+        .image-mask {
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
+
+        /* Horizontal scroll snap */
+        .snap-scroll {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .snap-scroll>* {
+            scroll-snap-align: start;
+        }
+
+        /* Glow effect */
+        .glow {
+            position: relative;
+        }
+
+        .glow::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            opacity: 0;
+            filter: blur(15px);
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+
+        .glow:hover::after {
+            opacity: 0.5;
+        }
+
+        /* Noise texture overlay */
+        .noise {
+            position: relative;
+        }
+
+        .noise::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Focus styles */
+        *:focus-visible {
+            outline: 2px solid #0ea5e9;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(14, 165, 233, 0.3);
+            color: inherit;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Magnetic button effect placeholder */
+        .magnetic {
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Text scramble effect */
+        .scramble-text {
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Cursor follower */
+        .cursor-follower {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #0ea5e9;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s, width 0.3s, height 0.3s;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
+
+        .cursor-follower.hover {
+            width: 50px;
+            height: 50px;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        @media (pointer: coarse) {
+            .cursor-follower {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Custom Cursor (Desktop only) -->
+    <div class="cursor-follower" id="cursor"></div>
+
+    <!-- Navigation -->
+    <nav class="nav-premium" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <!-- Logo -->
+            <a th:href="@{/}" class="flex items-center gap-3 group">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-purple flex items-center justify-center text-white text-lg shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <span class="text-xl font-bold text-gradient">ClínicaApp</span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-1">
+                <a href="#inicio" class="nav-link-premium">Inicio</a>
+                <a href="#clinicas" class="nav-link-premium">Clínicas</a>
+                <a href="#servicios" class="nav-link-premium">Servicios</a>
+                <a href="#testimonios" class="nav-link-premium">Testimonios</a>
+                <a href="#faq" class="nav-link-premium">FAQ</a>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-3">
+                <!-- Search -->
+                <div class="search-expand" id="searchExpand" onclick="toggleSearch()">
+                    <i class="bi bi-search text-lg"></i>
+                    <input type="text" placeholder="Buscar clínicas, servicios..." onkeydown="handleSearch(event)">
+                </div>
+
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema">
+                    <i class="bi bi-sun-fill" id="themeIcon"></i>
+                </button>
+
+                <!-- Auth -->
+                <div class="hidden md:flex items-center gap-2">
+                    <div sec:authorize="!isAuthenticated()" class="flex items-center gap-2">
+                        <a th:href="@{/login}"
+                            class="px-5 py-2.5 rounded-xl font-semibold text-sm text-gray-600 hover:text-primary-600 transition-colors dark:text-gray-300 dark:hover:text-primary-400">
+                            Login
+                        </a>
+                        <a th:href="@{/registro}" class="btn-premium text-sm py-2.5 px-5">
+                            Registrarse
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div sec:authorize="isAuthenticated()" class="flex items-center gap-2">
+                        <a th:href="@{/oficina-virtual}" class="btn-premium text-sm py-2.5 px-5">
+                            <i class="bi bi-person-workspace mr-2"></i> Mi Oficina
+                        </a>
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button type="submit"
+                                class="p-2.5 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all"
+                                title="Cerrar Sesión">
+                                <i class="bi bi-box-arrow-right text-lg"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <button
+                    class="md:hidden w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center"
+                    onclick="toggleMobileMenu()">
+                    <i class="bi bi-list text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div class="md:hidden hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 p-6 shadow-xl"
+            id="mobileMenu">
+            <div class="flex flex-col gap-4">
+                <a href="#inicio"
+                    class="text-lg font-semibold text-gray-800 dark:text-white py-2 border-b border-gray-100 dark:border-gray-800">Inicio</a>
+                <a href="#clinicas"
+                    class="text-lg font-semibold text-gray-800 dark:text-white py-2 border-b border-gray-100 dark:border-gray-800">Clínicas</a>
+                <a href="#servicios"
+                    class="text-lg font-semibold text-gray-800 dark:text-white py-2 border-b border-gray-100 dark:border-gray-800">Servicios</a>
+                <a href="#testimonios"
+                    class="text-lg font-semibold text-gray-800 dark:text-white py-2 border-b border-gray-100 dark:border-gray-800">Testimonios</a>
+                <a href="#faq"
+                    class="text-lg font-semibold text-gray-800 dark:text-white py-2 border-b border-gray-100 dark:border-gray-800">FAQ</a>
+                <div class="flex gap-3 mt-4" sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}"
+                        class="flex-1 text-center py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 font-semibold text-gray-800 dark:text-white">Login</a>
+                    <a th:href="@{/registro}"
+                        class="flex-1 text-center py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-purple text-white font-semibold">Registro</a>
+                </div>
+                <div class="flex gap-3 mt-4" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/oficina-virtual}"
+                        class="flex-1 text-center py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-purple text-white font-semibold">Mi
+                        Oficina</a>
+                    <form th:action="@{/logout}" method="post" class="flex-1 m-0">
+                        <button type="submit"
+                            class="w-full text-center py-3 rounded-xl border-2 border-rose-200 text-rose-500 font-semibold">Salir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Spacer for fixed nav -->
+    <div class="h-20"></div>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="relative min-h-[90vh] flex items-center overflow-hidden noise">
+        <!-- Particle Canvas -->
+        <canvas id="particle-canvas"></canvas>
+
+        <!-- Background Gradient Orbs -->
+        <div class="absolute top-20 left-10 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl float-element"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-accent-purple/20 rounded-full blur-3xl float-element">
+        </div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-emerald/10 rounded-full blur-3xl float-element">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 py-20 relative z-10 w-full">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Content -->
+                <div class="space-y-8 reveal" id="heroContent">
+                    <!-- Badge -->
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-accent-purple/10 border border-primary-200 dark:border-primary-800 dark:from-primary-900/30 dark:to-accent-purple/20">
+                        <span class="relative flex h-3 w-3">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-primary-500"></span>
+                        </span>
+                        <span class="text-sm font-semibold text-primary-700 dark:text-primary-300">Plataforma #1 en
+                            Cartagena</span>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight">
+                        El cuidado que tu <br>
+                        <span class="text-gradient">mascota merece</span><br>
+                        <span class="text-4xl lg:text-6xl text-gray-400 dark:text-gray-500 font-bold">a un clic de
+                            distancia</span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p class="text-xl text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed">
+                        Encuentra veterinarios de confianza, agenda citas en tiempo real, accede a historial médico
+                        digital y recibe recordatorios inteligentes. Todo en una plataforma segura.
+                    </p>
+
+                    <!-- Search Box Premium -->
+                    <div class="glass rounded-2xl p-2 max-w-2xl shadow-xl">
+                        <form th:action="@{/buscar-clinicas}" method="get" class="flex flex-col sm:flex-row gap-2">
+                            <div class="flex-1 relative">
+                                <i
+                                    class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-primary-500 text-lg"></i>
+                                <input type="text" name="query" id="heroSearch"
+                                    placeholder="¿Qué necesita tu mascota hoy?"
+                                    class="w-full pl-12 pr-4 py-4 rounded-xl bg-white/50 dark:bg-gray-800/50 border-2 border-transparent focus:border-primary-400 outline-none text-gray-800 dark:text-white font-medium transition-all">
+                            </div>
+                            <button type="submit" class="btn-premium py-4 px-8 whitespace-nowrap">
+                                <i class="bi bi-search"></i>
+                                Buscar
+                            </button>
+                        </form>
+                        <!-- Quick Tags -->
+                        <div class="flex flex-wrap gap-2 mt-3 px-2 pb-2">
+                            <button onclick="quickSearch('Vacunación')"
+                                class="px-3 py-1.5 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs font-semibold hover:bg-primary-100 transition">Vacunación</button>
+                            <button onclick="quickSearch('Urgencias')"
+                                class="px-3 py-1.5 rounded-lg bg-accent-rose/10 text-accent-rose text-xs font-semibold hover:bg-accent-rose/20 transition">Urgencias
+                                24h</button>
+                            <button onclick="quickSearch('Peluquería')"
+                                class="px-3 py-1.5 rounded-lg bg-accent-purple/10 text-accent-purple text-xs font-semibold hover:bg-accent-purple/20 transition">Peluquería</button>
+                            <button onclick="quickSearch('Cirugía')"
+                                class="px-3 py-1.5 rounded-lg bg-accent-emerald/10 text-accent-emerald text-xs font-semibold hover:bg-accent-emerald/20 transition">Cirugía</button>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="flex flex-wrap gap-6 pt-4">
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 font-semibold">
+                            <div
+                                class="w-8 h-8 rounded-full bg-accent-emerald/10 flex items-center justify-center text-accent-emerald">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            Cancelación gratis
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 font-semibold">
+                            <div
+                                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            Pago seguro SSL
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 font-semibold">
+                            <div
+                                class="w-8 h-8 rounded-full bg-accent-purple/10 flex items-center justify-center text-accent-purple">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </div>
+                            Veterinarios verificados
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual -->
+                <div class="relative lg:h-[600px] flex items-center justify-center reveal"
+                    style="transition-delay: 0.2s" id="heroVisual">
+                    <!-- Main Image -->
+                    <div class="relative z-10">
+                        <div
+                            class="relative rounded-3xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                            <img src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?q=80&w=1000&auto=format&fit=crop"
+                                alt="Veterinario cuidando mascota" class="w-full max-w-lg rounded-3xl image-mask">
+                            <!-- Overlay gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Cards -->
+                    <div
+                        class="absolute -left-8 top-10 glass-strong rounded-2xl p-4 shadow-xl float-element z-20 max-w-[200px]">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xl">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white">+2,500</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Citas este mes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute -right-4 bottom-20 glass-strong rounded-2xl p-4 shadow-xl float-element z-20"
+                        style="animation-delay: -2s">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-emerald to-emerald-600 flex items-center justify-center text-white text-xl">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white">98%</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Clientes felices</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute left-10 bottom-10 glass-strong rounded-2xl p-3 shadow-xl float-element z-20"
+                        style="animation-delay: -4s">
+                        <div class="flex items-center gap-2">
+                            <div class="flex -space-x-2">
+                                <img src="https://i.pravatar.cc/100?img=1"
+                                    class="w-8 h-8 rounded-full border-2 border-white" alt="User">
+                                <img src="https://i.pravatar.cc/100?img=2"
+                                    class="w-8 h-8 rounded-full border-2 border-white" alt="User">
+                                <img src="https://i.pravatar.cc/100?img=3"
+                                    class="w-8 h-8 rounded-full border-2 border-white" alt="User">
+                            </div>
+                            <span class="text-xs font-bold text-gray-600 dark:text-gray-300">+12K usuarios</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div
+            class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+            <span class="text-xs font-medium text-gray-500">Scroll</span>
+            <i class="bi bi-chevron-down text-lg"></i>
+        </div>
+    </section>
+
+    <!-- Partners Marquee -->
+    <section class="py-12 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800">
+        <div class="text-center mb-8">
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Nuestras Clínicas Asociadas</p>
+        </div>
+        <div class="marquee-container">
+            <div class="marquee-track">
+                <!-- Dynamic Clinics Set -->
+                <div class="flex items-center gap-16 px-8">
+                    <div th:each="clinica : ${clinicasDestacadas}" class="flex items-center gap-4 group cursor-pointer">
+                        <div
+                            class="w-12 h-12 rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700">
+                            <img th:src="${clinica.imagenUrl != null and !#strings.isEmpty(clinica.imagenUrl)} 
+                                        ? ${clinica.imagenUrl} 
+                                        : 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=100&auto=format&fit=crop'"
+                                class="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 transition-all duration-300"
+                                th:alt="${clinica.nombre}">
+                        </div>
+                        <span
+                            class="text-gray-400 dark:text-gray-500 font-bold text-sm group-hover:text-primary-500 transition-colors"
+                            th:text="${clinica.nombre}">Clínica</span>
+                    </div>
+                </div>
+                <!-- Duplicate for seamless loop (using same list) -->
+                <div class="flex items-center gap-16 px-8">
+                    <div th:each="clinica : ${clinicasDestacadas}" class="flex items-center gap-4 group cursor-pointer">
+                        <div
+                            class="w-12 h-12 rounded-xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700">
+                            <img th:src="${clinica.imagenUrl != null and !#strings.isEmpty(clinica.imagenUrl)} 
+                                        ? ${clinica.imagenUrl} 
+                                        : 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=100&auto=format&fit=crop'"
+                                class="w-full h-full object-cover grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 transition-all duration-300"
+                                th:alt="${clinica.nombre}">
+                        </div>
+                        <span
+                            class="text-gray-400 dark:text-gray-500 font-bold text-sm group-hover:text-primary-500 transition-colors"
+                            th:text="${clinica.nombre}">Clínica</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-purple opacity-5"></div>
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-3 gap-8 stagger-children" id="statsSection">
+                <div
+                    class="text-center p-8 rounded-3xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 reveal">
+                    <div
+                        class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-primary-500/30">
+                        <i class="bi bi-heart-pulse"></i>
+                    </div>
+                    <div class="stat-value" data-target="12560">0</div>
+                    <p class="text-gray-600 dark:text-gray-400 font-semibold mt-2">Mascotas Atendidas</p>
+                </div>
+                <div
+                    class="text-center p-8 rounded-3xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 reveal">
+                    <div
+                        class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-accent-emerald to-emerald-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="stat-value" data-target="8734">0</div>
+                    <p class="text-gray-600 dark:text-gray-400 font-semibold mt-2">Familias Felices</p>
+                </div>
+                <div
+                    class="text-center p-8 rounded-3xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 reveal">
+                    <div
+                        class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-accent-purple to-purple-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-purple-500/30">
+                        <i class="bi bi-hospital"></i>
+                    </div>
+                    <div class="stat-value" data-target="50">0</div>
+                    <p class="text-gray-600 dark:text-gray-400 font-semibold mt-2">Clínicas Asociadas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section (Premium Bento Upgrade) -->
+    <section id="servicios" class="py-32 relative overflow-hidden bg-slate-50 dark:bg-[#0b0f19]">
+        <!-- Background Mesh Decoration -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-primary-500/10 blur-[120px] rounded-full"></div>
+            <div class="absolute bottom-[-10%] right-[-5%] w-[500px] h-[500px] bg-accent-purple/10 blur-[100px] rounded-full"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+                <span class="inline-block py-1 px-3 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-bold text-xs uppercase tracking-widest mb-4">
+                    Nuestros Servicios
+                </span>
+                <h2 class="text-4xl lg:text-6xl font-black mb-6 tracking-tight dark:text-white">
+                    Cuidado de Élite para <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 via-primary-600 to-accent-purple">Tu Mejor Amigo</span>
+                </h2>
+                <p class="text-xl text-gray-500 dark:text-gray-400 font-medium">
+                    Combinamos tecnología avanzada con un compromiso inquebrantable por la salud de tu mascota.
+                </p>
+            </div>
+
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 stagger-children">
+                
+                <!-- Main Card: Consultas (Large) -->
+                <div class="md:col-span-8 md:row-span-2 group relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/50 shadow-xl hover:shadow-2xl transition-all duration-700 reveal">
+                    <!-- Background Image for the right half -->
+                    <div class="absolute inset-y-0 right-0 w-full lg:w-1/2 hidden lg:block overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=800&auto=format&fit=crop" 
+                             class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000 opacity-90" alt="Consultas">
+                        <!-- Seamless Gradient Mask -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-gray-800 dark:via-gray-800/80"></div>
+                    </div>
+
+                    <div class="relative h-full p-8 lg:p-12 flex flex-col justify-center lg:w-3/5">
+                        <div class="w-16 h-16 mb-8 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-primary-500/30 group-hover:rotate-6 transition-transform">
+                            <i class="bi bi-clipboard2-pulse"></i>
+                        </div>
+                        <h3 class="text-3xl lg:text-4xl font-bold mb-4 dark:text-white leading-tight">Consultas & <br>Especialidades</h3>
+                        <p class="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+                            Desde medicina preventiva hasta cardiología avanzada. Nuestro equipo está listo para cualquier reto médico con tecnología de punta.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="/buscar-clinicas" class="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-lg shadow-primary-600/20 hover:bg-primary-700 transition-all hover:-translate-y-1">
+                                Reservar Cita
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Card (Tall) -->
+                <div class="md:col-span-4 md:row-span-2 group relative overflow-hidden rounded-[2.5rem] bg-[#f43f5e] p-10 text-white shadow-xl hover:shadow-2xl transition-all duration-700 reveal">
+                    <div class="absolute -bottom-10 -right-10 opacity-10">
+                        <i class="bi bi-heart-pulse-fill text-[15rem]"></i>
+                    </div>
+                    <div class="relative h-full flex flex-col">
+                        <div class="w-16 h-16 mb-8 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-3xl">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4">Urgencias <br>24 Horas</h3>
+                        <p class="text-lg text-white/90 mb-10 leading-relaxed font-medium">
+                            Respuesta inmediata en centros especializados de alta complejidad. Quirófanos y laboratorio activos las 24 horas del día.
+                        </p>
+                        <div class="mt-auto">
+                            <a href="tel:+573005722844" class="inline-flex items-center justify-center gap-3 w-full py-4 bg-white text-rose-600 rounded-2xl font-bold hover:scale-105 transition-transform shadow-lg">
+                                <i class="bi bi-telephone-fill"></i>
+                                Llama Ahora
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Small Cards Set -->
+                <div class="md:col-span-4 group relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/50 p-8 shadow-md hover:shadow-xl transition-all duration-500 reveal">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-2xl bg-accent-purple/10 text-accent-purple flex items-center justify-center text-2xl group-hover:bg-accent-purple group-hover:text-white transition-all duration-500">
+                            <i class="bi bi-scissors"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold dark:text-white">Spa & Grooming</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Estética e higiene premium.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-4 group relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/50 p-8 shadow-md hover:shadow-xl transition-all duration-500 reveal">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 flex items-center justify-center text-2xl group-hover:bg-primary-500 group-hover:text-white transition-all duration-500">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold dark:text-white">Vacunación</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Esquemas de inmunización.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-4 group relative overflow-hidden rounded-[2rem] bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/50 p-8 shadow-md hover:shadow-xl transition-all duration-500 reveal">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-2xl bg-accent-emerald/10 text-accent-emerald flex items-center justify-center text-2xl group-hover:bg-accent-emerald group-hover:text-white transition-all duration-500">
+                            <i class="bi bi-journal-medical"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold dark:text-white">Historial Digital</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Toda la info en tu móvil.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Web Platform Experience Section (Aurora Style) -->
+    <section class="py-24 relative bg-gray-50 dark:bg-[#0b0f19] overflow-hidden text-gray-900 dark:text-white border-y border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <!-- Floating shapes -->
+        <div
+            class="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_rgba(13,110,253,0.15),_transparent_50%)]">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_rgba(79,70,229,0.15),_transparent_50%)]">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-16 items-center mb-16">
+
+                <!-- Left Column: Text -->
+                <div class="lg:col-span-5 reveal space-y-8">
+                    <h2 class="text-4xl lg:text-[2.75rem] font-extrabold leading-tight text-gray-900 dark:text-white">
+                        ¿Sabes qué tienen en común las empresas más exitosas del mundo?
+                    </h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+                        Las grandes compañías no dependen del azar: dependen de sistemas. Automatizan, miden, documentan
+                        y eliminan fricción. Ese es su verdadero secreto.
+                    </p>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+                        Durante años, esta tecnología solo estuvo disponible para corporaciones gigantes. Hoy,
+                        ClínicaApp trae ese mismo nivel de inteligencia a consultorios y clínicas de Latinoamérica.
+                    </p>
+                    <blockquote class="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-primary-500 pl-4 my-6">
+                        "Lo que antes era un privilegio corporativo, ahora es tu ventaja competitiva."
+                    </blockquote>
+                    <div class="pt-2">
+                        <a th:href="@{/registro}"
+                            class="inline-block bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold py-4 px-8 rounded-full transition-all shadow-[0_0_25px_rgba(37,99,235,0.4)] hover:shadow-[0_0_35px_rgba(37,99,235,0.6)] hover:-translate-y-1">
+                            Activar mi ventaja competitiva
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: Premium Showcase -->
+                <div class="lg:col-span-7 relative reveal" style="transition-delay: 0.3s">
+                    <div class="relative w-full flex items-center justify-center">
+
+                        <!-- Abstract Background Glow -->
+                        <div
+                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(ellipse_at_center,_rgba(37,99,235,0.4)_0%,_transparent_60%)] blur-3xl z-0 pointer-events-none">
+                        </div>
+                        <div
+                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.3)_0%,_transparent_60%)] blur-3xl z-0 pointer-events-none">
+                        </div>
+
+                        <!-- Floating Image Container -->
+                        <div
+                            class="relative z-10 animate-float transition-all duration-700 hover:scale-[1.03] hover:drop-shadow-[0_30px_50px_rgba(0,0,0,0.9)] drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]">
+                            <!-- We wrap the image in a subtle glass container to give it that final 'premium' touch just in case it's a raw screenshot -->
+                            <div
+                                class="relative rounded-[1.5rem] sm:rounded-[2.5rem] p-1 sm:p-2 bg-gradient-to-tr from-white/10 via-white/5 to-transparent border border-white/10 backdrop-blur-sm">
+                                <img th:src="@{/img/mockup-final.png}" alt="Plataforma ClínicaApp"
+                                    class="w-full max-w-[700px] h-auto object-contain rounded-[1.2rem] sm:rounded-[2rem] border border-gray-800/50">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Grid (Bottom) -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 reveal" style="transition-delay: 0.5s">
+                <div
+                    class="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-sm border border-gray-200 dark:border-gray-800 p-6 rounded-2xl hover:bg-gray-50 dark:hover:bg-[#1f2937] transition-all hover:border-gray-300 dark:hover:border-gray-700 shadow-sm hover:shadow-md">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 text-lg mb-4">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white mb-2 text-[15px]">Claridad Operativa</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-light">Decisiones basadas en datos reales, no
+                        en intuición.</p>
+                </div>
+
+                <div
+                    class="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-sm border border-gray-200 dark:border-gray-800 p-6 rounded-2xl hover:bg-gray-50 dark:hover:bg-[#1f2937] transition-all hover:border-gray-300 dark:hover:border-gray-700 shadow-sm hover:shadow-md">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 text-lg mb-4">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white mb-2 text-[15px]">Automatización Inteligente</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-light">Elimina tareas repetitivas; enfócate en
+                        tus pacientes.</p>
+                </div>
+
+                <div
+                    class="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-sm border border-gray-200 dark:border-gray-800 p-6 rounded-2xl hover:bg-gray-50 dark:hover:bg-[#1f2937] transition-all hover:border-gray-300 dark:hover:border-gray-700 shadow-sm hover:shadow-md">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 text-lg mb-4">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white mb-2 text-[15px]">Documentación Perfecta</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-light">Historias clínicas consistentes,
+                        completas y libres de errores.</p>
+                </div>
+
+                <div
+                    class="bg-white/80 dark:bg-[#111827]/80 backdrop-blur-sm border border-gray-200 dark:border-gray-800 p-6 rounded-2xl hover:bg-gray-50 dark:hover:bg-[#1f2937] transition-all hover:border-gray-300 dark:hover:border-gray-700 shadow-sm hover:shadow-md">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 text-lg mb-4">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 dark:text-white mb-2 text-[15px]">Crecimiento Sostenible</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-light">Haz que tu consultorio funcione como una
+                        gran empresa... sin fricción.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Map Section -->
+    <section class="py-24 bg-white dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <div class="badge-premium inline-flex mb-4">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Cobertura Total
+                </div>
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">Encuentra clínicas cerca de ti</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400">Más de 50 clínicas veterinarias distribuidas
+                    estratégicamente en todos los barrios de Cartagena.</p>
+            </div>
+
+            <div class="relative">
+                <!-- Leaflet CSS -->
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+                <!-- Map Container -->
+                <div class="map-container reveal rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white dark:border-gray-800 relative z-10"
+                    id="mapContainer" style="height: 550px;">
+                    <!-- El mapa real de Leaflet se renderizará aquí -->
+                </div>
+
+                <!-- Map Overlay Info -->
+                <div class="absolute bottom-6 left-6 glass-strong rounded-2xl p-5 max-w-xs shadow-2xl border border-white/20"
+                    style="z-index: 1000;">
+                    <h4 class="font-bold text-gray-800 dark:text-white mb-1 text-lg">Cartagena, Colombia</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Clínicas top disponibles en tu zona
+                    </p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-200/50 shadow-sm">
+                            <i class="bi bi-circle-fill text-[10px] animate-pulse"></i>
+                            Mapa Interactivo Activo
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Leaflet JS & Inicialización -->
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                <script th:inline="javascript">
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // Obtenemos las clínicas inyectadas desde el HomeController
+                        /*<![CDATA[*/
+                        var clinicas = /*[[${clinicasDestacadas}]]*/[];
+                        /*]]>*/
+
+                        // Validar que el contenedor exista y haya datos
+                        if (document.getElementById('mapContainer')) {
+
+                            // Centro por defecto: Cartagena
+                            var map = L.map('mapContainer', {
+                                zoomControl: false // Desactivamos el control por defecto para moverlo si queremos, o dejarlo false por diseño
+                            }).setView([10.4113, -75.5308], 13);
+
+                            // Añadir controles de zoom en otra posición
+                            L.control.zoom({ position: 'topright' }).addTo(map);
+
+                            // Capa base Premium (CartoDB Voyager)
+                            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                                subdomains: 'abcd',
+                                maxZoom: 20
+                            }).addTo(map);
+
+                            var bounds = L.latLngBounds();
+                            var pointsAdded = false;
+
+                            if (clinicas && clinicas.length > 0) {
+                                clinicas.forEach(function (clinica) {
+                                    if (clinica.latitud && clinica.longitud) {
+                                        // Icono HTML Personalizado
+                                        var customIcon = L.divIcon({
+                                            className: 'custom-leaflet-icon',
+                                            html: `<div style="background: linear-gradient(135deg, #0d6efd, #4f46e5); width: 44px; height: 44px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; box-shadow: 0 8px 15px rgba(13,110,253,0.4); transition: transform 0.3s;"><i class="bi bi-hospital-fill"></i></div>`,
+                                            iconSize: [44, 44],
+                                            iconAnchor: [22, 22],
+                                            popupAnchor: [0, -22]
+                                        });
+
+                                        var marker = L.marker([clinica.latitud, clinica.longitud], { icon: customIcon }).addTo(map);
+
+                                        // Contenido del Popup
+                                        var popupContent = `
+                                            <div style="padding: 12px; min-width: 220px; font-family: 'Inter', sans-serif;">
+                                                <h6 style="margin: 0 0 6px 0; font-weight: 800; color: #0f172a; font-size: 15px;">${clinica.nombre}</h6>
+                                                <p style="margin: 0 0 12px 0; font-size: 13px; color: #64748b; line-height: 1.4;">${clinica.direccion}</p>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+                                                    <span style="background: #fef3c7; color: #d97706; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                                                        <i class="bi bi-star-fill"></i> 4.8
+                                                    </span>
+                                                    <a href="/buscar-clinicas?query=${encodeURIComponent(clinica.nombre)}" style="background: #0d6efd; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(13,110,253,0.2);">Ver Clínica</a>
+                                                </div>
+                                            </div>
+                                        `;
+
+                                        // Estilizar el popup por defecto de Leaflet
+                                        marker.bindPopup(popupContent, {
+                                            className: 'premium-popup'
+                                        });
+
+                                        // Efecto hover simple usando CSS inyectado
+                                        marker.on('mouseover', function (e) {
+                                            this.openPopup();
+                                            e.target._icon.querySelector('div').style.transform = 'scale(1.15)';
+                                        });
+                                        marker.on('mouseout', function (e) {
+                                            e.target._icon.querySelector('div').style.transform = 'scale(1)';
+                                        });
+
+                                        bounds.extend([clinica.latitud, clinica.longitud]);
+                                        pointsAdded = true;
+                                    }
+                                });
+
+                                // Si hay puntos, ajustamos el mapa para que se vean todos
+                                if (pointsAdded) {
+                                    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+                                }
+                            }
+                        }
+                    });
+                </script>
+
+                <!-- Estilos para el popup -->
+                <style>
+                    .premium-popup .leaflet-popup-content-wrapper {
+                        border-radius: 16px;
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                        border: 1px solid #e2e8f0;
+                    }
+
+                    .premium-popup .leaflet-popup-tip {
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                    }
+                </style>
+            </div>
+        </div>
+
+        <!-- Clinic List Preview -->
+        <div class="mt-8 grid md:grid-cols-3 gap-4 stagger-children" id="mapClinics">
+            <div class="glass rounded-2xl p-4 flex items-center gap-4 hover:shadow-lg transition-all cursor-pointer reveal"
+                onclick="showToast('Navegando a Pet City...', 'info')">
+                <div
+                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <div class="flex-1">
+                    <h5 class="font-bold text-gray-800 dark:text-white text-sm">Pet City Cartagena</h5>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Santa Mónica • 2.3 km</p>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-center gap-1 text-amber-500 text-sm">
+                        <i class="bi bi-star-fill"></i>
+                        <span class="font-bold">4.8</span>
+                    </div>
+                    <span class="text-xs text-gray-400">24 reseñas</span>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-4 flex items-center gap-4 hover:shadow-lg transition-all cursor-pointer reveal"
+                onclick="showToast('Navegando a Centro Torices...', 'info')">
+                <div
+                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-emerald to-emerald-600 flex items-center justify-center text-white">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <div class="flex-1">
+                    <h5 class="font-bold text-gray-800 dark:text-white text-sm">Centro Veterinario Torices</h5>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Torices • 1.8 km</p>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-center gap-1 text-amber-500 text-sm">
+                        <i class="bi bi-star-fill"></i>
+                        <span class="font-bold">4.9</span>
+                    </div>
+                    <span class="text-xs text-gray-400">31 reseñas</span>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-4 flex items-center gap-4 hover:shadow-lg transition-all cursor-pointer reveal"
+                onclick="showToast('Navegando a Vetzone...', 'info')">
+                <div
+                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-purple to-purple-600 flex items-center justify-center text-white">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <div class="flex-1">
+                    <h5 class="font-bold text-gray-800 dark:text-white text-sm">Vetzone</h5>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Alto Bosque • 3.1 km</p>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-center gap-1 text-amber-500 text-sm">
+                        <i class="bi bi-star-fill"></i>
+                        <span class="font-bold">4.7</span>
+                    </div>
+                    <span class="text-xs text-gray-400">18 reseñas</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Clinics Section -->
+    <section id="clinicas" class="py-24 bg-gray-50 dark:bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6 reveal">
+                <div class="max-w-2xl">
+                    <div class="badge-premium inline-flex mb-4">
+                        <i class="bi bi-star-fill"></i>
+                        Destacados
+                    </div>
+                    <h2 class="text-4xl lg:text-5xl font-bold mb-4">Clínicas Populares en Cartagena</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400">Explora las clínicas mejor valoradas por nuestra
+                        comunidad de dueños responsables.</p>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        class="filter-btn active px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-primary-500 to-accent-purple text-white shadow-lg shadow-primary-500/25 transition-all"
+                        onclick="filterClinics('all', this)">
+                        Todas
+                    </button>
+                    <button
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold text-sm bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-primary-400 transition-all"
+                        onclick="filterClinics('24h', this)">
+                        <i class="bi bi-clock-history mr-1"></i>24 Horas
+                    </button>
+                    <button
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold text-sm bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-primary-400 transition-all"
+                        onclick="filterClinics('urgencias', this)">
+                        <i class="bi bi-bandaid-fill mr-1"></i>Urgencias
+                    </button>
+                    <button
+                        class="filter-btn px-5 py-2.5 rounded-xl font-semibold text-sm bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-primary-400 transition-all"
+                        onclick="filterClinics('especializada', this)">
+                        <i class="bi bi-award-fill mr-1"></i>Especializada
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 stagger-children" id="clinicsGrid"
+                th:if="${clinicasDestacadas != null and !clinicasDestacadas.isEmpty()}">
+                <!-- Clinic Loop (Limited to 3) -->
+                <article th:each="clinica, iterStat : ${clinicasDestacadas}" th:if="${iterStat.index < 3}"
+                    class="group bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-500 reveal clinic-card">
+                    <div class="relative h-56 overflow-hidden">
+                        <img th:src="${clinica.imagenUrl != null and !#strings.isEmpty(clinica.imagenUrl)} 
+                                    ? ${clinica.imagenUrl} 
+                                    : 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&auto=format&fit=crop'"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            alt="Imagen de la clínica">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                        </div>
+                        <div class="absolute top-4 left-4">
+                            <span
+                                class="px-3 py-1.5 rounded-full bg-white/90 backdrop-blur text-primary-600 text-xs font-bold shadow-lg">
+                                <i class="bi bi-star-fill text-amber-400 mr-1"></i><span>4.8</span>
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <span
+                                class="px-3 py-1.5 rounded-full bg-accent-emerald/90 backdrop-blur text-white text-xs font-bold shadow-lg">
+                                <i class="bi bi-check-circle-fill mr-1"></i>Verificado
+                            </span>
+                        </div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-white font-bold text-lg" th:text="${clinica.nombre}">Nombre Clínica</h3>
+                            <p class="text-white/80 text-sm flex items-center gap-1">
+                                <i class="bi bi-geo-alt-fill"></i> <span
+                                    th:text="${#strings.abbreviate(clinica.direccion, 40)}">Dirección</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span
+                                class="px-3 py-1 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs font-semibold">Consultas</span>
+                            <span
+                                class="px-3 py-1 rounded-lg bg-accent-emerald/10 text-accent-emerald text-xs font-semibold">Vacunación</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">Atención integral para tu
+                            mascota con los mejores especialistas de la ciudad.</p>
+                        <div class="flex gap-3">
+                            <a th:href="@{/detalle-clinica/{id}(id=${clinica.id})}"
+                                class="flex-1 btn-premium py-3 text-sm justify-center">
+                                Ver Detalles
+                            </a>
+                            <button
+                                class="w-12 h-12 rounded-xl border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-rose-500 hover:border-rose-200 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all"
+                                onclick="toggleFavorite(this)">
+                                <i class="bi bi-heart text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="text-center mt-12 reveal">
+                <a href="/buscar-clinicas" class="btn-premium inline-flex">
+                    Ver Todas las Clínicas
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Appointment Calendar Section -->
+    <section class="py-24 bg-white dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <div class="badge-premium inline-flex mb-4">
+                        <i class="bi bi-calendar-heart"></i>
+                        Agenda Inteligente
+                    </div>
+                    <h2 class="text-4xl lg:text-5xl font-bold mb-6">Reserva tu cita en segundos</h2>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                        Nuestro sistema de agenda inteligente te muestra disponibilidad en tiempo real. Selecciona
+                        fecha, hora y recibe confirmación instantánea con recordatorios automáticos por WhatsApp.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 flex-shrink-0">
+                                <i class="bi bi-check-lg text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Disponibilidad Real</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Horarios actualizados al instante,
+                                    sin esperas ni confusiones.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-accent-emerald/10 flex items-center justify-center text-accent-emerald flex-shrink-0">
+                                <i class="bi bi-check-lg text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Recordatorios Automáticos</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Notificaciones por WhatsApp y email
+                                    24h antes de tu cita.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-accent-purple/10 flex items-center justify-center text-accent-purple flex-shrink-0">
+                                <i class="bi bi-check-lg text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Reagenda Fácil</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Cambia tu cita hasta 2 horas antes
+                                    sin penalización.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-premium mt-8"
+                        onclick="showToast('¡Calendario interactivo activado!', 'success')">
+                        <i class="bi bi-calendar-plus"></i>
+                        Agendar Ahora
+                    </button>
+                </div>
+
+                <div class="reveal relative demo-container w-full max-w-md mx-auto lg:mx-0">
+                    <!-- Cursor fantasma para animación -->
+                    <div id="demoCursor"
+                        class="absolute z-[60] w-8 h-8 pointer-events-none transition-all duration-700 ease-in-out opacity-0"
+                        style="left: 50%; top: 80%;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-gray-800 dark:text-gray-200 drop-shadow-xl"
+                            style="transform: rotate(-25deg); fill: white;">
+                            <path d="M4 4l7.07 17 2.51-7.39L21 11.07z"></path>
+                        </svg>
+                        <!-- Efecto de clic -->
+                        <div id="demoClickEffect"
+                            class="absolute top-0 left-0 w-8 h-8 bg-primary-500 rounded-full opacity-0 scale-0 transition-all duration-300 pointer-events-none"
+                            style="transform-origin: top left; margin-left: -10px; margin-top: -10px;"></div>
+                    </div>
+
+                    <div class="glass-strong rounded-3xl p-6 shadow-2xl relative overflow-hidden border border-white/40 dark:border-gray-700/50"
+                        id="demoCalendarCard">
+                        <!-- Mensaje de éxito overlay -->
+                        <div id="demoSuccessOverlay"
+                            class="absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md z-40 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 rounded-3xl">
+                            <div class="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/40 border-4 border-emerald-50 dark:border-emerald-900 flex items-center justify-center text-emerald-500 mb-5 scale-0 transition-transform duration-500 shadow-xl shadow-emerald-500/20"
+                                id="demoSuccessIcon">
+                                <i class="bi bi-check-lg text-5xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2 translate-y-4 opacity-0 transition-all duration-500"
+                                id="demoSuccessTitle">¡Cita Confirmada!</h3>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 translate-y-4 opacity-0 transition-all duration-500 delay-100 text-center px-4"
+                                id="demoSuccessText">Recordatorio automático enviado a tu WhatsApp.</p>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-6">
+                            <button
+                                class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 cursor-default">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Mayo 2026</h3>
+                            <button
+                                class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 cursor-default">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-7 gap-1 mb-2">
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">LUN</div>
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">MAR</div>
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">MIE</div>
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">JUE</div>
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">VIE</div>
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">SAB</div>
+                            <div class="text-center text-xs font-bold text-gray-400 py-1">DOM</div>
+                        </div>
+
+                        <div class="grid grid-cols-7 gap-1 mb-6">
+                            <!-- Semana 1 -->
+                            <div class="text-center py-2 text-sm text-gray-300 dark:text-gray-600">27</div>
+                            <div class="text-center py-2 text-sm text-gray-300 dark:text-gray-600">28</div>
+                            <div class="text-center py-2 text-sm text-gray-300 dark:text-gray-600">29</div>
+                            <div class="text-center py-2 text-sm text-gray-300 dark:text-gray-600">30</div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg">
+                                1</div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg">
+                                2</div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg">
+                                3</div>
+
+                            <!-- Semana 2 -->
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg relative">
+                                4<span
+                                    class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-400 rounded-full"></span>
+                            </div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg relative">
+                                5<span
+                                    class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-400 rounded-full"></span>
+                            </div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg relative">
+                                6</div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg relative">
+                                7</div>
+                            <div class="text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg relative transition-colors duration-300"
+                                id="demoDayTarget">8</div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-400 dark:text-gray-500 rounded-lg bg-gray-50 dark:bg-gray-800/30">
+                                9</div>
+                            <div
+                                class="text-center py-2 text-sm font-semibold text-gray-400 dark:text-gray-500 rounded-lg bg-gray-50 dark:bg-gray-800/30">
+                                10</div>
+                        </div>
+
+                        <div class="pt-6 border-t border-gray-100 dark:border-gray-800">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">Horarios para el 8
+                                    de Mayo:</span>
+                                <span
+                                    class="text-[11px] px-2 py-1 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-md font-bold"
+                                    id="demoSlotsText">3 disponibles</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    class="flex-1 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold transition"
+                                    id="demoTime1">09:00 AM</button>
+                                <button
+                                    class="flex-1 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold transition-colors duration-300"
+                                    id="demoTimeTarget">11:30 AM</button>
+                                <button
+                                    class="flex-1 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold transition"
+                                    id="demoTime3">02:00 PM</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-5">
+                            <button id="demoBtnSubmit"
+                                class="w-full btn-premium py-3.5 justify-center text-[15px] shadow-lg shadow-primary-500/20 transition-all relative overflow-hidden">
+                                <span class="relative z-10 flex items-center gap-2">
+                                    <i class="bi bi-calendar-check"></i> Agendar Ahora
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const cursor = document.getElementById('demoCursor');
+                        const clickEffect = document.getElementById('demoClickEffect');
+
+                        const targetDay = document.getElementById('demoDayTarget');
+                        const targetTime = document.getElementById('demoTimeTarget');
+                        const targetBtn = document.getElementById('demoBtnSubmit');
+
+                        const successOverlay = document.getElementById('demoSuccessOverlay');
+                        const successIcon = document.getElementById('demoSuccessIcon');
+                        const successTitle = document.getElementById('demoSuccessTitle');
+                        const successText = document.getElementById('demoSuccessText');
+
+                        function runDemo() {
+                            // Reset state
+                            cursor.style.opacity = '0';
+                            cursor.style.transform = 'translateY(20px)';
+
+                            targetDay.className = 'text-center py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-lg relative transition-colors duration-300';
+                            targetTime.className = 'flex-1 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold transition-colors duration-300';
+                            targetBtn.style.transform = 'scale(1)';
+
+                            successOverlay.style.opacity = '0';
+                            successIcon.style.transform = 'scale(0)';
+                            successTitle.style.transform = 'translateY(20px)';
+                            successTitle.style.opacity = '0';
+                            successText.style.transform = 'translateY(20px)';
+                            successText.style.opacity = '0';
+
+                            // Start animation loop
+                            setTimeout(() => {
+                                // 1. Move to Day
+                                cursor.style.opacity = '1';
+                                cursor.style.transform = 'translateY(0)';
+
+                                const containerRect = document.querySelector('.demo-container').getBoundingClientRect();
+                                const dayRect = targetDay.getBoundingClientRect();
+
+                                cursor.style.top = (dayRect.top - containerRect.top + 10) + 'px';
+                                cursor.style.left = (dayRect.left - containerRect.left + 15) + 'px';
+
+                                setTimeout(() => {
+                                    simulateClick();
+                                    targetDay.className = 'text-center py-2 text-sm font-semibold bg-gradient-to-r from-primary-500 to-accent-purple text-white shadow-md rounded-lg relative transition-colors duration-300';
+
+                                    setTimeout(() => {
+                                        // 2. Move to Time
+                                        const timeRect = targetTime.getBoundingClientRect();
+                                        cursor.style.top = (timeRect.top - containerRect.top + 15) + 'px';
+                                        cursor.style.left = (timeRect.left - containerRect.left + timeRect.width / 2) + 'px';
+
+                                        setTimeout(() => {
+                                            simulateClick();
+                                            targetTime.className = 'flex-1 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-semibold shadow-md border-transparent transition-colors duration-300';
+
+                                            setTimeout(() => {
+                                                // 3. Move to Button
+                                                const btnRect = targetBtn.getBoundingClientRect();
+                                                cursor.style.top = (btnRect.top - containerRect.top + 15) + 'px';
+                                                cursor.style.left = (btnRect.left - containerRect.left + btnRect.width / 2) + 'px';
+
+                                                setTimeout(() => {
+                                                    simulateClick();
+                                                    targetBtn.style.transform = 'scale(0.95)';
+
+                                                    setTimeout(() => {
+                                                        targetBtn.style.transform = 'scale(1)';
+
+                                                        // 4. Success Overlay
+                                                        successOverlay.style.opacity = '1';
+                                                        cursor.style.opacity = '0';
+
+                                                        setTimeout(() => {
+                                                            successIcon.style.transform = 'scale(1)';
+                                                            successTitle.style.transform = 'translateY(0)';
+                                                            successTitle.style.opacity = '1';
+
+                                                            setTimeout(() => {
+                                                                successText.style.transform = 'translateY(0)';
+                                                                successText.style.opacity = '1';
+
+                                                                // Restart loop after delay
+                                                                setTimeout(runDemo, 5000);
+                                                            }, 200);
+                                                        }, 300);
+                                                    }, 150);
+                                                }, 700);
+                                            }, 500);
+                                        }, 700);
+                                    }, 500);
+                                }, 800);
+                            }, 500);
+                        }
+
+                        function simulateClick() {
+                            clickEffect.style.opacity = '0.6';
+                            clickEffect.style.transform = 'scale(2.5)';
+                            setTimeout(() => {
+                                clickEffect.style.opacity = '0';
+                                setTimeout(() => {
+                                    clickEffect.style.transform = 'scale(0)';
+                                }, 300);
+                            }, 200);
+                        }
+
+                        // Start when visible
+                        const observer = new IntersectionObserver((entries) => {
+                            if (entries[0].isIntersecting) {
+                                runDemo();
+                                observer.disconnect();
+                            }
+                        });
+                        observer.observe(document.querySelector('.demo-container'));
+                    });
+                </script>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials 3D Carousel -->
+    <section id="testimonios"
+        class="py-24 bg-gradient-to-br from-primary-50 to-accent-purple/5 dark:from-gray-900 dark:to-gray-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+                <div class="badge-premium inline-flex mb-4">
+                    <i class="bi bi-chat-heart-fill"></i>
+                    Testimonios
+                </div>
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">Lo que dicen nuestros clientes</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400">Miles de familias confían en nosotros para el
+                    cuidado de sus mascotas.</p>
+            </div>
+
+            <div class="testimonial-carousel reveal" id="testimonialCarousel">
+                <div class="testimonial-track" id="testimonialTrack">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-card" data-index="0">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://i.pravatar.cc/150?img=32" alt="María G."
+                                class="w-14 h-14 rounded-full object-cover ring-4 ring-primary-100 dark:ring-primary-900/30">
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">María González</h4>
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">"Increíble plataforma. Pude
+                            agendar la cirugía de mi perro en minutos y el seguimiento post-operatorio fue excelente.
+                            Los recordatorios automáticos me salvaron de olvidar los medicamentos."</p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="bi bi-hospital text-primary-500"></i>
+                            <span>Cliente de Pet City</span>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-card" data-index="1">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://i.pravatar.cc/150?img=11" alt="Carlos R."
+                                class="w-14 h-14 rounded-full object-cover ring-4 ring-accent-emerald/20">
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Carlos Rodríguez</h4>
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">"A las 3 AM mi gato tuvo una
+                            emergencia. Encontré una clínica 24h a 5 minutos y salvaron su vida. El sistema de urgencias
+                            es verdaderamente invaluable."</p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="bi bi-hospital text-accent-emerald"></i>
+                            <span>Cliente de Mascotas 24h</span>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-card" data-index="2">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://i.pravatar.cc/150?img=5" alt="Ana P."
+                                class="w-14 h-14 rounded-full object-cover ring-4 ring-accent-purple/20">
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Ana Patricia López</h4>
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">"Como dueña de 3 perros, el
+                            historial digital me facilita la vida. Tengo todas las vacunas y desparasitaciones en un
+                            solo lugar. ¡Totalmente recomendado!"</p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="bi bi-hospital text-accent-purple"></i>
+                            <span>Cliente de Mascoclinica</span>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 4 -->
+                    <div class="testimonial-card" data-index="3">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://i.pravatar.cc/150?img=68" alt="Javier M."
+                                class="w-14 h-14 rounded-full object-cover ring-4 ring-primary-100 dark:ring-primary-900/30">
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Javier Martínez</h4>
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">"La interfaz es tan fluida que
+                            hacer una reserva se siente como un juego. Me encanta la transparencia con los precios y los
+                            perfiles de los especialistas."</p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="bi bi-hospital text-primary-500"></i>
+                            <span>Cliente de VetSalud</span>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 5 -->
+                    <div class="testimonial-card" data-index="4">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://i.pravatar.cc/150?img=47" alt="Laura G."
+                                class="w-14 h-14 rounded-full object-cover ring-4 ring-accent-emerald/20">
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Laura Gómez</h4>
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">"Poder tener la receta médica
+                            de mi gata en mi celular 10 minutos después de la consulta no tiene precio. Ya no se me
+                            pierden los papeles."</p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="bi bi-hospital text-accent-emerald"></i>
+                            <span>Cliente de Felinos 24/7</span>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 6 -->
+                    <div class="testimonial-card" data-index="5">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://i.pravatar.cc/150?img=12" alt="Andrés C."
+                                class="w-14 h-14 rounded-full object-cover ring-4 ring-accent-purple/20">
+                            <div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Andrés Castro</h4>
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">"El proceso de pago anticipado
+                            me dio mucha seguridad. La clínica ya me estaba esperando y el trato fue completamente VIP."
+                        </p>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="bi bi-hospital text-accent-purple"></i>
+                            <span>Cliente de Clínica Central</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-center gap-4 mt-8 relative z-20">
+                    <button
+                        class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:scale-110 transition-all border border-gray-100 dark:border-gray-700"
+                        onclick="rotateTestimonials(-1); resetTestimonialTimer();">
+                        <i class="bi bi-chevron-left text-xl"></i>
+                    </button>
+                    <div class="flex items-center gap-2 px-4" id="testimonialDots">
+                        <span class="w-3 h-3 rounded-full bg-primary-500 transition-all cursor-pointer"
+                            onclick="goToTestimonial(0)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-all cursor-pointer"
+                            onclick="goToTestimonial(1)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-all cursor-pointer"
+                            onclick="goToTestimonial(2)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-all cursor-pointer"
+                            onclick="goToTestimonial(3)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-all cursor-pointer"
+                            onclick="goToTestimonial(4)"></span>
+                        <span class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-all cursor-pointer"
+                            onclick="goToTestimonial(5)"></span>
+                    </div>
+                    <button
+                        class="w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-gray-600 hover:text-primary-600 hover:scale-110 transition-all border border-gray-100 dark:border-gray-700"
+                        onclick="rotateTestimonials(1); resetTestimonialTimer();">
+                        <i class="bi bi-chevron-right text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nosotros / Por qué ClínicaApp Section -->
+    <section class="py-24 bg-white dark:bg-gray-900 relative overflow-hidden transition-colors duration-300" id="sobre-nosotros">
+        <!-- Glow effects -->
+        <div
+            class="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary-500/10 rounded-full blur-[120px] pointer-events-none">
+        </div>
+        <div
+            class="absolute bottom-0 right-0 w-1/3 h-1/3 bg-accent-purple/10 rounded-full blur-[100px] pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+
+            <!-- Top Content: Image & Text -->
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-16">
+                <!-- Image -->
+                <div class="lg:col-span-4 reveal">
+                    <div
+                        class="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-primary-500/10 border border-gray-200 dark:border-white/5 group">
+                        <img th:src="@{/img/mockup-avatar.png}" alt="Ingeniería ClínicaApp"
+                            class="w-full object-cover aspect-[4/5] group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-white via-white/20 dark:from-[#0b0f19] dark:via-[#0b0f19]/20 to-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Content -->
+                <div class="lg:col-span-8 reveal">
+                    <div
+                        class="text-[11px] tracking-[0.2em] text-primary-500 dark:text-primary-400 font-bold uppercase mb-6 flex items-center gap-3">
+                        <span class="w-12 h-[2px] bg-primary-500 dark:bg-primary-400"></span>
+                        ARTÍCULO WEB • POR EQUIPO DE INGENIERÍA
+                    </div>
+
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.1]">
+                        ¿Por Qué Tu Gestión es Lenta?<br>
+                        <span class="text-gray-800 dark:text-white">La Tecnología de Alto Valor que Mereces.</span>
+                    </h2>
+
+                    <div class="space-y-6 text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-10 max-w-3xl">
+                        <p class="font-bold text-gray-900 dark:text-white">Seamos brutales y directos:</p>
+                        <p class="text-[17px]">Tu sistema veterinario actual te quita tiempo y margen de ganancia. La
+                            mayoría de las clínicas usan agendas de papel, WhatsApp desorganizados o software médico
+                            obsoleto de los años 90. ¿El resultado? Pierdes tiempo en tareas manuales, aumentan las
+                            inasistencias y frustras a tus clientes.</p>
+                    </div>
+
+                    <a href="/clinica/registrar-clinica"
+                        class="inline-flex items-center justify-center px-8 py-4 bg-gray-100 dark:bg-[#1e293b]/80 hover:bg-primary-50 dark:hover:bg-[#2dd4bf]/10 border border-gray-200 dark:border-[#2dd4bf]/40 text-gray-800 dark:text-white hover:text-primary-600 dark:hover:text-[#2dd4bf] rounded-2xl font-bold transition-all shadow-lg hover:shadow-primary-500/20 w-full sm:w-auto text-sm sm:text-base">
+                        Deje de perder tiempo. Desafíe nuestra ingeniería hoy.
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bottom Grid: 4 Cards -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 reveal stagger-children">
+                <!-- Card 1 -->
+                <div
+                    class="bg-gray-50/80 dark:bg-[#111827]/60 backdrop-blur-xl border border-gray-200 dark:border-white/5 rounded-3xl p-8 hover:border-[#0ea5e9]/50 hover:bg-white dark:hover:bg-[#111827] transition-all duration-300 group shadow-sm hover:shadow-md">
+                    <h3 class="text-gray-900 dark:text-white font-extrabold text-lg mb-2">1. Velocidad Tesla</h3>
+                    <p class="text-[#0ea5e9] text-xs font-bold tracking-[0.15em] uppercase mb-4">LA REACCIÓN</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Si un paciente busca cita o su historial, lo tiene
+                        en segundos. No competimos con las recepciones telefónicas colapsadas; las automatizamos para
+                        que usted atienda.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div
+                    class="bg-gray-50/80 dark:bg-[#111827]/60 backdrop-blur-xl border border-gray-200 dark:border-white/5 rounded-3xl p-8 hover:border-[#8b5cf6]/50 hover:bg-white dark:hover:bg-[#111827] transition-all duration-300 group shadow-sm hover:shadow-md">
+                    <h3 class="text-gray-900 dark:text-white font-extrabold text-lg mb-2">2. Experiencia Apple</h3>
+                    <p class="text-[#8b5cf6] text-xs font-bold tracking-[0.15em] uppercase mb-4">LA SEDUCCIÓN</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">El software debe ser tan limpio y sin esfuerzo que
+                        su equipo lo ame usar. Cero fricción. El diseño impecable desde el registro hasta la receta
+                        médica le ahorra horas.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div
+                    class="bg-gray-50/80 dark:bg-[#111827]/60 backdrop-blur-xl border border-gray-200 dark:border-white/5 rounded-3xl p-8 hover:border-[#10b981]/50 hover:bg-white dark:hover:bg-[#111827] transition-all duration-300 group shadow-sm hover:shadow-md">
+                    <h3 class="text-gray-900 dark:text-white font-extrabold text-lg mb-2">3. Eficiencia Toyota</h3>
+                    <p class="text-[#10b981] text-xs font-bold tracking-[0.15em] uppercase mb-4">EL MARGEN</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Eliminamos el desperdicio del código y del proceso.
+                        Las citas no asistidas se reducen a cero gracias a los pagos anticipados por Stripe. Su ROI es
+                        nuestra prioridad.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div
+                    class="bg-gray-50/80 dark:bg-[#111827]/60 backdrop-blur-xl border border-gray-200 dark:border-white/5 rounded-3xl p-8 hover:border-[#f59e0b]/50 hover:bg-white dark:hover:bg-[#111827] transition-all duration-300 group shadow-sm hover:shadow-md">
+                    <h3 class="text-gray-900 dark:text-white font-extrabold text-lg mb-2">4. IA de DeepMind</h3>
+                    <p class="text-[#f59e0b] text-xs font-bold tracking-[0.15em] uppercase mb-4">LA CERTEZA</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">No solo registramos datos. Usamos Inteligencia
+                        Artificial para auditar reservas, predecir inasistencias y devolverle el control absoluto de su
+                        clínica veterinaria.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 bg-gray-50 dark:bg-gray-900/50">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <div class="badge-premium inline-flex mb-4">
+                    <i class="bi bi-question-circle-fill"></i>
+                    Preguntas Frecuentes
+                </div>
+                <h2 class="text-4xl lg:text-5xl font-bold mb-4">Resolvemos tus dudas</h2>
+            </div>
+
+            <div class="space-y-4 stagger-children" id="faqContainer">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden reveal">
+                    <button
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                        onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 flex-shrink-0">
+                                <i class="bi bi-credit-card"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 dark:text-white">¿Cómo funciona el pago de las
+                                citas?</span>
+                        </div>
+                        <i class="bi bi-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 pl-20">
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            Al solicitar tu cita, serás redirigido a nuestra pasarela de pago segura (procesada por
+                            Stripe). Puedes pagar con tarjeta de crédito, débito y otros métodos. La cita solo se
+                            confirma una vez procesado el pago exitosamente.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden reveal">
+                    <button
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                        onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-accent-rose/10 flex items-center justify-center text-accent-rose flex-shrink-0">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 dark:text-white">¿Qué pasa si necesito cancelar?</span>
+                        </div>
+                        <i class="bi bi-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 pl-20">
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            Puedes cancelar desde tu panel de usuario. Cancelaciones con más de 24h de anticipación
+                            tienen reembolso completo. Entre 24h y 2h antes, 50% de reembolso. Menos de 2h no aplica.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden reveal">
+                    <button
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                        onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-accent-emerald/10 flex items-center justify-center text-accent-emerald flex-shrink-0">
+                                <i class="bi bi-coin"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 dark:text-white">¿Registrarse tiene algún costo?</span>
+                        </div>
+                        <i class="bi bi-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 pl-20">
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            <strong>No.</strong> Crear tu cuenta es y siempre será <em>totalmente gratis</em>. Solo
+                            pagas por los servicios que agendas. No hay cuotas mensuales ni cargos ocultos para dueños
+                            de mascotas.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden reveal">
+                    <button
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                        onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-accent-purple/10 flex items-center justify-center text-accent-purple flex-shrink-0">
+                                <i class="bi bi-file-earmark-medical"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 dark:text-white">¿Cómo accedo al historial
+                                médico?</span>
+                        </div>
+                        <i class="bi bi-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 pl-20">
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            Desde tu panel de usuario, selecciona tu mascota y encontrarás todo el historial clínico:
+                            vacunas, desparasitaciones, recetas y resultados de laboratorio. Puedes descargarlo en PDF
+                            en cualquier momento.
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden reveal">
+                    <button
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                        onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+                                <i class="bi bi-shield-lock"></i>
+                            </div>
+                            <span class="font-bold text-gray-800 dark:text-white">¿Mis datos están seguros?</span>
+                        </div>
+                        <i class="bi bi-chevron-down text-gray-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 pl-20">
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                            Utilizamos encriptación SSL de grado bancario y cumplimos con la Ley de Protección de Datos
+                            Personales de Colombia. Tus datos médicos y de pago nunca son compartidos con terceros.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="pt-24 pb-0 relative overflow-hidden bg-white dark:bg-[#0b0f19] border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-4xl mx-auto px-6 relative z-10 flex flex-col items-center text-center mb-16">
+            <div class="text-[11px] tracking-[0.2em] text-primary-500 dark:text-primary-400 font-bold uppercase mb-6 flex items-center justify-center gap-3 reveal">
+                <span class="w-8 h-[2px] bg-primary-500 dark:bg-primary-400"></span>
+                EL EQUIPO DETRÁS
+                <span class="w-8 h-[2px] bg-primary-500 dark:bg-primary-400"></span>
+            </div>
+            <h2 class="text-4xl lg:text-5xl xl:text-6xl font-extrabold text-gray-900 dark:text-white mb-8 leading-[1.15] reveal">
+                Conoce a los creadores de esta tecnología.
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400 text-lg sm:text-xl leading-relaxed mb-10 reveal max-w-3xl">
+                No somos una corporación anónima. Somos un equipo multidisciplinario de ingenieros, expertos en salud y amantes de los animales, trabajando desde Colombia para transformar cómo cuidas a tu mejor amigo.
+            </p>
+            <div class="reveal">
+                <a href="mailto:hola@clinicaapp.com" class="inline-flex items-center gap-2 text-[#0ea5e9] hover:text-white font-bold transition-colors group text-lg bg-[#0ea5e9]/10 hover:bg-[#0ea5e9] px-6 py-3 rounded-full border border-[#0ea5e9]/30">
+                    Escríbenos directamente 
+                    <i class="bi bi-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Image Container (Full Width Edge-to-Edge) -->
+        <div class="w-full relative reveal mt-8">
+            <div class="relative w-full h-[60vh] min-h-[500px] lg:h-[85vh] lg:min-h-[750px] overflow-hidden shadow-[0_-30px_60px_rgba(14,165,233,0.15)] border-t border-gray-200 dark:border-white/10">
+                <img th:src="@{/img/mockup-group.png}" alt="Equipo ClínicaApp" class="w-full h-full object-cover object-center transform hover:scale-[1.03] transition-transform duration-[20s]">
+                <!-- Gradients to blend smoothly -->
+                <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent dark:from-[#0b0f19] dark:via-transparent dark:to-transparent"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section with 3D Video Carousel -->
+    <section id="securitySection" class="py-32 bg-[#020617] relative overflow-hidden">
+        <!-- Background Glows -->
+        <div class="absolute top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-primary-500/10 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-accent-purple/10 blur-[150px] rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                
+                <!-- Left: 3D Carousel -->
+                <div class="order-2 lg:order-1 reveal">
+                    <div class="security-showcase-container">
+                        <div class="phone-carousel-track" id="securityTrack">
+                            <!-- Phone 1 -->
+                            <div class="phone-card active" data-index="0">
+                                <div class="phone-reflection"></div>
+                                <video loop playsinline preload="auto" class="w-full h-full object-cover">
+                                    <source th:src="@{/video/video1.mp4}" type="video/mp4">
+                                </video>
+                            </div>
+                            <!-- Phone 2 -->
+                            <div class="phone-card next" data-index="1">
+                                <div class="phone-reflection"></div>
+                                <video loop playsinline preload="auto" class="w-full h-full object-cover">
+                                    <source th:src="@{/video/video2.mp4}" type="video/mp4">
+                                </video>
+                            </div>
+                            <!-- Phone 3 -->
+                            <div class="phone-card hidden" data-index="2">
+                                <div class="phone-reflection"></div>
+                                <video loop playsinline preload="auto" class="w-full h-full object-cover">
+                                    <source th:src="@{/video/video3.mp4}" type="video/mp4">
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carousel Controls -->
+                    <div class="flex flex-col items-center gap-6 mt-8">
+                        <div class="flex items-center gap-8 bg-white/5 backdrop-blur-xl border border-white/10 p-3 rounded-full shadow-2xl">
+                            <button onclick="rotateSecurityCarousel(-1)" class="carousel-nav-btn">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <div class="flex gap-2" id="securityDots">
+                                <span class="carousel-dot active"></span>
+                                <span class="carousel-dot"></span>
+                                <span class="carousel-dot"></span>
+                            </div>
+                            <button onclick="rotateSecurityCarousel(1)" class="carousel-nav-btn">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Text Content -->
+                <div class="order-1 lg:order-2 reveal space-y-8">
+                    <div id="securityBadge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs font-bold uppercase tracking-widest transition-all duration-500">
+                        <i class="bi bi-robot"></i>
+                        Asistente Virtual
+                    </div>
+                    <h2 id="securityTitle" class="text-5xl lg:text-7xl font-extrabold text-white leading-tight transition-all duration-500">
+                        Conoce a <br>
+                        <span class="text-gradient">Nova</span>
+                    </h2>
+                    <p id="securityDesc" class="text-xl text-gray-400 leading-relaxed max-w-lg transition-all duration-500">
+                        Tu asistente de IA siempre lista para ayudarte. Nova te guía en cada paso, desde agendar una cita hasta resolver tus dudas sobre salud animal.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-6 pt-4">
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 transition-all duration-500" id="securityCard1">
+                            <div class="text-primary-500 text-2xl mb-2 icon"><i class="bi bi-lightning-charge"></i></div>
+                            <h4 class="text-white font-bold text-sm mb-1 title">IA Activa 24/7</h4>
+                            <p class="text-xs text-gray-500 desc">Respuestas al instante para ti.</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 transition-all duration-500" id="securityCard2">
+                            <div class="text-accent-purple text-2xl mb-2 icon"><i class="bi bi-map"></i></div>
+                            <h4 class="text-white font-bold text-sm mb-1 title">Guía Paso a Paso</h4>
+                            <p class="text-xs text-gray-500 desc">Nova conoce todo sobre tu clínica.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-purple"></div>
+        <div class="absolute inset-0 opacity-20">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z" fill="white">
+                    <animate attributeName="d" dur="10s" repeatCount="indefinite" values="M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z;
+                                M0,50 Q25,70 50,50 T100,50 L100,100 L0,100 Z;
+                                M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z" />
+                </path>
+            </svg>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10 reveal">
+            <h2 class="text-4xl lg:text-6xl font-bold text-white mb-6">¿Listo para cuidar mejor a tu mascota?</h2>
+            <p class="text-xl text-white/80 mb-10 max-w-2xl mx-auto">Únete a más de 12,000 familias que ya confían en
+                ClínicaApp para el cuidado de sus mejores amigos.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/registro"
+                    class="px-8 py-4 bg-white text-primary-600 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2">
+                    Crear Cuenta Gratis
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+                <a href="/buscar-clinicas"
+                    class="px-8 py-4 bg-white/10 backdrop-blur text-white border-2 border-white/30 rounded-2xl font-bold text-lg hover:bg-white/20 transition-all inline-flex items-center justify-center gap-2">
+                    Explorar Clínicas
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white relative">
+        <!-- Wave -->
+        <div class="absolute -top-px left-0 right-0">
+            <svg viewBox="0 0 1440 100" fill="none" class="w-full h-auto">
+                <path d="M0,50 C360,100 1080,0 1440,50 L1440,100 L0,100 Z" fill="#111827" />
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 pt-24 pb-12">
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+                <!-- Brand -->
+                <div class="lg:col-span-2">
+                    <a href="/" class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-accent-purple flex items-center justify-center text-white text-xl">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                        <span class="text-2xl font-bold">ClínicaApp</span>
+                    </a>
+                    <p class="text-gray-400 mb-6 max-w-sm leading-relaxed">
+                        Simplificamos el acceso a servicios veterinarios de calidad en Cartagena. Conectamos a dueños de
+                        mascotas con los mejores profesionales.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-gray-400">
+                            <i class="bi bi-geo-alt-fill text-primary-400"></i>
+                            <span>Cartagena, Colombia</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-400">
+                            <i class="bi bi-envelope-fill text-primary-400"></i>
+                            <a href="mailto:hola@clinicaapp.com"
+                                class="hover:text-white transition">hola@clinicaapp.com</a>
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-400">
+                            <i class="bi bi-telephone-fill text-primary-400"></i>
+                            <a href="tel:+573005722844" class="hover:text-white transition">+57 300 572 2844</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="font-bold mb-6 text-lg">Explorar</h4>
+                    <ul class="space-y-3">
+                        <li><a href="/"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Inicio</a>
+                        </li>
+                        <li><a href="/buscar-clinicas"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Buscar
+                                Clínicas</a></li>
+                        <li><a href="#servicios"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Servicios</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Sobre
+                                Nosotros</a></li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Blog</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-6 text-lg">Servicios</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Consultas</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Vacunación</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Urgencias</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Peluquería</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-gray-400 hover:text-white transition flex items-center gap-2 group"><i
+                                    class="bi bi-chevron-right text-xs text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>Para
+                                Clínicas</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="font-bold mb-6 text-lg">Newsletter</h4>
+                    <p class="text-gray-400 text-sm mb-4">Recibe tips de cuidado y promociones exclusivas.</p>
+                    <form onsubmit="handleNewsletter(event)" class="space-y-3">
+                        <input type="email" placeholder="tu@email.com" required
+                            class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-primary-400 focus:outline-none transition">
+                        <button type="submit"
+                            class="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-purple text-white font-bold hover:shadow-lg hover:shadow-primary-500/25 transition-all">
+                            Suscribirse
+                        </button>
+                    </form>
+                    <div class="flex gap-3 mt-6">
+                        <a href="#"
+                            class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#1877f2] hover:text-white transition-all"><i
+                                class="bi bi-facebook"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gradient-to-br hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:text-white transition-all"><i
+                                class="bi bi-instagram"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-black hover:text-white transition-all"><i
+                                class="bi bi-twitter-x"></i></a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#0a66c2] hover:text-white transition-all"><i
+                                class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom -->
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">© 2026 <strong class="text-white">ClínicaApp</strong>. Todos los
+                    derechos reservados.</p>
+                <div class="flex gap-6 text-sm">
+                    <a href="#" class="text-gray-500 hover:text-white transition">Términos</a>
+                    <a href="#" class="text-gray-500 hover:text-white transition">Privacidad</a>
+                    <a href="#" class="text-gray-500 hover:text-white transition">Cookies</a>
+                </div>
+                <div class="flex gap-3">
+                    <span class="px-3 py-1 rounded-full bg-gray-800 text-gray-400 text-xs flex items-center gap-1"><i
+                            class="bi bi-shield-check text-primary-400"></i>Seguro</span>
+                    <span class="px-3 py-1 rounded-full bg-gray-800 text-gray-400 text-xs flex items-center gap-1"><i
+                            class="bi bi-lock-fill text-primary-400"></i>SSL</span>
+                    <span class="px-3 py-1 rounded-full bg-gray-800 text-gray-400 text-xs flex items-center gap-1"><i
+                            class="bi bi-patch-check-fill text-primary-400"></i>Verificado</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- WhatsApp FAB -->
+    <a href="https://wa.me/573005722844?text=Hola%2C%20necesito%20ayuda%20con%20ClínicaApp" target="_blank"
+        rel="noopener noreferrer"
+        class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-gradient-to-br from-[#25D366] to-[#128C7E] text-white flex items-center justify-center text-2xl shadow-xl shadow-green-500/30 z-50 hover:scale-110 transition-transform border-3 border-white">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script>
+
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                html.classList.remove('dark');
+                icon.classList.remove('bi-moon-fill');
+                icon.classList.add('bi-sun-fill');
+                showToast('Modo claro activado', 'info');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                html.classList.add('dark');
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-fill');
+                showToast('Modo oscuro activado', 'info');
+            }
+        }
+
+        // ===== NAVIGATION SCROLL =====
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ===== MOBILE MENU =====
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // ===== SEARCH =====
+        function toggleSearch() {
+            const search = document.getElementById('searchExpand');
+            search.classList.toggle('active');
+            if (search.classList.contains('active')) {
+                search.querySelector('input').focus();
+            }
+        }
+
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value;
+                if (query) {
+                    showToast(`Buscando: "${query}"...`, 'info');
+                    setTimeout(() => {
+                        window.location.href = `/buscar-clinicas?query=${encodeURIComponent(query)}`;
+                    }, 1000);
+                }
+            }
+        }
+
+        function handleHeroSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('heroSearch').value;
+            if (query) {
+                showToast(`Buscando servicios de "${query}"...`, 'info');
+                setTimeout(() => {
+                    window.location.href = `/buscar-clinicas?query=${encodeURIComponent(query)}`;
+                }, 1500);
+            }
+        }
+
+        function quickSearch(term) {
+            document.getElementById('heroSearch').value = term;
+            showToast(`Buscando: ${term}...`, 'info');
+            setTimeout(() => {
+                window.location.href = `/buscar-clinicas?query=${encodeURIComponent(term)}`;
+            }, 1000);
+        }
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast-item';
+
+            const icons = {
+                success: 'bi-check-circle-fill text-emerald-500',
+                error: 'bi-x-circle-fill text-rose-500',
+                info: 'bi-info-circle-fill text-primary-500',
+                warning: 'bi-exclamation-triangle-fill text-amber-500'
+            };
+
+            toast.innerHTML = `
+                <i class="bi ${icons[type]} text-xl"></i>
+                <span class="font-semibold text-gray-800 dark:text-white text-sm">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        // ===== PARTICLE SYSTEM =====
+        (function initParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationId;
+
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+
+            resize();
+            window.addEventListener('resize', resize);
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                    this.color = Math.random() > 0.5 ? '#0ea5e9' : '#8b5cf6';
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.y > canvas.height) this.y = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                }
+
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = this.opacity;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function init() {
+                particles = [];
+                const particleCount = Math.min(50, Math.floor(canvas.width * canvas.height / 15000));
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Draw connections
+                particles.forEach((a, i) => {
+                    particles.slice(i + 1).forEach(b => {
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 100) {
+                            ctx.strokeStyle = '#0ea5e9';
+                            ctx.globalAlpha = 0.1 * (1 - distance / 100);
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+
+                animationId = requestAnimationFrame(animate);
+            }
+
+            init();
+            animate();
+
+            // Pause when not visible
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (!animationId) animate();
+                    } else {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                });
+            });
+            observer.observe(canvas);
+        })();
+
+        // ===== GSAP SCROLL ANIMATIONS =====
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Reveal animations
+            gsap.utils.toArray('.reveal').forEach(elem => {
+                gsap.fromTo(elem,
+                    { opacity: 0, y: 50 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 1,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: elem,
+                            start: 'top 85%',
+                            toggleActions: 'play none none none'
+                        }
+                    }
+                );
+            });
+
+            // Stagger children
+            gsap.utils.toArray('.stagger-children').forEach(parent => {
+                gsap.fromTo(parent.children,
+                    { opacity: 0, y: 30 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        stagger: 0.15,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: parent,
+                            start: 'top 80%',
+                            toggleActions: 'play none none none'
+                        }
+                    }
+                );
+            });
+
+            // Stats counter animation
+            const statsSection = document.getElementById('statsSection');
+            if (statsSection) {
+                ScrollTrigger.create({
+                    trigger: statsSection,
+                    start: 'top 80%',
+                    onEnter: () => {
+                        document.querySelectorAll('.stat-value').forEach(counter => {
+                            const target = parseInt(counter.dataset.target);
+                            const duration = 2000;
+                            const start = performance.now();
+
+                            function update(currentTime) {
+                                const elapsed = currentTime - start;
+                                const progress = Math.min(elapsed / duration, 1);
+                                const easeOut = 1 - Math.pow(1 - progress, 4);
+                                const current = Math.floor(easeOut * target);
+
+                                counter.textContent = current.toLocaleString('es-CO');
+
+                                if (progress < 1) {
+                                    requestAnimationFrame(update);
+                                }
+                            }
+
+                            requestAnimationFrame(update);
+                        });
+                    },
+                    once: true
+                });
+            }
+
+            // Parallax for floating elements
+            gsap.to('.float-element', {
+                y: -50,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '#inicio',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1
+                }
+            });
+        }
+
+        // ===== 3D TILT CARDS =====
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+                // Update shine position
+                const shine = card.querySelector('.card-shine');
+                if (shine) {
+                    shine.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 60%)`;
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            });
+        });
+
+        // ===== CUSTOM CURSOR =====
+        const cursor = document.getElementById('cursor');
+        let cursorX = 0, cursorY = 0;
+        let currentX = 0, currentY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+        });
+
+        function animateCursor() {
+            currentX += (cursorX - currentX) * 0.1;
+            currentY += (cursorY - currentY) * 0.1;
+            cursor.style.left = currentX + 'px';
+            cursor.style.top = currentY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Hover effect on interactive elements
+        document.querySelectorAll('a, button, .tilt-card, .map-pin').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // ===== CLINIC FILTERS =====
+        function filterClinics(category, btn) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active', 'bg-gradient-to-r', 'from-primary-500', 'to-accent-purple', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+                b.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border', 'border-gray-200', 'dark:border-gray-700');
+            });
+
+            btn.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-400', 'border', 'border-gray-200', 'dark:border-gray-700');
+            btn.classList.add('active', 'bg-gradient-to-r', 'from-primary-500', 'to-accent-purple', 'text-white', 'shadow-lg', 'shadow-primary-500/25');
+
+            // Filter cards
+            const cards = document.querySelectorAll('.clinic-card');
+            cards.forEach((card, index) => {
+                const cardCategory = card.dataset.category;
+                if (category === 'all' || cardCategory === category) {
+                    gsap.to(card, {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.4,
+                        delay: index * 0.05,
+                        display: 'block'
+                    });
+                } else {
+                    gsap.to(card, {
+                        opacity: 0,
+                        scale: 0.8,
+                        duration: 0.4,
+                        onComplete: () => {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+            });
+
+            showToast(`Filtrando: ${category === 'all' ? 'Todas las clínicas' : category}`, 'info');
+        }
+
+        // ===== FAVORITE TOGGLE =====
+        function toggleFavorite(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('bi-heart')) {
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill', 'text-rose-500');
+                btn.classList.add('border-rose-200', 'bg-rose-50', 'dark:bg-rose-900/20');
+                showToast('Agregado a favoritos', 'success');
+
+                // Add pop animation
+                gsap.fromTo(btn, { scale: 0.8 }, { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.5)' });
+            } else {
+                icon.classList.remove('bi-heart-fill', 'text-rose-500');
+                icon.classList.add('bi-heart');
+                btn.classList.remove('border-rose-200', 'bg-rose-50', 'dark:bg-rose-900/20');
+                showToast('Eliminado de favoritos', 'info');
+            }
+        }
+
+        // ===== CALENDAR =====
+        // Old static calendar logic has been removed as it was replaced by the automated demo calendar.
+
+        // ===== TESTIMONIALS 3D CAROUSEL =====
+        var currentTestimonial = 0;
+        var testimonialCards = document.querySelectorAll('.testimonial-card');
+        var totalTestimonials = testimonialCards.length;
+        var testimonialTimer;
+
+        function updateTestimonials() {
+            testimonialCards.forEach((card, i) => {
+                // Calcular distancia más corta en un círculo
+                let offset = i - currentTestimonial;
+
+                if (offset > totalTestimonials / 2) offset -= totalTestimonials;
+                if (offset < -totalTestimonials / 2) offset += totalTestimonials;
+
+                const absOffset = Math.abs(offset);
+
+                if (absOffset > 2) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translate(-50%, -50%) scale(0.6) rotateY(' + (offset * 35) + 'deg) translateZ(-500px)';
+                    card.style.pointerEvents = 'none';
+                    card.style.zIndex = '0';
+                } else {
+                    // Si es la central absOffset = 0, si está a un lado = 1, a dos = 2
+                    card.style.opacity = absOffset === 0 ? '1' : (absOffset === 1 ? '0.7' : '0.3');
+                    card.style.transform = `translate(-50%, -50%) scale(${1 - absOffset * 0.15}) rotateY(${offset * 35}deg) translateZ(${-absOffset * 150}px)`;
+                    card.style.pointerEvents = absOffset === 0 ? 'auto' : 'none';
+                    card.style.zIndex = 10 - absOffset;
+                }
+            });
+
+            // Update dots
+            const dots = document.querySelectorAll('#testimonialDots span');
+            dots.forEach((dot, i) => {
+                if (i === currentTestimonial) {
+                    dot.classList.remove('bg-gray-300', 'dark:bg-gray-600');
+                    dot.classList.add('bg-primary-500');
+                    dot.style.transform = 'scale(1.3)';
+                } else {
+                    dot.classList.remove('bg-primary-500');
+                    dot.classList.add('bg-gray-300', 'dark:bg-gray-600');
+                    dot.style.transform = 'scale(1)';
+                }
+            });
+        }
+
+        function rotateTestimonials(direction) {
+            currentTestimonial = (currentTestimonial + direction + totalTestimonials) % totalTestimonials;
+            updateTestimonials();
+        }
+
+        function goToTestimonial(index) {
+            currentTestimonial = index;
+            updateTestimonials();
+            resetTestimonialTimer();
+        }
+
+        function resetTestimonialTimer() {
+            clearInterval(testimonialTimer);
+            testimonialTimer = setInterval(() => rotateTestimonials(1), 4000);
+        }
+
+        // Iniciar auto-rotación y setup inicial
+        updateTestimonials();
+        resetTestimonialTimer();
+
+        // ===== FAQ ACCORDION =====
+        function toggleFaq(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('.bi-chevron-down');
+            const isOpen = !content.classList.contains('hidden');
+
+            // Close all others
+            document.querySelectorAll('#faqContainer .hidden').forEach(el => {
+                if (el !== content && !el.classList.contains('hidden')) {
+                    el.classList.add('hidden');
+                    el.previousElementSibling.querySelector('.bi-chevron-down').style.transform = 'rotate(0deg)';
+                }
+            });
+
+            if (isOpen) {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+
+                // Animate content
+                gsap.fromTo(content,
+                    { height: 0, opacity: 0 },
+                    { height: 'auto', opacity: 1, duration: 0.4, ease: 'power2.out' }
+                );
+            }
+        }
+
+
+        // ===== NEWSLETTER =====
+        function handleNewsletter(e) {
+            e.preventDefault();
+            const email = e.target.querySelector('input').value;
+            showToast(`¡Gracias por suscribirte! Revisa ${email}`, 'success');
+            e.target.reset();
+        }
+
+        // ===== MAGNETIC BUTTONS =====
+        document.querySelectorAll('.magnetic').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
+            });
+        });
+
+        // ===== RIPPLE EFFECT =====
+        document.querySelectorAll('.ripple').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const ripple = document.createElement('span');
+                ripple.style.cssText = `
+                    position: absolute;
+                    background: rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    width: 20px;
+                    height: 20px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    transform: translate(-50%, -50%);
+                    animation: rippleEffect 0.6s ease-out;
+                    pointer-events: none;
+                `;
+
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add ripple keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes rippleEffect {
+                to {
+                    width: 200px;
+                    height: 200px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ===== SMOOTH SCROLL FOR ANCHORS =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ===== INTERSECTION OBSERVER FALLBACK =====
+        if (typeof gsap === 'undefined') {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                el.classList.add('transition-all', 'duration-700');
+                revealObserver.observe(el);
+            });
+        }
+
+        // ===== PERFORMANCE: Pause animations when tab hidden =====
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause expensive animations
+            } else {
+                // Resume
+            }
+        });
+
+        // ===== SECURITY 3D CAROUSEL =====
+        let securityIndex = 0;
+        const securityCards = document.querySelectorAll('.phone-card');
+        const securityDots = document.querySelectorAll('#securityDots .carousel-dot');
+        const totalSecurity = securityCards.length;
+
+        const securityContent = [
+            {
+                badge: '<i class="bi bi-robot"></i> Asistente Virtual',
+                title: 'Conoce a <br><span class="text-gradient">Nova</span>',
+                desc: 'Tu asistente de IA siempre lista para ayudarte. Nova te guía en cada paso, desde agendar una cita hasta resolver tus dudas sobre salud animal.',
+                card1: { icon: 'bi-lightning-charge', title: 'IA Activa 24/7', desc: 'Respuestas al instante para ti.' },
+                card2: { icon: 'bi-map', title: 'Guía Paso a Paso', desc: 'Nova conoce todo sobre tu clínica.' }
+            },
+            {
+                badge: '<i class="bi bi-heart-fill"></i> Cuidado Integral',
+                title: 'Todo por <br><span class="text-gradient">Ellos</span>',
+                desc: 'Gestiona el historial clínico, vacunas y recordatorios de tu mascota en una sola plataforma. Diseñada para darles la vida larga y sana que merecen.',
+                card1: { icon: 'bi-folder2-open', title: 'Historial Digital', desc: 'Accede a su salud desde el móvil.' },
+                card2: { icon: 'bi-alarm', title: 'Alertas de Vacuna', desc: 'Nunca olvides una dosis importante.' }
+            },
+            {
+                badge: '<i class="bi bi-shield-lock-fill"></i> Infraestructura Global',
+                title: 'Seguridad <br><span class="text-gradient">Blindada</span>',
+                desc: 'Tus datos clínicos y personales están protegidos por el respaldo de Oracle Cloud, cumpliendo con los estándares internacionales más estrictos de cifrado.',
+                card1: { icon: 'bi-cpu', title: 'Cifrado Militar', desc: 'AES-256 bits para toda la información.' },
+                card2: { icon: 'bi-cloud-check', title: 'Backup Diario', desc: 'Réplicas automáticas en tiempo real.' }
+            }
+        ];
+
+        // ===== SECURITY VISIBILITY OBSERVER =====
+        let isSecurityInView = false;
+
+        const securityObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                isSecurityInView = entry.isIntersecting;
+                if (isSecurityInView) {
+                    updateSecurityCarousel();
+                } else {
+                    // Stop everything if we leave the section
+                    securityCards.forEach(card => {
+                        const video = card.querySelector('video');
+                        video.pause();
+                        video.muted = true;
+                    });
+                }
+            });
+        }, { threshold: 0.3 }); // Activa cuando el 30% de la sección es visible
+
+        const secTarget = document.getElementById('securitySection');
+        if (secTarget) securityObserver.observe(secTarget);
+
+        function rotateSecurityCarousel(direction) {
+            securityIndex = (securityIndex + direction + totalSecurity) % totalSecurity;
+            updateSecurityCarousel();
+        }
+
+        function updateSecurityCarousel() {
+            // Update Text Content with animation
+            const content = securityContent[securityIndex];
+            const elements = {
+                badge: document.getElementById('securityBadge'),
+                title: document.getElementById('securityTitle'),
+                desc: document.getElementById('securityDesc'),
+                c1: document.getElementById('securityCard1'),
+                c2: document.getElementById('securityCard2')
+            };
+
+            // Animate out
+            Object.values(elements).forEach(el => {
+                if (el) {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(10px)';
+                }
+            });
+
+            setTimeout(() => {
+                if (elements.badge) {
+                    elements.badge.innerHTML = content.badge;
+                    elements.title.innerHTML = content.title;
+                    elements.desc.innerHTML = content.desc;
+                    
+                    elements.c1.querySelector('.icon i').className = `bi ${content.card1.icon}`;
+                    elements.c1.querySelector('.title').innerText = content.card1.title;
+                    elements.c1.querySelector('.desc').innerText = content.card1.desc;
+                    
+                    elements.c2.querySelector('.icon i').className = `bi ${content.card2.icon}`;
+                    elements.c2.querySelector('.title').innerText = content.card2.title;
+                    elements.c2.querySelector('.desc').innerText = content.card2.desc;
+
+                    // Animate in
+                    Object.values(elements).forEach(el => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    });
+                }
+            }, 300);
+
+            securityCards.forEach((card, i) => {
+                const video = card.querySelector('video');
+                card.classList.remove('active', 'prev', 'next', 'hidden');
+                
+                let position = i - securityIndex;
+                if (position > totalSecurity / 2) position -= totalSecurity;
+                if (position < -totalSecurity / 2) position += totalSecurity;
+
+                if (position === 0) {
+                    card.classList.add('active');
+                    // Only play if the section is in view
+                    if (isSecurityInView) {
+                        video.muted = false;
+                        video.play().catch(() => {
+                            video.muted = true;
+                            video.play();
+                        });
+                    }
+                } else {
+                    if (position === -1 || (position === totalSecurity - 1 && totalSecurity > 2)) {
+                        card.classList.add('prev');
+                    } else if (position === 1 || (position === -totalSecurity + 1 && totalSecurity > 2)) {
+                        card.classList.add('next');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                    video.pause();
+                    video.currentTime = 0;
+                    video.muted = true;
+                }
+            });
+            // Update dots
+            securityDots.forEach((dot, i) => {
+                if (i === securityIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+
+        // Initialize carousel
+        updateSecurityCarousel();
+
+        // ===== INIT =====
+        console.log('%c ClínicaApp Premium ', 'background: linear-gradient(135deg, #0ea5e9, #8b5cf6); color: white; font-size: 24px; font-weight: bold; padding: 10px 20px; border-radius: 10px;');
+        console.log('%c Plataforma veterinaria 100% profesional ', 'color: #0ea5e9; font-size: 14px;');
+    </script>
+    <div th:replace="~{fragments/asistente_publico :: guido-bot}"></div>
+</body>
+
+</html>

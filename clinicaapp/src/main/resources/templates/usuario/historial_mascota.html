@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Historial clínico completo de tu mascota en Clínica App.">
+    <title th:text="'Historial de ' + ${mascota.nombre} + ' | Clínica App'">Historial Clínico</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --nova: #8b5cf6;
+            --nova-light: #ede9fe;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+            --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.1);
+            --shadow-glow: 0 0 40px -10px var(--primary-glow);
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+        }
+
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --gray-50: #0f172a;
+            --gray-100: #1e293b;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --gray-400: #94a3b8;
+            --gray-500: #cbd5e1;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
+            --gray-900: #f8fafc;
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            color: var(--gray-400);
+        }
+
+        [data-theme="dark"] .dashboard-card,
+        [data-theme="dark"] .radar-card,
+        [data-theme="dark"] .timeline-content,
+        [data-theme="dark"] .empty-state {
+            background: var(--glass) !important;
+            border-color: var(--glass-border) !important;
+            backdrop-filter: blur(24px);
+        }
+
+        [data-theme="dark"] .pet-name,
+        [data-theme="dark"] .section-title,
+        [data-theme="dark"] .risk-title,
+        [data-theme="dark"] .timeline-title,
+        [data-theme="dark"] .empty-title {
+            color: white !important;
+        }
+
+        [data-theme="dark"] .pet-meta-item,
+        [data-theme="dark"] .risk-description,
+        [data-theme="dark"] .timeline-desc,
+        [data-theme="dark"] .visit-field-label,
+        [data-theme="dark"] .stat-label {
+            color: var(--gray-400) !important;
+        }
+
+        [data-theme="dark"] .diagnosis-box {
+            background: rgba(245, 158, 11, 0.1) !important;
+        }
+
+        [data-theme="dark"] .treatment-box {
+            background: rgba(99, 102, 241, 0.1) !important;
+        }
+
+        [data-theme="dark"] .nova-bubble {
+            background: rgba(139, 92, 246, 0.1) !important;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: -0.02em;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 30%, #faf5ff 60%, #f0fdfa 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND ANIMATED SHAPES ===== */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-shape-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shape-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -5s;
+        }
+
+        .bg-shape-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s;
+            opacity: 0.25;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.05);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.95);
+            }
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard-container {
+            padding: 2rem 0 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER SECTION ===== */
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px -3px var(--primary-glow);
+            animation: slideDown 0.6s ease-out;
+            letter-spacing: 0.02em;
+        }
+
+        .welcome-title {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+            line-height: 1.15;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .welcome-subtitle {
+            color: var(--gray-500);
+            font-size: 1.125rem;
+            font-weight: 400;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb-section {
+            background: transparent;
+            padding: 1rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-item a {
+            color: var(--gray-500);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--primary);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            content: '›';
+            color: var(--gray-400);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        /* ===== ALERTS PREMIUM ===== */
+        .alert-premium {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            animation: slideDown 0.4s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-premium::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .alert-success-premium {
+            background: linear-gradient(135deg, var(--success-light) 0%, rgba(16, 185, 129, 0.05) 100%);
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-success-premium::before {
+            background: var(--success);
+        }
+
+        .alert-danger-premium {
+            background: linear-gradient(135deg, var(--danger-light) 0%, rgba(239, 68, 68, 0.05) 100%);
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-danger-premium::before {
+            background: var(--danger);
+        }
+
+        .alert-premium i {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .alert-success-premium i {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.3);
+        }
+
+        .alert-danger-premium i {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.3);
+        }
+
+        /* ===== CARDS - GLASSMORPHISM ===== */
+        .dashboard-card {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            border: none;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 0 60px -20px var(--primary-glow);
+        }
+
+        /* ===== PET PROFILE CARD ===== */
+        .pet-profile-card {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            border: none;
+            overflow: hidden;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pet-profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--success));
+        }
+
+        .pet-profile-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 0 60px -20px var(--primary-glow);
+        }
+
+        .pet-avatar {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #ddd6fe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary);
+            border: 5px solid white;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pet-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .pet-profile-card:hover .pet-avatar {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-xl), 0 0 0 2px var(--primary);
+        }
+
+        .pet-profile-card:hover .pet-avatar img {
+            transform: scale(1.1);
+        }
+
+        .pet-name {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .pet-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .pet-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .pet-meta-item i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .btn-action {
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9375rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-action:hover::before {
+            left: 100%;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px -3px var(--primary-glow);
+        }
+
+        .btn-primary-custom:hover {
+            box-shadow: 0 8px 25px -5px var(--primary-glow);
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px -3px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success-custom:hover {
+            box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s ease;
+            flex-shrink: 0;
+        }
+
+        .section-icon:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .section-icon.bg-primary-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        }
+
+        .section-icon.bg-nova {
+            background: linear-gradient(135deg, var(--nova) 0%, #7c3aed 100%);
+        }
+
+        .section-icon.bg-success-gradient {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .visit-count {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.375rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-left: auto;
+            box-shadow: 0 2px 8px -2px var(--primary-glow);
+        }
+
+        /* ===== RADAR CARDS ===== */
+        .radar-card {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            border: none;
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--nova), #7c3aed);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .radar-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 0 60px -20px rgba(139, 92, 246, 0.2);
+        }
+
+        .radar-card:hover::before {
+            opacity: 1;
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .risk-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .risk-title {
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 1rem;
+        }
+
+        .risk-tag {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            border: 2px solid transparent;
+        }
+
+        .risk-tag.bg-success {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+
+        .risk-tag.bg-warning {
+            background: var(--warning-light);
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .risk-tag.bg-danger {
+            background: var(--danger-light);
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .risk-tag.bg-info {
+            background: var(--info-light);
+            color: #155e75;
+            border-color: #7dd3fc;
+        }
+
+        .risk-description {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .risk-progress {
+            height: 8px;
+            border-radius: var(--radius-full);
+            background: var(--gray-100);
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-progress-bar {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 1.5s ease-out;
+            background: linear-gradient(90deg, var(--success), #34d399);
+            position: relative;
+        }
+
+        .risk-progress-bar.bg-warning {
+            background: linear-gradient(90deg, var(--warning), #fbbf24);
+        }
+
+        .risk-progress-bar.bg-danger {
+            background: linear-gradient(90deg, var(--danger), #f87171);
+        }
+
+        .risk-progress-bar.bg-info {
+            background: linear-gradient(90deg, var(--info), #38bdf8);
+        }
+
+        .risk-percentage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .risk-action {
+            border-top: 1px solid var(--gray-100);
+            padding-top: 1rem;
+            margin-top: auto;
+        }
+
+        .risk-action-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-action-text {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .nova-bubble {
+            background: linear-gradient(135deg, var(--nova-light) 0%, #f5f3ff 100%);
+            border-left: 4px solid var(--nova);
+            padding: 1.25rem;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-style: italic;
+            color: var(--gray-700);
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .nova-bubble::before {
+            content: '🤖';
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            opacity: 0.15;
+            font-size: 2rem;
+        }
+
+        .nova-bubble strong {
+            color: var(--nova);
+            font-style: normal;
+        }
+
+        /* ===== TIMELINE PREMIUM ===== */
+        .timeline-section {
+            margin-top: 3rem;
+        }
+
+        .timeline {
+            list-style: none;
+            padding: 0;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary) 0%, var(--primary-light) 50%, var(--gray-200) 100%);
+            border-radius: 4px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 85px;
+            margin-bottom: 2.5rem;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 64px;
+            height: 64px;
+            background: white;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: var(--primary);
+            box-shadow: 0 4px 15px -2px var(--primary-glow);
+            z-index: 1;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-item:hover .timeline-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px -2px var(--primary-glow);
+        }
+
+        .timeline-icon.completed {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .timeline-content {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            border: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .timeline-content:hover {
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+            transform: translateY(-4px);
+        }
+
+        .visit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 2px solid var(--gray-100);
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .clinic-name {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .visit-date {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .visit-date i {
+            color: var(--primary);
+        }
+
+        .btn-receta {
+            background: linear-gradient(135deg, var(--danger-light) 0%, rgba(239, 68, 68, 0.05) 100%);
+            color: var(--danger);
+            border: 2px solid #fca5a5;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-receta:hover {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.3);
+        }
+
+        .visit-body {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .visit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .visit-field-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-500);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .visit-field-label i {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .visit-field-value {
+            font-size: 0.95rem;
+            color: var(--gray-800);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .diagnosis-box {
+            background: linear-gradient(135deg, var(--warning-light) 0%, #fde68a 100%);
+            border-left: 4px solid var(--warning);
+            padding: 1.25rem;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .treatment-box {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #ddd6fe 100%);
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .medications-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.625rem;
+            margin-top: 0.75rem;
+        }
+
+        .medication-tag {
+            background: white;
+            border: 2px solid var(--gray-200);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .medication-tag:hover {
+            border-color: var(--success);
+            color: var(--success);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .medication-tag i {
+            color: var(--success);
+            font-size: 0.875rem;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            border-radius: var(--radius-lg);
+            border: 2px dashed var(--gray-200);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .empty-state:hover {
+            border-color: var(--primary-light);
+            background: linear-gradient(135deg, var(--primary-light) 0%, white 100%);
+        }
+
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-50) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3.5rem;
+            color: var(--gray-300);
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: var(--shadow-md);
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-text {
+            color: var(--gray-500);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .btn-empty {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 10px 25px -10px var(--primary-glow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-empty:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -10px var(--primary-glow);
+            color: white;
+        }
+
+        /* ===== MODAL PREMIUM ===== */
+        .modal-content {
+            border: none;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .modal-body {
+            padding: 1.75rem;
+        }
+
+        .modal-footer {
+            padding: 1.25rem 1.75rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .form-control-modal {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-modal:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        /* ===== ALBUM SECTION ===== */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .album-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .album-item:hover {
+            transform: scale(1.03);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .album-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .delete-photo-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .album-item:hover .delete-photo-btn {
+            opacity: 1;
+        }
+
+        .delete-photo-btn:hover {
+            background: #ef4444;
+            transform: scale(1.1);
+        }
+        .form-control-modal {
+            padding: 0.9375rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+        }
+
+        .form-control-modal:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .input-group-text-modal {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-right: none;
+            color: var(--gray-400);
+            padding: 0.9375rem 1rem;
+            font-size: 1.125rem;
+        }
+
+        .btn-light-custom {
+            background: white;
+            color: var(--gray-600);
+            border: 2px solid var(--gray-200);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-light-custom:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .btn-primary-modal {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 12px -2px var(--primary-glow);
+        }
+
+        .btn-primary-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px var(--primary-glow);
+        }
+
+        /* ===== QUICK ACTIONS FLOAT ===== */
+        .quick-actions-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .fab-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-decoration: none;
+        }
+
+        .fab-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .fab-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .fab-btn.success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            font-size: 1.25rem;
+        }
+
+        .fab-tooltip {
+            position: absolute;
+            right: 70px;
+            background: var(--gray-800);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .fab-btn:hover .fab-tooltip {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.2;
+            }
+
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .timeline-item {
+                padding-left: 70px;
+            }
+
+            .timeline-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            .timeline::before {
+                left: 25px;
+            }
+
+            .pet-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .visit-header {
+                flex-direction: column;
+            }
+
+            .quick-actions-float {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .fab-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 1.5rem 0;
+            }
+
+            .welcome-title {
+                font-size: 1.75rem;
+            }
+
+            .pet-profile-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animated Shapes -->
+    <div class="bg-shapes">
+        <div class="bg-shape bg-shape-1"></div>
+        <div class="bg-shape bg-shape-2"></div>
+        <div class="bg-shape bg-shape-3"></div>
+    </div>
+
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- ===== BREADCRUMB ===== -->
+    <div class="breadcrumb-section">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/}"><i class="bi bi-house-door-fill me-1"></i>Inicio</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/usuario/mis-mascotas}"><i class="bi bi-heart-pulse me-1"></i>Mis Mascotas</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="bi bi-clipboard2-pulse me-1"></i>Historial de <span
+                            th:text="${mascota.nombre}">Firulais</span>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <main class="dashboard-container">
+        <div class="container">
+
+            <!-- ===== HEADER SECTION ===== -->
+            <div class="dashboard-header" data-aos="fade-down">
+                <div class="welcome-badge">
+                    <i class="bi bi-clipboard2-pulse-fill"></i>
+                    Historial Clínico
+                </div>
+                <h1 class="welcome-title">
+                    <span th:text="${mascota.nombre}">Firulais</span>
+                </h1>
+                <p class="welcome-subtitle">Registro completo de atenciones médicas y diagnósticos</p>
+            </div>
+
+            <!-- ===== ALERTAS PREMIUM ===== -->
+            <div th:if="${param.emailEnviado}" class="alert-premium alert-success-premium alert-dismissible fade show"
+                role="alert" data-aos="fade-right">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                    <strong>¡Correo enviado exitosamente!</strong>
+                    <span class="d-block" style="opacity: 0.85;">El historial ha sido enviado a <span
+                            th:text="${param.email}">tu correo</span></span>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div th:if="${param.errorEmail}" class="alert-premium alert-danger-premium alert-dismissible fade show"
+                role="alert" data-aos="fade-right">
+                <i class="bi bi-x-circle-fill"></i>
+                <div>
+                    <strong>Error al enviar el correo</strong>
+                    <span class="d-block" style="opacity: 0.85;">Hubo un problema al enviar el correo. Por favor,
+                        inténtalo de nuevo más tarde.</span>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- ===== PERFIL DE MASCOTA ===== -->
+            <div class="pet-profile-card mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="pet-avatar">
+                                <img th:if="${mascota.fotoUrl != null}" th:src="${mascota.fotoUrl}"
+                                    alt="Foto de mascota">
+                                <i th:if="${mascota.fotoUrl == null}" class="bi bi-heart-pulse-fill"></i>
+                            </div>
+                            <div>
+                                <h2 class="pet-name" th:text="${mascota.nombre}">Firulais</h2>
+                                <p class="text-muted mb-0"
+                                    th:text="${mascota.especie.toString().substring(0,1) + mascota.especie.toString().substring(1).toLowerCase()} + ' • ' + ${mascota.getRaza()}">
+                                    Perro • Golden Retriever</p>
+
+                                <div class="pet-meta">
+                                    <div class="pet-meta-item">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span
+                                            th:text="'Nacimiento: ' + ${#temporals.format(mascota.fechaNacimiento, 'dd ''de'' MMMM, yyyy')}">01
+                                            de enero, 2020</span>
+                                    </div>
+                                    <div class="pet-meta-item">
+                                        <i class="bi bi-activity"></i>
+                                        <span
+                                            th:text="${visitasDTO != null} ? ${visitasDTO.size()} + ' visitas registradas' : 'Sin visitas'">5
+                                            visitas registradas</span>
+                                    </div>
+                                    <div class="pet-meta-item" th:if="${mascota.edad != null}">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        <span th:text="${mascota.edad + ' años'}">3 años</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-4 mt-md-0">
+                        <div class="action-bar justify-content-md-end">
+                            <button type="button" class="btn-action btn-primary-custom" data-bs-toggle="modal"
+                                data-bs-target="#emailModal">
+                                <i class="bi bi-envelope-fill"></i>
+                                <span>Enviar</span>
+                            </button>
+                            <a th:href="@{/usuario/historial/{id}/pdf(id=${mascota.id})}"
+                                class="btn-action btn-success-custom" target="_blank">
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                                <span>PDF</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RADAR DE SALUD NOVA AI ===== -->
+            <div class="mb-5" data-aos="fade-up" data-aos-delay="200" th:if="${prediccion != null}">
+                <div class="section-header">
+                    <div class="section-icon bg-nova">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="section-title">Radar de Salud Preventiva Nova AI</h3>
+                        <p class="text-muted mb-0" style="font-size: 0.9375rem;"
+                            th:text="${prediccion.analisisGeneral}">Análisis de riesgos basado en inteligencia
+                            artificial</p>
+                    </div>
+                </div>
+
+                <div class="row g-4 mt-1">
+                    <div th:each="riesgo, iterStat : ${prediccion.riesgos}" class="col-md-6 col-lg-4" data-aos="fade-up"
+                        th:attr="data-aos-delay=${iterStat.index * 100}">
+                        <div class="radar-card h-100">
+                            <div class="risk-header">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="risk-icon-box" th:classappend="${riesgo.colorClass == 'success' ? 'bg-success bg-opacity-10 text-success' : 
+                                                   riesgo.colorClass == 'warning' ? 'bg-warning bg-opacity-10 text-warning' : 
+                                                   riesgo.colorClass == 'danger' ? 'bg-danger bg-opacity-10 text-danger' : 
+                                                   'bg-info bg-opacity-10 text-info'}">
+                                        <i th:class="'bi ' + ${riesgo.iconClass}"></i>
+                                    </div>
+                                    <span class="risk-title" th:text="${riesgo.categoria}">Articular</span>
+                                </div>
+                                <span th:class="'risk-tag bg-' + ${riesgo.colorClass}"
+                                    th:text="${riesgo.nivelRiesgo}">Alto</span>
+                            </div>
+
+                            <p class="risk-description" th:text="${riesgo.descripcion}">Descripción del riesgo detectado
+                                por la IA.</p>
+
+                            <div class="risk-percentage">
+                                <span class="fw-semibold">Nivel de Alerta</span>
+                                <span class="fw-bold" th:text="${riesgo.porcentaje} + '%'">85%</span>
+                            </div>
+                            <div class="risk-progress">
+                                <div th:class="'risk-progress-bar bg-' + ${riesgo.colorClass}" role="progressbar"
+                                    th:attr="data-width=${riesgo.porcentaje}" style="width: 0%;"></div>
+                            </div>
+
+                            <div class="risk-action">
+                                <div class="risk-action-label">
+                                    <i class="bi bi-lightbulb-fill"></i>
+                                    <span>Acción Recomendada</span>
+                                </div>
+                                <p class="risk-action-text" th:text="${riesgo.accionRecomendada}">Qué hacer para
+                                    prevenir.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="nova-bubble">
+                        <strong><i class="bi bi-robot me-2"></i>Nova AI dice:</strong>
+                        <span th:text="${prediccion.recomendacionNova}">Recomendación general...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== TIMELINE DE VISITAS ===== -->
+            <div class="timeline-section" th:if="${visitasDTO != null and !visitasDTO.isEmpty()}">
+                <div class="section-header" data-aos="fade-up">
+                    <div class="section-icon bg-primary-gradient">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h3 class="section-title">Línea de Tiempo de Visitas</h3>
+                    <span class="visit-count" th:text="${visitasDTO.size()} + ' registros'">5 registros</span>
+                </div>
+
+                <ul class="timeline">
+                    <li th:each="dto, iterStat : ${visitasDTO}" class="timeline-item" data-aos="fade-up"
+                        th:attr="data-aos-delay=${iterStat.index * 100}">
+
+                        <div class="timeline-icon"
+                            th:class="${iterStat.first} ? 'timeline-icon completed' : 'timeline-icon'">
+                            <i th:class="${iterStat.first} ? 'bi bi-check-lg' : 'bi bi-clipboard2-pulse'"></i>
+                        </div>
+
+                        <div class="timeline-content">
+                            <div class="visit-header">
+                                <div class="clinic-name">
+                                    <i class="bi bi-hospital-fill"></i>
+                                    <span th:text="${dto.nombreClinica}">Clínica Veterinaria</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="visit-date">
+                                        <i class="bi bi-calendar-check-fill"></i>
+                                        <span th:text="${#temporals.format(dto.visita.fechaVisita, 'dd MMM, yyyy')}">15
+                                            Ene, 2024</span>
+                                    </div>
+                                    <a th:if="${dto.visita.citaId != null}"
+                                        th:href="@{/usuario/citas/{id}/receta(id=${dto.visita.citaId})}"
+                                        class="btn-receta" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf-fill"></i> Receta
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="visit-body">
+                                <!-- Diagnóstico -->
+                                <div class="visit-field">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-stethoscope"></i> Diagnóstico
+                                    </span>
+                                    <div class="diagnosis-box">
+                                        <span class="visit-field-value" th:text="${dto.visita.diagnostico}">Chequeo
+                                            general</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tratamiento -->
+                                <div class="visit-field">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-bandaid-fill"></i> Tratamiento
+                                    </span>
+                                    <div class="treatment-box">
+                                        <span class="visit-field-value" th:text="${dto.visita.tratamiento}">Vacunación
+                                            anual</span>
+                                    </div>
+                                </div>
+
+                                <!-- Medicamentos -->
+                                <div class="visit-field"
+                                    th:if="${dto.visita.medicamentosRecetados != null and !dto.visita.medicamentosRecetados.isEmpty()}">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-capsule"></i> Medicamentos Recetados
+                                    </span>
+                                    <div class="medications-list">
+                                        <span th:each="med : ${dto.visita.medicamentosRecetados}"
+                                            class="medication-tag">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <span th:text="${med}">Medicamento</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Notas -->
+                                <div class="visit-field" th:if="${!#strings.isEmpty(dto.visita.notasAdicionales)}">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-journal-text"></i> Notas Adicionales
+                                    </span>
+                                    <span class="visit-field-value text-muted"
+                                        th:text="${dto.visita.notasAdicionales}">Notas del veterinario</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ===== ESTADO VACÍO PREMIUM ===== -->
+            <div th:if="${visitasDTO == null or visitasDTO.isEmpty()}" class="empty-state" data-aos="zoom-in">
+                <div class="empty-icon">
+                    <i class="bi bi-file-earmark-medical"></i>
+                </div>
+                <h3 class="empty-title">Historial Clínico Vacío</h3>
+                <p class="empty-text">Esta mascota aún no tiene visitas registradas. ¡Es hora de agendar su primera cita
+                    y comenzar a cuidar su salud!</p>
+                <a th:href="@{/usuario/citas/solicitar}" class="btn-empty">
+                    <i class="bi bi-calendar-plus-fill"></i> Agendar Primera Cita
+                </a>
+            </div>
+
+                <!-- SECCIÓN ÁLBUM DE RECUERDOS -->
+                <div class="dashboard-card p-4 mt-5" data-aos="fade-up">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="section-title mb-0">
+                            <i class="bi bi-images me-2 text-primary"></i>Álbum de Recuerdos
+                        </h3>
+                        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#modalAddPhoto">
+                            <i class="bi bi-plus-circle me-2"></i>Añadir Foto
+                        </button>
+                    </div>
+                    
+                    <div th:if="${mascota.albumFotos != null and !mascota.albumFotos.empty}" class="album-grid">
+                        <div th:each="foto : ${mascota.albumFotos}" class="album-item">
+                            <img th:src="${foto}" alt="Foto de álbum">
+                            <button class="delete-photo-btn" th:data-url="${foto}" onclick="confirmDeletePhoto(this.getAttribute('data-url'))">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${mascota.albumFotos == null or mascota.albumFotos.empty}" class="empty-state py-4 border-0">
+                        <div class="empty-icon" style="width: 80px; height: 80px; font-size: 2rem;">
+                            <i class="bi bi-camera"></i>
+                        </div>
+                        <h5 class="empty-title">Sin fotos aún</h5>
+                        <p class="empty-text">Empieza a guardar los mejores momentos de <span th:text="${mascota.nombre}">tu mascota</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL AÑADIR FOTO -->
+    <div class="modal fade" id="modalAddPhoto" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-camera-fill me-2"></i>Añadir Foto al Álbum
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">URL de la Imagen</label>
+                        <input type="text" id="inputPhotoUrl" class="form-control-modal w-100" placeholder="https://ejemplo.com/foto.jpg">
+                        <div class="form-text mt-2">Pega la dirección de una imagen web para guardarla en el álbum.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary-modal" onclick="saveAlbumPhoto()">Guardar Foto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL EMAIL ===== -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-envelope-paper-fill me-2"></i>Enviar Historial por Correo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form th:action="@{/usuario/historial/{id}/enviar-email(id=${mascota.id})}" method="post">
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">
+                            El historial completo de <strong th:text="${mascota.nombre}"></strong> se enviará como PDF
+                            adjunto al correo que indiques.
+                        </p>
+                        <div class="mb-3">
+                            <label for="emailDestino" class="form-label fw-semibold">
+                                <i class="bi bi-envelope me-1"></i> Correo electrónico destino
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text-modal"><i
+                                        class="bi bi-envelope text-secondary"></i></span>
+                                <input type="email" class="form-control-modal" id="emailDestino" name="emailDestino"
+                                    sec:authentication="name" required placeholder="ejemplo@correo.com">
+                            </div>
+                            <div class="form-text mt-2" style="font-size: 0.8125rem; color: var(--gray-500);">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Asegúrate de que el correo sea correcto antes de enviar
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-light-custom" data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg me-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn-primary-modal">
+                            <i class="bi bi-send-fill me-1"></i> Enviar Ahora
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer-usuario}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script th:inline="javascript">
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ===== BARRAS DE RIESGO ANIMADAS =====
+            setTimeout(() => {
+                document.querySelectorAll('.risk-progress-bar').forEach(bar => {
+                    const width = bar.getAttribute('data-width');
+                    if (width) {
+                        bar.style.width = width + '%';
+                    }
+                });
+            }, 500);
+
+            // ===== AUTO-CLOSE ALERTS =====
+            document.querySelectorAll('.alert-premium').forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                }, 8000);
+            });
+
+            // ===== MODAL FOCUS =====
+            const emailModal = document.getElementById('emailModal');
+            if (emailModal) {
+                emailModal.addEventListener('shown.bs.modal', function () {
+                    document.getElementById('emailDestino').focus();
+                });
+            }
+        });
+
+        // ===== ÁLBUM LOGIC =====
+        const mascotaId = /*[[${mascota.id}]]*/ null;
+
+        function saveAlbumPhoto() {
+            const url = document.getElementById('inputPhotoUrl').value;
+            if (!url) return;
+
+            fetch(`/api/mascotas/${mascotaId}/album`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(url)
+            }).then(res => {
+                if (res.ok) location.reload();
+                else alert('Error al guardar la foto');
+            });
+        }
+
+        function confirmDeletePhoto(url) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta foto?')) {
+                fetch(`/usuario/mascotas/${mascotaId}/album/eliminar?photoUrl=` + encodeURIComponent(url), {
+                    method: 'POST'
+                }).then(res => {
+                    if (res.ok) location.reload();
+                    else alert('Error al eliminar la foto');
+                });
+            }
+        }
+    </script>
+
+    <!-- ===== QUICK ACTIONS FLOAT ===== -->
+    <div class="quick-actions-float">
+        <button class="fab-btn success" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <i class="bi bi-arrow-up"></i>
+            <span class="fab-tooltip">Volver arriba</span>
+        </button>
+        <button type="button" class="fab-btn primary" data-bs-toggle="modal" data-bs-target="#emailModal">
+            <i class="bi bi-envelope-fill"></i>
+            <span class="fab-tooltip">Enviar por email</span>
+        </button>
+    </div>
+
+    <!-- Lógica Global y Partículas -->
+    <script th:replace="~{fragments/header :: activeLinkScript}"></script>
+    <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
+</body>
+
+</html>

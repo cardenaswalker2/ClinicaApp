@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel de control de Clínica App. Gestiona tus citas, mascotas y pagos.">
+    <title>Mi Panel | Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+            --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.1);
+            --shadow-glow: 0 0 40px -10px var(--primary-glow);
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+        }
+
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --gray-50: #0f172a;
+            --gray-100: #1e293b;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --gray-400: #94a3b8;
+            --gray-500: #cbd5e1;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
+            --gray-900: #f8fafc;
+            --glass: rgba(30, 41, 59, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ===== DARK MODE - COBERTURA COMPLETA ===== */
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            color: #cbd5e1;
+        }
+
+        /* --- Cards principales --- */
+        [data-theme="dark"] .dashboard-card {
+            background: rgba(30, 41, 59, 0.75) !important;
+            border: 1px solid rgba(255, 255, 255, 0.07) !important;
+            backdrop-filter: blur(24px);
+        }
+
+        [data-theme="dark"] .card-header-custom {
+            border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+        }
+
+        [data-theme="dark"] .card-title-custom {
+            color: #f1f5f9 !important;
+        }
+
+        /* --- Textos bienvenida --- */
+        [data-theme="dark"] .welcome-title {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .welcome-subtitle {
+            color: #94a3b8 !important;
+        }
+
+        /* --- Tarjeta de perfil (sidebar) --- */
+        [data-theme="dark"] .profile-card {
+            background: rgba(30, 41, 59, 0.75) !important;
+            border: 1px solid rgba(255, 255, 255, 0.07) !important;
+        }
+
+        [data-theme="dark"] .profile-name {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .profile-email {
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .btn-profile {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-theme="dark"] .btn-profile:hover {
+            background: rgba(99, 102, 241, 0.2) !important;
+            border-color: var(--primary) !important;
+            color: #a5b4fc !important;
+        }
+
+        /* --- Tarjeta Pagos --- */
+        [data-theme="dark"] .pagos-card {
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.5) 0%, rgba(4, 120, 87, 0.4) 100%) !important;
+            border-color: rgba(16, 185, 129, 0.2) !important;
+        }
+
+        [data-theme="dark"] .pagos-card .card-header-custom {
+            border-bottom-color: rgba(16, 185, 129, 0.2) !important;
+        }
+
+        /* --- Items de citas --- */
+        [data-theme="dark"] .cita-item {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border-color: rgba(255, 255, 255, 0.07) !important;
+        }
+
+        [data-theme="dark"] .cita-item:hover {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: rgba(99, 102, 241, 0.3) !important;
+        }
+
+        [data-theme="dark"] .cita-icon {
+            background: rgba(99, 102, 241, 0.12) !important;
+            color: #a5b4fc !important;
+        }
+
+        [data-theme="dark"] .cita-details h6 {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .cita-details small {
+            color: #94a3b8 !important;
+        }
+
+        /* --- Botón ver / receta --- */
+        [data-theme="dark"] .btn-ver {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .btn-ver:hover {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+
+        [data-theme="dark"] .btn-receta {
+            background: rgba(127, 29, 29, 0.25) !important;
+            color: #fca5a5 !important;
+            border-color: rgba(239, 68, 68, 0.3) !important;
+        }
+
+        /* --- Badges estado --- */
+        [data-theme="dark"] .badge-pendiente {
+            background: rgba(92, 60, 0, 0.5) !important;
+            color: #fcd34d !important;
+            border-color: rgba(252, 211, 77, 0.3) !important;
+        }
+
+        [data-theme="dark"] .badge-confirmada {
+            background: rgba(6, 78, 59, 0.5) !important;
+            color: #6ee7b7 !important;
+            border-color: rgba(110, 231, 183, 0.3) !important;
+        }
+
+        [data-theme="dark"] .badge-completada {
+            background: rgba(30, 64, 175, 0.35) !important;
+            color: #93c5fd !important;
+            border-color: rgba(147, 197, 253, 0.3) !important;
+        }
+
+        /* --- Estado vacío --- */
+        [data-theme="dark"] .empty-state {
+            background: rgba(15, 23, 42, 0.5) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        [data-theme="dark"] .empty-state i {
+            background: rgba(30, 41, 59, 0.8) !important;
+            color: #475569 !important;
+        }
+
+        [data-theme="dark"] .empty-state h5 {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .empty-state p {
+            color: #64748b !important;
+        }
+
+        /* --- Mascotas --- */
+        [data-theme="dark"] .mascota-item {
+            border-color: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        [data-theme="dark"] .mascota-item:hover {
+            background: rgba(30, 41, 59, 0.8) !important;
+        }
+
+        [data-theme="dark"] .mascota-name {
+            color: #e2e8f0 !important;
+        }
+
+        [data-theme="dark"] .mascota-icon {
+            background: rgba(219, 39, 119, 0.12) !important;
+            color: #f9a8d4 !important;
+        }
+
+        [data-theme="dark"] .btn-mascota {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #94a3b8 !important;
+        }
+
+        [data-theme="dark"] .btn-add-mascota {
+            background: rgba(6, 78, 59, 0.25) !important;
+            color: #6ee7b7 !important;
+            border-color: rgba(16, 185, 129, 0.25) !important;
+        }
+
+        [data-theme="dark"] .btn-add-mascota:hover {
+            background: rgba(6, 78, 59, 0.4) !important;
+            border-color: rgba(16, 185, 129, 0.5) !important;
+            color: #a7f3d0 !important;
+        }
+
+        /* --- Stat cards (fila de estadísticas) --- */
+        [data-theme="dark"] .stat-card {
+            background: rgba(30, 41, 59, 0.75) !important;
+            border-color: rgba(255, 255, 255, 0.07) !important;
+        }
+
+        [data-theme="dark"] .stat-value {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] .stat-label {
+            color: #64748b !important;
+        }
+
+        [data-theme="dark"] .stat-icon.blue {
+            background: rgba(37, 99, 235, 0.15) !important;
+            color: #93c5fd !important;
+        }
+
+        [data-theme="dark"] .stat-icon.green {
+            background: rgba(5, 150, 105, 0.15) !important;
+            color: #6ee7b7 !important;
+        }
+
+        [data-theme="dark"] .stat-icon.purple {
+            background: rgba(124, 58, 237, 0.15) !important;
+            color: #c4b5fd !important;
+        }
+
+        [data-theme="dark"] .stat-icon.orange {
+            background: rgba(234, 88, 12, 0.15) !important;
+            color: #fdba74 !important;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: -0.02em;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 30%, #faf5ff 60%, #f0fdfa 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND ANIMATED SHAPES ===== */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-shape-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shape-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -5s;
+        }
+
+        .bg-shape-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s;
+            opacity: 0.25;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.05);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.95);
+            }
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard-container {
+            padding: 2rem 0 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER SECTION ===== */
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px -3px var(--primary-glow);
+            animation: slideDown 0.6s ease-out;
+            letter-spacing: 0.02em;
+        }
+
+        .welcome-title {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+            line-height: 1.15;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .welcome-subtitle {
+            color: var(--gray-500);
+            font-size: 1.125rem;
+            font-weight: 400;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-custom {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            backdrop-filter: blur(12px);
+            animation: slideInRight 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            color: #047857;
+        }
+
+        .alert-success-custom::before {
+            background: var(--success);
+        }
+
+        .alert-success-custom i {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ===== CARDS - GLASSMORPHISM ===== */
+        .dashboard-card {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            border: none;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 0 60px -20px var(--primary-glow);
+        }
+
+        .card-header-custom {
+            background: transparent;
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title-custom {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            margin: 0;
+        }
+
+        .card-title-custom i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+            box-shadow: 0 4px 12px -2px var(--primary-glow);
+        }
+
+        .card-body-custom {
+            padding: 1.5rem 1.75rem;
+        }
+
+        /* ===== CTA CARD - PREMIUM GRADIENT ===== */
+        .cta-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 30%, #ec4899 100%);
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: 2.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-xl), 0 0 60px -20px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            animation: pulse 6s ease-in-out infinite;
+        }
+
+        .cta-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 0.3;
+            }
+        }
+
+        .cta-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-text h4 {
+            font-size: 1.625rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .cta-text p {
+            opacity: 0.85;
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        .btn-cta {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            color: var(--primary-dark);
+        }
+
+        .btn-cta i {
+            transition: transform 0.4s ease;
+        }
+
+        .btn-cta:hover i {
+            transform: rotate(90deg);
+        }
+
+        /* ===== GAME BANNER - CYBERPUNK NEON ===== */
+        .game-banner {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 70%, #701a75 100%);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-xl), 0 0 40px -10px rgba(124, 58, 237, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .game-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 25s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(40px, 40px);
+            }
+        }
+
+        .game-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .game-text h3 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .game-text h3 i {
+            color: #fbbf24;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.5));
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .game-text p {
+            opacity: 0.75;
+            margin: 0;
+            max-width: 420px;
+            font-size: 1rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .btn-game {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1e1b4b;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px -10px rgba(251, 191, 36, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-game::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-game:hover::before {
+            left: 100%;
+        }
+
+        .btn-game:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 20px 40px -10px rgba(251, 191, 36, 0.6);
+            color: #1e1b4b;
+        }
+
+        /* ===== CITAS LIST - MODERN ITEMS ===== */
+        .cita-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.875rem;
+            background: white;
+            border: 1px solid var(--gray-100);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cita-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(180deg, var(--primary) 0%, #8b5cf6 100%);
+            transition: width 0.4s ease;
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .cita-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-md);
+            transform: translateX(8px);
+        }
+
+        .cita-item:hover::before {
+            width: 4px;
+        }
+
+        .cita-info {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cita-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.5rem;
+            transition: all 0.4s ease;
+            flex-shrink: 0;
+        }
+
+        .cita-item:hover .cita-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px -4px var(--primary-glow);
+        }
+
+        .cita-details h6 {
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.375rem;
+            font-size: 1.0625rem;
+        }
+
+        .cita-details small {
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .cita-details small i {
+            color: var(--primary);
+            font-size: 0.875rem;
+        }
+
+        .cita-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-estado {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border: 2px solid transparent;
+        }
+
+        .badge-pendiente {
+            background: var(--warning-light);
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .badge-confirmada {
+            background: var(--success-light);
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+
+        .badge-completada {
+            background: var(--info-light);
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+        .btn-ver {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: var(--gray-50);
+            color: var(--gray-500);
+            border: 1.5px solid var(--gray-200);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px var(--primary-glow);
+        }
+
+        .btn-receta {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1.5px solid #fca5a5;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-receta:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border-radius: var(--radius-md);
+            border: 2px dashed var(--gray-200);
+            transition: all 0.4s ease;
+        }
+
+        .empty-state:hover {
+            border-color: var(--primary-light);
+            background: linear-gradient(135deg, var(--primary-light) 0%, white 100%);
+        }
+
+        .empty-state i {
+            width: 88px;
+            height: 88px;
+            background: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            color: var(--gray-300);
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
+        }
+
+        .empty-state:hover i {
+            color: var(--primary);
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .empty-state h5 {
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .empty-state p {
+            font-size: 0.9375rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== SIDEBAR CARDS ===== */
+        .profile-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: linear-gradient(135deg, white 0%, var(--gray-50) 100%);
+        }
+
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 50%, #ec4899 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            box-shadow: 0 15px 40px -10px rgba(99, 102, 241, 0.4);
+            position: relative;
+            border: 4px solid white;
+            overflow: hidden;
+        }
+
+        .profile-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 50%, #ec4899 100%);
+            z-index: -1;
+            opacity: 0.2;
+            animation: pulse-ring 3s ease-out infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.2;
+            }
+
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-email {
+            color: var(--gray-500);
+            font-size: 0.875rem;
+            margin-bottom: 1.75rem;
+            font-weight: 500;
+        }
+
+        .btn-profile {
+            background: white;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-profile:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ===== MASCOTAS LIST ===== */
+        .mascota-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mascota-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(180deg, #f472b6 0%, #ec4899 100%);
+            transition: width 0.4s ease;
+        }
+
+        .mascota-item:hover {
+            background: var(--gray-50);
+            padding-left: 2.25rem;
+        }
+
+        .mascota-item:hover::before {
+            width: 4px;
+        }
+
+        .mascota-item:last-child {
+            border-bottom: none;
+        }
+
+        .mascota-name {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            position: relative;
+            z-index: 1;
+        }
+
+        .mascota-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #db2777;
+            font-size: 1.25rem;
+            transition: all 0.4s ease;
+            flex-shrink: 0;
+        }
+
+        .mascota-item:hover .mascota-icon {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 8px 20px -4px rgba(219, 39, 119, 0.2);
+        }
+
+        .btn-mascota {
+            padding: 0.5rem 1.125rem;
+            font-size: 0.875rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            border: 1.5px solid var(--gray-200);
+            color: var(--gray-500);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-mascota:hover {
+            background: var(--info);
+            color: white;
+            border-color: var(--info);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-add-mascota {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+            border: 2px dashed #86efac;
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            width: 100%;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            margin-top: 0.5rem;
+        }
+
+        .btn-add-mascota:hover {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #22c55e;
+            color: #15803d;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ===== PAGOS CARD ===== */
+        .pagos-card {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #a7f3d0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pagos-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .pagos-card .card-header-custom {
+            border-bottom-color: #a7f3d0;
+        }
+
+        .btn-pagos {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            box-shadow: 0 10px 25px -10px rgba(16, 185, 129, 0.4);
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-pagos:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 35px -10px rgba(16, 185, 129, 0.5);
+            color: white;
+        }
+
+        /* ===== QUICK STATS ROW ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #2563eb;
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #059669;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            color: #7c3aed;
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+            color: #ea580c;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-800);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Staggered animations */
+        .dashboard-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .dashboard-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dashboard-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .dashboard-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .cita-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .cita-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .cita-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991px) {
+            .welcome-title {
+                font-size: 2.25rem;
+            }
+
+            .game-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+
+            .cta-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+
+            .cita-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .cita-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 1.5rem 0;
+            }
+
+            .welcome-title {
+                font-size: 1.875rem;
+            }
+
+            .game-banner {
+                padding: 1.75rem;
+            }
+
+            .game-text h3 {
+                font-size: 1.5rem;
+            }
+
+            .btn-game,
+            .btn-cta {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animated Shapes -->
+    <div class="bg-shapes">
+        <div class="bg-shape bg-shape-1"></div>
+        <div class="bg-shape bg-shape-2"></div>
+        <div class="bg-shape bg-shape-3"></div>
+    </div>
+
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <main class="dashboard-container">
+        <div class="container">
+
+            <!-- ===== HEADER SECTION ===== -->
+            <div class="dashboard-header" data-aos="fade-down">
+                <div class="welcome-badge">
+                    <i class="bi bi-sparkles"></i>
+                    Bienvenido de vuelta
+                </div>
+                <h1 class="welcome-title">
+                    ¡Hola, <span th:text="${usuario.nombre}">Usuario</span>! 👋
+                </h1>
+                <p class="welcome-subtitle">Aquí tienes un resumen de la actividad de tus mascotas. Gestiona citas,
+                    revisa historiales y mantén a tus compañeros felices.</p>
+            </div>
+
+            <!-- ===== ALERTA DE ÉXITO ===== -->
+            <div th:if="${param.perfilActualizado}" class="alert alert-custom alert-success-custom" role="alert"
+                data-aos="fade-right">
+                <i class="bi bi-check-lg"></i>
+                <div>
+                    <strong style="font-weight: 700;">¡Excelente!</strong>
+                    <span class="d-block" style="opacity: 0.85;">Tu perfil ha sido actualizado exitosamente</span>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- ===== COLUMNA PRINCIPAL ===== -->
+                <div class="col-lg-8">
+
+                    <!-- ===== QUICK STATS ROW ===== -->
+                    <div class="stats-row" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="stat-value" th:text="${citasActivas != null ? citasActivas.size() : 0}">0</div>
+                            <div class="stat-label">Citas Activas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="bi bi-heart-fill"></i>
+                            </div>
+                            <div class="stat-value" th:text="${mascotas != null ? mascotas.size() : 0}">0</div>
+                            <div class="stat-label">Mascotas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div class="stat-value">100%</div>
+                            <div class="stat-label">Salud</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange">
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <div class="stat-value">4.9</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                    </div>
+
+                    <!-- ===== BANNER DEL JUEGO ===== -->
+                    <div class="game-banner" data-aos="zoom-in" data-aos-delay="150">
+                        <div class="game-grid"></div>
+                        <div class="game-content">
+                            <div class="game-text">
+                                <h3><i class="bi bi-controller"></i>Mi Mascota Virtual</h3>
+                                <p>Aprende sobre el cuidado y la responsabilidad de una manera divertida e interactiva.
+                                    ¡Cuida de tu mascota digital y descubre tips de salud!</p>
+                            </div>
+                            <a th:href="@{/usuario/juego}" class="btn-game">
+                                Jugar ahora
+                                <i class="bi bi-arrow-right-short"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ===== CTA PRINCIPAL ===== -->
+                    <div class="cta-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="cta-text">
+                            <h4>¿Necesitas agendar una cita?</h4>
+                            <p>Programa una nueva consulta para tu mascota en segundos con nuestros veterinarios
+                                expertos</p>
+                        </div>
+                        <a th:href="@{/usuario/citas/solicitar}" class="btn-cta">
+                            <i class="bi bi-calendar-plus-fill"></i>
+                            Agendar Ahora
+                        </a>
+                    </div>
+
+                    <!-- ===== PRÓXIMAS CITAS ===== -->
+                    <div class="dashboard-card" data-aos="fade-up" data-aos-delay="250">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom">
+                                <i class="bi bi-calendar2-week"></i>
+                                Próximas Citas
+                            </h5>
+                            <a th:href="@{/usuario/mis-citas}" class="btn btn-outline-primary rounded-pill px-4"
+                                style="font-weight: 600; border-width: 2px;">
+                                Ver todas
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                        <div class="card-body-custom">
+                            <div th:if="${citasActivas != null and !citasActivas.isEmpty()}">
+                                <div th:each="cita, iterStat : ${citasActivas}" class="cita-item"
+                                    th:attr="data-aos='fade-up', data-aos-delay=${iterStat.index * 100}">
+                                    <div class="cita-info">
+                                        <div class="cita-icon">
+                                            <i class="bi bi-clock-history"></i>
+                                        </div>
+                                        <div class="cita-details">
+                                            <h6 th:text="${cita.nombreMascota} + ' en ' + ${cita.nombreClinica}">Mascota
+                                                en Clínica</h6>
+                                            <small>
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span th:text="${cita.fechaHora}">Fecha y hora</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="cita-actions">
+                                        <span class="badge-estado"
+                                            th:classappend="${cita.estado == 'Pendiente' ? 'badge-pendiente' : 
+                                                       (cita.estado == 'Confirmada' ? 'badge-confirmada' : 'badge-completada')}"
+                                            th:text="${cita.estado}">Estado</span>
+
+                                        <!-- BOTÓN DE RECETA: Solo aparece si el doctor ya lo atendió -->
+                                        <a th:if="${cita.estado == 'Completada'}"
+                                            th:href="@{/usuario/citas/{id}/receta(id=${cita.id})}" class="btn-receta"
+                                            target="_blank">
+                                            <i class="bi bi-file-earmark-pdf"></i> Receta
+                                        </a>
+
+                                        <a th:href="@{/usuario/citas/{id}(id=${cita.id})}" class="btn-ver">
+                                            <i class="bi bi-eye-fill"></i> Ver detalles
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:if="${citasActivas == null or citasActivas.isEmpty()}" class="empty-state">
+                                <i class="bi bi-calendar3"></i>
+                                <h5>No tienes citas próximas</h5>
+                                <p>Programa tu primera cita y mantén a tu mascota saludable con nuestros expertos</p>
+                                <a th:href="@{/usuario/citas/solicitar}" class="btn btn-primary rounded-pill px-4 mt-3"
+                                    style="font-weight: 600; padding: 0.75rem 2rem;">
+                                    <i class="bi bi-plus-lg me-2"></i>Agendar cita
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== ACTIVIDAD RECIENTE ===== -->
+                    <div class="dashboard-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom">
+                                <i class="bi bi-activity"
+                                    style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);"></i>
+                                Actividad Reciente
+                            </h5>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="d-flex align-items-center gap-3 mb-3 pb-3"
+                                style="border-bottom: 1px solid var(--gray-100);">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #2563eb; flex-shrink: 0;">
+                                    <i class="bi bi-calendar-check-fill"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--gray-800); font-size: 0.9375rem;">Cita
+                                        programada exitosamente</div>
+                                    <div style="font-size: 0.8125rem; color: var(--gray-500);">Hace 2 horas</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 mb-3 pb-3"
+                                style="border-bottom: 1px solid var(--gray-100);">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #059669; flex-shrink: 0;">
+                                    <i class="bi bi-heart-pulse-fill"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--gray-800); font-size: 0.9375rem;">
+                                        Revisión de salud completada</div>
+                                    <div style="font-size: 0.8125rem; color: var(--gray-500);">Hace 1 día</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #d97706; flex-shrink: 0;">
+                                    <i class="bi bi-trophy-fill"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: var(--gray-800); font-size: 0.9375rem;">Nivel 3
+                                        alcanzado en Mi Mascota Virtual</div>
+                                    <div style="font-size: 0.8125rem; color: var(--gray-500);">Hace 2 días</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ===== COLUMNA LATERAL ===== -->
+                <div class="col-lg-4">
+
+                    <!-- ===== PERFIL ===== -->
+                    <div class="dashboard-card profile-card" data-aos="fade-left" data-aos-delay="100">
+                        <div class="profile-avatar">
+                            <span th:if="${usuario.fotoUrl == null or usuario.fotoUrl.isEmpty()}"
+                                th:text="${usuario.nombre != null and usuario.apellido != null ? usuario.nombre.substring(0,1) + usuario.apellido.substring(0,1) : 'US'}">US</span>
+                            <img th:if="${usuario.fotoUrl != null and !usuario.fotoUrl.isEmpty()}"
+                                th:src="${usuario.fotoUrl}" alt="Foto de Perfil"
+                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <div class="profile-name" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Apellido
+                        </div>
+                        <div class="profile-email" th:text="${usuario.email}">email@ejemplo.com</div>
+                        <a th:href="@{/usuario/perfil}" class="btn btn-profile">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar Perfil
+                        </a>
+                    </div>
+
+                    <!-- ===== MASCOTAS ===== -->
+                    <div class="dashboard-card" data-aos="fade-left" data-aos-delay="200">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom">
+                                <i class="bi bi-heart-pulse-fill"
+                                    style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);"></i>
+                                Mis Mascotas
+                            </h5>
+                        </div>
+                        <div>
+                            <div th:if="${mascotas != null and !mascotas.isEmpty()}">
+                                <div th:each="mascota : ${mascotas}" class="mascota-item">
+                                    <div class="mascota-name">
+                                        <div class="mascota-icon">
+                                            <i class="bi bi-heart-fill"></i>
+                                        </div>
+                                        <span th:text="${mascota.nombre}">Nombre Mascota</span>
+                                    </div>
+                                    <a th:href="@{/usuario/historial/{id}(id=${mascota.id})}" class="btn-mascota">
+                                        Historial
+                                    </a>
+                                </div>
+                            </div>
+                            <div th:if="${mascotas == null or mascotas.isEmpty()}" class="p-4 text-center">
+                                <i class="bi bi-heart mb-3 d-block"
+                                    style="font-size: 2.5rem; color: var(--gray-300);"></i>
+                                <small style="color: var(--gray-500); font-weight: 500;">No tienes mascotas
+                                    registradas</small>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <a th:href="@{/usuario/mascotas/nueva}" class="btn-add-mascota">
+                                <i class="bi bi-plus-circle-fill"></i>
+                                Añadir Mascota
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ===== PAGOS ===== -->
+                    <div class="dashboard-card pagos-card" data-aos="fade-left" data-aos-delay="300">
+                        <div class="card-header-custom" style="background: transparent;">
+                            <h5 class="card-title-custom">
+                                <i class="bi bi-wallet2"
+                                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></i>
+                                Mis Pagos
+                            </h5>
+                        </div>
+                        <div class="card-body-custom" style="position: relative; z-index: 1;">
+                            <p style="color: #065f46; font-weight: 500; margin-bottom: 1.25rem; line-height: 1.6;">
+                                Consulta tus transacciones y descarga tus recibos de forma segura</p>
+                            <a th:href="@{/usuario/pagos}" class="btn-pagos">
+                                <i class="bi bi-receipt-cutoff"></i>
+                                Ver mis pagos
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ===== TIPS DE SALUD ===== -->
+                    <div class="dashboard-card" data-aos="fade-left" data-aos-delay="400">
+                        <div class="card-header-custom">
+                            <h5 class="card-title-custom">
+                                <i class="bi bi-lightbulb-fill"
+                                    style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);"></i>
+                                Tip del Día
+                            </h5>
+                        </div>
+                        <div class="card-body-custom">
+                            <div
+                                style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 1.25rem; border: 1px solid #fcd34d;">
+                                <div style="display: flex; align-items: flex-start; gap: 0.875rem;">
+                                    <i class="bi bi-shield-plus"
+                                        style="font-size: 1.5rem; color: #d97706; flex-shrink: 0;"></i>
+                                    <div>
+                                        <div
+                                            style="font-weight: 700; color: #92400e; font-size: 0.9375rem; margin-bottom: 0.375rem;">
+                                            Vacunación al día</div>
+                                        <div style="font-size: 0.875rem; color: #b45309; line-height: 1.6;">Mantén el
+                                            calendario de vacunación de tu mascota actualizado. Las vacunas previenen
+                                            enfermedades graves.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer-usuario}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script th:src="@{/js/scripts.js}"></script>
+
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
+    </script>
+
+    <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
+</body>
+
+</html>

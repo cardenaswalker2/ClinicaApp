@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Clínico | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.1);
+            --shadow-xl: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --shadow-primary: 0 8px 24px rgba(79, 70, 229, 0.18);
+            --shadow-info: 0 8px 24px rgba(14, 165, 233, 0.18);
+            --shadow-danger: 0 8px 24px rgba(239, 68, 68, 0.18);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--gray-50);
+            min-height: 100vh;
+            color: var(--gray-700);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar .container {
+            padding-top: 0.875rem;
+            padding-bottom: 0.875rem;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #38bdf8, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .pet-name {
+            background: linear-gradient(135deg, #38bdf8, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .btn-back {
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ===== PATIENT PROFILE ===== */
+        .profile-section {
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.1s;
+        }
+
+        .patient-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            position: sticky;
+            top: 80px;
+        }
+
+        .patient-header {
+            background: linear-gradient(135deg, var(--gray-800), #1e1b4b);
+            color: white;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .patient-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+        }
+
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .patient-name {
+            font-weight: 800;
+            font-size: 1.25rem;
+            margin: 0 0 0.25rem 0;
+            letter-spacing: -0.02em;
+        }
+
+        .patient-meta {
+            opacity: 0.7;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .patient-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .patient-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .patient-stat .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 700;
+        }
+
+        .patient-stat .value {
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        /* Profile Details */
+        .profile-details {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 0.9rem;
+        }
+
+        .detail-id {
+            font-family: 'Courier New', monospace;
+            background: var(--gray-100);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-section {
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.2s;
+        }
+
+        .timeline-header {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.01em;
+        }
+
+        .timeline-header i {
+            background: linear-gradient(135deg, var(--info), var(--success));
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Visit Card */
+        .visit-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            position: relative;
+        }
+
+        .visit-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .visit-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .visit-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .visit-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .visit-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--info), var(--success));
+            opacity: 0.8;
+        }
+
+        .visit-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .visit-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* Visit Header */
+        .visit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            flex-wrap: wrap;
+        }
+
+        .visit-date {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--info);
+        }
+
+        .visit-date i {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: #0369a1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .visit-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-custom {
+            padding: 0.375rem 0.875rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: none;
+        }
+
+        .badge-conciencia {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+        }
+
+        .badge-condicion {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--success);
+        }
+
+        /* Vitals */
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-100);
+        }
+
+        .vital-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-align: center;
+        }
+
+        .vital-icon {
+            font-size: 1.1rem;
+        }
+
+        .vital-icon.peso {
+            color: var(--primary);
+        }
+
+        .vital-icon.temp {
+            color: var(--danger);
+        }
+
+        .vital-icon.cardiaca {
+            color: var(--success);
+        }
+
+        .vital-icon.respiratoria {
+            color: var(--info);
+        }
+
+        .vital-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .vital-value {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+        }
+
+        /* Visit Content */
+        .visit-section {
+            margin-bottom: 1rem;
+        }
+
+        .visit-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.375rem;
+        }
+
+        .section-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .section-text.diagnostico {
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        /* Receta */
+        .receta-box {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border: 1.5px solid rgba(239, 68, 68, 0.12);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .receta-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .receta-text {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #991b1b;
+            font-style: italic;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Follow Up */
+        .follow-up {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1.5px solid rgba(59, 130, 246, 0.12);
+            border-radius: var(--radius-md);
+            padding: 0.875rem 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .follow-up i {
+            color: #3b82f6;
+            font-size: 1.1rem;
+        }
+
+        .follow-up span {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1e40af;
+        }
+
+        /* Visit Footer */
+        .visit-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-100);
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .visit-attribution {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .btn-receta {
+            background: white;
+            color: var(--danger);
+            border: 1.5px solid rgba(239, 68, 68, 0.2);
+            border-radius: var(--radius-md);
+            padding: 0.625rem 1.25rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-receta:hover {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-danger);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray-300);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state p {
+            color: var(--gray-500);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .patient-card {
+                position: relative;
+                top: 0;
+                margin-bottom: 1.5rem;
+            }
+
+            .vitals-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .visit-header {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .patient-header {
+                padding: 1.25rem;
+            }
+
+            .patient-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+            }
+
+            .patient-name {
+                font-size: 1.1rem;
+            }
+
+            .visit-body {
+                padding: 1rem;
+            }
+
+            .vitals-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+                padding: 0.75rem;
+            }
+
+            .visit-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn-receta {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="bi bi-folder2-open"></i>
+                Expediente Médico: <span class="pet-name" th:text="${mascota.nombre}">Nombre</span>
+            </span>
+            <button onclick="window.history.back()" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                <span class="d-none d-sm-inline">Volver</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Perfil del Paciente (Sidebar) -->
+            <div class="col-lg-4 profile-section">
+                <div class="patient-card">
+                    <!-- Header del Perfil -->
+                    <div class="patient-header">
+                        <div class="patient-avatar">
+                            <i
+                                th:class="${mascota.especie.name() == 'PERRO' ? 'bi bi-dog' : (mascota.especie.name() == 'GATO' ? 'bi bi-cat' : 'bi bi-heart-pulse')}"></i>
+                        </div>
+                        <h2 class="patient-name" th:text="${mascota.nombre}">Nombre</h2>
+                        <p class="patient-meta" th:text="${mascota.especie + ' • ' + mascota.raza}">Especie • Raza</p>
+
+                        <div class="patient-stats">
+                            <div class="patient-stat">
+                                <span class="label">Edad</span>
+                                <span class="value">
+                                    <span th:text="${mascota.getEdad()}">0</span> años
+                                </span>
+                            </div>
+                            <div class="patient-stat">
+                                <span class="label">Sexo</span>
+                                <span class="value">
+                                    <i
+                                        th:class="${mascota.sexo == 'Macho' ? 'bi bi-gender-male text-info' : 'bi bi-gender-female text-danger'}"></i>
+                                    <span th:text="${mascota.sexo}">--</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles -->
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Propietario ID</span>
+                            <span class="detail-value" th:text="${mascota.propietarioId}">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Nacimiento</span>
+                            <span class="detail-value" th:text="${mascota.fechaNacimiento}">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">ID Sistema</span>
+                            <span class="detail-id" th:text="${mascota.id}">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline de Visitas -->
+            <div class="col-lg-8 timeline-section">
+                <div class="timeline-header">
+                    <i class="bi bi-calendar-check"></i>
+                    Cronología de Atenciones
+                </div>
+
+                <!-- Visitas -->
+                <div th:each="v : ${historial}" class="visit-card">
+                    <div class="visit-body">
+                        <!-- Header de Visita -->
+                        <div class="visit-header">
+                            <div class="visit-date">
+                                <i class="bi bi-calendar3"></i>
+                                <span th:text="${#temporals.format(v.fechaVisita, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                            </div>
+                            <div class="visit-badges">
+                                <span th:if="${v.estadoConciencia != null}" class="badge-custom badge-conciencia"
+                                    th:text="${v.estadoConciencia}">Conciencia</span>
+                                <span th:if="${v.condicionCorporal != null}" class="badge-custom badge-condicion"
+                                    th:text="${v.condicionCorporal}">Condición</span>
+                            </div>
+                        </div>
+
+                        <!-- Signos Vitales -->
+                        <div class="vitals-grid" th:if="${v.peso != null or v.temperatura != null}">
+                            <div class="vital-item">
+                                <i class="bi bi-speedometer2 vital-icon peso"></i>
+                                <span class="vital-label">Peso</span>
+                                <span class="vital-value">
+                                    <span th:text="${v.peso != null ? v.peso : '--'}">--</span> kg
+                                </span>
+                            </div>
+                            <div class="vital-item">
+                                <i class="bi bi-thermometer-half vital-icon temp"></i>
+                                <span class="vital-label">Temp</span>
+                                <span class="vital-value">
+                                    <span th:text="${v.temperatura != null ? v.temperatura : '--'}">--</span> °C
+                                </span>
+                            </div>
+                            <div class="vital-item">
+                                <i class="bi bi-heart-pulse vital-icon cardiaca"></i>
+                                <span class="vital-label">Cardiaca</span>
+                                <span class="vital-value">
+                                    <span
+                                        th:text="${v.frecuenciaCardiaca != null ? v.frecuenciaCardiaca : '--'}">--</span>
+                                    bpm
+                                </span>
+                            </div>
+                            <div class="vital-item">
+                                <i class="bi bi-wind vital-icon respiratoria"></i>
+                                <span class="vital-label">Resp</span>
+                                <span class="vital-value">
+                                    <span
+                                        th:text="${v.frecuenciaRespiratoria != null ? v.frecuenciaRespiratoria : '--'}">--</span>
+                                    rpm
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Diagnóstico -->
+                        <div class="visit-section">
+                            <div class="section-label">Diagnóstico Clínico</div>
+                            <p class="section-text diagnostico" th:text="${v.diagnostico}">--</p>
+                        </div>
+
+                        <!-- Tratamiento -->
+                        <div class="visit-section">
+                            <div class="section-label">Tratamiento y Hallazgos</div>
+                            <p class="section-text" th:text="${v.tratamiento}">--</p>
+                        </div>
+
+                        <!-- Receta -->
+                        <div th:if="${v.medicamentosRecetados != null && !v.medicamentosRecetados.isEmpty()}"
+                            class="receta-box">
+                            <div class="receta-label">
+                                <i class="bi bi-capsule-pill"></i>
+                                Receta Médica
+                            </div>
+                            <p class="receta-text" th:text="${v.medicamentosRecetados}">--</p>
+                        </div>
+
+                        <!-- Próxima Cita -->
+                        <div class="follow-up" th:if="${v.fechaProximaCita != null}">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>
+                                Próxima Revisión:
+                                <span th:text="${#temporals.format(v.fechaProximaCita, 'dd/MM/yyyy HH:mm')}">--</span>
+                            </span>
+                        </div>
+
+                        <!-- Footer de Visita -->
+                        <div class="visit-footer">
+                            <div class="visit-attribution">
+                                <i class="bi bi-person-badge"></i>
+                                Atendido por Clínica
+                            </div>
+                            <a th:href="@{'/clinica/descargar-receta/' + ${v.id}}" class="btn-receta" target="_blank">
+                                <i class="bi bi-file-pdf"></i>
+                                Ver Receta
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(historial)}" class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Esta mascota no tiene registros médicos previos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

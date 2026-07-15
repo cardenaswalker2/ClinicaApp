@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Crea tu cuenta en Clínica App. Agenda citas veterinarias, accede al historial médico de tu mascota y recibe recordatorios de vacunas.">
+    <title>Crear Cuenta | Clínica App - Cartagena</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <div th:replace="~{fragments/asistente_registro_guido :: guido-registro}"></div>
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #38bdf8;
+            --success-color: #10b981;
+            --google-red: #ea4335;
+            --github-black: #24292e;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-input: #f9fafb;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0a0e1a;
+            --bg-card: #111827;
+            --bg-input: #1f2937;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="dark"] .form-title,
+        [data-theme="dark"] .form-label,
+        [data-theme="dark"] .login-text,
+        [data-theme="dark"] .form-subtitle,
+        [data-theme="dark"] .social-text,
+        [data-theme="dark"] .divider-custom,
+        [data-theme="dark"] .input-icon,
+        [data-theme="dark"] .password-hint {
+            color: var(--text-main) !important;
+        }
+
+        [data-theme="dark"] .form-header,
+        [data-theme="dark"] .form-footer {
+            background: transparent !important;
+            border-color: var(--border-color) !important;
+        }
+
+        [data-theme="dark"] .divider-custom::before,
+        [data-theme="dark"] .divider-custom::after {
+            background: linear-gradient(to right, transparent, var(--border-color), transparent);
+        }
+
+        [data-theme="dark"] .alert-danger-custom {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border-left-color: #ef4444;
+        }
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Botón de cambio de tema flotante - MEJORADO */
+        .theme-toggle-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 1050;
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            color: var(--text-main);
+            font-size: 1.4rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        [data-theme="dark"] .theme-toggle-btn {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.15) rotate(15deg);
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 12px 40px rgba(14, 165, 233, 0.4);
+        }
+
+        /* Layout Principal */
+        .register-wrapper {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Panel Izquierdo - Hero MEJORADO */
+        .register-hero {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.88), rgba(16, 185, 129, 0.92)),
+                url('https://images.unsplash.com/photo-1576201836106-db1758fd1c97?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            color: white;
+            overflow: hidden;
+        }
+
+        .register-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            opacity: 0.6;
+            z-index: 1;
+        }
+
+        /* Efecto de luz flotante */
+        .register-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            animation: floatLight 8s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes floatLight {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(10%, 10%);
+            }
+        }
+
+        .register-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .benefits-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 0.625rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+
+            0%,
+            100% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 8px 32px rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        .benefits-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .benefits-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.92;
+            line-height: 1.7;
+            font-weight: 300;
+            max-width: 480px;
+            margin-bottom: 2.5rem;
+        }
+
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInLeft 0.5s ease forwards;
+        }
+
+        .benefit-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .benefit-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .benefit-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .benefit-item:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .benefit-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-item:hover .benefit-icon {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .benefit-text {
+            font-weight: 500;
+        }
+
+        .benefits-footer {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 1.25rem 1.5rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .stat-number {
+            font-size: 1.75rem;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 0.25rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        /* Panel Derecho - Formulario MEJORADO */
+        .register-form-panel {
+            flex: 1.2;
+            background: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        #form-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        [data-theme="dark"] .register-form-panel {
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1b3d 100%);
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 25px 60px var(--shadow-color), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="dark"] .register-card {
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .brand-link:hover {
+            transform: scale(1.05);
+            color: var(--primary-dark);
+        }
+
+        .brand-icon-premium {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35);
+            transition: var(--transition);
+        }
+
+        .brand-link:hover .brand-icon-premium {
+            transform: rotate(-5deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(14, 165, 233, 0.5);
+        }
+
+        .form-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .form-subtitle {
+            color: #6b7280;
+            margin-top: 0.5rem;
+            font-size: 1.05rem;
+            font-weight: 400;
+        }
+
+        .form-body {
+            padding: 0;
+        }
+
+        /* Alertas MEJORADAS */
+        .alert-custom {
+            border: none;
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            animation: alertSlide 0.4s ease-out;
+        }
+
+        @keyframes alertSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-danger-custom {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Social Login MEJORADO */
+        .social-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .social-text {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .social-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+        }
+
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.9375rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-social::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-social:hover::before {
+            left: 100%;
+        }
+
+        .btn-social:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.25);
+            color: white;
+        }
+
+        .btn-social:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-google {
+            background: var(--google-red);
+        }
+
+        .btn-google:hover {
+            background: #d33b28;
+        }
+
+        /* Divider MEJORADO */
+        .divider-custom {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.75rem 0;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .divider-custom::before,
+        .divider-custom::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+        }
+
+        /* Formulario MEJORADO */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .required::after {
+            content: '*';
+            color: #ef4444;
+            margin-left: 0.25rem;
+        }
+
+        .input-group-custom {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.125rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1.1rem;
+            z-index: 10;
+            transition: color 0.3s ease;
+        }
+
+        .input-group-custom:focus-within .input-icon {
+            color: var(--primary-color);
+        }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 1.0625rem 1rem 1.0625rem 3.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-input);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .form-control-custom::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+        }
+
+        [data-theme="dark"] .form-control-custom:focus {
+            background: #1e293b;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+        }
+
+        .form-control-custom.is-invalid {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        [data-theme="dark"] .form-control-custom.is-invalid {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .invalid-feedback {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            color: #ef4444;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        .password-strength-bar.weak {
+            width: 33%;
+            background: #ef4444;
+        }
+
+        .password-strength-bar.medium {
+            width: 66%;
+            background: #f59e0b;
+        }
+
+        .password-strength-bar.strong {
+            width: 100%;
+            background: #10b981;
+        }
+
+        .password-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Botón Submit MEJORADO */
+        .btn-submit {
+            width: 100%;
+            padding: 1.0625rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.35);
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(14, 165, 233, 0.45);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-submit.loading {
+            color: transparent;
+        }
+
+        .btn-submit.loading::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border: 2.5px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer MEJORADO */
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            background: transparent !important;
+        }
+
+        .login-text {
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .login-link {
+            color: var(--primary-color);
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .login-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .login-link:hover::after {
+            width: 100%;
+        }
+
+        .login-link:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Checkbox personalizado */
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 6px;
+            border: 2px solid #d1d5db;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            transition: all 0.2s ease;
+            margin-top: 0.15rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .form-check-input:checked::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #4b5563;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Responsive MEJORADO */
+        @media (max-width: 991px) {
+            .register-wrapper {
+                padding: 1rem 0;
+            }
+
+            .register-hero {
+                display: none;
+            }
+
+            .register-form-panel {
+                padding: 1.5rem;
+            }
+
+            .register-card {
+                max-width: 100%;
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-title {
+                font-size: 1.75rem;
+            }
+
+            .register-card {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .social-buttons {
+                gap: 0.75rem;
+            }
+        }
+
+        /* NUEVO: Efecto de brillo en inputs */
+        .input-group-custom::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .input-group-custom:focus-within::after {
+            width: 100%;
+        }
+
+        /* NUEVO: Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        /* Animación de Transición Circular */
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none;
+            mix-blend-mode: normal;
+        }
+
+        ::view-transition-old(root) {
+            z-index: 1;
+        }
+
+        ::view-transition-new(root) {
+            z-index: 2147483647;
+        }
+
+        .theme-transition-active::view-transition-new(root) {
+            animation: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Botón Toggle Tema -->
+    <button class="theme-toggle-btn" id="themeToggle" title="Cambiar tema">
+        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+    </button>
+
+    <main class="register-wrapper">
+        <!-- Panel Izquierdo - Hero -->
+        <div class="register-hero">
+            <div class="register-hero-content">
+                <span class="benefits-badge">
+                    <i class="bi bi-stars"></i>
+                    Completamente Gratis
+                </span>
+
+                <h2 class="benefits-title">Tu centro de salud para mascotas</h2>
+                <p class="benefits-subtitle">
+                    Únete a miles de dueños de mascotas que ya confían en nosotros para el cuidado de sus compañeros.
+                </p>
+
+                <ul class="benefits-list">
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-calendar2-check"></i>
+                        </div>
+                        <span class="benefit-text">Agenda citas 24/7 desde cualquier dispositivo</span>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-file-medical"></i>
+                        </div>
+                        <span class="benefit-text">Historial clínico digital siempre disponible</span>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-bell"></i>
+                        </div>
+                        <span class="benefit-text">Recordatorios automáticos de vacunas</span>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <span class="benefit-text">Pagos seguros y protegidos</span>
+                    </li>
+                </ul>
+
+                <div class="benefits-footer">
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="stat-number">15k+</span>
+                            <span class="stat-label">Usuarios</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">50+</span>
+                            <span class="stat-label">Clínicas</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">4.9</span>
+                            <span class="stat-label">Rating</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho - Formulario -->
+        <div class="register-form-panel">
+            <canvas id="form-particles"></canvas>
+            <div class="register-card">
+                <!-- Header -->
+                <div class="form-header">
+                    <a th:href="@{/}" class="brand-link">
+                        <div class="brand-icon-premium">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                        <span class="brand-text-premium"
+                            style="font-size: 1.75rem; font-weight: 800; color: var(--primary-color);">ClínicaApp</span>
+                    </a>
+                    <h2 class="form-title">Crea tu cuenta gratuita</h2>
+                    <p class="form-subtitle">Comienza a cuidar mejor a tu mascota hoy</p>
+                </div>
+
+                <!-- Body -->
+                <div class="form-body">
+                    <!-- Alerta de Error -->
+                    <div th:if="${error}" class="alert alert-custom alert-danger-custom" role="alert">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <!-- Social Login -->
+                    <div class="social-section">
+                        <p class="social-text">La forma más rápida de empezar</p>
+                        <div class="social-buttons">
+                            <a th:href="@{/oauth2/authorization/google}" class="btn-social btn-google">
+                                <i class="bi bi-google"></i>
+                                Continuar con Google
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="divider-custom">o completa el formulario</div>
+
+                    <!-- Formulario -->
+                    <form id="registroForm" th:action="@{/registro}" method="post" th:object="${usuarioDto}" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label for="nombre" class="form-label required">Nombre</label>
+                                <div class="input-group-custom">
+                                    <i class="bi bi-person input-icon"></i>
+                                    <input type="text" id="nombre" class="form-control-custom" th:field="*{nombre}"
+                                        placeholder="Tu nombre" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="apellido" class="form-label required">Apellido</label>
+                                <div class="input-group-custom">
+                                    <i class="bi bi-person input-icon"></i>
+                                    <input type="text" id="apellido" class="form-control-custom" th:field="*{apellido}"
+                                        placeholder="Tu apellido" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label required">Correo Electrónico</label>
+                            <div class="input-group-custom">
+                                <i class="bi bi-envelope input-icon"></i>
+                                <input type="email" id="email" class="form-control-custom" th:field="*{email}"
+                                    placeholder="tu@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono" class="form-label required">Teléfono</label>
+                            <div class="input-group-custom">
+                                <i class="bi bi-telephone input-icon"></i>
+                                <input type="tel" id="telefono" class="form-control-custom" th:field="*{telefono}"
+                                    placeholder="+57 300 123 4567" required>
+                            </div>
+                            <div class="password-hint">Incluye el código de país (ej: +57 para Colombia)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label required">Contraseña</label>
+                            <div class="input-group-custom">
+                                <i class="bi bi-lock input-icon"></i>
+                                <input type="password" id="password" class="form-control-custom" th:field="*{password}"
+                                    placeholder="Mínimo 8 caracteres" required minlength="8">
+                            </div>
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="password-strength-bar" id="strengthBar"></div>
+                            </div>
+                            <div class="password-hint">Usa letras, números y símbolos para mayor seguridad</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label required">Confirmar Contraseña</label>
+                            <div class="input-group-custom">
+                                <i class="bi bi-lock-fill input-icon"></i>
+                                <input type="password" id="confirmPassword" class="form-control-custom"
+                                    placeholder="Repite tu contraseña" required>
+                            </div>
+                            <div class="invalid-feedback" id="confirmFeedback" style="display: none;">
+                                <i class="bi bi-exclamation-circle"></i>
+                                Las contraseñas no coinciden
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    Acepto los <a href="#" class="login-link">términos y condiciones</a> y la <a
+                                        href="#" class="login-link">política de privacidad</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <span>Crear Cuenta Gratis</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="form-footer">
+                    <p class="login-text">
+                        ¿Ya tienes una cuenta?
+                        <a th:href="@{/login}" class="login-link">Inicia sesión aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('registroForm');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const confirmFeedback = document.getElementById('confirmFeedback');
+            const submitBtn = document.getElementById('submitBtn');
+            const strengthBar = document.getElementById('strengthBar');
+            const passwordStrength = document.getElementById('passwordStrength');
+
+            // Validación de fortaleza de contraseña
+            password.addEventListener('input', function () {
+                const val = this.value;
+                passwordStrength.classList.add('show');
+
+                let strength = 0;
+                if (val.length >= 8) strength++;
+                if (val.match(/[a-z]/) && val.match(/[A-Z]/)) strength++;
+                if (val.match(/[0-9]/)) strength++;
+                if (val.match(/[^a-zA-Z0-9]/)) strength++;
+
+                strengthBar.className = 'password-strength-bar';
+                if (strength <= 1) {
+                    strengthBar.classList.add('weak');
+                } else if (strength === 2 || strength === 3) {
+                    strengthBar.classList.add('medium');
+                } else {
+                    strengthBar.classList.add('strong');
+                }
+
+                if (val.length === 0) {
+                    passwordStrength.classList.remove('show');
+                }
+            });
+
+            // Validación de coincidencia de contraseñas
+            function validatePasswords() {
+                if (confirmPassword.value !== password.value) {
+                    confirmPassword.classList.add('is-invalid');
+                    confirmFeedback.style.display = 'flex';
+                    return false;
+                } else {
+                    confirmPassword.classList.remove('is-invalid');
+                    confirmFeedback.style.display = 'none';
+                    return true;
+                }
+            }
+
+            confirmPassword.addEventListener('input', validatePasswords);
+            password.addEventListener('input', function () {
+                if (confirmPassword.value) validatePasswords();
+            });
+
+            // Validación del formulario
+            form.addEventListener('submit', function (event) {
+                let isValid = true;
+                if (password.value.length < 8) {
+                    password.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    password.classList.remove('is-invalid');
+                }
+                if (!validatePasswords()) {
+                    isValid = false;
+                }
+                const terms = document.getElementById('terms');
+                if (!terms.checked) {
+                    terms.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    terms.classList.remove('is-invalid');
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const firstInvalid = form.querySelector('.is-invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstInvalid.focus();
+                    }
+                } else {
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+                }
+            });
+
+            // Formateo automático de teléfono
+            const telefono = document.getElementById('telefono');
+            telefono.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 0 && value[0] !== '+') {
+                    value = '+' + value;
+                }
+                e.target.value = value;
+            });
+
+            // --- Sistema de Partículas Premium (Lado del Formulario) ---
+            const formCanvas = document.getElementById('form-particles');
+            if (formCanvas) {
+                const fCtx = formCanvas.getContext('2d');
+                let fParticles = [];
+                let fAnimationFrame;
+                let mouse = { x: null, y: null, radius: 150 };
+
+                window.addEventListener('mousemove', (e) => {
+                    const rect = formCanvas.getBoundingClientRect();
+                    mouse.x = e.clientX - rect.left;
+                    mouse.y = e.clientY - rect.top;
+                });
+
+                class Particle {
+                    constructor() { this.init(); }
+                    init() {
+                        this.x = Math.random() * formCanvas.width;
+                        this.y = Math.random() * formCanvas.height;
+                        this.size = Math.random() * 4 + 1;
+                        this.speedX = (Math.random() - 0.5) * 0.4;
+                        this.speedY = (Math.random() - 0.5) * 0.4;
+                        this.opacity = Math.random() * 0.5 + 0.1;
+                        this.rotation = Math.random() * Math.PI * 2;
+                        this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+                        this.type = Math.random() > 0.7 ? 'triangle' : 'fragment';
+                        this.pulse = Math.random() * Math.PI * 2;
+                    }
+                    draw() {
+                        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                        const color = isDark ? `rgba(255, 255, 255, ${this.opacity})` : `rgba(14, 165, 233, ${this.opacity})`;
+                        fCtx.save();
+                        fCtx.translate(this.x, this.y);
+                        fCtx.rotate(this.rotation);
+                        this.pulse += 0.02;
+                        const sizeMultiplier = 1 + Math.sin(this.pulse) * 0.2;
+                        const currentSize = this.size * sizeMultiplier;
+                        fCtx.beginPath();
+                        if (this.type === 'triangle') {
+                            fCtx.moveTo(currentSize, 0);
+                            for (let i = 1; i < 3; i++) fCtx.lineTo(currentSize * Math.cos((i * 2 * Math.PI) / 3), currentSize * Math.sin((i * 2 * Math.PI) / 3));
+                        } else {
+                            fCtx.rect(-currentSize / 2, -currentSize / 2, currentSize, currentSize / 2);
+                        }
+                        fCtx.closePath();
+                        fCtx.fillStyle = color;
+                        fCtx.fill();
+                        if (this.opacity > 0.4) {
+                            fCtx.shadowBlur = 10;
+                            fCtx.shadowColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(14, 165, 233, 0.5)';
+                        }
+                        fCtx.restore();
+                    }
+                    update() {
+                        if (mouse.x != null && mouse.y != null) {
+                            let dx = this.x - mouse.x;
+                            let dy = this.y - mouse.y;
+                            let distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < mouse.radius) {
+                                const force = (mouse.radius - distance) / mouse.radius;
+                                this.x += (dx / distance) * force * 2;
+                                this.y += (dy / distance) * force * 2;
+                            }
+                        }
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+                        this.rotation += this.rotationSpeed;
+                        if (this.x < 0) this.x = formCanvas.width;
+                        if (this.x > formCanvas.width) this.x = 0;
+                        if (this.y < 0) this.y = formCanvas.height;
+                        if (this.y > formCanvas.height) this.y = 0;
+                    }
+                }
+
+                function initFormParticles() {
+                    formCanvas.width = formCanvas.parentElement.offsetWidth;
+                    formCanvas.height = formCanvas.parentElement.offsetHeight;
+                    fParticles = [];
+                    for (let i = 0; i < 80; i++) fParticles.push(new Particle());
+                }
+
+                function drawFormParticles() {
+                    fCtx.clearRect(0, 0, formCanvas.width, formCanvas.height);
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    fCtx.lineWidth = 0.8;
+                    for (let i = 0; i < fParticles.length; i++) {
+                        for (let j = i + 1; j < fParticles.length; j++) {
+                            const dx = fParticles[i].x - fParticles[j].x;
+                            const dy = fParticles[i].y - fParticles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 120) {
+                                const lineOpacity = (1 - dist / 120) * 0.15;
+                                fCtx.strokeStyle = isDark ? `rgba(255, 255, 255, ${lineOpacity})` : `rgba(14, 165, 233, ${lineOpacity})`;
+                                fCtx.beginPath();
+                                fCtx.moveTo(fParticles[i].x, fParticles[i].y);
+                                fCtx.lineTo(fParticles[j].x, fParticles[j].y);
+                                fCtx.stroke();
+                            }
+                        }
+                    }
+                    fParticles.forEach(p => { p.update(); p.draw(); });
+                    fAnimationFrame = requestAnimationFrame(drawFormParticles);
+                }
+                initFormParticles();
+                drawFormParticles();
+                window.addEventListener('resize', () => {
+                    cancelAnimationFrame(fAnimationFrame);
+                    initFormParticles();
+                    drawFormParticles();
+                });
+            }
+
+            // --- Lógica del Modo Nocturno ---
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            themeToggle.addEventListener('click', (e) => {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+                if (document.startViewTransition) {
+                    const x = e.clientX;
+                    const y = e.clientY;
+                    const endRadius = Math.hypot(
+                        Math.max(x, window.innerWidth - x),
+                        Math.max(y, window.innerHeight - y)
+                    );
+
+                    document.documentElement.classList.add('theme-transition-active');
+
+                    const transition = document.startViewTransition(() => {
+                        html.setAttribute('data-theme', newTheme);
+                        localStorage.setItem('theme', newTheme);
+                        updateThemeIcon(newTheme);
+                    });
+
+                    transition.ready.then(() => {
+                        document.documentElement.animate(
+                            {
+                                clipPath: [
+                                    `circle(0px at ${x}px ${y}px)`,
+                                    `circle(${endRadius}px at ${x}px ${y}px)`,
+                                ],
+                            },
+                            {
+                                duration: 600,
+                                easing: 'ease-in-out',
+                                pseudoElement: '::view-transition-new(root)',
+                            }
+                        ).onfinish = () => {
+                            document.documentElement.classList.remove('theme-transition-active');
+                        };
+                    });
+                } else {
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateThemeIcon(newTheme);
+                }
+            });
+
+            function updateThemeIcon(theme) {
+                if (!themeIcon) return;
+                if (theme === 'dark') {
+                    themeIcon.classList.replace('bi-moon-stars-fill', 'bi-sun-fill');
+                } else {
+                    themeIcon.classList.replace('bi-sun-fill', 'bi-moon-stars-fill');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reportes Financieros | Admin</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-soft: 0 8px 32px rgba(99, 102, 241, 0.12);
+            --shadow-hover: 0 20px 60px rgba(99, 102, 241, 0.18);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 25%, #ddd6fe 50%, #e0e7ff 75%, #c7d2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #334155;
+            padding-bottom: 3rem;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ===== HEADER PREMIUM ESTILO DASHBOARD ===== */
+        .page-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(224, 231, 255, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .breadcrumb-custom {
+            color: #6366f1;
+            font-weight: 600;
+            font-size: 0.9rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .breadcrumb-custom a {
+            color: #818cf8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb-custom a:hover {
+            color: #4f46e5;
+        }
+
+        .breadcrumb-custom .active {
+            color: #4f46e5;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        /* ===== BOTONES ACCIÓN PREMIUM ===== */
+        .btn-action {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            color: #4f46e5;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            border-color: #6366f1;
+            color: #6366f1;
+        }
+
+        .btn-action.primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-action.primary:hover {
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .btn-action.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-action.primary:hover::before {
+            left: 100%;
+        }
+
+        /* ===== KPI CARDS ESTILO DASHBOARD ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 576px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .kpi-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .kpi-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .kpi-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .kpi-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .kpi-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        .kpi-card.indigo::before {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .kpi-card.green::before {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+
+        .kpi-card.blue::before {
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+        }
+
+        .kpi-card.amber::before {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        }
+
+        .kpi-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .kpi-card.indigo .kpi-icon {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: #6366f1;
+        }
+
+        .kpi-card.green .kpi-icon {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #10b981;
+        }
+
+        .kpi-card.blue .kpi-icon {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: #0ea5e9;
+        }
+
+        .kpi-card.amber .kpi-icon {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #f59e0b;
+        }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        @media (min-width: 768px) {
+            .kpi-value {
+                font-size: 2rem;
+            }
+        }
+
+        .kpi-footer {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .kpi-card.indigo .kpi-footer {
+            color: #6366f1;
+        }
+
+        .kpi-card.green .kpi-footer {
+            color: #10b981;
+        }
+
+        .kpi-card.blue .kpi-footer {
+            color: #0ea5e9;
+        }
+
+        .kpi-card.amber .kpi-footer {
+            color: #f59e0b;
+        }
+
+        /* ===== CHART CARDS PREMIUM ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 992px) {
+            .charts-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .charts-grid .full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .chart-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease both;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-4px);
+        }
+
+        .chart-card:nth-child(1) {
+            animation-delay: 0.3s;
+        }
+
+        .chart-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .chart-card:nth-child(3) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(224, 231, 255, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-header h5 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chart-header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-header-icon.indigo {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        .chart-header-icon.green {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+
+        .chart-header-icon.blue {
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+        }
+
+        .chart-header-icon.pink {
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+        }
+
+        .chart-badge {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #6366f1;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.4rem 0.75rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .chart-body {
+            padding: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 320px;
+            }
+
+            .chart-container.tall {
+                height: 380px;
+            }
+        }
+
+        /* ===== FOOTER PREMIUM ===== */
+        .report-footer {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(224, 231, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+            border-radius: 4px;
+        }
+
+        /* ===== PRINT ===== */
+        @media print {
+
+            .page-header,
+            .btn-action,
+            .navbar,
+            .nav-spacer {
+                display: none !important;
+            }
+
+            .kpi-card,
+            .chart-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 2px solid #e2e8f0;
+            }
+
+            body {
+                background: white;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .page-title {
+                font-size: 1.4rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .page-header {
+                border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+                padding: 1.5rem 0;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Fragmento header admin -->
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+
+    <!-- ===== HEADER PREMIUM ===== -->
+    <div class="page-header">
+        <div class="container header-content">
+            <div class="row align-items-center">
+                <div class="col-lg-8 col-md-7">
+                    <h1 class="page-title">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        Centro de Reportes
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-custom mb-0">
+                            <li>
+                                <a th:href="@{/admin/dashboard}">
+                                    <i class="bi bi-grid-fill me-1"></i>Dashboard
+                                </a>
+                            </li>
+                            <li><i class="bi bi-chevron-right mx-2" style="font-size: 0.7rem;"></i></li>
+                            <li class="active">
+                                <i class="bi bi-graph-up me-1"></i>Reportes Financieros
+                            </li>
+                        </ol>
+                    </nav>
+                    <p class="page-subtitle">Análisis financiero, métricas de crecimiento y rendimiento de servicios.
+                    </p>
+                </div>
+                <div class="col-lg-4 col-md-5 text-md-end mt-3 mt-md-0">
+                    <div class="d-flex gap-2 flex-wrap justify-content-md-end">
+                        <a th:href="@{/admin/reportes/descargar/resumen-mensual}" class="btn-action primary"
+                            target="_blank">
+                            <i class="bi bi-file-earmark-pdf-fill"></i>
+                            <span>Descargar PDF</span>
+                        </a>
+                        <button class="btn-action" onclick="window.print()">
+                            <i class="bi bi-printer-fill"></i>
+                            <span>Imprimir</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <div class="container pb-5">
+
+        <!-- ===== KPI CARDS ===== -->
+        <div class="kpi-grid">
+            <div class="kpi-card indigo">
+                <div class="kpi-icon"><i class="bi bi-cash-stack"></i></div>
+                <div class="kpi-label">Ingresos Totales</div>
+                <h2 class="kpi-value"
+                    th:text="'$' + ${#numbers.formatDecimal(ingresosTotales, 1, 'COMMA', 2, 'POINT')}">$0.00</h2>
+                <div class="kpi-footer">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Acumulado histórico</span>
+                </div>
+            </div>
+
+            <div class="kpi-card green">
+                <div class="kpi-icon"><i class="bi bi-calendar-check-fill"></i></div>
+                <div class="kpi-label">Citas Completadas</div>
+                <h2 class="kpi-value" th:text="${citasCompletadas}">0</h2>
+                <div class="kpi-footer">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Finalizadas y pagadas</span>
+                </div>
+            </div>
+
+            <div class="kpi-card blue">
+                <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+                <div class="kpi-label">Nuevos Clientes (Mes)</div>
+                <h2 class="kpi-value" th:text="${nuevosClientesMes}">0</h2>
+                <div class="kpi-footer">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Registros este mes</span>
+                </div>
+            </div>
+
+            <div class="kpi-card amber">
+                <div class="kpi-icon"><i class="bi bi-receipt"></i></div>
+                <div class="kpi-label">Ticket Promedio</div>
+                <h2 class="kpi-value" th:text="'$' + ${#numbers.formatDecimal(ticketPromedio, 1, 'COMMA', 2, 'POINT')}">
+                    $0.00</h2>
+                <div class="kpi-footer">
+                    <i class="bi bi-tag-fill"></i>
+                    <span>Valor medio por cita</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CHARTS GRID ===== -->
+        <div class="charts-grid">
+
+            <!-- Chart 1: Nuevos Usuarios por Mes (Full Width) -->
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <h5>
+                        <span class="chart-header-icon indigo"><i class="bi bi-graph-up-arrow"></i></span>
+                        Nuevos Usuarios por Mes
+                    </h5>
+                    <span class="chart-badge"><i class="bi bi-calendar3 me-1"></i>Año Actual</span>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-container tall">
+                        <canvas id="chartUsuarios"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Citas por Estado -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5>
+                        <span class="chart-header-icon green"><i class="bi bi-pie-chart-fill"></i></span>
+                        Citas por Estado
+                    </h5>
+                    <span class="chart-badge"><i class="bi bi-globe me-1"></i>Global</span>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-container">
+                        <canvas id="chartCitas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 3: Servicios Más Populares -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5>
+                        <span class="chart-header-icon pink"><i class="bi bi-trophy-fill"></i></span>
+                        Servicios Más Populares
+                    </h5>
+                    <span class="chart-badge"><i class="bi bi-stars me-1"></i>Top</span>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-container">
+                        <canvas id="chartServicios"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== RESUMEN RÁPIDO (NUEVO) ===== -->
+        <div class="row mt-2 mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="chart-card p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="kpi-icon"
+                            style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #6366f1; margin-bottom: 0;">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Datos en tiempo real</h6>
+                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">Todos los reportes se actualizan
+                                automáticamente con la información más reciente del sistema.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="chart-card p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="kpi-icon"
+                            style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #10b981; margin-bottom: 0;">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">Información segura</h6>
+                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">Los datos financieros están protegidos
+                                y solo accesibles para administradores autorizados.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="report-footer">
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+            <i class="bi bi-heart-fill text-danger"></i>
+            <span>ClínicaApp</span>
+        </div>
+        <small>© 2024 ClínicaApp — Reporte generado automáticamente · Datos en tiempo real</small>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:inline="javascript">
+        const fontFamily = "'Plus Jakarta Sans', sans-serif";
+
+        // ========== DATOS DEL SERVIDOR ==========
+        const labelsCitas = /*[[${labelsCitas}]]*/ '[]';
+        const dataCitas = /*[[${dataCitas}]]*/ '[]';
+        const labelsUsuarios = /*[[${labelsUsuarios}]]*/ '[]';
+        const dataUsuarios = /*[[${dataUsuarios}]]*/ '[]';
+        const labelsServicios = /*[[${labelsServicios}]]*/ '[]';
+        const dataServicios = /*[[${dataServicios}]]*/ '[]';
+
+        // Parsear JSONs
+        const parsedLabelsCitas = JSON.parse(labelsCitas);
+        const parsedDataCitas = JSON.parse(dataCitas);
+        const parsedLabelsUsuarios = JSON.parse(labelsUsuarios);
+        const parsedDataUsuarios = JSON.parse(dataUsuarios);
+        const parsedLabelsServicios = JSON.parse(labelsServicios);
+        const parsedDataServicios = JSON.parse(dataServicios);
+
+        // ========== CHART 1: Usuarios por Mes (Area Chart) ==========
+        const ctxUsuarios = document.getElementById('chartUsuarios').getContext('2d');
+        const gradientUsuarios = ctxUsuarios.createLinearGradient(0, 0, 0, 380);
+        gradientUsuarios.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+        gradientUsuarios.addColorStop(1, 'rgba(99, 102, 241, 0.02)');
+
+        new Chart(ctxUsuarios, {
+            type: 'line',
+            data: {
+                labels: parsedLabelsUsuarios,
+                datasets: [{
+                    label: 'Nuevos Usuarios',
+                    data: parsedDataUsuarios,
+                    borderColor: '#6366f1',
+                    backgroundColor: gradientUsuarios,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#6366f1',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            font: { family: fontFamily, size: 13, weight: '600' },
+                            color: '#475569',
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: fontFamily, size: 14, weight: '700' },
+                        bodyFont: { family: fontFamily, size: 13 },
+                        padding: 14,
+                        cornerRadius: 12,
+                        displayColors: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(226, 232, 240, 0.5)', drawBorder: false },
+                        ticks: {
+                            font: { family: fontFamily, size: 12 },
+                            color: '#94a3b8',
+                            stepSize: 1,
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { family: fontFamily, size: 11, weight: '600' },
+                            color: '#64748b',
+                            maxRotation: 45,
+                        }
+                    }
+                },
+                animation: { duration: 1500, easing: 'easeOutQuart' }
+            }
+        });
+
+        // ========== CHART 2: Citas por Estado (Doughnut) ==========
+        const ctxCitas = document.getElementById('chartCitas').getContext('2d');
+        new Chart(ctxCitas, {
+            type: 'doughnut',
+            data: {
+                labels: parsedLabelsCitas,
+                datasets: [{
+                    data: parsedDataCitas,
+                    backgroundColor: [
+                        '#94a3b8',  // Pendiente de Pago
+                        '#fbbf24',  // Pendiente
+                        '#10b981',  // Confirmada
+                        '#0ea5e9',  // Completada
+                        '#ef4444',  // Cancelada
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverOffset: 12,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: fontFamily, size: 12, weight: '600' },
+                            color: '#475569',
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded',
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: fontFamily, size: 14, weight: '700' },
+                        bodyFont: { family: fontFamily, size: 13 },
+                        padding: 14,
+                        cornerRadius: 12,
+                        callbacks: {
+                            label: function (context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                return context.label + ': ' + context.parsed + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                },
+                animation: { animateRotate: true, duration: 1500, easing: 'easeOutQuart' }
+            }
+        });
+
+        // ========== CHART 3: Servicios Populares (Horizontal Bar) ==========
+        const ctxServicios = document.getElementById('chartServicios').getContext('2d');
+        new Chart(ctxServicios, {
+            type: 'bar',
+            data: {
+                labels: parsedLabelsServicios,
+                datasets: [{
+                    label: 'Citas agendadas',
+                    data: parsedDataServicios,
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.75)',
+                        'rgba(236, 72, 153, 0.75)',
+                        'rgba(14, 165, 233, 0.75)',
+                        'rgba(16, 185, 129, 0.75)',
+                        'rgba(245, 158, 11, 0.75)',
+                        'rgba(139, 92, 246, 0.75)',
+                    ],
+                    borderColor: [
+                        '#6366f1',
+                        '#ec4899',
+                        '#0ea5e9',
+                        '#10b981',
+                        '#f59e0b',
+                        '#8b5cf6',
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: fontFamily, size: 14, weight: '700' },
+                        bodyFont: { family: fontFamily, size: 13 },
+                        padding: 14,
+                        cornerRadius: 12,
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(226, 232, 240, 0.5)', drawBorder: false },
+                        ticks: {
+                            font: { family: fontFamily, size: 12 },
+                            color: '#94a3b8',
+                            stepSize: 1,
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { family: fontFamily, size: 12, weight: '600' },
+                            color: '#334155',
+                        }
+                    }
+                },
+                animation: { duration: 1500, easing: 'easeOutQuart' }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2592 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencia Interactiva | Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <!-- CSS Externos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-dark: rgba(15, 23, 42, 0.95);
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #a855f7;
+            --cyan: #06b6d4;
+            --amber: #f59e0b;
+            --green: #10b981;
+            --red: #ef4444;
+            --dark: #0f172a;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+            --gradient-3: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --gradient-4: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            --gradient-dark: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --shadow-soft: 0 20px 40px rgba(99, 102, 241, 0.15);
+            --shadow-hover: 0 30px 60px rgba(99, 102, 241, 0.25);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 30%, #fae8ff 60%, #fef3c7 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ============================================
+           BANNER DEMO - PREMIUM CON EFECTO HOLOGRÁFICO
+           ============================================ */
+        .demo-mode-indicator {
+            background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 30%, #312e81 60%, #0f172a 100%);
+            background-size: 200% 100%;
+            color: #fbbf24;
+            padding: 16px;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 800;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+            animation: bannerShift 8s linear infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes bannerShift {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 200% 0%;
+            }
+        }
+
+        .demo-mode-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            100% {
+                left: 200%;
+            }
+        }
+
+        .demo-mode-indicator .btn {
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            color: #fbbf24;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-mode-indicator .btn:hover {
+            background: #fbbf24;
+            color: #0f172a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+        }
+
+        /* ============================================
+           TARJETAS GLASSMORPHISM PREMIUM
+           ============================================ */
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(30px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: var(--shadow-hover), 0 0 60px rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .dashboard-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ============================================
+           STATS CARDS - EFECTO 3D CON GRADIENTES
+           ============================================ */
+        .stat-card {
+            padding: 28px;
+            border-radius: var(--radius-md);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-card.bg-primary {
+            background: var(--gradient-1);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-card.bg-dark {
+            background: var(--gradient-dark);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.4);
+        }
+
+        .stat-card.bg-success {
+            background: var(--gradient-4);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .stat-card.bg-warning {
+            background: var(--gradient-3);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.15) rotate(-5deg);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================
+           HEADER SECTION - TIPOGRAFÍA PREMIUM
+           ============================================ */
+        .display-5 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .gradient-text::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient-1);
+            border-radius: 2px;
+        }
+
+        /* ============================================
+           NOVA BRAIN CHAT - INTERFAZ HOLOGRÁFICA
+           ============================================ */
+        .nova-container {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.15);
+        }
+
+        .nova-header {
+            background: var(--gradient-1);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nova-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            animation: patternMove 15s linear infinite;
+        }
+
+        @keyframes patternMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(20px, 20px);
+            }
+        }
+
+        .nova-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nova-dot {
+            width: 10px;
+            height: 10px;
+            background: #22d3ee;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #22d3ee, 0 0 30px rgba(34, 211, 238, 0.5);
+            animation: pulse-dot 2s infinite;
+            position: relative;
+        }
+
+        .nova-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(34, 211, 238, 0.3);
+            animation: ripple-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(0.85);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes ripple-dot {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        #chatBox {
+            height: 320px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        #chatBox::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatBox::-webkit-scrollbar-thumb {
+            background: var(--gradient-1);
+            border-radius: 10px;
+        }
+
+        .msg {
+            padding: 16px 20px;
+            border-radius: 20px;
+            max-width: 85%;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            position: relative;
+            animation: messageSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .msg-ai {
+            background: white;
+            color: #1e293b;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            position: relative;
+        }
+
+        .msg-ai::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gradient-1);
+            border-radius: 20px 0 0 4px;
+        }
+
+        .msg-user {
+            background: var(--gradient-1);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .msg-time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 8px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 20px;
+            align-self: flex-start;
+            background: white;
+            border-radius: 20px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .typing-indicator span {
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: typing-bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing-bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Input de chat premium */
+        .nova-input-group {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .nova-input {
+            flex: 1;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+            font-weight: 500;
+        }
+
+        .nova-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 20px rgba(99, 102, 241, 0.1);
+        }
+
+        .nova-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .nova-btn-send {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+
+        .nova-btn-send:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .nova-btn-send:active {
+            transform: scale(0.95);
+        }
+
+        /* ============================================
+           BOTONES PREMIUM CON EFECTO SHINE
+           ============================================ */
+        .btn-premium {
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 0 rgba(79, 70, 229, 0.3), 0 10px 30px rgba(99, 102, 241, 0.3);
+            transform: translateY(0);
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            color: white;
+            box-shadow: 0 9px 0 rgba(79, 70, 229, 0.3), 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-premium:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 rgba(79, 70, 229, 0.3), 0 6px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        /* ============================================
+           ESCÁNER BIOMÉTRICO - EFECTO CYBERPUNK
+           ============================================ */
+        .scanner-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 2px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .scan-line {
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            position: absolute;
+            top: 0;
+            animation: scan 2.5s infinite ease-in-out;
+            box-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan);
+            z-index: 10;
+            filter: blur(1px);
+        }
+
+        .scan-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(6, 182, 212, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.08) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            animation: gridPulse 2s infinite;
+        }
+
+        @keyframes gridPulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .scanning .scan-grid {
+            opacity: 1;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        .face-overlay {
+            position: absolute;
+            inset: 15px;
+            border: 2px solid rgba(6, 182, 212, 0.4);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .scanning .face-overlay {
+            opacity: 1;
+            animation: face-pulse 1s infinite;
+        }
+
+        @keyframes face-pulse {
+
+            0%,
+            100% {
+                border-color: rgba(6, 182, 212, 0.4);
+                box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+            }
+
+            50% {
+                border-color: rgba(6, 182, 212, 1);
+                box-shadow: 0 0 30px rgba(6, 182, 212, 0.5);
+            }
+        }
+
+        /* ============================================
+           CITAS CARDS - EFECTO HOVER LATERAL
+           ============================================ */
+        .cita-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .cita-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: var(--gradient-1);
+            transform: scaleY(0);
+            transition: var(--transition);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .cita-card:hover {
+            transform: translateX(12px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.12);
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+
+        .cita-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .cita-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            color: var(--primary-dark);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .cita-delete {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .cita-delete:hover {
+            background: var(--red);
+            color: white;
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* ============================================
+           TABLA MÉDICA - CARDS ESTILO DATAGRID
+           ============================================ */
+        .table-medical {
+            border-collapse: separate;
+            border-spacing: 0 12px;
+        }
+
+        .table-medical thead th {
+            border: none;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .table-medical tbody tr {
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .table-medical tbody tr:hover {
+            transform: scale(1.02) translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .table-medical td {
+            padding: 20px 16px;
+            border: none;
+            vertical-align: middle;
+        }
+
+        .table-medical td:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .table-medical td:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .badge-medical {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            color: var(--primary-dark);
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ============================================
+           MASCOTAS CARDS - AVATARES ANIMADOS
+           ============================================ */
+        .pet-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            transition: var(--transition);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .pet-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.12);
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+
+        .pet-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-right: 18px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .pet-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: var(--secondary);
+            animation: pet-orbit 3s linear infinite;
+        }
+
+        @keyframes pet-orbit {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pet-avatar.dog {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #2563eb;
+        }
+
+        .pet-avatar.cat {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            color: #db2777;
+        }
+
+        .pet-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .pet-status.complete {
+            color: var(--green);
+        }
+
+        .pet-status.pending {
+            color: var(--amber);
+        }
+
+        /* ============================================
+           TOASTS PREMIUM CON GLASSMORPHISM
+           ============================================ */
+        .toast-container-nova {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nova-toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            padding: 20px 28px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-width: 360px;
+            border-left: 5px solid var(--primary);
+            animation: toastSlide 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nova-toast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        @keyframes toastSlide {
+            from {
+                opacity: 0;
+                transform: translateX(100px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .nova-toast.hiding {
+            animation: toastHide 0.4s ease forwards;
+        }
+
+        @keyframes toastHide {
+            to {
+                opacity: 0;
+                transform: translateX(100px) scale(0.9);
+            }
+        }
+
+        .toast-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .toast-icon.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+            color: var(--green);
+        }
+
+        .toast-icon.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+            color: var(--amber);
+        }
+
+        .toast-icon.info {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.05));
+            color: var(--primary);
+        }
+
+        .toast-content h6 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .toast-content p {
+            margin: 6px 0 0;
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        /* ============================================
+           HEX ASSISTANT - EFECTO HOLOGRÁFICO
+           ============================================ */
+        .hex-assistant {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hex-avatar {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 3px solid var(--primary);
+            border-radius: 50% 20% 50% 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.4), 0 0 60px rgba(99, 102, 241, 0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: hex-float 4s ease-in-out infinite;
+        }
+
+        @keyframes hex-float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(2deg);
+            }
+        }
+
+        .hex-avatar::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(transparent, var(--cyan), transparent 30%);
+            animation: hex-rotate 3s linear infinite;
+        }
+
+        .hex-avatar::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 50% 20% 50% 20%;
+        }
+
+        .hex-avatar i {
+            font-size: 1.8rem;
+            color: white;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes hex-rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hex-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.6), 0 0 100px rgba(99, 102, 241, 0.3);
+        }
+
+        .hex-bubble {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            color: var(--dark);
+            padding: 14px 22px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            animation: hex-bubble-float 3s ease-in-out infinite;
+            border: 2px solid var(--primary);
+            max-width: 240px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes hex-bubble-float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ============================================
+           HEX PANEL - TERMINAL FUTURISTA
+           ============================================ */
+        .hex-panel {
+            position: fixed;
+            bottom: 130px;
+            left: 30px;
+            width: 400px;
+            background: rgba(15, 23, 42, 0.97);
+            backdrop-filter: blur(40px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5), 0 0 60px rgba(99, 102, 241, 0.1);
+            display: none;
+            flex-direction: column;
+            color: white;
+            overflow: hidden;
+            z-index: 2001;
+            animation: hex-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes hex-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .hex-header {
+            padding: 24px;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.2));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hex-header h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .hex-body {
+            padding: 24px;
+            max-height: 320px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .hex-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .hex-body::-webkit-scrollbar-thumb {
+            background: var(--gradient-1);
+            border-radius: 10px;
+        }
+
+        .hex-msg {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border-left: 3px solid var(--cyan);
+            transition: var(--transition);
+        }
+
+        .hex-msg:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .hex-commands {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 24px 24px;
+        }
+
+        .hex-cmd {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: white;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hex-cmd:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            border-color: var(--primary-light);
+        }
+
+        .hex-cmd i {
+            font-size: 1.1rem;
+        }
+
+        /* ============================================
+           MASCOTA VIRTUAL - DASHBOARD GAMIFICADO
+           ============================================ */
+        .pet-dashboard {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pet-dashboard::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+            animation: pet-bg-rotate 20s linear infinite;
+        }
+
+        @keyframes pet-bg-rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pet-emoji-container {
+            position: relative;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .pet-emoji-container:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .progress {
+            background: rgba(226, 232, 240, 0.5);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            border-radius: 50px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progress-shine 2s infinite;
+        }
+
+        @keyframes progress-shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ============================================
+           FORMULARIOS PREMIUM
+           ============================================ */
+        .form-select,
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            font-weight: 500;
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: #475569;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+        }
+
+        /* ============================================
+           BADGES Y ETIQUETAS
+           ============================================ */
+        .badge {
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 50px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.bg-primary {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)) !important;
+            color: var(--primary-dark) !important;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1)) !important;
+            color: #059669 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* ============================================
+           BOTONES OUTLINE MEJORADOS
+           ============================================ */
+        .btn-outline-primary {
+            border-width: 2px;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-outline-danger {
+            border-width: 2px;
+            border-radius: 50px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25);
+        }
+
+        /* ============================================
+           ALERTS PREMIUM
+           ============================================ */
+        .alert {
+            border-radius: var(--radius-md);
+            border: none;
+            padding: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05));
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .hex-panel {
+                width: calc(100vw - 40px);
+                left: 20px;
+            }
+
+            .hex-assistant {
+                left: 20px;
+                bottom: 20px;
+            }
+
+            .toast-container-nova {
+                right: 20px;
+                left: 20px;
+            }
+
+            .nova-toast {
+                min-width: auto;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .clinic-hero {
+                height: 450px;
+            }
+        }
+
+        /* ============================================
+           UTILIDADES
+           ============================================ */
+        .glow-text {
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Scrollbar global */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-1);
+            border-radius: 50px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gradient-2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============================================
+         BANNER DEMO - EFECTO HOLOGRÁFICO
+         ============================================ -->
+    <div class="demo-mode-indicator sticky-top text-center">
+        <i class="bi bi-cpu-fill me-2"></i>
+        <span style="position: relative; z-index: 1;">Entorno de Prueba Inteligente — Clínica App v2.0</span>
+        <a href="/registro" class="btn btn-sm ms-3">Finalizar Demo →</a>
+    </div>
+
+    <div class="container py-5">
+
+        <!-- ============================================
+             HEADER CON STATS PREMIUM
+             ============================================ -->
+        <div class="row mb-5 animate__animated animate__fadeInDown">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="d-inline-flex align-items-center gap-2 mb-3"
+                    style="background: rgba(99,102,241,0.1); padding: 8px 20px; border-radius: 50px; border: 1px solid rgba(99,102,241,0.2);">
+                    <span
+                        style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse-dot 2s infinite;"></span>
+                    <span
+                        style="font-size: 0.8rem; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 1px;">
+                        Demo Activo
+                    </span>
+                </div>
+                <h1 class="display-5 mb-3">Panel de <span class="gradient-text">Invitado</span></h1>
+                <p class="text-muted fs-5 mb-0" style="line-height: 1.6;">
+                    Explora las funcionalidades de nuestra arquitectura veterinaria inteligente con IA integrada.
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-card bg-primary animate__animated animate__fadeIn"
+                            style="animation-delay: 0.1s">
+                            <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                            <div>
+                                <div class="stat-value" id="statCitas">124</div>
+                                <div class="stat-label">Citas Hoy</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card bg-dark animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                            <div class="stat-icon"><i class="bi bi-shield-check"></i></div>
+                            <div>
+                                <div class="stat-value">99.9%</div>
+                                <div class="stat-label">Uptime</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card bg-success animate__animated animate__fadeIn"
+                            style="animation-delay: 0.3s">
+                            <div class="stat-icon"><i class="bi bi-heart-pulse"></i></div>
+                            <div>
+                                <div class="stat-value">1,847</div>
+                                <div class="stat-label">Mascotas Activas</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-card bg-warning animate__animated animate__fadeIn"
+                            style="animation-delay: 0.4s">
+                            <div class="stat-icon"><i class="bi bi-robot"></i></div>
+                            <div>
+                                <div class="stat-value">Nova</div>
+                                <div class="stat-label">IA Online</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- ============================================
+                 COLUMNA PRINCIPAL (8 cols)
+                 ============================================ -->
+            <div class="col-lg-8">
+
+                <!-- AGENDAR CITA INTELIGENTE -->
+                <div class="dashboard-card p-4 mb-4 animate__animated animate__fadeInLeft">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <div>
+                            <h4 class="fw-bold mb-1" style="font-size: 1.3rem;">
+                                <i class="bi bi-calendar-plus text-primary me-2"></i>Agendamiento Express
+                            </h4>
+                            <p class="text-muted mb-0 small" style="font-size: 0.9rem;">
+                                <i class="bi bi-magic me-1 text-primary"></i>
+                                IA asigna automáticamente el mejor especialista disponible
+                            </p>
+                        </div>
+                        <span class="badge bg-primary px-3 py-2" style="font-size: 0.8rem;">
+                            <i class="bi bi-cpu me-1"></i> Procesamiento IA
+                        </span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Mascota</label>
+                            <select class="form-select" id="demoPet">
+                                <option value="">Selecciona Mascota</option>
+                                <option value="Max">🐕 Max (Golden Retriever)</option>
+                                <option value="Luna">🐈 Luna (Siamesa)</option>
+                                <option value="Rocky">🐕 Rocky (Bulldog)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipo de Consulta</label>
+                            <select class="form-select" id="demoTipo">
+                                <option>Consulta General</option>
+                                <option>Vacunación</option>
+                                <option>Urgencia</option>
+                                <option>Estética</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Urgencia</label>
+                            <select class="form-select" id="demoUrgencia">
+                                <option value="normal">🟢 Normal (24-48h)</option>
+                                <option value="alta">🟡 Alta (Same day)</option>
+                                <option value="critica">🔴 Crítica (Inmediato)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="simularAgendar()" class="btn btn-premium w-100 mb-4">
+                        <i class="bi bi-magic me-2"></i>
+                        <span id="btnAgendarText">Analizar y Agendar con IA</span>
+                        <div id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></div>
+                    </button>
+
+                    <div id="listaCitas">
+                        <div class="text-center py-5 border-2 border-dashed rounded-4 bg-light" id="noCitas"
+                            style="border-style: dashed; border-color: #cbd5e1;">
+                            <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0 fw-500">No hay citas en la cola de procesamiento.<br>
+                                <small class="text-muted">Selecciona una mascota para comenzar</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HISTORIAL MÉDICO SIMULADO -->
+                <div class="dashboard-card p-4 animate__animated animate__fadeInUp">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <h5 class="fw-bold mb-0" style="font-size: 1.2rem;">
+                            <i class="bi bi-file-earmark-medical me-2 text-primary"></i>Expediente Digital
+                        </h5>
+                        <button class="btn btn-sm btn-outline-primary"
+                            onclick="mostrarToast('Sincronizando con historial...', 'info')">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-medical">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Servicio</th>
+                                    <th>Especialista</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaHistorial">
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">10 Abr 2024</div>
+                                        <small class="text-muted">15:30 hrs</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge-medical">
+                                            <i class="bi bi-shield-plus me-1"></i> Vacunación Rabia
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 36px; height: 36px; font-size: 0.8rem; color: white; font-weight: 700; background: var(--gradient-1);">
+                                                DR</div>
+                                            <span class="fw-semibold">Dr. Rodríguez</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-success fw-bold" style="font-size: 0.9rem;">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Completado
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button onclick="mostrarDescarga('Vacunación_Rabia_Max_10Abr2024.pdf')"
+                                            class="btn btn-sm btn-outline-danger rounded-pill"
+                                            style="width: 40px; height: 40px; padding: 0;">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">02 Mar 2024</div>
+                                        <small class="text-muted">09:00 hrs</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge-medical">
+                                            <i class="bi bi-heart-pulse me-1"></i> Chequeo General
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 36px; height: 36px; font-size: 0.8rem; color: white; font-weight: 700; background: var(--gradient-2);">
+                                                DG</div>
+                                            <span class="fw-semibold">Dra. Gómez</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-success fw-bold" style="font-size: 0.9rem;">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Completado
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button onclick="mostrarDescarga('Chequeo_General_Max_02Mar2024.pdf')"
+                                            class="btn btn-sm btn-outline-danger rounded-pill"
+                                            style="width: 40px; height: 40px; padding: 0;">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 COLUMNA SIDEBAR (4 cols)
+                 ============================================ -->
+            <div class="col-lg-4">
+
+                <!-- NOVA BRAIN IA -->
+                <div class="dashboard-card nova-container mb-4 animate__animated animate__fadeInRight">
+                    <div class="nova-header">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="position-relative">
+                                <i class="bi bi-robot fs-2"></i>
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle p-1 bg-info border border-white rounded-circle"
+                                    style="width: 12px; height: 12px;">
+                                    <span class="visually-hidden">Online</span>
+                                </span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Nova Brain</h5>
+                                <div class="nova-status">
+                                    <div class="nova-dot"></div>
+                                    <span>Asistente IA Activo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-link text-white p-1" onclick="novaChat.clear()"
+                            style="position: relative; z-index: 1;">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+
+                    <div id="chatBox">
+                        <div class="msg msg-ai">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-robot text-primary"></i>
+                                <strong class="small">Nova Brain</strong>
+                            </div>
+                            ¡Hola! Soy Nova, tu asistente veterinario inteligente. Puedo ayudarte con:
+                            <ul class="mb-0 mt-2 ps-3 small">
+                                <li>Información sobre servicios</li>
+                                <li>Recordatorios de vacunas</li>
+                                <li>Síntomas básicos</li>
+                                <li>Agendamiento rápido</li>
+                            </ul>
+                            <span class="msg-time">Justo ahora</span>
+                        </div>
+                    </div>
+
+                    <div class="nova-input-group">
+                        <input type="text" id="userInput" class="nova-input" placeholder="Escribe tu consulta..."
+                            onkeypress="if(event.key==='Enter')novaChat.send()">
+                        <button onclick="novaChat.send()" class="nova-btn-send">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RECONOCIMIENTO FACIAL -->
+                <div class="dashboard-card p-4 mb-4 text-center animate__animated animate__fadeInRight"
+                    style="animation-delay: 0.1s">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">
+                            <i class="bi bi-person-bounding-box text-primary me-2"></i>BioSeguridad
+                        </h5>
+                        <span class="badge bg-success" style="font-size: 0.75rem;">
+                            <i class="bi bi-shield-check me-1"></i>Activo
+                        </span>
+                    </div>
+
+                    <div class="scanner-container d-flex align-items-center justify-content-center position-relative mb-4"
+                        style="height: 200px;" id="scannerContainer">
+                        <div class="scan-grid"></div>
+                        <div class="scan-line d-none" id="scanLine"></div>
+                        <div class="face-overlay d-none" id="faceOverlay"></div>
+
+                        <div class="text-center" id="scanContent" style="position: relative; z-index: 1;">
+                            <i class="bi bi-person-circle text-white-50 display-1 mb-3 d-block" id="cameraIcon"></i>
+                            <p class="text-white-50 small mb-0" id="scanText">Sistema de reconocimiento listo</p>
+                        </div>
+
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3 d-none" id="scanProgress"
+                            style="z-index: 2;">
+                            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.15);">
+                                <div class="progress-bar"
+                                    style="width: 0%; transition: width 0.3s; background: linear-gradient(90deg, var(--cyan), var(--primary));"
+                                    id="progressBar"></div>
+                            </div>
+                            <p class="text-info small mt-2 mb-0 fw-bold" id="scanStatus"
+                                style="text-shadow: 0 0 10px rgba(6,182,212,0.5);">Inicializando...</p>
+                        </div>
+                    </div>
+
+                    <button onclick="simularEscaneo()" class="btn btn-outline-primary w-100 fw-bold" id="btnScan"
+                        style="border-radius: var(--radius-md); padding: 14px;">
+                        <i class="bi bi-fingerprint me-2"></i>Iniciar Escaneo Biométrico
+                    </button>
+
+                    <div id="scanResult" class="mt-3"></div>
+                </div>
+
+                <!-- MASCOTA VIRTUAL -->
+                <div class="dashboard-card p-4 mb-4 pet-dashboard animate__animated animate__fadeInRight"
+                    style="animation-delay: 0.2s">
+                    <div class="d-flex justify-content-between align-items-center mb-4"
+                        style="position: relative; z-index: 1;">
+                        <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">
+                            <i class="bi bi-controller text-primary me-2"></i>Mascota Virtual
+                        </h5>
+                        <span class="badge bg-secondary" id="lastUpdate" style="font-size: 0.75rem;">Actualizado
+                            ahora</span>
+                    </div>
+
+                    <div class="text-center mb-5" style="position: relative; z-index: 1;">
+                        <div class="position-relative d-inline-block">
+                            <div class="pet-emoji-container" id="petEmojiContainer"
+                                style="width: 110px; height: 110px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
+                                        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                                        font-size: 3.5rem; margin: 0 auto; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);">
+                                <span id="petEmoji">🐶</span>
+                            </div>
+                            <span class="position-absolute bottom-0 end-0 badge rounded-pill border border-white"
+                                id="petStatusText"
+                                style="font-size: 0.8rem; padding: 8px 14px; background: linear-gradient(135deg, #10b981, #059669);">
+                                ¡Feliz!
+                            </span>
+                        </div>
+                        <h4 class="fw-bold mt-4 mb-1" id="petNameDisp" style="font-size: 1.4rem;">Nova-Pet</h4>
+                        <p class="text-muted small">Tu compañero digital en tiempo real</p>
+                    </div>
+
+                    <div class="mb-4" style="position: relative; z-index: 1;">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small fw-bold text-muted text-uppercase"
+                                    style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    <i class="bi bi-heart-fill text-danger me-1"></i>Salud
+                                </span>
+                                <span class="small fw-bold" id="val-salud">100%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div id="bar-salud" class="progress-bar bg-danger" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small fw-bold text-muted text-uppercase"
+                                    style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    <i class="bi bi-egg-fried text-warning me-1"></i>Hambre
+                                </span>
+                                <span class="small fw-bold" id="val-hambre">0%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div id="bar-hambre" class="progress-bar bg-warning" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small fw-bold text-muted text-uppercase"
+                                    style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    <i class="bi bi-lightning-fill text-info me-1"></i>Energía
+                                </span>
+                                <span class="small fw-bold" id="val-energia">100%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div id="bar-energia" class="progress-bar"
+                                    style="width: 100%; background: linear-gradient(90deg, #06b6d4, #6366f1);"></div>
+                            </div>
+                        </div>
+                        <div class="mb-0">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small fw-bold text-muted text-uppercase"
+                                    style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    <i class="bi bi-emoji-smile-fill text-success me-1"></i>Felicidad
+                                </span>
+                                <span class="small fw-bold" id="val-felicidad">100%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div id="bar-felicidad" class="progress-bar bg-success" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2" style="position: relative; z-index: 1;">
+                        <div class="col-6">
+                            <button onclick="petSystem.action('FEED')" class="btn btn-outline-primary w-100"
+                                style="border-radius: var(--radius-sm); padding: 12px; font-weight: 700; font-size: 0.9rem;">
+                                <i class="bi bi-egg-fried me-1"></i> Alimentar
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button onclick="petSystem.action('PLAY')" class="btn btn-outline-primary w-100"
+                                style="border-radius: var(--radius-sm); padding: 12px; font-weight: 700; font-size: 0.9rem;">
+                                <i class="bi bi-controller me-1"></i> Jugar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTIONS -->
+                <div class="dashboard-card p-4 animate__animated animate__fadeInRight" style="animation-delay: 0.3s">
+                    <h6 class="fw-bold mb-4 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 2px;">
+                        Acciones Rápidas</h6>
+                    <div class="d-grid gap-3">
+                        <button class="btn btn-outline-primary text-start d-flex align-items-center gap-3"
+                            style="border-radius: var(--radius-sm); padding: 16px; font-weight: 600;"
+                            onclick="novaChat.ask('¿Cuándo es la próxima vacuna de Max?')">
+                            <div
+                                style="width: 44px; height: 44px; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1)); 
+                                        border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-event text-primary"></i>
+                            </div>
+                            <span>Consultar próximas vacunas</span>
+                        </button>
+                        <button class="btn btn-outline-primary text-start d-flex align-items-center gap-3"
+                            style="border-radius: var(--radius-sm); padding: 16px; font-weight: 600;"
+                            onclick="novaChat.ask('Necesito una cita de emergencia')">
+                            <div
+                                style="width: 44px; height: 44px; background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(245,158,11,0.1)); 
+                                        border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-telephone-plus text-danger"></i>
+                            </div>
+                            <span>Línea de emergencia 24/7</span>
+                        </button>
+                        <button class="btn btn-outline-primary text-start d-flex align-items-center gap-3"
+                            style="border-radius: var(--radius-sm); padding: 16px; font-weight: 600;"
+                            onclick="mostrarToast('Farmacia en línea - Próximamente', 'info')">
+                            <div
+                                style="width: 44px; height: 44px; background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.1)); 
+                                        border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-capsule text-success"></i>
+                            </div>
+                            <span>Comprar medicamentos</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         TOAST CONTAINER
+         ============================================ -->
+    <div class="toast-container-nova" id="toastContainer"></div>
+
+    <!-- ============================================
+         HEX ASSISTANT
+         ============================================ -->
+    <div class="hex-assistant">
+        <div class="hex-bubble" onclick="hexDemo.toggle()">
+            💡 ¿Necesitas ayuda?
+        </div>
+        <div class="hex-avatar" onclick="hexDemo.toggle()">
+            <i class="bi bi-cpu"></i>
+        </div>
+    </div>
+
+    <!-- ============================================
+         HEX PANEL
+         ============================================ -->
+    <div class="hex-panel" id="hexPanel">
+        <div class="hex-header">
+            <div>
+                <h6 class="fw-bold mb-0">HEX Demo Guide</h6>
+                <small class="text-white-50">Asistente de Navegación</small>
+            </div>
+            <button class="btn btn-sm btn-link text-white p-1" onclick="hexDemo.toggle()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="hex-body" id="hexBody">
+            <div class="hex-msg">
+                <strong>👋 Bienvenido al Demo</strong><br>
+                Estoy aquí para guiarte. Este es un entorno simulado donde puedes probar todas las funcionalidades sin
+                riesgo.
+            </div>
+        </div>
+        <div class="hex-commands">
+            <button class="hex-cmd" onclick="hexDemo.explain('citas')">
+                <i class="bi bi-calendar"></i> Agendar
+            </button>
+            <button class="hex-cmd" onclick="hexDemo.explain('nova')">
+                <i class="bi bi-robot"></i> Nova IA
+            </button>
+            <button class="hex-cmd" onclick="hexDemo.explain('bio')">
+                <i class="bi bi-fingerprint"></i> BioSeguridad
+            </button>
+            <button class="hex-cmd" onclick="hexDemo.explain('demo')">
+                <i class="bi bi-info-circle"></i> Sobre Demo
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCRIPTS (SIN MODIFICAR - LÓGICA INTACTA)
+         ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sistema de Notificaciones Toast Premium
+        const toastSystem = {
+            container: document.getElementById('toastContainer'),
+
+            show: function (message, type = 'info', duration = 4000) {
+                const icons = {
+                    success: 'bi-check-circle-fill',
+                    warning: 'bi-exclamation-triangle-fill',
+                    info: 'bi-info-circle-fill'
+                };
+
+                const toast = document.createElement('div');
+                toast.className = 'nova-toast';
+                toast.innerHTML = `
+                    <div class="toast-icon ${type}">
+                        <i class="bi ${icons[type]}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <h6>${type === 'success' ? '¡Éxito!' : type === 'warning' ? 'Atención' : 'Información'}</h6>
+                        <p>${message}</p>
+                    </div>
+                `;
+
+                this.container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('hiding');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+        };
+
+        // Nova Brain Chat System
+        const novaChat = {
+            box: document.getElementById('chatBox'),
+            input: document.getElementById('userInput'),
+
+            send: async function () {
+                const text = this.input.value.trim();
+                if (!text) return;
+
+                this.addMessage(text, 'user');
+                this.input.value = '';
+
+                this.showTyping();
+
+                try {
+                    const response = await fetch('/api/public/demo/think', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mensaje: text })
+                    });
+
+                    const data = await response.json();
+
+                    this.hideTyping();
+                    this.addMessage(data.respuesta, 'ai');
+
+                    if (data.sugerencias && data.sugerencias.length > 0) {
+                        this.addSuggestions(data.sugerencias);
+                    }
+
+                    if (data.intent === 'EMERGENCIA') {
+                        toastSystem.show('Protocolo de emergencia activado. Línea directa disponible.', 'warning', 6000);
+                    }
+                } catch (err) {
+                    console.error("Nova AI Error:", err);
+                    this.hideTyping();
+                    this.addMessage("Vaya, pareces que mi procesador central está ocupado. Intenta de nuevo en un momento.", 'ai');
+                }
+            },
+
+            ask: function (question) {
+                this.input.value = question;
+                this.send();
+            },
+
+            addMessage: function (text, type) {
+                const div = document.createElement('div');
+                div.className = `msg msg-${type}`;
+
+                if (type === 'ai') {
+                    div.innerHTML = `
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-robot text-primary"></i>
+                            <strong class="small">Nova Brain (Procesador IA)</strong>
+                        </div>
+                        ${text}
+                        <span class="msg-time">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        ${text}
+                        <span class="msg-time">${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+                    `;
+                }
+
+                this.box.appendChild(div);
+                this.box.scrollTop = this.box.scrollHeight;
+            },
+
+            addSuggestions: function (suggestions) {
+                const div = document.createElement('div');
+                div.className = 'd-flex flex-wrap gap-2 mt-2';
+                suggestions.forEach(s => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-sm btn-outline-primary rounded-pill py-1 px-3';
+                    btn.innerHTML = s;
+                    btn.onclick = () => this.ask(s.replace(/^[^a-zA-ZáéíóúÁÉÍÓÚ]+/, ''));
+                    div.appendChild(btn);
+                });
+                this.box.appendChild(div);
+                this.box.scrollTop = this.box.scrollHeight;
+            },
+
+            showTyping: function () {
+                const typing = document.createElement('div');
+                typing.className = 'typing-indicator';
+                typing.id = 'typingIndicator';
+                typing.innerHTML = '<span></span><span></span><span></span>';
+                this.box.appendChild(typing);
+                this.box.scrollTop = this.box.scrollHeight;
+            },
+
+            hideTyping: function () {
+                const typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
+            },
+
+            clear: function () {
+                this.box.innerHTML = `
+                    <div class="msg msg-ai">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-robot text-primary"></i>
+                            <strong class="small">Nova Brain</strong>
+                        </div>
+                        Conversación reiniciada por el usuario. ¡Hola! 😄
+                        <span class="msg-time">Justo ahora</span>
+                    </div>
+                `;
+                toastSystem.show('Conversación reiniciada', 'info');
+            }
+        };
+
+        // Sistema de Mascota Virtual
+        const petSystem = {
+            state: {
+                salud: 100,
+                hambre: 20,
+                felicidad: 80,
+                energia: 90,
+                nombre: "Nova-Pet",
+                lastUpdate: Date.now()
+            },
+
+            init: function () {
+                const saved = localStorage.getItem('demoPetState');
+                if (saved) {
+                    this.state = JSON.parse(saved);
+                    this.sincronizar();
+                }
+                this.render();
+                setInterval(() => this.tick(), 10000);
+            },
+
+            tick: function () {
+                this.state.hambre = Math.min(100, this.state.hambre + 1);
+                this.state.energia = Math.max(0, this.state.energia - 0.5);
+                if (this.state.hambre > 70) {
+                    this.state.salud = Math.max(0, this.state.salud - 1);
+                    this.state.felicidad = Math.max(0, this.state.felicidad - 1);
+                }
+                this.save();
+                this.render();
+            },
+
+            action: function (type) {
+                switch (type) {
+                    case 'FEED':
+                        this.state.hambre = Math.max(0, this.state.hambre - 25);
+                        this.state.salud = Math.min(100, this.state.salud + 2);
+                        this.state.felicidad = Math.min(100, this.state.felicidad + 5);
+                        this.animatePet('scale(1.2)');
+                        toastSystem.show('¡Nom nom! Qué rico alimento.', 'success');
+                        break;
+                    case 'PLAY':
+                        if (this.state.energia > 10) {
+                            this.state.felicidad = Math.min(100, this.state.felicidad + 20);
+                            this.state.energia = Math.max(0, this.state.energia - 15);
+                            this.state.hambre = Math.min(100, this.state.hambre + 5);
+                            this.animatePet('rotate(20deg)');
+                            toastSystem.show('¡Guao guao! Eso fue divertido.', 'success');
+                        } else {
+                            toastSystem.show('Estoy demasiado cansado para jugar...', 'warning');
+                        }
+                        break;
+                }
+                this.save();
+                this.render();
+            },
+
+            animatePet: function (transform) {
+                const el = document.getElementById('petEmojiContainer');
+                el.style.transform = transform;
+                setTimeout(() => el.style.transform = 'scale(1)', 300);
+            },
+
+            save: function () {
+                localStorage.setItem('demoPetState', JSON.stringify(this.state));
+            },
+
+            sincronizar: function () {
+                const ahora = Date.now();
+                const diffMinutos = Math.floor((ahora - this.state.lastUpdate) / 60000);
+                if (diffMinutos > 0) {
+                    this.state.hambre = Math.min(100, this.state.hambre + diffMinutos * 0.1);
+                    this.state.energia = Math.max(0, this.state.energia - diffMinutos * 0.05);
+                    this.state.lastUpdate = ahora;
+                }
+            },
+
+            render: function () {
+                const updateBar = (id, val) => {
+                    document.getElementById(`bar-${id}`).style.width = val + '%';
+                    document.getElementById(`val-${id}`).textContent = Math.round(val) + '%';
+                };
+
+                updateBar('salud', this.state.salud);
+                updateBar('hambre', this.state.hambre);
+                updateBar('energia', this.state.energia);
+                updateBar('felicidad', this.state.felicidad);
+
+                const statusTag = document.getElementById('petStatusText');
+                if (this.state.salud < 40) {
+                    statusTag.textContent = 'Enfermo 🤒';
+                    statusTag.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    document.getElementById('petEmoji').textContent = '🤢';
+                } else if (this.state.hambre > 60) {
+                    statusTag.textContent = 'Hambriento 🦴';
+                    statusTag.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                    document.getElementById('petEmoji').textContent = '🤤';
+                } else {
+                    statusTag.textContent = '¡Feliz! ✨';
+                    statusTag.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    document.getElementById('petEmoji').textContent = '🐶';
+                }
+            }
+        };
+
+        // Sistema de Agendamiento
+        let citasCount = 0;
+
+        function simularAgendar() {
+            const pet = document.getElementById('demoPet').value;
+            const tipo = document.getElementById('demoTipo').value;
+            const urgencia = document.getElementById('demoUrgencia').value;
+
+            if (!pet) {
+                toastSystem.show('Por favor selecciona una mascota primero', 'warning');
+                document.getElementById('demoPet').focus();
+                return;
+            }
+
+            const btnText = document.getElementById('btnAgendarText');
+            const spinner = document.getElementById('btnSpinner');
+
+            btnText.textContent = 'Analizando disponibilidad...';
+            spinner.classList.remove('d-none');
+
+            toastSystem.show('Nova Brain está analizando especialistas disponibles...', 'info', 3000);
+
+            setTimeout(() => {
+                const doctores = {
+                    'Consulta General': 'Dr. Rodríguez',
+                    'Vacunación': 'Dra. Martínez',
+                    'Urgencia': 'Dr. Chen (Urgencias)',
+                    'Estética': 'Dra. López'
+                };
+
+                const doctor = doctores[tipo] || 'Dr. Rodríguez';
+
+                const horas = ['09:00', '10:30', '14:00', '15:30', '17:00', '18:30'];
+                const hora = horas[Math.floor(Math.random() * horas.length)];
+                const fecha = new Date();
+                fecha.setDate(fecha.getDate() + (urgencia === 'critica' ? 0 : urgencia === 'alta' ? 1 : Math.floor(Math.random() * 3) + 2));
+
+                const fechaStr = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+
+                const lista = document.getElementById('listaCitas');
+                const noCitas = document.getElementById('noCitas');
+                if (noCitas) noCitas.style.display = 'none';
+
+                const citaId = 'cita-' + Date.now();
+                const card = document.createElement('div');
+                card.className = 'cita-card animate__animated animate__backInDown';
+                card.id = citaId;
+
+                const urgenciaBadge = urgencia === 'critica' ? '🔴 Crítica' : urgencia === 'alta' ? '🟡 Alta' : '🟢 Normal';
+                const urgenciaClass = urgencia === 'critica' ? 'bg-danger' : urgencia === 'alta' ? 'bg-warning text-dark' : 'bg-success';
+
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="cita-time">
+                            <i class="bi bi-clock"></i>
+                            ${fechaStr} • ${hora}
+                        </div>
+                        <span class="badge ${urgenciaClass}" style="font-size: 0.75rem;">${urgenciaBadge}</span>
+                    </div>
+                    <h6 class="fw-bold mb-1" style="font-size: 1.05rem;">${tipo} - ${pet}</h6>
+                    <p class="text-muted small mb-3"><i class="bi bi-person-badge me-1"></i> ${doctor}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary" style="font-size: 0.8rem;">
+                            <i class="bi bi-check2-all me-1"></i> Confirmada
+                        </span>
+                        <button class="cita-delete" onclick="eliminarCita('${citaId}')" title="Cancelar cita">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+                `;
+
+                lista.prepend(card);
+
+                btnText.textContent = 'Analizar y Agendar con IA';
+                spinner.classList.add('d-none');
+
+                citasCount++;
+                document.getElementById('statCitas').textContent = 124 + citasCount;
+
+                toastSystem.show(`✅ Cita confirmada para ${pet} el ${fechaStr} a las ${hora}`, 'success', 5000);
+
+                saveCitas();
+            }, 2500);
+        }
+
+        function saveCitas() {
+            const items = Array.from(document.querySelectorAll('.cita-card')).map(el => ({
+                id: el.id,
+                html: el.innerHTML
+            }));
+            localStorage.setItem('demoCitas', JSON.stringify(items));
+        }
+
+        function eliminarCita(id) {
+            const cita = document.getElementById(id);
+            cita.classList.replace('animate__backInDown', 'animate__backOutRight');
+            setTimeout(() => {
+                cita.remove();
+                citasCount--;
+                document.getElementById('statCitas').textContent = 124 + citasCount;
+                toastSystem.show('Cita cancelada correctamente', 'info');
+
+                const lista = document.getElementById('listaCitas');
+                if (lista.children.length === 0 || (lista.children.length === 1 && lista.children[0].id === 'noCitas')) {
+                    document.getElementById('noCitas').style.display = 'block';
+                }
+                saveCitas();
+            }, 500);
+        }
+
+        function seleccionarMascota(nombre) {
+            document.getElementById('demoPet').value = nombre;
+            toastSystem.show(`${nombre} seleccionado. ¿Qué necesitas agendar?`, 'info');
+            novaChat.addMessage(`Veo que seleccionaste a ${nombre}. ¿En qué puedo ayudarte con ${nombre === 'Max' ? 'él' : 'ella'} hoy?`, 'ai');
+        }
+
+        // Sistema de Escaneo Biométrico
+        function simularEscaneo() {
+            const container = document.getElementById('scannerContainer');
+            const line = document.getElementById('scanLine');
+            const overlay = document.getElementById('faceOverlay');
+            const content = document.getElementById('scanContent');
+            const progress = document.getElementById('scanProgress');
+            const bar = document.getElementById('progressBar');
+            const status = document.getElementById('scanStatus');
+            const btn = document.getElementById('btnScan');
+            const result = document.getElementById('scanResult');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Escaneando...';
+
+            container.classList.add('scanning');
+            line.classList.remove('d-none');
+            overlay.classList.remove('d-none');
+            content.style.opacity = '0.3';
+            progress.classList.remove('d-none');
+
+            const steps = [
+                { pct: '25%', text: 'Detectando rostro...' },
+                { pct: '50%', text: 'Analizando puntos biométricos...' },
+                { pct: '75%', text: 'Comparando con base de datos...' },
+                { pct: '100%', text: 'Verificando identidad...' }
+            ];
+
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    bar.style.width = steps[step].pct;
+                    status.textContent = steps[step].text;
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    completarEscaneo();
+                }
+            }, 700);
+
+            function completarEscaneo() {
+                setTimeout(() => {
+                    container.classList.remove('scanning');
+                    line.classList.add('d-none');
+                    overlay.classList.add('d-none');
+                    content.style.opacity = '1';
+                    progress.classList.add('d-none');
+
+                    document.getElementById('cameraIcon').className = 'bi bi-person-check-fill text-success display-1 mb-3 d-block';
+                    document.getElementById('scanText').textContent = 'Usuario Validado';
+                    document.getElementById('scanText').className = 'text-success fw-bold';
+
+                    result.innerHTML = `
+                        <div class="alert alert-success border-0 rounded-4 mb-0" style="position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; 
+                                        background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%);
+                                        animation: rotate 10s linear infinite;"></div>
+                            <div class="d-flex align-items-center gap-3" style="position: relative; z-index: 1;">
+                                <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #10b981, #059669); 
+                                            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+                                            box-shadow: 0 8px 25px rgba(16,185,129,0.3);">
+                                    <i class="bi bi-shield-check text-white fs-3"></i>
+                                </div>
+                                <div>
+                                    <strong style="font-size: 1.1rem;">ACCESO CONCEDIDO</strong>
+                                    <div class="small" style="opacity: 0.8;">ID: #8492 • Confianza: 99.8%</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Verificación Completada';
+                    btn.classList.replace('btn-outline-primary', 'btn-success');
+                    btn.disabled = false;
+
+                    toastSystem.show('Autenticación biométrica completada con éxito', 'success', 4000);
+
+                    setTimeout(() => {
+                        resetEscaneo();
+                    }, 8000);
+
+                }, 500);
+            }
+        }
+
+        function resetEscaneo() {
+            document.getElementById('cameraIcon').className = 'bi bi-person-circle text-white-50 display-1 mb-3 d-block';
+            document.getElementById('scanText').textContent = 'Sistema de reconocimiento listo';
+            document.getElementById('scanText').className = 'text-white-50 small mb-0';
+            document.getElementById('scanResult').innerHTML = '';
+            const btn = document.getElementById('btnScan');
+            btn.innerHTML = '<i class="bi bi-fingerprint me-2"></i>Iniciar Escaneo Biométrico';
+            btn.classList.replace('btn-success', 'btn-outline-primary');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+
+        // HEX Demo Assistant
+        const hexDemo = {
+            panel: document.getElementById('hexPanel'),
+            body: document.getElementById('hexBody'),
+
+            toggle: function () {
+                const isHidden = this.panel.style.display === 'none' || !this.panel.style.display;
+                this.panel.style.display = isHidden ? 'flex' : 'none';
+            },
+
+            explain: function (topic) {
+                const explanations = {
+                    citas: "🗓️ <strong>Agendamiento Express:</strong><br>Selecciona tu mascota, tipo de consulta y nivel de urgencia. La IA analizará automáticamente la disponibilidad de especialistas y te asignará el mejor horario.",
+                    nova: "🤖 <strong>Nova Brain:</strong><br>Asistente veterinario inteligente que puede responder preguntas sobre:<br>• Vacunas y calendario<br>• Síntomas básicos<br>• Información de servicios<br>• Emergencias",
+                    bio: "🔐 <strong>BioSeguridad:</strong><br>Sistema de reconocimiento facial simulado. En producción, utiliza algoritmos de deep learning para verificación de identidad con 99.9% de precisión.",
+                    demo: "ℹ️ <strong>Sobre este Demo:</strong><br>Este es un entorno de prueba. Los datos son simulados y no representan información real. Algunas funciones están limitadas."
+                };
+
+                const div = document.createElement('div');
+                div.className = 'hex-msg';
+                div.innerHTML = explanations[topic];
+                this.body.appendChild(div);
+                this.body.scrollTop = this.body.scrollHeight;
+            }
+        };
+
+        // Funciones globales
+        function mostrarToast(message, type = 'info') {
+            toastSystem.show(message, type);
+        }
+
+        function mostrarDescarga(filename) {
+            toastSystem.show(`Generando ${filename}...`, 'info', 2000);
+            setTimeout(() => {
+                toastSystem.show(`📄 ${filename} descargado correctamente`, 'success', 4000);
+            }, 2000);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                const response = await fetch('/api/public/demo/data');
+                const data = await response.json();
+                console.log("Demo Data Loaded:", data);
+            } catch (e) { console.warn("No se pudieron cargar datos reales para la demo"); }
+
+            petSystem.init();
+
+            const savedCitas = localStorage.getItem('demoCitas');
+            if (savedCitas) {
+                const citas = JSON.parse(savedCitas);
+                const lista = document.getElementById('listaCitas');
+                const noCitas = document.getElementById('noCitas');
+                if (citas.length > 0 && noCitas) noCitas.style.display = 'none';
+
+                citas.forEach(c => {
+                    const card = document.createElement('div');
+                    card.className = 'cita-card animate__animated animate__fadeIn';
+                    card.id = c.id;
+                    card.innerHTML = c.html;
+                    lista.appendChild(card);
+                    citasCount++;
+                });
+                document.getElementById('statCitas').textContent = 124 + citasCount;
+            }
+
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            setTimeout(() => {
+                toastSystem.show('💡 Consejo: Prueba a jugar con Nova-Pet o pregúntale a la IA por una receta.', 'info', 6000);
+            }, 3000);
+        });
+    </script>
+</body>
+
+</html>

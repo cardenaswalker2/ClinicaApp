@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClínicaApp — Folleto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --sky: #0ea5e9;
+            --sky-dark: #0284c7;
+            --violet: #8b5cf6;
+            --emerald: #10b981;
+            --slate: #0f172a;
+            --slate-mid: #334155;
+            --muted: #64748b;
+            --paper: #f8fafc;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background: #1e293b;
+            color: var(--slate);
+        }
+
+        /* ─── Pantalla: vista previa ─── */
+        .screen-toolbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .screen-toolbar p { font-size: 0.85rem; color: #94a3b8; }
+        .screen-toolbar button {
+            background: linear-gradient(135deg, var(--sky), var(--violet));
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .screen-toolbar button:hover { opacity: 0.9; }
+
+        .preview-wrap {
+            padding: 5rem 1.5rem 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .page-label {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            align-self: flex-start;
+            max-width: 297mm;
+            width: 100%;
+        }
+
+        /* ─── Hoja A4 apaisada (cara portada + cara interior) ─── */
+        .sheet {
+            width: 297mm;
+            height: 210mm;
+            background: #fff;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════════
+           CARA 1 — PORTADA COMPLETA
+        ═══════════════════════════════════════ */
+        .cover {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #0c4a6e 0%, #0369a1 18%, #0ea5e9 42%, #6366f1 68%, #8b5cf6 88%, #5b21b6 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+            position: relative;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 85%, rgba(16, 185, 129, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 85% 15%, rgba(244, 63, 94, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 55%);
+        }
+
+        .cover-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.07;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5c-3 8-12 12-12 22 0 8 6 14 12 18 6-4 12-10 12-18 0-10-9-14-12-22z' fill='%23fff'/%3E%3C/svg%3E");
+            background-size: 48px 48px;
+        }
+
+        .cover-waves {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 45%;
+            opacity: 0.15;
+        }
+        .cover-waves svg { width: 100%; height: 100%; }
+
+        .cover-content {
+            position: relative;
+            z-index: 2;
+            padding: 2rem 3rem;
+            max-width: 90%;
+        }
+
+        .cover-logo-wrap {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 1.5rem;
+            filter: drop-shadow(0 12px 40px rgba(0,0,0,0.35));
+        }
+
+        .cover-logo-wrap svg { width: 100%; height: 100%; }
+
+        .cover h1 {
+            font-size: 3.4rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 0.35rem;
+        }
+        .cover h1 span { color: #bae6fd; }
+
+        .cover-tagline {
+            font-size: 1.35rem;
+            font-weight: 600;
+            opacity: 0.95;
+            margin-bottom: 0.75rem;
+        }
+
+        .cover-sub {
+            font-size: 1rem;
+            opacity: 0.82;
+            max-width: 520px;
+            margin: 0 auto 1.75rem;
+            line-height: 1.55;
+        }
+
+        .cover-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+        }
+
+        .cover-badge {
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.28);
+            backdrop-filter: blur(8px);
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 1.25rem;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 0.72rem;
+            opacity: 0.65;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .cover-paw-deco {
+            position: absolute;
+            font-size: 4rem;
+            opacity: 0.08;
+            z-index: 1;
+        }
+        .cover-paw-deco.p1 { top: 8%; left: 6%; transform: rotate(-20deg); }
+        .cover-paw-deco.p2 { top: 12%; right: 8%; transform: rotate(15deg); }
+        .cover-paw-deco.p3 { bottom: 18%; left: 10%; transform: rotate(10deg); }
+        .cover-paw-deco.p4 { bottom: 22%; right: 7%; transform: rotate(-12deg); }
+
+        /* ═══════════════════════════════════════
+           CARA 2 — 3 PANELES (interior)
+        ═══════════════════════════════════════ */
+        .inside {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            height: 100%;
+            background: var(--paper);
+        }
+
+        .panel {
+            padding: 1.35rem 1.25rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px dashed #cbd5e1;
+            position: relative;
+        }
+        .panel:last-child { border-right: none; }
+
+        .panel-num {
+            position: absolute;
+            top: 0.65rem;
+            right: 0.85rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sky), var(--violet));
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel-header {
+            margin-bottom: 0.85rem;
+            padding-right: 1.5rem;
+        }
+
+        .panel-tag {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--sky);
+            margin-bottom: 0.25rem;
+        }
+
+        .panel h2 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--slate);
+            line-height: 1.2;
+        }
+
+        .panel p, .panel li {
+            font-size: 0.68rem;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+
+        .panel p { margin-bottom: 0.55rem; }
+
+        .feature-list {
+            list-style: none;
+            margin: 0.4rem 0 0.6rem;
+        }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+            margin-bottom: 0.35rem;
+            color: var(--slate-mid);
+            font-weight: 500;
+        }
+        .feature-list li i {
+            color: var(--sky);
+            font-size: 0.75rem;
+            margin-top: 0.1rem;
+            flex-shrink: 0;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.45rem;
+            margin: 0.5rem 0;
+        }
+        .stat-box {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.45rem 0.5rem;
+            text-align: center;
+        }
+        .stat-box strong {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--sky), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-box span { font-size: 0.58rem; color: var(--muted); font-weight: 600; }
+
+        /* Panel 2 — tech */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+            margin: 0.35rem 0 0.5rem;
+        }
+        .tech-chip {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.4rem 0.45rem;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--slate);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .tech-chip i { font-size: 0.85rem; color: var(--sky); }
+
+        .flow-steps {
+            margin-top: 0.35rem;
+        }
+        .flow-step {
+            display: flex;
+            gap: 0.45rem;
+            margin-bottom: 0.4rem;
+            align-items: flex-start;
+        }
+        .flow-step .dot {
+            width: 1.1rem;
+            height: 1.1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sky), var(--violet));
+            color: #fff;
+            font-size: 0.55rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.05rem;
+        }
+        .flow-step div strong {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--slate);
+            margin-bottom: 0.1rem;
+        }
+        .flow-step div span { font-size: 0.6rem; color: var(--muted); line-height: 1.35; }
+
+        /* Panel 3 — nosotros */
+        .team-card {
+            background: linear-gradient(135deg, #0f172a, #1e3a5f);
+            border-radius: 10px;
+            padding: 0.75rem;
+            color: #fff;
+            margin: 0.45rem 0 0.6rem;
+        }
+        .team-card h3 {
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-bottom: 0.15rem;
+        }
+        .team-card .role {
+            font-size: 0.62rem;
+            color: #7dd3fc;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .team-card p {
+            font-size: 0.62rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .contact-block {
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        .contact-block p {
+            font-size: 0.62rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 0.25rem;
+            color: var(--slate-mid);
+            font-weight: 600;
+        }
+        .contact-block i { color: var(--sky); }
+
+        .qr-placeholder {
+            width: 52px;
+            height: 52px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.2;
+            margin-top: 0.35rem;
+        }
+
+        .fold-hint {
+            position: absolute;
+            bottom: 0.4rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.55rem;
+            color: #94a3b8;
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── Impresión ─── */
+        @media print {
+            body { background: #fff; }
+            .screen-toolbar, .page-label, .preview-wrap { padding: 0; }
+            .screen-toolbar { display: none !important; }
+            .preview-wrap {
+                padding: 0;
+                gap: 0;
+            }
+            .page-label { display: none; }
+            .sheet {
+                box-shadow: none;
+                page-break-after: always;
+                margin: 0;
+            }
+            .sheet:last-child { page-break-after: auto; }
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+        }
+
+        @media screen and (max-width: 900px) {
+            .sheet {
+                width: 100%;
+                height: auto;
+                min-height: 70vw;
+            }
+            .inside { grid-template-columns: 1fr; }
+            .panel { border-right: none; border-bottom: 1px dashed #cbd5e1; min-height: auto; }
+            .cover h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-toolbar">
+        <div>
+            <strong>ClínicaApp — Folleto tríptico</strong>
+            <p>Cara 1: portada · Cara 2: 3 paneles (dóblalo en 3 para leer). Imprime en A4 apaisado, doble cara.</p>
+        </div>
+        <button type="button" onclick="window.print()"><i class="bi bi-printer-fill"></i> Imprimir / PDF</button>
+    </div>
+
+    <div class="preview-wrap">
+
+        <p class="page-label">Cara 1 — Portada (lado exterior al cerrar el folleto)</p>
+        <section class="sheet cover" aria-label="Portada ClínicaApp">
+            <div class="cover-pattern"></div>
+            <i class="bi bi-heart-pulse-fill cover-paw-deco p1"></i>
+            <i class="bi bi-heart-pulse-fill cover-paw-deco p2"></i>
+            <i class="bi bi-heart-pulse-fill cover-paw-deco p3"></i>
+            <i class="bi bi-heart-pulse-fill cover-paw-deco p4"></i>
+
+            <div class="cover-waves">
+                <svg viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0,120 Q300,40 600,100 T1200,80 L1200,200 L0,200 Z" fill="white"/>
+                    <path d="M0,150 Q400,90 800,130 T1200,110 L1200,200 L0,200 Z" fill="white" opacity="0.5"/>
+                </svg>
+            </div>
+
+            <div class="cover-content">
+                <div class="cover-logo-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.35"/>
+                                <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.1"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" rx="28" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+                        <path d="M50 78c-15-10-28-22-28-38 0-12 8-18 15-12 3 2 6 4 13 4s10-2 13-4c7-6 15 0 15 12 0 16-13 28-28 38z" fill="white" opacity="0.95"/>
+                        <path d="M35 48c2-3 5-5 8-5s6 2 7 5M50 48c1-3 4-5 7-5s6 2 8 5" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="38" cy="38" r="2.5" fill="white"/>
+                        <circle cx="62" cy="38" r="2.5" fill="white"/>
+                    </svg>
+                </div>
+
+                <h1>Clínica<span>App</span></h1>
+                <p class="cover-tagline">La plataforma veterinaria más avanzada de Colombia</p>
+                <p class="cover-sub">
+                    Conecta dueños de mascotas, clínicas y veterinarios en un ecosistema digital:
+                    citas en tiempo real, historial médico, pagos seguros e inteligencia artificial.
+                </p>
+
+                <div class="cover-badges">
+                    <span class="cover-badge"><i class="bi bi-calendar-check-fill"></i> Citas online</span>
+                    <span class="cover-badge"><i class="bi bi-robot"></i> Nova AI</span>
+                    <span class="cover-badge"><i class="bi bi-phone-fill"></i> Web + Móvil</span>
+                    <span class="cover-badge"><i class="bi bi-geo-alt-fill"></i> Cartagena</span>
+                </div>
+            </div>
+
+            <p class="cover-footer">www.clinicaapp.com · Plataforma veterinaria premium · 2025</p>
+        </section>
+
+        <p class="page-label">Cara 2 — Interior (abre y lee en 3 paneles; dobla por las líneas punteadas)</p>
+        <section class="sheet inside" aria-label="Interior folleto">
+            <!-- PANEL 1: Qué es -->
+            <article class="panel">
+                <span class="panel-num">1</span>
+                <header class="panel-header">
+                    <p class="panel-tag">Sección 01</p>
+                    <h2>¿Qué es ClínicaApp?</h2>
+                </header>
+
+                <p>
+                    <strong style="color:var(--slate);">ClínicaApp</strong> es una plataforma omnicanal que centraliza
+                    la atención veterinaria: los usuarios buscan clínicas, agendan citas, gestionan mascotas y acceden
+                    a su oficina virtual desde web o móvil.
+                </p>
+
+                <ul class="feature-list">
+                    <li><i class="bi bi-search"></i> Buscador de clínicas y servicios</li>
+                    <li><i class="bi bi-calendar2-week"></i> Agendamiento de citas en tiempo real</li>
+                    <li><i class="bi bi-file-medical"></i> Historial médico y visitas digitales</li>
+                    <li><i class="bi bi-credit-card"></i> Pagos con Stripe integrados</li>
+                    <li><i class="bi bi-bell"></i> Notificaciones por email y SMS (Twilio)</li>
+                    <li><i class="bi bi-stars"></i> Asistente Nova-Pet con IA conversacional</li>
+                </ul>
+
+                <div class="stat-row">
+                    <div class="stat-box"><strong>360°</strong><span>Ecosistema médico</span></div>
+                    <div class="stat-box"><strong>24/7</strong><span>Acceso digital</span></div>
+                </div>
+
+                <p>Roles: dueños de mascotas, veterinarios, administradores de clínica y panel de control global.</p>
+                <p class="fold-hint">↔ Doblar aquí</p>
+            </article>
+
+            <!-- PANEL 2: Tecnología -->
+            <article class="panel">
+                <span class="panel-num">2</span>
+                <header class="panel-header">
+                    <p class="panel-tag">Sección 02</p>
+                    <h2>Tecnología e implementación</h2>
+                </header>
+
+                <p>Arquitectura full-stack diseñada para escalar y operar en producción.</p>
+
+                <div class="tech-grid">
+                    <span class="tech-chip"><i class="bi bi-box-seam"></i> Spring Boot 3</span>
+                    <span class="tech-chip"><i class="bi bi-database"></i> MongoDB</span>
+                    <span class="tech-chip"><i class="bi bi-shield-lock"></i> Spring Security</span>
+                    <span class="tech-chip"><i class="bi bi-phone"></i> Flutter</span>
+                    <span class="tech-chip"><i class="bi bi-google"></i> OAuth2</span>
+                    <span class="tech-chip"><i class="bi bi-credit-card-2-front"></i> Stripe</span>
+                    <span class="tech-chip"><i class="bi bi-chat-dots"></i> Twilio SMS</span>
+                    <span class="tech-chip"><i class="bi bi-cpu"></i> Groq + Weka ML</span>
+                </div>
+
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <span class="dot">1</span>
+                        <div><strong>Backend REST</strong><span>Java 17, Thymeleaf, APIs REST y capa de servicios con MongoDB.</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="dot">2</span>
+                        <div><strong>App móvil</strong><span>Flutter consume el API; login con Google y UI glassmorphism.</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="dot">3</span>
+                        <div><strong>IA Nova</strong><span>Asistente con Groq, herramientas de negocio y monitor ML con Weka.</span></div>
+                    </div>
+                    <div class="flow-step">
+                        <span class="dot">4</span>
+                        <div><strong>Seguridad</strong><span>OAuth2, roles, auditoría, respaldos y modo mantenimiento.</span></div>
+                    </div>
+                </div>
+                <p class="fold-hint">↔ Doblar aquí</p>
+            </article>
+
+            <!-- PANEL 3: Nosotros -->
+            <article class="panel">
+                <span class="panel-num">3</span>
+                <header class="panel-header">
+                    <p class="panel-tag">Sección 03</p>
+                    <h2>Quiénes lo desarrollamos</h2>
+                </header>
+
+                <p>
+                    Somos un equipo de ingeniería de software enfocado en construir productos digitales
+                    de misión crítica con estándares empresariales.
+                </p>
+
+                <div class="team-card">
+                    <h3>Luis Alejandro Cárdenas R.</h3>
+                    <p class="role">Lead Architect — ClínicaApp Ecosystem</p>
+                    <p>
+                        Full-Stack &amp; Solution Architect. Liderazgo técnico en backend Spring Boot,
+                        app Flutter, integración de IA (Nova), pagos y comunicaciones a escala.
+                    </p>
+                </div>
+
+                <p><strong style="color:var(--slate);font-size:0.68rem;">Nuestra misión:</strong> digitalizar la experiencia veterinaria en Colombia con tecnología accesible, segura e inteligente.</p>
+
+                <ul class="feature-list">
+                    <li><i class="bi bi-check-circle-fill"></i> Código mantenible y documentado</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Diseño premium (glass, modo oscuro)</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Listo para crecer a más ciudades</li>
+                </ul>
+
+                <div class="contact-block">
+                    <p><i class="bi bi-envelope-fill"></i> cardenaswalker1@gmail.com</p>
+                    <p><i class="bi bi-globe"></i> Cartagena, Colombia</p>
+                    <p><i class="bi bi-github"></i> Proyecto ClinicaApp · 2023 — Presente</p>
+                    <div class="qr-placeholder">QR<br>web</div>
+                </div>
+            </article>
+        </section>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Cliente - Recepción</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --secondary: #64748b;
+            --dark: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.98);
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+            min-height: 100vh;
+            color: #334155;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.025;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .bg-shapes .shape-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            top: -150px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shapes .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--success);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -8s;
+        }
+
+        .bg-shapes .shape-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--danger);
+            top: 50%;
+            right: 30%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(40px, -40px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        /* ===== HEADER PREMIUM ===== */
+        .page-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(14, 165, 233, 0.4);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title i {
+            font-size: 2.25rem;
+            animation: pulse-user 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-user {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.85;
+            }
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== MAIN CARD ===== */
+        .form-card {
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+            padding: 1.75rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .form-header h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-header h2 i {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .form-body {
+            padding: 2.5rem;
+        }
+
+        /* ===== ALERTS PREMIUM ===== */
+        .alert-custom {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-custom::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .alert-danger-custom {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
+        }
+
+        .alert-danger-custom::before {
+            background: linear-gradient(180deg, #ef4444, #dc2626);
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+        }
+
+        .alert-success-custom::before {
+            background: linear-gradient(180deg, #22c55e, #16a34a);
+        }
+
+        .alert-success-custom i {
+            color: #22c55e;
+            font-size: 1.25rem;
+        }
+
+        .alert-danger-custom i {
+            color: #ef4444;
+            font-size: 1.25rem;
+        }
+
+        /* ===== SECTION DIVIDERS ===== */
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+            position: relative;
+        }
+
+        .section-divider::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+        }
+
+        .section-divider i {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #bae6fd 100%);
+            color: var(--primary-dark);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+
+        /* ===== FORM CONTROLS PREMIUM ===== */
+        .form-label {
+            font-weight: 800;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .required::after {
+            content: "*";
+            color: var(--danger);
+            margin-left: 0.25rem;
+            font-weight: 900;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.15);
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-text {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-text i {
+            color: var(--primary);
+        }
+
+        /* ===== INPUT GROUPS ===== */
+        .input-group-text {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2.5px solid var(--border);
+            border-right: none;
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+            color: var(--primary);
+            padding: 1rem 1.25rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Password toggle button */
+        .btn-outline-secondary {
+            border: 2.5px solid var(--border);
+            border-left: none;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 1rem 1.25rem;
+            color: var(--secondary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-group-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 1.1rem 2.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(14, 165, 233, 0.45);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: white;
+            color: #334155;
+            border: 2.5px solid var(--border);
+            padding: 1.1rem 2.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-color: var(--secondary);
+            color: #0f172a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== FOOTER INFO ===== */
+        .footer-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: var(--secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .footer-info i {
+            color: var(--primary);
+        }
+
+        .footer-info .text-danger {
+            color: var(--danger) !important;
+            font-weight: 900;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.75rem 0;
+                margin-bottom: 2rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .page-title i {
+                font-size: 1.75rem;
+            }
+
+            .form-body {
+                padding: 1.5rem;
+            }
+
+            .form-header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .btn-group-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn-primary-custom,
+            .btn-secondary-custom {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section-divider {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.15rem;
+            }
+
+            .form-header h2 i {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .section-divider i {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Animated Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div th:replace="~{fragments/header :: header-recepcion}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- Header Premium -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">
+                <i class="bi bi-person-plus-fill"></i>
+                Registrar Nuevo Cliente
+            </h1>
+            <p class="page-subtitle">Añade un nuevo miembro a la comunidad de ClínicaApp</p>
+        </div>
+    </div>
+
+    <main class="container pb-5" style="position:relative; z-index:1;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Alertas de error/éxito -->
+                <div th:if="${mensajeError}" class="alert alert-custom alert-danger-custom alert-dismissible fade show">
+                    <i class="bi bi-x-circle-fill"></i>
+                    <span th:text="${mensajeError}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${mensajeExito}" class="alert alert-custom alert-success-custom alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span th:text="${mensajeExito}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2>
+                            <i class="bi bi-person-vcard"></i>
+                            Información del Cliente
+                        </h2>
+                    </div>
+
+                    <div class="form-body">
+                        <form th:action="@{/recepcion/clientes/guardar}" th:object="${usuarioRegistroDTO}"
+                            method="post">
+
+                            <!-- Sección: Datos Personales -->
+                            <div class="form-section">
+                                <div class="section-divider">
+                                    <i class="bi bi-person"></i>
+                                    Datos Personales
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="nombre" class="form-label required">Nombre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" id="nombre" class="form-control" th:field="*{nombre}"
+                                                placeholder="Ej: María" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="apellido" class="form-label required">Apellido</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" id="apellido" class="form-control" th:field="*{apellido}"
+                                                placeholder="Ej: González" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="email" class="form-label required">Correo Electrónico</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" id="email" class="form-control" th:field="*{email}"
+                                            placeholder="cliente@ejemplo.com" required>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Se enviará un correo de confirmación a esta dirección.
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input type="tel" id="telefono" class="form-control" th:field="*{telefono}"
+                                            placeholder="+57 300 123 4567">
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="bi bi-globe me-1"></i>
+                                        Formato internacional recomendado (ej: +57 para Colombia).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección: Seguridad -->
+                            <div class="form-section">
+                                <div class="section-divider">
+                                    <i class="bi bi-shield-lock"></i>
+                                    Configuración de Acceso
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="password" class="form-label required">Contraseña Temporal</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                        <input type="password" id="password" class="form-control" th:field="*{password}"
+                                            placeholder="Mínimo 8 caracteres" required>
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            onclick="togglePassword()">
+                                            <i class="bi bi-eye" id="toggleIcon"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        El cliente deberá usar esta contraseña para su primer inicio de sesión. Se
+                                        recomienda cambiarla al ingresar.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="btn-group-actions">
+                                <a th:href="@{/recepcion/clientes}" class="btn-secondary-custom">
+                                    <i class="bi bi-x-lg"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn-primary-custom">
+                                    <i class="bi bi-check-lg"></i>
+                                    Guardar Cliente
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Info adicional -->
+                <div class="footer-info">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle visibilidad de contraseña
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        }
+
+        // Validación en tiempo real simple
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputs = document.querySelectorAll('.form-control');
+
+            inputs.forEach(input => {
+                input.addEventListener('blur', function () {
+                    if (this.checkValidity() && this.value !== '') {
+                        this.style.borderColor = 'var(--success)';
+                        this.style.background = 'rgba(34, 197, 94, 0.02)';
+                    } else if (!this.checkValidity() && this.value !== '') {
+                        this.style.borderColor = 'var(--danger)';
+                        this.style.background = 'rgba(239, 68, 68, 0.02)';
+                    }
+                });
+
+                input.addEventListener('focus', function () {
+                    this.style.borderColor = '';
+                    this.style.background = '';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

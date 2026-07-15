@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Comisión Stripe | ClínicaApp Admin</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --stripe: #635bff;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-strong: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 4px 24px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 20px 50px rgba(99, 102, 241, 0.18);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #ede9fe 25%, #e0e7ff 50%, #f5f3ff 75%, #fff1f2 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #334155;
+            padding-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            33% {
+                background-position: 100% 50%;
+            }
+
+            66% {
+                background-position: 50% 100%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Partículas flotantes de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Contenedor Principal */
+        .admin-container {
+            padding: 1.5rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER DE PÁGINA ===== */
+        .page-header {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-weight: 600;
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.05));
+            color: #4338ca;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        /* ===== ALERTA DE ÉXITO ===== */
+        .alert-success-custom {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: var(--radius-xl);
+            padding: 1.25rem 1.5rem;
+            color: #065f46;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-soft);
+            animation: slideDown 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-success-custom::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, #10b981, #34d399);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success-custom i {
+            font-size: 1.5rem;
+            color: #059669;
+        }
+
+        /* ===== CARD PRINCIPAL ===== */
+        .main-card {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.2s;
+            position: relative;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .card-header-custom {
+            padding: 1.75rem 2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+            position: relative;
+        }
+
+        .card-header-custom h5 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header-custom i {
+            background: linear-gradient(135deg, #635bff, #0a2540);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 24px rgba(99, 91, 255, 0.3);
+            animation: pulse-percent 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-percent {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .card-body-custom {
+            padding: 2rem;
+        }
+
+        /* ===== FORMULARIOS PREMIUM ===== */
+        .form-group {
+            margin-bottom: 1.75rem;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-label-custom {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label-custom::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, var(--stripe), #0a2540);
+            border-radius: 50%;
+        }
+
+        /* Input Group Premium */
+        .input-group-premium {
+            box-shadow: 0 4px 12px rgba(99, 91, 255, 0.1);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            background: rgba(248, 250, 252, 0.8);
+            border: 2px solid #e0e7ff;
+        }
+
+        .input-group-premium:focus-within {
+            box-shadow: 0 8px 25px rgba(99, 91, 255, 0.2);
+            border-color: var(--stripe);
+            transform: translateY(-2px);
+        }
+
+        .input-group-text-custom {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border: none;
+            color: var(--stripe);
+            font-weight: 800;
+            font-size: 1.5rem;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-control-custom {
+            border: none;
+            padding: 1rem 1.25rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            text-align: center;
+            background: transparent;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .form-control-custom:focus {
+            background: white;
+            outline: none;
+        }
+
+        .form-control-custom::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Form text helper */
+        .form-text-custom {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.75rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(224, 231, 255, 0.5), rgba(199, 210, 254, 0.3));
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--stripe);
+        }
+
+        /* ===== SIMULADOR DE COMISIÓN (NUEVO) ===== */
+        .simulator-card {
+            background: linear-gradient(135deg, rgba(99, 91, 255, 0.05) 0%, rgba(10, 37, 64, 0.03) 100%);
+            border: 2px solid rgba(99, 91, 255, 0.15);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.4s;
+        }
+
+        .simulator-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .simulator-title i {
+            color: var(--stripe);
+        }
+
+        .simulator-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .simulator-row:last-child {
+            border-bottom: none;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .simulator-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .simulator-value {
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .simulator-value.income {
+            color: #059669;
+        }
+
+        .simulator-value.fee {
+            color: var(--stripe);
+        }
+
+        .simulator-value.net {
+            color: #1e293b;
+            font-size: 1.1rem;
+        }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .btn-group-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.5s;
+        }
+
+        .btn-cancel {
+            background: rgba(241, 245, 249, 0.8);
+            border: 2px solid #e2e8f0;
+            color: #475569;
+            border-radius: var(--radius-md);
+            padding: 1rem 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            color: #334155;
+            transform: translateY(-2px);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--stripe), #0a2540);
+            border: none;
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 1rem 2.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 10px 25px rgba(99, 91, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-save::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(99, 91, 255, 0.4);
+            color: white;
+        }
+
+        .btn-save:hover::before {
+            left: 100%;
+        }
+
+        /* ===== FOOTER ===== */
+        .admin-footer {
+            margin-top: 3rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(226, 232, 240, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c7d2fe, #ddd6fe);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.25rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .card-body-custom {
+                padding: 1.5rem;
+            }
+
+            .btn-group-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn-cancel,
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card-header-custom {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .input-group-text-custom {
+                font-size: 1.25rem;
+                padding: 0.875rem 1.25rem;
+            }
+
+            .form-control-custom {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .form-control-custom {
+                font-size: 1.1rem;
+                padding: 0.875rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar Admin Unificado -->
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <div class="container admin-container">
+
+        <!-- ===== HEADER DE PÁGINA ===== -->
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-percent me-2" style="color: var(--stripe);"></i>Comisión Stripe</h1>
+                <p>Configura el porcentaje de retención por transacción procesada.</p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Volver al Dashboard
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+
+                <!-- ===== ALERTA DE ÉXITO ===== -->
+                <div th:if="${param.success}" class="alert-success-custom">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>¡Comisión actualizada correctamente!</span>
+                </div>
+
+                <!-- ===== CARD PRINCIPAL ===== -->
+                <div class="main-card">
+
+                    <!-- Header del Card -->
+                    <div class="card-header-custom">
+                        <h5>
+                            <i class="bi bi-percent"></i>
+                            Configurar Comisión de Stripe
+                        </h5>
+                    </div>
+
+                    <!-- Body del Card -->
+                    <div class="card-body-custom">
+
+                        <form th:action="@{/admin/configuracion/guardar}" th:object="${config}" method="post">
+                            <input type="hidden" name="origen" value="stripe">
+
+                            <!-- ===== CAMPO: Porcentaje de Retención ===== -->
+                            <div class="form-group">
+                                <label class="form-label-custom">Porcentaje de Retención</label>
+                                <div class="input-group-premium">
+                                    <span class="input-group-text-custom">%</span>
+                                    <input type="number" step="0.1" class="form-control-custom"
+                                        th:field="*{comisionStripe}" required placeholder="2.9" min="0" max="100"
+                                        id="comisionInput">
+                                </div>
+                                <div class="form-text-custom">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Este porcentaje se descontará automáticamente de los ingresos de las clínicas en
+                                    cada transacción procesada por Stripe.
+                                </div>
+                            </div>
+
+                            <!-- ===== SIMULADOR DE COMISIÓN (NUEVO) ===== -->
+                            <div class="simulator-card">
+                                <div class="simulator-title">
+                                    <i class="bi bi-calculator"></i>
+                                    Simulador de Transacción
+                                </div>
+                                <div class="simulator-row">
+                                    <span class="simulator-label">Monto de ejemplo</span>
+                                    <span class="simulator-value income">$1,000.00</span>
+                                </div>
+                                <div class="simulator-row">
+                                    <span class="simulator-label">Comisión Stripe (<span
+                                            id="simPorcentaje">2.9</span>%)</span>
+                                    <span class="simulator-value fee" id="simComision">-$29.00</span>
+                                </div>
+                                <div class="simulator-row">
+                                    <span class="simulator-label">Ingreso neto para la clínica</span>
+                                    <span class="simulator-value net" id="simNeto">$971.00</span>
+                                </div>
+                            </div>
+
+                            <!-- ===== BOTONES DE ACCIÓN ===== -->
+                            <div class="btn-group-actions">
+                                <a th:href="@{/admin/dashboard}" class="btn-cancel">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn-save">
+                                    <i class="bi bi-save"></i> Guardar Cambios
+                                </button>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+                <!-- ===== CARD DE INFORMACIÓN ADICIONAL ===== -->
+                <div class="main-card mt-4" style="animation-delay: 0.6s;">
+                    <div class="card-header-custom"
+                        style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(254, 215, 170, 0.95) 100%);">
+                        <h5 style="color: #92400e;">
+                            <i class="bi bi-lightbulb"
+                                style="background: linear-gradient(135deg, #f59e0b, #fbbf24);"></i>
+                            Consejos de Configuración
+                        </h5>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 36px; height: 36px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-1-circle-fill" style="color: #4338ca; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Tarifa estándar
+                                        de Stripe</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">La tarifa
+                                        estándar de Stripe es del 2.9% + $0.30 por transacción. Considera esto al
+                                        configurar tu comisión.</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 36px; height: 36px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-2-circle-fill" style="color: #059669; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Transparencia con
+                                        las clínicas</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Las clínicas
+                                        verán el desglose de la comisión en cada pago recibido. Mantén la tarifa justa
+                                        para retener clientes.</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 36px; height: 36px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-3-circle-fill" style="color: #b45309; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Cambios
+                                        inmediatos</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Los cambios en
+                                        la comisión se aplican inmediatamente a las nuevas transacciones. Las
+                                        transacciones anteriores no se ven afectadas.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="admin-footer">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div
+                style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;">
+            </div>
+            <span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">Sistema Operativo</span>
+        </div>
+        <small>© 2024 ClínicaApp - Panel de Administración</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        // ===== SIMULADOR DE COMISIÓN EN TIEMPO REAL =====
+        document.addEventListener('DOMContentLoaded', function () {
+            const comisionInput = document.getElementById('comisionInput');
+            const simPorcentaje = document.getElementById('simPorcentaje');
+            const simComision = document.getElementById('simComision');
+            const simNeto = document.getElementById('simNeto');
+
+            const MONTO_EJEMPLO = 1000;
+
+            function actualizarSimulador() {
+                let porcentaje = parseFloat(comisionInput.value) || 0;
+                // Limitar visualmente a 2 decimales para el simulador
+                porcentaje = Math.min(Math.max(porcentaje, 0), 100);
+
+                const comision = (MONTO_EJEMPLO * porcentaje) / 100;
+                const neto = MONTO_EJEMPLO - comision;
+
+                simPorcentaje.textContent = porcentaje.toFixed(1);
+                simComision.textContent = '-$' + comision.toFixed(2);
+                simNeto.textContent = '$' + neto.toFixed(2);
+
+                // Animación sutil en los valores
+                simNeto.style.transform = 'scale(1.05)';
+                setTimeout(() => simNeto.style.transform = 'scale(1)', 150);
+            }
+
+            // Eventos
+            comisionInput.addEventListener('input', actualizarSimulador);
+            comisionInput.addEventListener('change', actualizarSimulador);
+
+            // Inicializar
+            actualizarSimulador();
+
+            // ===== ANIMACIÓN DE ENTRADA PARA ELEMENTOS =====
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.form-group, .simulator-card, .btn-group-actions').forEach(el => {
+                observer.observe(el);
+            });
+        });
+
+        // ===== CONFIRMACIÓN ANTES DE SALIR CON CAMBIOS =====
+        let formModified = false;
+        const form = document.querySelector('form');
+
+        form.addEventListener('input', () => formModified = true);
+
+        window.addEventListener('beforeunload', (e) => {
+            if (formModified) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Resetear flag al enviar
+        form.addEventListener('submit', () => {
+            formModified = false;
+        });
+
+        // Cancelar también resetea
+        document.querySelector('.btn-cancel').addEventListener('click', () => {
+            formModified = false;
+        });
+    </script>
+
+    <style>
+        /* Animación del punto pulsante del footer */
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+    </style>
+
+</body>
+
+</html>

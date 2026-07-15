@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClínicaApp - Quiz Interactivo Profesional</title>
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <link th:replace="~{fragments/header :: favIcon}">
+    <style th:replace="~{fragments/header :: headerStyles}"></style>
+
+    <style>
+        :root {
+            --medical-blue: #0ea5e9;
+            --medical-indigo: #6366f1;
+            --medical-emerald: #10b981;
+            --medical-rose: #f43f5e;
+            --card-bg-glass: rgba(255, 255, 255, 0.45);
+            --card-border-glass: rgba(255, 255, 255, 0.4);
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --glow-color: rgba(14, 165, 233, 0.15);
+        }
+
+        [data-theme="dark"] {
+            --card-bg-glass: rgba(15, 23, 42, 0.45);
+            --card-border-glass: rgba(255, 255, 255, 0.05);
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --glow-color: rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body-custom);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Grid Pattern */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(var(--glow-color) 1.5px, transparent 1.5px), 
+                radial-gradient(var(--glow-color) 1.5px, transparent 1.5px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.8;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Glowing Orbs */
+        .glowing-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.35;
+            transition: all 0.8s ease;
+        }
+
+        .orb-blue {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--medical-blue) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+            animation: floatOrb 20s infinite alternate ease-in-out;
+        }
+
+        .orb-indigo {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--medical-indigo) 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+            animation: floatOrb 25s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 80px) scale(1.2); }
+        }
+
+        /* ECG Heartbeat SVG Background */
+        .heartbeat-container {
+            position: absolute;
+            top: 10%;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            opacity: 0.08;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ecg-line {
+            stroke: var(--medical-blue);
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: ecgDraw 8s linear infinite;
+        }
+
+        @keyframes ecgDraw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Page Container */
+        .quiz-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            margin-top: 80px;
+        }
+
+        /* Premium Quiz Card */
+        .premium-card {
+            background: var(--card-bg-glass);
+            border: 1.5px solid var(--card-border-glass);
+            border-radius: 30px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 720px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Card mouse-tracking glow effect */
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y, -100%);
+            left: var(--mouse-x, -100%);
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Modern UI Elements */
+        .tech-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            color: var(--medical-blue);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            margin-bottom: 1.5rem;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--medical-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
+            animation: pulse-dot-anim 1.5s infinite;
+        }
+
+        @keyframes pulse-dot-anim {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(14, 165, 233, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+
+        /* Countdown Timer Ring */
+        .timer-container {
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+        .timer-svg {
+            transform: rotate(-90deg);
+        }
+        .timer-bg {
+            fill: none;
+            stroke: rgba(226, 232, 240, 0.4);
+            stroke-width: 3.5px;
+        }
+        [data-theme="dark"] .timer-bg {
+            stroke: rgba(255, 255, 255, 0.08);
+        }
+        .timer-fill {
+            fill: none;
+            stroke: var(--medical-blue);
+            stroke-width: 3.5px;
+            stroke-linecap: round;
+            stroke-dasharray: 113; /* 2 * PI * 18 */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+        }
+        .timer-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* HUD Diagnostics Console Simulator */
+        .hud-console {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid rgba(14, 165, 233, 0.2);
+            border-radius: 16px;
+            padding: 0.9rem 1.2rem;
+            box-shadow: inset 0 0 20px rgba(14, 165, 233, 0.04);
+        }
+        .console-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.72rem;
+            color: var(--medical-blue);
+        }
+        .console-dot-green {
+            width: 7px;
+            height: 7px;
+            background-color: var(--medical-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--medical-emerald);
+            animation: consoleBlink 1.2s infinite alternate;
+        }
+        @keyframes consoleBlink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .console-body {
+            height: 75px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            color: rgba(248, 250, 252, 0.85);
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+        .console-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .console-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+        }
+        .log-entry {
+            margin-bottom: 0.2rem;
+            animation: logIn 0.25s ease-out forwards;
+        }
+        @keyframes logIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Typography */
+        .title-h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 2.25rem;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--medical-blue), var(--medical-indigo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .subtitle-p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .question-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.4;
+            margin-bottom: 2rem;
+        }
+
+        /* Futuristic Segmented Progress Bar */
+        .progress-segments {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-seg {
+            flex: 1;
+            height: 5px;
+            background: rgba(226, 232, 240, 0.8);
+            border-radius: 4px;
+            transition: all 0.4s ease;
+        }
+
+        [data-theme="dark"] .progress-seg {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-seg.active {
+            background: linear-gradient(90deg, var(--medical-blue), var(--medical-indigo));
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+        }
+
+        /* Repeating CSS Barcode & Ticket styles */
+        .barcode-container {
+            position: relative;
+            display: block;
+            width: 100%;
+            max-width: 250px;
+            margin: 0.75rem auto;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .barcode {
+            height: 38px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--text-dark),
+                var(--text-dark) 1px,
+                transparent 1px,
+                transparent 4px,
+                var(--text-dark) 4px,
+                var(--text-dark) 6px,
+                transparent 6px,
+                transparent 8px
+            );
+            opacity: 0.75;
+            width: 100%;
+        }
+
+        .barcode-laser {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--medical-rose);
+            box-shadow: 0 0 8px var(--medical-rose);
+            animation: laserScan 2s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes laserScan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .premium-ticket {
+            position: relative;
+            background: rgba(255, 255, 255, 0.45);
+            border: 2px dashed var(--medical-emerald);
+            border-radius: 20px;
+            padding: 1.75rem;
+            margin-top: 1rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .premium-ticket {
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .premium-ticket::before, .premium-ticket::after {
+            content: '';
+            position: absolute;
+            top: 60%;
+            width: 22px;
+            height: 22px;
+            background: var(--bg-body-custom);
+            border-radius: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.08);
+            border: 1.5px solid var(--card-border-glass);
+        }
+
+        .premium-ticket::before {
+            left: -12px;
+        }
+
+        .premium-ticket::after {
+            right: -12px;
+        }
+
+        .ticket-divider {
+            border-top: 2px dashed rgba(0,0,0,0.08);
+            margin: 1.25rem 0;
+            position: relative;
+        }
+
+        [data-theme="dark"] .ticket-divider {
+            border-top-color: rgba(255,255,255,0.08);
+        }
+
+        .ticket-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1.25rem;
+            background: linear-gradient(135deg, var(--medical-blue), var(--medical-indigo));
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+        }
+
+        .coupon-code-box {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            padding: 0.5rem 1.25rem;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+
+        [data-theme="dark"] .coupon-code-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.07);
+        }
+
+        .copy-btn {
+            height: 42px;
+            width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+        }
+
+        /* Premium Option Buttons */
+        .modern-option {
+            background: rgba(255, 255, 255, 0.35);
+            border: 1.5px solid var(--card-border-glass);
+            border-radius: 18px;
+            padding: 1.1rem 1.4rem;
+            margin-bottom: 0.9rem;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        [data-theme="dark"] .modern-option {
+            background: rgba(30, 41, 59, 0.25);
+        }
+
+        .option-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--text-muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        [data-theme="dark"] .option-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .modern-option:hover:not(:disabled) {
+            transform: translateX(6px);
+            border-color: var(--medical-blue);
+            background: rgba(14, 165, 233, 0.06);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.06);
+        }
+
+        .modern-option:hover:not(:disabled) .option-badge {
+            background: var(--medical-blue);
+            border-color: var(--medical-blue);
+            color: white;
+        }
+
+        /* Option Feedback States */
+        .modern-option.state-correct {
+            border-color: var(--medical-emerald) !important;
+            background: rgba(16, 185, 129, 0.08) !important;
+            color: var(--medical-emerald) !important;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.08) !important;
+        }
+
+        .modern-option.state-correct .option-badge {
+            background: var(--medical-emerald) !important;
+            border-color: var(--medical-emerald) !important;
+            color: white !important;
+        }
+
+        .modern-option.state-incorrect {
+            border-color: var(--medical-rose) !important;
+            background: rgba(244, 63, 94, 0.08) !important;
+            color: var(--medical-rose) !important;
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.08) !important;
+        }
+
+        .modern-option.state-incorrect .option-badge {
+            background: var(--medical-rose) !important;
+            border-color: var(--medical-rose) !important;
+            color: white !important;
+        }
+
+        .modern-option.state-dimmed {
+            opacity: 0.4;
+            transform: scale(0.97);
+        }
+
+        /* Action Buttons */
+        .pulse-btn {
+            background: linear-gradient(135deg, var(--medical-blue), var(--medical-indigo));
+            color: white !important;
+            border: none;
+            border-radius: 16px;
+            padding: 1rem 2.2rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            font-family: 'Space Grotesk', sans-serif;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pulse-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .pulse-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.45);
+        }
+
+        .pulse-btn:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid var(--card-border-glass);
+            border-radius: 16px;
+            padding: 1rem 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Sound Settings button */
+        .sound-toggle-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--card-border-glass);
+            color: var(--text-dark);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        .sound-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Score Gauge SVG */
+        .gauge-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 2rem auto;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(226, 232, 240, 0.8);
+            stroke-width: 12px;
+        }
+
+        [data-theme="dark"] .gauge-bg {
+            stroke: rgba(255, 255, 255, 0.08);
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: url(#gaugeGradient);
+            stroke-width: 12px;
+            stroke-linecap: round;
+            stroke-dasharray: 502.4; /* 2 * PI * r (r=80) */
+            stroke-dashoffset: 502.4;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .gauge-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Results Summary */
+        .summary-card {
+            background: rgba(255, 255, 255, 0.20);
+            border: 1px solid var(--card-border-glass);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        [data-theme="dark"] .summary-card {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        [data-theme="dark"] .summary-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .summary-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Digital Certificate Display styles */
+        .certificate-frame {
+            border: 8px double #10b981;
+            padding: 2.5rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            color: #0f172a;
+            position: relative;
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.15);
+            margin-top: 2rem;
+            display: none;
+        }
+        .cert-ribbon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            color: #f59e0b;
+        }
+
+        /* High Scores leaderboard styling */
+        .history-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+        .history-table th, .history-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        [data-theme="dark"] .history-table th, [data-theme="dark"] .history-table td {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Animations */
+        .fade-container {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .fade-out-custom {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .fade-in-custom {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header-publico}"></div>
+    <canvas id="global-particles"></canvas>
+    <div class="grid-overlay"></div>
+    <div class="glowing-orb orb-blue"></div>
+    <div class="glowing-orb orb-indigo"></div>
+
+    <!-- ECG Heartbeat SVG Background -->
+    <div class="heartbeat-container">
+        <svg width="100%" height="120px" viewBox="0 0 1000 120" preserveAspectRatio="none">
+            <path class="ecg-line" fill="none" stroke-width="2" 
+                  d="M0,60 L200,60 L220,40 L230,80 L245,20 L260,95 L270,55 L280,65 L290,60 L450,60 L470,40 L480,80 L495,20 L510,95 L520,55 L530,65 L540,60 L750,60 L770,40 L780,80 L795,20 L810,95 L820,55 L830,65 L840,60 L1000,60" />
+        </svg>
+    </div>
+
+    <div class="quiz-wrapper">
+        <div class="premium-card" id="quizCard">
+            <!-- Audio Toggle Control -->
+            <button class="sound-toggle-btn" id="soundToggle" onclick="toggleMute()" title="Silenciar Sonido">
+                <i class="bi bi-volume-up-fill" id="soundIcon"></i>
+            </button>
+
+            <div class="card-inner">
+                
+                <!-- START SCREEN -->
+                <div id="startScreen" class="fade-container">
+                    <div class="text-center">
+                        <div class="tech-pill">
+                            <span class="pulse-dot"></span>
+                            <span>EVALUACIÓN MÉDICA DIGITAL</span>
+                        </div>
+                        <h1 class="title-h1">ClínicaApp Certificación</h1>
+                        <p class="subtitle-p mb-5">
+                            Bienvenido al portal oficial de certificación interactiva. Evalúa tu conocimiento de la plataforma médica inteligente y descubre todos sus beneficios.
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <button class="pulse-btn" onclick="startQuiz()">
+                                <span>Iniciar Evaluación</span>
+                                <i class="bi bi-arrow-right-short fs-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUESTION SCREEN -->
+                <div id="questionScreen" class="fade-container" style="display: none; opacity: 0;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="tech-pill m-0">
+                            <span class="pulse-dot"></span>
+                            <span id="questionCounter">PREGUNTA 1 DE 5</span>
+                        </div>
+                        
+                        <!-- Futuristic Circular Timer -->
+                        <div class="timer-container">
+                            <svg class="timer-svg" width="44" height="44" viewBox="0 0 44 44">
+                                <circle class="timer-bg" cx="22" cy="22" r="18" />
+                                <circle class="timer-fill" id="timerFill" cx="22" cy="22" r="18" />
+                            </svg>
+                            <span class="timer-text" id="timerText">15</span>
+                        </div>
+                    </div>
+
+                    <!-- Futuristic Progress Bar -->
+                    <div class="progress-segments" id="progressSegments">
+                        <div class="progress-seg"></div>
+                        <div class="progress-seg"></div>
+                        <div class="progress-seg"></div>
+                        <div class="progress-seg"></div>
+                        <div class="progress-seg"></div>
+                    </div>
+
+                    <h2 class="question-title" id="questionText">¿Pregunta?</h2>
+                    
+                    <div id="optionsContainer">
+                        <!-- Options generated dynamically -->
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button class="pulse-btn" id="nextBtn" style="display: none;" onclick="nextQuestion()">
+                            <span id="nextBtnText">Siguiente</span>
+                            <i class="bi bi-arrow-right-short fs-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RESULTS SCREEN -->
+                <div id="resultScreen" class="fade-container text-center" style="display: none; opacity: 0;">
+                    <div class="tech-pill">
+                        <i class="bi bi-award-fill"></i>
+                        <span>RESULTADO OBTENIDO</span>
+                    </div>
+                    <h2 class="title-h1">Evaluación Finalizada</h2>
+                    <p class="subtitle-p" id="resultMessage">Has completado exitosamente la certificación interactiva.</p>
+
+                    <!-- Score Gauge -->
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" width="180" height="180" viewBox="0 0 180 180">
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#0ea5e9" />
+                                    <stop offset="100%" stop-color="#6366f1" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="gauge-bg" cx="90" cy="90" r="80" />
+                            <circle class="gauge-fill" id="gaugeFill" cx="90" cy="90" r="80" />
+                        </svg>
+                        <div class="gauge-text">
+                            <span id="scoreText">0/5</span>
+                            <span class="gauge-label">PUNTOS</span>
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Summary Section (Green/Red highlights without correct answer reveal) -->
+                    <div class="summary-card">
+                        <div class="summary-title text-start">
+                            <i class="bi bi-clipboard-pulse text-primary"></i>
+                            <span>Resumen de Respuestas</span>
+                        </div>
+                        <div class="summary-list" id="summaryList">
+                            <!-- Items populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Reward Card Section -->
+                    <div class="summary-card mt-3" id="rewardCard" style="display: none;">
+                        <div class="summary-title text-start">
+                            <i class="bi bi-gift text-primary"></i>
+                            <span id="rewardTitle">Tu Recompensa Especial</span>
+                        </div>
+                        
+                        <!-- Beautiful Premium Digital Ticket -->
+                        <div class="premium-ticket" id="ticketBox">
+                            <!-- Float Badge -->
+                            <div class="ticket-badge" id="ticketBadgeText">15% OFF</div>
+                            
+                            <div class="ticket-inner text-center">
+                                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); font-weight: 700; margin-bottom: 0.25rem;" id="ticketLabel">BONO DE EXCELENCIA</div>
+                                <h3 style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--medical-emerald); margin: 0.4rem 0;" id="ticketBenefit">15% DESCUENTO</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; max-width: 380px; margin-left: auto; margin-right: auto;" id="ticketDesc">Válido en tu próxima consulta general o servicio médico.</p>
+                                
+                                <!-- Custom Ticket Divider -->
+                                <div class="ticket-divider"></div>
+                                
+                                <div class="d-flex align-items-center justify-content-center gap-2 mt-2">
+                                    <div class="coupon-code-box" id="ticketCode">
+                                        CLINIC-XXXXX
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary copy-btn" id="copyCodeBtn" onclick="copyCouponCode()" title="Copiar código de cupón">
+                                        <i class="bi bi-clipboard" id="copyIcon"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Joke Button Container (Replaces QR) -->
+                                <div id="jokeButtonContainer" style="position: relative; margin: 15px auto; width: 100%; display: none;">
+                                    <button class="pulse-btn" id="jokeButton" style="width: 100%; max-width: 250px; border-radius: 12px; padding: 12px; font-weight: 800; font-size: 1rem; color: white; background: linear-gradient(135deg, #db2777, #be185d); border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(219,39,119,0.4);" onclick="showChupetaOverlay()">
+                                        <i class="bi bi-gift-fill me-2"></i>Haz click para ver tu premio
+                                    </button>
+                                    
+                                    <!-- The overlay that appears after clicking -->
+                                    <div id="chupetaOverlay" style="position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 220px; height: 180px; background: rgba(255, 255, 255, 0.98); border-radius: 16px; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 20; animation: popIn 0.5s ease-out forwards; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 2px solid #db2777;">
+                                        <button style="position: absolute; top: 5px; right: 8px; background: none; border: none; font-size: 1.2rem; color: #cbd5e1; cursor: pointer;" onclick="document.getElementById('chupetaOverlay').style.display='none'; event.stopPropagation();">×</button>
+                                        <div style="font-size: 3.5rem; animation: bounce 1s infinite;">🍭</div>
+                                        <div style="font-size: 0.9rem; font-weight: 800; color: #db2777; text-align: center; line-height: 1.2; margin-top: 10px;">¡HAS GANADO<br>UNA CHUPETA!</div>
+                                    </div>
+                                    
+                                    <style>
+                                        @keyframes popIn { 0% { transform: translate(-50%, 20px) scale(0.5); opacity: 0; } 70% { transform: translate(-50%, -10px) scale(1.1); } 100% { transform: translate(-50%, 0) scale(1); opacity: 1; } }
+                                        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+                                    </style>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Dispatch Form -->
+                    <div class="summary-card mt-3" id="emailDispatchCard">
+                        <div class="summary-title text-start">
+                            <i class="bi bi-envelope-at text-primary"></i>
+                            <span>Enviar Resultados por Correo</span>
+                        </div>
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                            Recibe un resumen profesional detallado con tus respuestas y estadísticas directo en tu correo electrónico.
+                        </p>
+                        <div id="emailInputArea">
+                            <div class="input-group">
+                                <input type="email" class="form-control form-control-sm" id="userEmailInput" placeholder="tu-correo@ejemplo.com">
+                                <button class="btn btn-sm btn-primary fw-bold" type="button" id="sendEmailBtn" onclick="dispatchEmailResults()">
+                                    <i class="bi bi-send me-1"></i> Enviar
+                                </button>
+                            </div>
+                        </div>
+                        <div id="emailStatusMessage" style="display:none; font-size: 0.85rem;" class="mt-2 text-start"></div>
+                    </div>
+
+                    <!-- Certificate Generation UI -->
+                    <div class="certificate-frame text-center" id="certificateFrame">
+                        <i class="bi bi-patch-check-fill cert-ribbon"></i>
+                        <h4 style="font-family: 'Space Grotesk', sans-serif; color: #065f46; font-weight: 700;">CERTIFICADO DE EXCELENCIA</h4>
+                        <p style="font-size: 0.85rem; color: #475569;">Otorgado por ClínicaApp a:</p>
+                        <h3 id="certName" style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #1e293b; margin: 1rem 0; border-bottom: 2px dashed #10b981; padding-bottom: 0.5rem; display: inline-block;"></h3>
+                        <p style="font-size: 0.85rem; color: #475569;">Por aprobar satisfactoriamente el Quiz de Evaluación Técnica con una puntuación destacada de <strong id="certScoreText"></strong>.</p>
+                        <div class="d-flex justify-content-between mt-4" style="font-size: 0.75rem; color: #64748b;">
+                            <span>Fecha: <strong id="certDate"></strong></span>
+                            <span>Código de Verificación: <strong id="certCode"></strong></span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-success rounded-pill mt-3 px-3 fw-bold" onclick="window.print()">
+                            <i class="bi bi-printer me-1"></i> Imprimir Certificado
+                        </button>
+                    </div>
+
+                    <!-- Leaderboard / History Section -->
+                    <div class="summary-card mt-3" id="historyCard" style="display:none;">
+                        <div class="summary-title text-start">
+                            <i class="bi bi-clock-history text-primary"></i>
+                            <span>Historial de Intentos Locales</span>
+                        </div>
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Puntaje</th>
+                                    <th>Tiempo Promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- User Name Form for Certificate (If passed) -->
+                    <div class="card p-3 mt-3 border border-success" id="certificateForm" style="display:none; background: rgba(16,185,129,0.03);">
+                        <p class="mb-2 fw-semibold text-success">¡Calificas para un certificado de excelencia!</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" id="userNameInput" placeholder="Ingresa tu nombre para el certificado">
+                            <button class="btn btn-sm btn-success" type="button" onclick="generateCertificate()">Generar</button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-5">
+                        <button class="btn-glass" onclick="window.location.href='/'">
+                            <i class="bi bi-house-door"></i>
+                            <span>Inicio</span>
+                        </button>
+                        <button class="pulse-btn" onclick="fadeTransition('resultScreen', 'questionScreen', initQuiz)">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span>Reintentar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- HUD Console Simulator -->
+                <div class="hud-console mt-4" id="hudConsole">
+                    <div class="console-header">
+                        <span class="d-flex align-items-center gap-2">
+                            <span class="console-dot-green"></span>
+                            <span class="font-monospace">CLINIC_OS_DIAGNOSTICS_1.9</span>
+                        </span>
+                        <span class="font-monospace text-muted">STABLE</span>
+                    </div>
+                    <div class="console-body" id="consoleLogs">
+                        <!-- Simulated diagnostic logs -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & Utility Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Track mouse movement for glow overlay inside card
+        const card = document.getElementById('quizCard');
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+
+        // 30 Informational Questions about ClinicApp (Balanced Option Lengths)
+        const allQuestions = [
+            { q: "¿Qué es ClínicaApp?", options: ["Un portal de entretenimiento y minijuegos temáticos para hospitales", "Una plataforma integral para gestionar citas y servicios clínicos", "Una red social corporativa para médicos e investigadores de salud", "Un catálogo virtual exclusivo para comprar medicamentos en línea"], a: 1 },
+            { q: "¿Cuál es una de las principales ventajas de usar ClínicaApp?", options: ["Recibir diagnósticos médicos automatizados mediante inteligencia artificial", "Agendar citas desde cualquier lugar y en cualquier momento del día", "Comprar insumos médicos y equipos de alta tecnología para doctores", "Consultar el clima local y recibir alertas de salud por regiones"], a: 1 },
+            { q: "¿Qué beneficio ofrece el Historial Médico Digital?", options: ["Permite que cualquier persona en internet pueda ver tus registros", "Centraliza tu información médica para un acceso rápido y seguro", "Borra de manera automática los reportes de salud de hace un año", "Imprime copias físicas de tus recetas de forma diaria y automática"], a: 1 },
+            { q: "¿Qué tipo de profesionales puedes encontrar en ClínicaApp?", options: ["Médicos que se dedican de forma exclusiva a la cardiología avanzada", "Únicamente médicos generales que atienden consultas básicas y leves", "Una amplia red de especialistas médicos y veterinarios certificados", "Estudiantes universitarios que realizan pasantías médicas cortas"], a: 2 },
+            { q: "¿Para qué sirve el sistema de notificaciones de la plataforma?", options: ["Para enviar publicidad de farmacéuticas y laboratorios externos", "Para recordar tus citas próximas y alertas de pagos pendientes", "Para publicar estados de ánimo e historias de salud en tu muro", "Para chatear de forma libre y anónima con otros pacientes registrados"], a: 1 },
+            { q: "¿ClínicaApp permite gestionar citas para tus mascotas?", options: ["No, el sistema de salud está reservado únicamente para seres humanos", "Sí, a través de nuestro módulo veterinario interactivo Nova-Pet", "Solo si se trata de perros y animales de servicio o asistencia", "Sí, pero la administración exige instalar un aplicativo diferente"], a: 1 },
+            { q: "¿Qué es el código QR en ClínicaApp?", options: ["Un juego interactivo para ganar puntos canjeables por medicamentos", "Un método de acceso rápido y sin contacto a todas nuestras sedes", "Un cupón de descuento válido únicamente en farmacias locales aliadas", "Una receta médica digital encriptada para el control de dosis"], a: 1 },
+            { q: "¿Es seguro registrar mis datos médicos en ClínicaApp?", options: ["No, la base de datos es pública y accesible para todos en internet", "Sí, usamos tecnología avanzada para garantizar la confidencialidad", "Solo cuenta con protección activa en el horario de atención médica", "Sí, pero los datos se enlazan con redes sociales con fines comerciales"], a: 1 },
+            { q: "¿Desde qué dispositivos puedes acceder a ClínicaApp?", options: ["Únicamente desde computadoras de escritorio conectadas a red local", "Desde cualquier computadora, tablet o teléfono móvil con internet", "Únicamente desde smartphones y dispositivos de última generación", "Solo utilizando las pantallas físicas instaladas en cada consultorio"], a: 1 },
+            { q: "¿Qué sección de la app debes visitar para ver tus próximas consultas?", options: ["El menú de Ajustes Avanzados de Red", "La pestaña de Foros y Ayuda de Soporte", "La sección de Mis Citas Programadas", "El catálogo de la Tienda Médica Virtual"], a: 2 },
+            { q: "¿Cómo te ayuda la plataforma si tienes varias clínicas cerca?", options: ["Te obliga a registrarte en una sola clínica sin opción a cambios", "Cuenta con un buscador inteligente para encontrar la sede ideal", "Asigna de manera automática una sede aleatoria de difícil acceso", "Te obliga a visitar de forma física todas las sedes del sector"], a: 1 },
+            { q: "¿Puedes realizar pagos a través de la plataforma?", options: ["No, todas las transacciones deben realizarse en efectivo físico", "Sí, cuenta con un módulo de pago virtual integrado y muy seguro", "Solo admite transferencias en monedas de curso extranjero regulado", "Sí, pero debes enviar el recibo escaneado en formato PDF por email"], a: 1 },
+            { q: "¿Para qué sirve el panel 'Mi Oficina'?", options: ["Permite ejecutar minijuegos interactivos de simulación médica", "Sirve para administrar tus datos, dependientes y citas programadas", "Facilita la comunicación directa con el equipo de soporte técnico", "Muestra noticias sobre eventos deportivos e información de salud"], a: 1 },
+            { q: "¿Cómo garantizamos que no pierdas tu turno presencialmente?", options: ["Un altavoz repite tu nombre en toda la sala de forma constante", "Mediante un sistema de turnos y pantallas digitales en salas", "Se envía una carta con los datos del turno a tu dirección física", "El personal de recepción realiza llamadas directas a tu celular"], a: 1 },
+            { q: "¿ClínicaApp te permite llevar el control de vacunas?", options: ["Permite guardar únicamente la vacuna contra la influenza estacional", "Sí, facilita registrar y vigilar el historial completo de vacunas", "No, esta información es administrada solo por centros nacionales", "Sí, pero el registro de vacunas se limita al perfil de mascotas"], a: 1 },
+            { q: "¿Qué debes hacer si tienes una emergencia médica grave?", options: ["Registrar una solicitud de cita tradicional dentro de la aplicación", "Escribir un ticket de soporte de urgencias en el chat de ayuda", "Acudir a la sala de emergencias física más cercana de inmediato", "Esperar a recibir una llamada del especialista médico de turno"], a: 2 },
+            { q: "¿ClínicaApp es gratuita para los pacientes?", options: ["Sí, el registro y uso de la plataforma base no tiene costo alguno", "No, requiere realizar pagos mensuales fijos de forma obligatoria", "El sistema aplica cargos por cada inicio de sesión en la cuenta", "Es gratuita solo durante las primeras 72 horas desde el registro"], a: 0 },
+            { q: "¿Es posible cambiar el diseño de la aplicación para que no canse la vista de noche?", options: ["No, la aplicación solo cuenta con un diseño de fondo claro fijo", "Sí, incluye un Modo Nocturno que oscurece la paleta de colores", "Se debe cambiar la intensidad del brillo directamente en la pantalla", "Sí, pero requiere instalar filtros especiales para el navegador"], a: 1 },
+            { q: "¿Qué hace ClínicaApp para reducir los tiempos de espera?", options: ["Adelanta las horas de las salas de espera para calmar la ansiedad", "Agiliza flujos de citas y admite el Check-in por código QR", "Programa consultas de forma masiva para atender varios pacientes", "Cancela citas médicas cuando se detectan demoras en los turnos"], a: 1 },
+            { q: "¿La plataforma incluye atención pediátrica?", options: ["No, las clínicas asociadas atienden de forma exclusiva a adultos", "Sí, contamos con especialistas certificados en el área de pediatría", "Las consultas pediátricas solo se realizan de forma virtual", "Sí, pero exige adjuntar una carta de remisión firmada por el estado"], a: 1 },
+            { q: "¿Qué sucede con tus datos si cambias de especialista dentro de la misma clínica?", options: ["El sistema borra tu historial de forma permanente por seguridad", "Tus datos médicos se comparten automáticamente entre especialistas", "Deberás transcribir toda la información clínica en el nuevo consultorio", "Se bloqueará la cuenta hasta validar el cambio del médico tratante"], a: 1 },
+            { q: "¿Qué ocurre si olvidas la fecha de tu consulta?", options: ["La clínica cancela tu cuenta y te multa de forma obligatoria", "Recibirás recordatorios automáticos en tu celular o por correo", "Debes asistir a la clínica diariamente a consultar con recepción", "Se agenda automáticamente otra cita para el siguiente fin de semana"], a: 1 },
+            { q: "¿Qué es Nova-Pet?", options: ["Una píldora especial para el control de estrés en mascotas domésticas", "Un módulo especial enfocado en el registro y cuidado de tus mascotas", "Un programa espacial de investigación sobre la salud de los animales", "Una mascota virtual interactiva con la que los niños pueden jugar"], a: 1 },
+            { q: "¿Qué necesitas para registrarte en ClínicaApp?", options: ["Presentar un análisis clínico de laboratorio con fecha reciente", "Ingresar tus datos de contacto básicos y un correo electrónico activo", "Obtener una invitación oficial emitida por otro paciente registrado", "Pagar el costo de suscripción anual obligatorio durante el registro"], a: 1 },
+            { q: "¿ClínicaApp puede ayudarte a recordar medicamentos?", options: ["No, el sistema no cuenta con herramientas para medicamentos", "Permite configurar alarmas y avisos de dosis en el celular", "El personal médico te llamará para verificar cada toma diaria", "Un mensajero enviará notificaciones impresas directas a tu casa"], a: 1 },
+            { q: "¿Cómo puedes contactar a soporte si tienes dudas con la plataforma?", options: ["Utilizando la línea de atención al cliente y los canales de soporte", "Presentando un reclamo en voz alta en las oficinas de administración", "Enviando un documento en formato fax a las sedes de la clínica", "No existe asistencia técnica para los usuarios de la aplicación"], a: 0 },
+            { q: "¿Por qué ClínicaApp es considerada una plataforma moderna?", options: ["Por incluir colores muy llamativos y luces neón en su interfaz", "Por centralizar múltiples flujos de salud en una sola app interactiva", "Debido a que puede operar con normalidad sin conexión a internet", "Porque fue desarrollada en su totalidad durante el presente año"], a: 1 },
+            { q: "¿Qué tan rápido es el acceso usando el Código QR?", options: ["Requiere de 5 a 10 minutos de validación en la recepción física", "Es inmediato, permitiendo validar tu llegada sin hacer filas largas", "Tarda más tiempo que el proceso de registro manual en mostrador", "Funciona de manera exclusiva durante los fines de semana y festivos"], a: 1 },
+            { q: "¿Qué compromiso tiene ClínicaApp con el medio ambiente?", options: ["Regalamos plantas y semillas en la entrada de las instalaciones", "Evita el desperdicio de papel al digitalizar todas las recetas médicas", "Usa reactores de energía renovable experimental en cada sede médica", "No cuenta con políticas de protección ambiental en sus operaciones"], a: 1 },
+            { q: "¿Qué hace especial a ClínicaApp frente a un consultorio tradicional?", options: ["Las consultas médicas se realizan sin la presencia física del paciente", "Ofrece un entorno digital completo que te ahorra tiempo y esperas", "Las citas médicas se programan en plena vía pública por seguridad", "El llamativo diseño arquitectónico de las fachadas de cada clínica"], a: 1 }
+        ];
+
+        let quizQuestions = [];
+        let currentIndex = 0;
+        let finalScore = 0;
+        let isQuestionAnswered = false;
+        let sessionAnswers = [];
+        let timeRemaining = 15;
+        let timerInterval = null;
+        let totalElapsedSeconds = 0;
+        let clockTimerInterval = null;
+        let currentCertCode = ''; // Added global variable to hold cert verification code
+        let currentCouponCode = ''; // Global variable to hold current coupon activation code
+
+        // Sound System utilizing Web Audio API
+        let audioCtx = null;
+        let soundMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (soundMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+            
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'incorrect') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'victory') {
+                    osc.type = 'sine';
+                    const scale = [523.25, 659.25, 783.99, 1046.50];
+                    scale.forEach((freq, idx) => {
+                        const oscN = audioCtx.createOscillator();
+                        const gainN = audioCtx.createGain();
+                        oscN.connect(gainN);
+                        gainN.connect(audioCtx.destination);
+                        oscN.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        gainN.gain.setValueAtTime(0.1, now + idx * 0.1);
+                        gainN.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+                        oscN.start(now + idx * 0.1);
+                        oscN.stop(now + idx * 0.1 + 0.25);
+                    });
+                }
+            } catch(e) {
+                console.warn("Audio blocked or context failed to initialize", e);
+            }
+        }
+
+        function toggleMute() {
+            soundMuted = !soundMuted;
+            const icon = document.getElementById('soundIcon');
+            const btn = document.getElementById('soundToggle');
+            if (soundMuted) {
+                icon.className = 'bi bi-volume-mute-fill';
+                btn.title = "Activar Sonido";
+                writeLog("AUDIO: Desactivado por el usuario.");
+            } else {
+                icon.className = 'bi bi-volume-up-fill';
+                btn.title = "Silenciar Sonido";
+                playSound('click');
+                writeLog("AUDIO: Activado.");
+            }
+        }
+
+        // HUD Console Logging
+        function writeLog(text) {
+            const logsContainer = document.getElementById('consoleLogs');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry text-start';
+            const time = new Date().toLocaleTimeString([], { hour12: false });
+            entry.innerHTML = `<span class="text-primary font-monospace">[${time}]</span> <span class="font-monospace">${text}</span>`;
+            logsContainer.appendChild(entry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function shuffle(arr) {
+            return arr.sort(() => Math.random() - 0.5);
+        }
+
+        function showChupetaOverlay() {
+            playSound('click');
+            document.getElementById('chupetaOverlay').style.display = 'flex';
+        }
+
+        function fadeTransition(fromId, toId, callback) {
+            const fromEl = document.getElementById(fromId);
+            const toEl = document.getElementById(toId);
+            
+            fromEl.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            fromEl.style.opacity = '0';
+            fromEl.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                fromEl.style.display = 'none';
+                
+                toEl.style.display = 'block';
+                toEl.style.opacity = '0';
+                toEl.style.transform = 'translateY(10px)';
+                toEl.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+                
+                // Force reflow
+                toEl.offsetHeight;
+                
+                toEl.style.opacity = '1';
+                toEl.style.transform = 'translateY(0)';
+                
+                if (callback) callback();
+            }, 250);
+        }
+
+        function startQuiz() {
+            playSound('click');
+            writeLog("SESIÓN: Iniciando evaluación de ClínicaApp...");
+            fadeTransition('startScreen', 'questionScreen', initQuiz);
+        }
+
+        function initQuiz() {
+            const temp = shuffle([...allQuestions]);
+            quizQuestions = temp.slice(0, 5);
+            currentIndex = 0;
+            finalScore = 0;
+            sessionAnswers = [];
+            totalElapsedSeconds = 0;
+            currentCertCode = ''; // Reset verification code
+            
+            if (window.qrPollInterval) {
+                clearInterval(window.qrPollInterval);
+                window.qrPollInterval = null;
+            }
+            
+            // Hide certificate blocks
+            document.getElementById('certificateForm').style.display = 'none';
+            document.getElementById('certificateFrame').style.display = 'none';
+            
+            // Hide reward card
+            const rewardCard = document.getElementById('rewardCard');
+            if (rewardCard) {
+                rewardCard.style.display = 'none';
+            }
+
+            // Reset email dispatch form
+            const emailInput = document.getElementById('userEmailInput');
+            if (emailInput) {
+                emailInput.value = '';
+                emailInput.disabled = false;
+            }
+            const sendBtn = document.getElementById('sendEmailBtn');
+            if (sendBtn) {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="bi bi-send me-1"></i> Enviar';
+            }
+            const statusMsg = document.getElementById('emailStatusMessage');
+            if (statusMsg) {
+                statusMsg.style.display = 'none';
+                statusMsg.innerHTML = '';
+            }
+
+            // Global elapsed timer
+            if (clockTimerInterval) clearInterval(clockTimerInterval);
+            clockTimerInterval = setInterval(() => {
+                totalElapsedSeconds++;
+            }, 1000);
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isQuestionAnswered = false;
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            const currentQ = quizQuestions[currentIndex];
+            document.getElementById('questionCounter').innerText = `PREGUNTA ${currentIndex + 1} DE 5`;
+            document.getElementById('questionText').innerText = currentQ.q;
+
+            // Log current state
+            writeLog(`PREGUNTA ${currentIndex + 1}: Búfer cargado. Esperando respuesta...`);
+
+            // Handle progress segs
+            const segments = document.querySelectorAll('.progress-seg');
+            segments.forEach((seg, idx) => {
+                if (idx <= currentIndex) {
+                    seg.classList.add('active');
+                } else {
+                    seg.classList.remove('active');
+                }
+            });
+
+            // Options container render
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            let optionsMapped = currentQ.options.map((optText, index) => ({
+                text: optText,
+                isCorrect: (index === currentQ.a)
+            }));
+            optionsMapped = shuffle(optionsMapped);
+
+            const optionLetters = ['A', 'B', 'C', 'D'];
+
+            optionsMapped.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'modern-option';
+                btn.innerHTML = `
+                    <div class="option-badge">${optionLetters[idx]}</div>
+                    <span class="option-content-text">${opt.text}</span>
+                `;
+                btn.onclick = () => selectOption(btn, opt.isCorrect, currentQ.q);
+                container.appendChild(btn);
+            });
+
+            // Start countdown timer
+            startQuestionTimer();
+        }
+
+        function startQuestionTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timeRemaining = 15;
+            const fill = document.getElementById('timerFill');
+            const text = document.getElementById('timerText');
+            
+            text.innerText = timeRemaining;
+            fill.style.stroke = 'var(--medical-blue)';
+            
+            // Total circumference of circle (r=18) -> 2 * PI * 18 = 113.097
+            const totalDash = 113;
+            fill.style.strokeDashoffset = 0;
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                text.innerText = timeRemaining;
+                
+                // Animate circle ring
+                const offset = ((15 - timeRemaining) / 15) * totalDash;
+                fill.style.strokeDashoffset = offset;
+
+                // Color alerts based on urgency
+                if (timeRemaining <= 5) {
+                    fill.style.stroke = 'var(--medical-rose)';
+                } else if (timeRemaining <= 10) {
+                    fill.style.stroke = 'var(--medical-indigo)';
+                }
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            writeLog(`SISTEMA: Tiempo agotado para la Pregunta ${currentIndex + 1}.`);
+            playSound('incorrect');
+
+            const buttons = document.querySelectorAll('.modern-option');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('state-dimmed');
+            });
+
+            sessionAnswers.push({ qText: quizQuestions[currentIndex].q, correct: false });
+
+            const nextBtn = document.getElementById('nextBtn');
+            const nextBtnText = document.getElementById('nextBtnText');
+            nextBtnText.innerText = (currentIndex === 4) ? "Ver Resultados" : "Siguiente";
+            nextBtn.style.display = 'inline-flex';
+        }
+
+        function selectOption(selectedBtn, isCorrect, questionText) {
+            if (isQuestionAnswered) return;
+            isQuestionAnswered = true;
+            
+            // Stop active countdown
+            if (timerInterval) clearInterval(timerInterval);
+
+            const buttons = document.querySelectorAll('.modern-option');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                playSound('correct');
+                writeLog("RESPUESTA: ¡Correcta! Análisis positivo.");
+                selectedBtn.classList.add('state-correct');
+                selectedBtn.querySelector('.option-badge').innerHTML = '<i class="bi bi-check-lg"></i>';
+                finalScore++;
+                sessionAnswers.push({ qText: questionText, correct: true });
+            } else {
+                playSound('incorrect');
+                writeLog("RESPUESTA: Incorrecta. Desviación detectada.");
+                selectedBtn.classList.add('state-incorrect');
+                selectedBtn.querySelector('.option-badge').innerHTML = '<i class="bi bi-x-lg"></i>';
+                sessionAnswers.push({ qText: questionText, correct: false });
+                // We STRICTLY do not reveal correct options
+            }
+
+            buttons.forEach(btn => {
+                if (btn !== selectedBtn) {
+                    btn.classList.add('state-dimmed');
+                }
+            });
+
+            const nextBtn = document.getElementById('nextBtn');
+            const nextBtnText = document.getElementById('nextBtnText');
+            nextBtnText.innerText = (currentIndex === 4) ? "Ver Resultados" : "Siguiente";
+            nextBtn.style.display = 'inline-flex';
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            currentIndex++;
+            if (currentIndex < 5) {
+                const container = document.getElementById('optionsContainer');
+                container.classList.add('fade-out-custom');
+                setTimeout(() => {
+                    loadQuestion();
+                    container.classList.remove('fade-out-custom');
+                }, 250);
+            } else {
+                if (clockTimerInterval) clearInterval(clockTimerInterval);
+                fadeTransition('questionScreen', 'resultScreen', showResults);
+            }
+        }
+
+        function showResults() {
+            writeLog(`SISTEMA: Procesamiento completo. Puntaje final: ${finalScore}/5.`);
+            document.getElementById('scoreText').innerText = `${finalScore}/5`;
+            
+            // Set Gauge Offset: radius = 80 -> circumference = 502.4
+            const maxCircumference = 502.4;
+            const offset = maxCircumference - (finalScore / 5) * maxCircumference;
+            const gaugeFill = document.getElementById('gaugeFill');
+            gaugeFill.style.strokeDashoffset = offset;
+
+            let message = "";
+            const rewardTitle = document.getElementById('rewardTitle');
+            const ticketBox = document.getElementById('ticketBox');
+            const ticketLabel = document.getElementById('ticketLabel');
+            const ticketBenefit = document.getElementById('ticketBenefit');
+            const ticketDesc = document.getElementById('ticketDesc');
+            const ticketCode = document.getElementById('ticketCode');
+            const rewardCard = document.getElementById('rewardCard');
+
+            if (finalScore === 5) {
+                playSound('victory');
+                message = "¡Desempeño perfecto! Demostraste un dominio absoluto de ClínicaApp.";
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                document.getElementById('certificateForm').style.display = 'block';
+            } else if (finalScore >= 3) {
+                playSound('victory');
+                message = "Excelente conocimiento. Estás listo para aprovechar ClínicaApp al máximo.";
+                confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+                document.getElementById('certificateForm').style.display = 'block';
+            } else {
+                message = "Sigue explorando la aplicación para familiarizarte con todas sus ventajas.";
+                document.getElementById('certificateForm').style.display = 'none';
+            }
+            document.getElementById('resultMessage').innerText = message;
+
+            // Handle rewards dynamically based on score
+            if (rewardCard) {
+                rewardCard.style.display = 'block';
+                const badge = document.getElementById('ticketBadgeText');
+                if (finalScore >= 3) {
+                    rewardTitle.innerText = "Premio Sorpresa de Excelencia";
+                    ticketBox.style.borderColor = "#db2777";
+                    
+                    // Hide the discount elements
+                    ticketLabel.style.display = "none";
+                    ticketBenefit.style.display = "none";
+                    ticketDesc.style.display = "none";
+                    if (badge) badge.style.display = "none";
+                    
+                    const divider = ticketBox.querySelector('.ticket-divider');
+                    if (divider) divider.style.display = 'none';
+                    if (ticketCode && ticketCode.parentElement) {
+                        ticketCode.parentElement.style.display = 'none';
+                    }
+                    
+                    const jokeBtnContainer = document.getElementById('jokeButtonContainer');
+                    if (jokeBtnContainer) {
+                        jokeBtnContainer.style.display = 'block';
+                    }
+                    
+                    writeLog(`SISTEMA: Broma chupeta activada para ganador.`);
+                } else {
+                    rewardTitle.innerText = "Bono de Estímulo por Participación";
+                    ticketBox.style.borderColor = "var(--medical-indigo)";
+                    
+                    // Show standard elements for losers if we previously hid them
+                    ticketLabel.style.display = "block";
+                    ticketBenefit.style.display = "block";
+                    ticketDesc.style.display = "block";
+                    if (badge) badge.style.display = "inline-block";
+                    const divider = ticketBox.querySelector('.ticket-divider');
+                    if (divider) divider.style.display = 'block';
+                    if (ticketCode && ticketCode.parentElement) {
+                        ticketCode.parentElement.style.display = 'flex';
+                    }
+                    
+                    ticketLabel.innerText = "BONO DE BIENESTAR";
+                    ticketLabel.style.color = "var(--medical-indigo)";
+                    ticketBenefit.innerText = "5% DESCUENTO";
+                    ticketBenefit.style.color = "var(--medical-indigo)";
+                    ticketDesc.innerText = "¡Gracias por participar! Disfruta de un descuento de consuelo en tu próxima visita.";
+                    if (badge) {
+                        badge.innerText = "5% OFF";
+                        badge.style.background = "linear-gradient(135deg, var(--medical-indigo), var(--medical-blue))";
+                    }
+                    const randomCode = "BIENESTAR-5-" + Math.random().toString(36).substr(2, 5).toUpperCase();
+                    currentCouponCode = randomCode;
+                    ticketCode.innerText = randomCode;
+                    writeLog(`SISTEMA: Bono de Bienestar del 5% emitido con código ${randomCode}.`);
+                }
+            }
+
+            // Render summary list
+            const listContainer = document.getElementById('summaryList');
+            listContainer.innerHTML = '';
+
+            sessionAnswers.forEach((ans, idx) => {
+                const item = document.createElement('div');
+                item.className = 'summary-item';
+                
+                const statusBadge = ans.correct 
+                    ? `<span class="summary-status text-success"><i class="bi bi-check-circle-fill"></i> Correcta</span>`
+                    : `<span class="summary-status text-danger"><i class="bi bi-x-circle-fill"></i> Incorrecta</span>`;
+                
+                item.innerHTML = `
+                    <span class="text-truncate text-start" style="max-width: 70%; font-weight: 500;">Pregunta ${idx + 1}: ${ans.qText}</span>
+                    ${statusBadge}
+                `;
+                listContainer.appendChild(item);
+            });
+
+            // Save Attempt to localStorage
+            saveAttemptLocally();
+            displayLeaderboard();
+        }
+
+        // Leaderboard & Local storage system
+        function saveAttemptLocally() {
+            const history = JSON.parse(localStorage.getItem('quiz_attempts') || '[]');
+            history.unshift({
+                date: new Date().toLocaleDateString(),
+                score: `${finalScore}/5`,
+                elapsed: `${Math.round(totalElapsedSeconds / 5)}s / preg`
+            });
+            localStorage.setItem('quiz_attempts', JSON.stringify(history.slice(0, 5))); // Limit to last 5
+        }
+
+        function displayLeaderboard() {
+            const history = JSON.parse(localStorage.getItem('quiz_attempts') || '[]');
+            const tableBody = document.getElementById('historyTableBody');
+            tableBody.innerHTML = '';
+            
+            if (history.length > 0) {
+                document.getElementById('historyCard').style.display = 'block';
+                history.forEach(att => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${att.date}</td>
+                        <td class="fw-bold">${att.score}</td>
+                        <td>${att.elapsed}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                document.getElementById('historyCard').style.display = 'none';
+            }
+        }
+
+        // Virtual Certificate generation
+        function generateCertificate() {
+            const name = document.getElementById('userNameInput').value.trim();
+            if (!name) {
+                alert("Por favor, ingresa tu nombre.");
+                return;
+            }
+            playSound('click');
+            currentCertCode = 'CA-' + Math.floor(1000 + Math.random() * 9000) + '-' + String.fromCharCode(65 + Math.floor(Math.random() * 26));
+            document.getElementById('certName').innerText = name;
+            document.getElementById('certScoreText').innerText = `${finalScore}/5 puntos`;
+            document.getElementById('certDate').innerText = new Date().toLocaleDateString();
+            document.getElementById('certCode').innerText = currentCertCode;
+
+            document.getElementById('certificateForm').style.display = 'none';
+            
+            const frame = document.getElementById('certificateFrame');
+            frame.style.display = 'block';
+            frame.scrollIntoView({ behavior: 'smooth' });
+            
+            writeLog(`CERTIFICADO: Documento emitido exitosamente para "${name}".`);
+        }
+
+        // Copy Coupon Code to Clipboard
+        function copyCouponCode() {
+            if (!currentCouponCode) return;
+            navigator.clipboard.writeText(currentCouponCode).then(() => {
+                playSound('click');
+                const icon = document.getElementById('copyIcon');
+                const btn = document.getElementById('copyCodeBtn');
+                
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-success');
+                if (icon) icon.className = 'bi bi-check-lg';
+                
+                writeLog(`SISTEMA: Código de cupón ${currentCouponCode} copiado al portapapeles.`);
+                
+                setTimeout(() => {
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-primary');
+                    if (icon) icon.className = 'bi bi-clipboard';
+                }, 2000);
+            }).catch(err => {
+                console.error("No se pudo copiar el código", err);
+            });
+        }
+
+        // Dispatch results via Email REST call
+        async function dispatchEmailResults() {
+            const emailInput = document.getElementById('userEmailInput');
+            const email = emailInput.value.trim();
+            const statusMsg = document.getElementById('emailStatusMessage');
+            const sendBtn = document.getElementById('sendEmailBtn');
+
+            if (!email) {
+                alert("Por favor, ingresa un correo electrónico válido.");
+                return;
+            }
+
+            // Simple email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Por favor, ingresa un correo electrónico con formato correcto (ej: usuario@ejemplo.com).");
+                return;
+            }
+
+            playSound('click');
+            writeLog(`CORREO: Iniciando envío de resultados a ${email}...`);
+            
+            // Disable button and input during send
+            sendBtn.disabled = true;
+            emailInput.disabled = true;
+            sendBtn.innerHTML = '<i class="bi bi-hourglass-split spin"></i> Enviando...';
+
+            statusMsg.style.display = 'block';
+            statusMsg.className = "mt-2 text-start text-muted";
+            statusMsg.innerHTML = '<i class="bi bi-info-circle me-1"></i> Despachando a los servidores de correo...';
+
+            // Get name if they generated certificate, else empty
+            const name = document.getElementById('userNameInput') ? document.getElementById('userNameInput').value.trim() || 'Invitado' : 'Invitado';
+
+            const payload = {
+                email: email,
+                nombre: name,
+                score: finalScore,
+                respuestas: sessionAnswers,
+                certCode: currentCertCode || '', // Send active certificate verification code
+                couponCode: currentCouponCode || '' // Send active coupon code
+            };
+
+            try {
+                const response = await fetch('/api/quiz/enviar-correo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    playSound('victory');
+                    writeLog("CORREO: Envío exitoso. Confirmado por el servidor de correo.");
+                    statusMsg.className = "mt-2 text-start text-success fw-bold";
+                    statusMsg.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ¡Resultados enviados con éxito! Revisa tu bandeja de entrada.';
+                    sendBtn.innerHTML = '<i class="bi bi-check-circle"></i> Enviado';
+                } else {
+                    throw new Error(data.message || 'Error en el servidor');
+                }
+            } catch (err) {
+                playSound('incorrect');
+                writeLog(`CORREO ERROR: Falló el envío. Razón: ${err.message}`);
+                statusMsg.className = "mt-2 text-start text-danger fw-bold";
+                statusMsg.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Error al enviar: ${err.message}`;
+                sendBtn.disabled = false;
+                emailInput.disabled = false;
+                sendBtn.innerHTML = '<i class="bi bi-send me-1"></i> Reintentar';
+            }
+        }
+
+        // Initialize HUD console with welcome lines
+        window.addEventListener('DOMContentLoaded', () => {
+            writeLog("SISTEMA: Clínic OS cargado con éxito.");
+            writeLog("SISTEMA: Conexión segura establecida con la base de datos de ClínicaApp.");
+            writeLog("SISTEMA: Evaluador de conocimiento inicializado. Listo.");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Fragmento MIRA -->
+    <div th:replace="~{fragments/asistente_sede_mira :: mira-sede}"></div>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.1);
+            --shadow-xl: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --shadow-primary: 0 8px 24px rgba(79, 70, 229, 0.18);
+            --shadow-success: 0 8px 24px rgba(16, 185, 129, 0.18);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--gray-50);
+            min-height: 100vh;
+            color: var(--gray-700);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar .container {
+            padding-top: 0.875rem;
+            padding-bottom: 0.875rem;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .navbar-brand span {
+            font-weight: 400;
+            opacity: 0.5;
+            font-size: 0.95rem;
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1.25rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+            color: white;
+        }
+
+        .user-email {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* ===== CARDS BASE ===== */
+        .card-base {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .card-base:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--gray-300);
+        }
+
+        /* ===== SALA DE ESPERA ===== */
+        .waiting-section {
+            margin-bottom: 2rem;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+            animation-delay: 0.1s;
+        }
+
+        .waiting-header {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        .waiting-header i {
+            font-size: 1.25rem;
+        }
+
+        .waiting-header h4 {
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .waiting-body {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-top: none;
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .waiting-item {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            transition: background 0.2s ease;
+        }
+
+        .waiting-item:last-child {
+            border-bottom: none;
+        }
+
+        .waiting-item:hover {
+            background: var(--gray-50);
+        }
+
+        .waiting-patient {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .waiting-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .waiting-info h5 {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--gray-800);
+            margin: 0 0 0.25rem 0;
+            letter-spacing: -0.01em;
+        }
+
+        .waiting-info .meta {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .waiting-info .meta i {
+            color: var(--gray-400);
+            margin-right: 0.25rem;
+        }
+
+        .btn-call {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-primary);
+            white-space: nowrap;
+        }
+
+        .btn-call:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.3);
+            color: white;
+        }
+
+        .btn-call i {
+            font-size: 1rem;
+        }
+
+        /* ===== STAT CARDS (KPIs) ===== */
+        .stats-row {
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1.75rem;
+            border-radius: var(--radius-xl);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.15s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .stat-card h6 {
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            opacity: 0.8;
+            margin: 0 0 0.75rem 0;
+            position: relative;
+        }
+
+        .stat-card h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 0;
+            letter-spacing: -2px;
+            position: relative;
+            line-height: 1;
+        }
+
+        .stat-card .stat-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .stat-card .stat-link:hover {
+            color: white;
+            gap: 0.625rem;
+        }
+
+        .stat-card .stat-icon {
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 4rem;
+            opacity: 0.08;
+        }
+
+        .bg-gradient-indigo {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: var(--shadow-primary);
+        }
+
+        .bg-gradient-emerald {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: var(--shadow-success);
+        }
+
+        /* ===== ADMIN NAV ===== */
+        .admin-panel {
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.25s;
+        }
+
+        .panel-header {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.01em;
+        }
+
+        .panel-header i {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .admin-nav-item {
+            text-decoration: none;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-lg);
+            background: white;
+            margin-bottom: 0.625rem;
+            border: 1.5px solid var(--gray-200);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .admin-nav-item:hover {
+            background: white;
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .admin-nav-item i {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .admin-nav-item:hover i {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .admin-nav-item .nav-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .admin-nav-item .nav-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            font-weight: 500;
+            display: block;
+            margin-top: 0.125rem;
+        }
+
+        .admin-nav-item:hover .nav-desc {
+            color: var(--primary-light);
+        }
+
+        /* ===== CHARTS ===== */
+        .chart-card {
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .chart-header {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.01em;
+        }
+
+        .chart-header i {
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 380px;
+        }
+
+        .chart-container-sm {
+            position: relative;
+            height: 240px;
+        }
+
+        /* ===== INFO FOOTER ===== */
+        .info-section {
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.5s;
+        }
+
+        .info-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin: 0 auto 1rem;
+        }
+
+        .info-icon.location {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+        }
+
+        .info-icon.phone {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--success);
+        }
+
+        .info-icon.info {
+            background: rgba(245, 158, 11, 0.08);
+            color: var(--warning);
+        }
+
+        .info-card h6 {
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .info-card p.truncate {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ===== FOOTER ===== */
+        .app-footer {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .app-footer p {
+            color: var(--gray-400);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .stat-card h1 {
+                font-size: 2rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .waiting-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn-call {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .stat-card {
+                padding: 1.25rem;
+            }
+
+            .stat-card h1 {
+                font-size: 1.75rem;
+            }
+
+            .admin-nav-item {
+                padding: 0.875rem 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/clinica/dashboard}">
+                <i class="bi bi-shield-plus"></i>
+                ClínicaApp <span>Admin</span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <span class="user-email d-none d-md-block" th:text="${clinica?.email}">admin@clinica.com</span>
+                <a class="btn-logout" th:href="@{/logout}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Salir
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- SALA DE ESPERA -->
+        <div class="row waiting-section" th:if="${salaDeEspera != null and not #lists.isEmpty(salaDeEspera)}">
+            <div class="col-12">
+                <div class="card-base" style="border: 2px solid rgba(79, 70, 229, 0.15);">
+                    <div class="waiting-header">
+                        <i class="bi bi-megaphone-fill"></i>
+                        <h4>Pacientes en Sala de Espera</h4>
+                    </div>
+                    <div class="waiting-body">
+                        <div th:each="p : ${salaDeEspera}" class="waiting-item">
+                            <div class="waiting-patient">
+                                <div class="waiting-avatar">
+                                    <i class="bi bi-heart-pulse-fill"></i>
+                                </div>
+                                <div class="waiting-info">
+                                    <h5 th:text="${p.nombreMascota ?: 'Paciente'}">Mascota</h5>
+                                    <div class="meta">
+                                        <i class="bi bi-person-fill"></i>
+                                        <span th:text="${p.nombreUsuario}">Dueño</span>
+                                        <span style="margin: 0 0.5rem; color: var(--gray-300);">|</span>
+                                        <i class="bi bi-tag-fill"></i>
+                                        <span th:text="${p.nombreServicio}">Servicio</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a th:href="@{'/clinica/atender/' + ${p.id}}" class="btn-call">
+                                Llamar a Consultorio
+                                <i class="bi bi-door-open-fill"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIs PRINCIPALES -->
+        <div class="row g-4 stats-row">
+            <div class="col-lg-6">
+                <div class="stat-card bg-gradient-indigo">
+                    <i class="bi bi-calendar-check stat-icon"></i>
+                    <h6>Citas Registradas</h6>
+                    <h1 id="count-citas" th:text="${totalCitas ?: 0}">0</h1>
+                    <a th:href="@{/clinica/citas}" class="stat-link">
+                        Ver Agenda Completa
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="stat-card bg-gradient-emerald">
+                    <i class="bi bi-cash-stack stat-icon"></i>
+                    <h6>Ingresos Recaudados</h6>
+                    <h1 id="count-ingresos"
+                        th:text="'$' + ${#numbers.formatDecimal(totalIngresos ?: 0, 0, 'POINT', 0, 'POINT')}">$0</h1>
+                    <a th:href="@{/clinica/reporte-ventas}" class="stat-link">
+                        Ver Reporte Financiero
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- PANEL DE CONTROL -->
+            <div class="col-lg-4 admin-panel">
+                <div class="card-base p-4">
+                    <div class="panel-header">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                        Panel de Control
+                    </div>
+
+                    <a th:href="@{/clinica/citas}" class="admin-nav-item">
+                        <i class="bi bi-clipboard2-heart"></i>
+                        <div>
+                            <span class="nav-title">Control de Pacientes</span>
+                            <span class="nav-desc">Gestionar citas y atenciones</span>
+                        </div>
+                    </a>
+
+                    <a th:href="@{/clinica/mis-servicios}" class="admin-nav-item">
+                        <i class="bi bi-tags"></i>
+                        <div>
+                            <span class="nav-title">Precios y Servicios</span>
+                            <span class="nav-desc">Configurar catálogo y tarifas</span>
+                        </div>
+                    </a>
+
+                    <a th:href="@{/clinica/horario}" class="admin-nav-item">
+                        <i class="bi bi-clock-history"></i>
+                        <div>
+                            <span class="nav-title">Horario de Atención</span>
+                            <span class="nav-desc">Definir disponibilidad de sede</span>
+                        </div>
+                    </a>
+
+                    <a th:href="@{/clinica/perfil}" class="admin-nav-item">
+                        <i class="bi bi-building-gear"></i>
+                        <div>
+                            <span class="nav-title">Editar Datos de Sede</span>
+                            <span class="nav-desc">Información pública y contacto</span>
+                        </div>
+                    </a>
+
+                    <a th:href="@{/clinica/reporte-ventas}" class="admin-nav-item">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
+                        <div>
+                            <span class="nav-title">Reportes de Ventas</span>
+                            <span class="nav-desc">Analizar ingresos históricos</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- GRÁFICO PRINCIPAL -->
+            <div class="col-lg-8 chart-card">
+                <div class="card-base p-4 h-100">
+                    <div class="chart-header">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Rendimiento Semanal
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+            <!-- GRÁFICO DONUT -->
+            <div class="col-md-6 chart-card" style="animation-delay: 0.4s;">
+                <div class="card-base p-4 text-center h-100">
+                    <h6 style="font-weight: 800; font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+                        Distribución de Citas
+                    </h6>
+                    <div class="chart-container-sm">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICO BARRAS -->
+            <div class="col-md-6 chart-card" style="animation-delay: 0.45s;">
+                <div class="card-base p-4 h-100">
+                    <h6
+                        style="font-weight: 800; font-size: 0.85rem; color: var(--gray-600); text-align: center; margin-bottom: 1.25rem;">
+                        Servicios Más Solicitados
+                    </h6>
+                    <div class="chart-container-sm">
+                        <canvas id="servicesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO DE SEDE -->
+        <div class="row g-4 mt-1 info-section">
+            <div class="col-12">
+                <div class="card-base">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <div class="info-card">
+                                <div class="info-icon location">
+                                    <i class="bi bi-geo-alt"></i>
+                                </div>
+                                <h6>Dirección</h6>
+                                <p th:text="${clinica?.direccion}">Cargando...</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4"
+                            style="border-left: 1px solid var(--gray-100); border-right: 1px solid var(--gray-100);">
+                            <div class="info-card">
+                                <div class="info-icon phone">
+                                    <i class="bi bi-telephone"></i>
+                                </div>
+                                <h6>Teléfono</h6>
+                                <p th:text="${clinica?.telefono}">Cargando...</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-card">
+                                <div class="info-icon info">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <h6>Descripción</h6>
+                                <p class="truncate" th:text="${clinica?.descripcion}">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer">
+            <p>PROAULA Clínica App &copy; 2024 | Gestión Administrativa</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:inline="javascript">
+        // Datos del Servidor
+        const labelsIngresos = JSON.parse(/*[[${labelsIngresosJson ?: '[]'}]]*/ '[]');
+        const dataIngresos = JSON.parse(/*[[${dataIngresosJson ?: '[]'}]]*/ '[]');
+        const labelsEstados = JSON.parse(/*[[${labelsEstadosJson ?: '[]'}]]*/ '[]');
+        const dataEstados = JSON.parse(/*[[${dataEstadosJson ?: '[]'}]]*/ '[]');
+        const labelsTopServicios = JSON.parse(/*[[${labelsTopServiciosJson ?: '[]'}]]*/ '[]');
+        const dataTopServicios = JSON.parse(/*[[${dataTopServiciosJson ?: '[]'}]]*/ '[]');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gráfico de Ingresos (Línea)
+            const ctxRev = document.getElementById('revenueChart').getContext('2d');
+            const gradient = ctxRev.createLinearGradient(0, 0, 0, 380);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.15)');
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+            new Chart(ctxRev, {
+                type: 'line',
+                data: {
+                    labels: labelsIngresos,
+                    datasets: [{
+                        label: 'Ingresos ($)',
+                        data: dataIngresos,
+                        borderColor: '#4f46e5',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4f46e5',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            cornerRadius: 10,
+                            titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: '700' },
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 12, weight: '600' },
+                            callbacks: {
+                                label: function (context) {
+                                    return '$ ' + context.parsed.y.toLocaleString('es-CO');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(226, 232, 240, 0.6)',
+                                borderDash: [4, 4]
+                            },
+                            ticks: {
+                                font: { family: 'Plus Jakarta Sans', size: 11 },
+                                color: '#94a3b8',
+                                callback: v => '$' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v)
+                            },
+                            border: { display: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { family: 'Plus Jakarta Sans', size: 11 },
+                                color: '#94a3b8'
+                            },
+                            border: { display: false }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
+            // Gráfico de Estados (Doughnut)
+            new Chart(document.getElementById('statusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: labelsEstados,
+                    datasets: [{
+                        data: dataEstados,
+                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#94a3b8'],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 16,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                                color: '#64748b'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 10,
+                            cornerRadius: 8,
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 12, weight: '600' }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Servicios (Barras horizontales)
+            new Chart(document.getElementById('servicesChart'), {
+                type: 'bar',
+                data: {
+                    labels: labelsTopServicios,
+                    datasets: [{
+                        data: dataTopServicios,
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 8,
+                        barThickness: 24
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 10,
+                            cornerRadius: 8,
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 12, weight: '600' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                                color: '#475569'
+                            },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Animación de Contadores
+            animateValue("count-citas", 0, parseInt(/*[[${totalCitas ?: 0}]]*/ '0'), 1200, false);
+            animateValue("count-ingresos", 0, parseFloat(/*[[${totalIngresos ?: 0}]]*/ '0'), 1200, true);
+        });
+
+        function animateValue(id, start, end, duration, isCurrency) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + (end - start) * easeProgress);
+
+                if (isCurrency) {
+                    obj.innerText = '$' + current.toLocaleString('es-CO');
+                } else {
+                    obj.innerText = current;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    if (isCurrency) {
+                        obj.innerText = '$' + end.toLocaleString('es-CO');
+                    } else {
+                        obj.innerText = end;
+                    }
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1428 | El Ecosistema Tech de ClínicaApp</title>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Tailwind & GSAP -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        /*<![CDATA[*/
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        aurora: {
+                            blue: '#00d2ff',
+                            purple: '#9d50bb',
+                            pink: '#f06292',
+                            green: '#00f2fe'
+                        }
+                    }
+                }
+            }
+        };
+        /*]]>*/
+    </script>
+
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --accent-blue: #0ea5e9;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== AURORA BACKGROUND ===== */
+        .aurora-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(14, 165, 233, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(244, 63, 94, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 30% 70%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+            filter: blur(100px);
+            animation: auroraMove 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes auroraMove {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+        }
+
+        /* ===== GLASSMORPHISM ===== */
+        .glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-strong {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+        }
+
+        /* ===== GRADIENTS ===== */
+        .text-gradient {
+            background: linear-gradient(135deg, #00d2ff 0%, #9d50bb 50%, #f06292 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-gradient-blue {
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bg-gradient-aurora {
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6, #ec4899);
+        }
+
+        /* ===== GLOW EFFECTS ===== */
+        .glow-blue {
+            box-shadow: 0 0 40px rgba(14, 165, 233, 0.15), 0 0 80px rgba(14, 165, 233, 0.05);
+        }
+
+        .glow-purple {
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.15), 0 0 80px rgba(139, 92, 246, 0.05);
+        }
+
+        /* ===== TECH TAGS ===== */
+        .tech-tag {
+            padding: 6px 14px;
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: #7dd3fc;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tech-tag:hover {
+            background: rgba(14, 165, 233, 0.15);
+            border-color: rgba(14, 165, 233, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* ===== CODE BLOCK ===== */
+        .code-block {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: #010409;
+            padding: 1.25rem;
+            border-radius: 16px;
+            border: 1px solid #1e293b;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: #94a3b8;
+        }
+
+        /* ===== PHONE MOCKUP ===== */
+        .phone-mockup {
+            width: 300px;
+            height: 620px;
+            background: #000;
+            border: 12px solid #1e293b;
+            border-radius: 48px;
+            position: relative;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                0 25px 60px rgba(0, 0, 0, 0.5),
+                0 0 60px rgba(14, 165, 233, 0.1);
+            overflow: hidden;
+        }
+
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 28px;
+            background: #000;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border-radius: 36px;
+            overflow: hidden;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(1deg);
+            }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .gradient-animate {
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== NAV ===== */
+        .nav-glass {
+            background: rgba(3, 7, 18, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== SECTION TITLES ===== */
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: 100px;
+            color: #38bdf8;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #0ea5e9, #8b5cf6, transparent);
+            opacity: 0.3;
+        }
+
+        .timeline-dot {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== CHART BARS ===== */
+        .chart-bar {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .chart-bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+
+        .chart-bar .tooltip {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: #0ea5e9;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .chart-bar:hover .tooltip {
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* ===== INPUTS ===== */
+        .input-glass {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            color: white;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            outline: none;
+        }
+
+        .input-glass:focus {
+            border-color: rgba(14, 165, 233, 0.4);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .input-glass::placeholder {
+            color: #64748b;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* ===== CARD HOVER ===== */
+        .feature-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ===== PARTICLE CANVAS ===== */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .phone-mockup {
+                width: 260px;
+                height: 540px;
+            }
+
+            .timeline-line {
+                left: 24px;
+            }
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== STATUS BADGE ===== */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 100px;
+            color: #34d399;
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #34d399;
+        }
+
+        /* ===== GRID PATTERN ===== */
+        .grid-pattern {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+    </style>
+    <link th:replace="~{fragments/header :: favIcon}">
+</head>
+
+<body class="antialiased">
+
+    <!-- Backgrounds -->
+    <div class="aurora-mesh"></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="fixed top-0 left-0 w-full z-50 nav-glass">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 relative overflow-hidden">
+                    <span class="text-white font-bold text-lg relative z-10">14</span>
+                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-400/20 to-purple-400/20"></div>
+                </div>
+                <span class="font-display text-2xl font-bold tracking-tight">
+                    1428<span class="text-blue-400">.tech</span>
+                </span>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-1">
+                <a href="#intro"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Intro</a>
+                <a href="#journey"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">El
+                    Viaje</a>
+                <a href="#stack"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Stack</a>
+                <a href="#simulators"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Demos</a>
+                <a href="#dashboard"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Mando</a>
+                <a href="#mobile"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Mobile</a>
+                <a href="#security"
+                    class="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">Seguridad</a>
+            </div>
+
+            <a th:href="@{/}"
+                class="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-sm font-semibold flex items-center gap-2 group">
+                <i class="bi bi-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                Regresar a la App
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section id="intro"
+        class="min-h-screen flex flex-col items-center justify-center pt-24 px-6 text-center relative overflow-hidden">
+
+        <!-- Decorative Elements -->
+        <div
+            class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none pulse-glow">
+        </div>
+        <div
+            class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none">
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto">
+            <!-- Badge -->
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/8 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 glow-blue">
+                <span class="relative flex h-2 w-2">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Arquitectura de Próxima Generación
+            </div>
+
+            <!-- Title -->
+            <h1
+                class="text-6xl md:text-8xl lg:text-9xl font-display font-extrabold tracking-tighter mb-8 leading-[0.9]">
+                Descubre <br>
+                <span class="text-gradient gradient-animate">ClinicaApp</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="max-w-2xl mx-auto text-slate-400 text-lg md:text-xl leading-relaxed mb-12">
+                La solución integral para el cuidado de tus mascotas. Desde la gestión de citas hasta diagnósticos
+                asistidos por IA, ClinicaApp une tecnología y amor animal en una sola plataforma.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-20">
+                <button onclick="gsap.to(window, {duration: 1, scrollTo: '#stack'})"
+                    class="btn-primary flex items-center gap-2">
+                    Explorar Stack
+                    <i class="bi bi-arrow-down-right"></i>
+                </button>
+                <button onclick="gsap.to(window, {duration: 1, scrollTo: '#simulators'})"
+                    class="btn-secondary flex items-center gap-2">
+                    Ver Demos Live
+                    <i class="bi bi-play-circle"></i>
+                </button>
+                <a th:href="@{/api/1428/generate-pdf}"
+                    class="btn-secondary bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 flex items-center gap-2">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    Descargar Reporte PDF
+                </a>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div class="glass-strong p-6 text-center group">
+                    <div class="text-3xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">...
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest font-medium">Sistema</div>
+                    <div class="status-badge mt-3 mx-auto">Online</div>
+                </div>
+                <div class="glass-strong p-6 text-center group">
+                    <div class="text-3xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">...
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest font-medium">Respuesta</div>
+                    <div class="text-[10px] text-emerald-400 mt-3 font-mono">~45ms</div>
+                </div>
+                <div class="glass-strong p-6 text-center group">
+                    <div class="text-3xl font-bold text-white mb-2 group-hover:text-pink-400 transition-colors">...
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest font-medium">Usuarios</div>
+                    <div class="text-[10px] text-slate-500 mt-3 font-mono">Activos</div>
+                </div>
+                <div class="glass-strong p-6 text-center group">
+                    <div class="text-3xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">...
+                    </div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest font-medium">Clínicas</div>
+                    <div class="text-[10px] text-slate-500 mt-3 font-mono">Conectadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+            <span class="text-[10px] uppercase tracking-widest text-slate-500">Scroll</span>
+            <div class="w-6 h-10 border-2 border-slate-600 rounded-full flex justify-center pt-2">
+                <div class="w-1 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== THE JOURNEY (ROADMAP) ===== -->
+    <section id="journey" class="py-32 px-6 relative">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-24">
+                <div class="section-label mx-auto">
+                    <i class="bi bi-compass"></i>
+                    Proceso
+                </div>
+                <h2 class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight">
+                    El Viaje de la <span class="text-gradient-blue">Innovación</span>
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">
+                    Así es como ClinicaApp transforma la experiencia de cuidar a los que más quieres.
+                </p>
+            </div>
+
+            <div class="relative">
+                <div class="timeline-line hidden md:block"></div>
+
+                <div class="space-y-32">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col md:flex-row items-center gap-12 journey-step">
+                        <div class="flex-1 text-right hidden md:block pr-8">
+                            <h3 class="text-2xl font-bold mb-3">Identificación Inteligente</h3>
+                            <p class="text-slate-400 leading-relaxed">Escaneo de QR dinámico para acceso inmediato al
+                                perfil médico y contacto de emergencia.</p>
+                            <div class="flex gap-2 justify-end mt-4">
+                                <span class="tech-tag">QR Dinámico</span>
+                                <span class="tech-tag">NFC</span>
+                            </div>
+                        </div>
+                        <div class="timeline-dot bg-blue-500 shadow-[0_0_30px_rgba(14,165,233,0.3)]">
+                            <i class="bi bi-qr-code-scan text-2xl text-white"></i>
+                        </div>
+                        <div class="flex-1 md:hidden text-center">
+                            <h3 class="text-2xl font-bold mb-2">Identificación Inteligente</h3>
+                            <p class="text-slate-400">Acceso inmediato al perfil médico vía QR.</p>
+                        </div>
+                        <div class="flex-1 hidden md:block pl-8">
+                            <div class="glass p-6 max-w-sm">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <i class="bi bi-shield-check text-blue-400"></i>
+                                    </div>
+                                    <div class="text-sm font-bold">Acceso Seguro</div>
+                                </div>
+                                <div class="text-xs text-slate-500">Autenticación biométrica + JWT tokens</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col md:flex-row items-center gap-12 journey-step">
+                        <div class="flex-1 hidden md:block pr-8 text-right">
+                            <div class="glass p-6 max-w-sm ml-auto">
+                                <div class="flex items-center gap-3 mb-3 justify-end">
+                                    <div class="text-sm font-bold">IA Avanzada</div>
+                                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <i class="bi bi-cpu text-purple-400"></i>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-slate-500">Modelo Llama 3 con fine-tuning médico</div>
+                            </div>
+                        </div>
+                        <div class="timeline-dot bg-purple-500 shadow-[0_0_30px_rgba(139,92,246,0.3)]">
+                            <i class="bi bi-robot text-2xl text-white"></i>
+                        </div>
+                        <div class="flex-1 text-left pl-8">
+                            <h3 class="text-2xl font-bold mb-3">Triage Asistido por IA</h3>
+                            <p class="text-slate-400 leading-relaxed">Nuestro motor Llama 3 analiza síntomas en tiempo
+                                real para priorizar la atención médica.</p>
+                            <div class="flex gap-2 mt-4">
+                                <span class="tech-tag">NLP</span>
+                                <span class="tech-tag">Groq API</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col md:flex-row items-center gap-12 journey-step">
+                        <div class="flex-1 text-right hidden md:block pr-8">
+                            <h3 class="text-2xl font-bold mb-3">Gestión de Citas</h3>
+                            <p class="text-slate-400 leading-relaxed">Agendamiento fluido con sincronización omnicanal
+                                (Web, Mobile y WhatsApp).</p>
+                            <div class="flex gap-2 justify-end mt-4">
+                                <span class="tech-tag">Calendario</span>
+                                <span class="tech-tag">WhatsApp</span>
+                            </div>
+                        </div>
+                        <div class="timeline-dot bg-pink-500 shadow-[0_0_30px_rgba(244,63,94,0.3)]">
+                            <i class="bi bi-calendar2-heart text-2xl text-white"></i>
+                        </div>
+                        <div class="flex-1 md:hidden text-center">
+                            <h3 class="text-2xl font-bold mb-2">Gestión de Citas</h3>
+                            <p class="text-slate-400">Agendamiento fluido y sincronizado.</p>
+                        </div>
+                        <div class="flex-1 hidden md:block pl-8">
+                            <div class="glass p-6 max-w-sm">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                                        <i class="bi bi-bell text-pink-400"></i>
+                                    </div>
+                                    <div class="text-sm font-bold">Recordatorios</div>
+                                </div>
+                                <div class="text-xs text-slate-500">SMS + Email + Push notifications</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col md:flex-row items-center gap-12 journey-step">
+                        <div class="flex-1 hidden md:block pr-8 text-right">
+                            <div class="glass p-6 max-w-sm ml-auto">
+                                <div class="flex items-center gap-3 mb-3 justify-end">
+                                    <div class="text-sm font-bold">Pagos Seguros</div>
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                        <i class="bi bi-lock text-emerald-400"></i>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-slate-500">PCI DSS compliant + cifrado AES-256</div>
+                            </div>
+                        </div>
+                        <div class="timeline-dot bg-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                            <i class="bi bi-shield-check text-2xl text-white"></i>
+                        </div>
+                        <div class="flex-1 text-left pl-8">
+                            <h3 class="text-2xl font-bold mb-3">Pago y Facturación</h3>
+                            <p class="text-slate-400 leading-relaxed">Pasarela Stripe integrada con generación
+                                automática de reportes PDF y facturas.</p>
+                            <div class="flex gap-2 mt-4">
+                                <span class="tech-tag">Stripe</span>
+                                <span class="tech-tag">PDF Auto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TECHNOLOGY STACK ===== -->
+    <section id="stack" class="py-32 px-6 relative grid-pattern">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
+                <div class="max-w-2xl">
+                    <div class="section-label">
+                        <i class="bi bi-stack"></i>
+                        Tecnología
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-display font-bold mb-4 tracking-tight">
+                        ¿Qué hace <span class="text-gradient-blue">ClinicaApp?</span>
+                    </h2>
+                    <p class="text-slate-400 text-lg">
+                        Nuestra plataforma optimiza cada aspecto de la experiencia veterinaria, asegurando que tanto
+                        médicos como dueños tengan las mejores herramientas.
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <div class="w-12 h-1 bg-blue-500 rounded-full"></div>
+                    <div class="w-4 h-1 bg-slate-700 rounded-full"></div>
+                    <div class="w-4 h-1 bg-slate-700 rounded-full"></div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass p-8 feature-card group cursor-pointer">
+                    <div
+                        class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                        <i class="bi bi-calendar-check text-8xl"></i>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
+                        <i class="bi bi-calendar-check text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Gestión de Citas</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                        Agenda consultas, cirugías y peluquería en segundos. Notificaciones automáticas vía SMS y Email
+                        para que nunca olvides una cita.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-tag">Calendario</span>
+                        <span class="tech-tag">Omnicanal</span>
+                        <span class="tech-tag">Sincronizado</span>
+                    </div>
+                    <div
+                        class="mt-6 pt-6 border-t border-white/5 flex items-center gap-2 text-xs text-slate-500 group-hover:text-blue-400 transition-colors">
+                        <span>Ver más</span>
+                        <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass p-8 feature-card group cursor-pointer">
+                    <div
+                        class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                        <i class="bi bi-clipboard2-pulse text-8xl"></i>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all duration-300">
+                        <i class="bi bi-clipboard2-pulse text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Historial Digital</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                        Toda la vida de tu mascota en un solo lugar. Diagnósticos, vacunas y exámenes accesibles desde
+                        cualquier dispositivo en segundos.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-tag">Cifrado</span>
+                        <span class="tech-tag">Portátil</span>
+                        <span class="tech-tag">Completo</span>
+                    </div>
+                    <div
+                        class="mt-6 pt-6 border-t border-white/5 flex items-center gap-2 text-xs text-slate-500 group-hover:text-emerald-400 transition-colors">
+                        <span>Ver más</span>
+                        <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass p-8 feature-card group cursor-pointer">
+                    <div
+                        class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                        <i class="bi bi-phone text-8xl"></i>
+                    </div>
+                    <div
+                        class="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-400 mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
+                        <i class="bi bi-phone-fill text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">App Móvil</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                        Lleva la clínica en tu bolsillo. Seguimiento en tiempo real del estado de tu mascota y chat
+                        directo con especialistas.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-tag">iOS</span>
+                        <span class="tech-tag">Android</span>
+                        <span class="tech-tag">Notificaciones</span>
+                    </div>
+                    <div
+                        class="mt-6 pt-6 border-t border-white/5 flex items-center gap-2 text-xs text-slate-500 group-hover:text-purple-400 transition-colors">
+                        <span>Ver más</span>
+                        <i class="bi bi-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== INTERACTIVE SIMULATORS ===== -->
+    <section id="simulators" class="py-32 px-6 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full bg-slate-900/30 pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-20">
+                <div class="section-label mx-auto">
+                    <i class="bi bi-lightning-charge"></i>
+                    Interactivo
+                </div>
+                <h2 class="text-5xl md:text-7xl font-display font-bold mb-6 tracking-tight">
+                    Prueba el <span class="text-gradient">Ecosistema</span>
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg">
+                    No solo te lo contamos, te lo mostramos. Interactúa con las funciones clave de nuestra plataforma.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                <!-- Email Simulator -->
+                <div class="glass-strong p-8 border-l-4 border-l-blue-500 relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none">
+                    </div>
+
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 class="text-2xl font-bold flex items-center gap-3">
+                                <i class="bi bi-envelope-at text-blue-400"></i>
+                                Gestión de Notificaciones
+                            </h3>
+                            <p class="text-sm text-slate-500 mt-1">Envía correos reales de confirmación de citas y
+                                resultados médicos.</p>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Para:</label>
+                            <input type="email" id="email-to" placeholder="cliente@ejemplo.com" class="input-glass">
+                        </div>
+                        <div class="hidden">
+                            <input type="text" id="email-subject" value="Simulación de Funcionamiento">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Mensaje de
+                                Prueba:</label>
+                            <textarea id="email-body" rows="4"
+                                placeholder="Ej: Confirmación de cita médica para el paciente 'Max'. Programada para el 15/05 a las 09:00 AM. Por favor, confirmar asistencia."
+                                class="input-glass resize-none"></textarea>
+                        </div>
+
+                        <button onclick="simulateEmail()" id="btn-send-email"
+                            class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-blue-500/20">
+                            <span>Enviar Simulación Pro</span>
+                            <i class="bi bi-magic group-hover:rotate-12 transition-transform"></i>
+                        </button>
+                    </div>
+
+                    <div id="email-log" class="mt-8 pt-8 border-t border-white/5 hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Consola de
+                                Servidor</span>
+                            <span class="text-[10px] text-green-500 font-mono flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                ONLINE
+                            </span>
+                        </div>
+                        <div class="code-block text-green-400/90 font-mono text-[11px] leading-relaxed"
+                            id="email-console">
+                            // Esperando evento...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logic Visualizer -->
+                <div class="relative">
+                    <div
+                        class="absolute -top-10 -right-10 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse pointer-events-none">
+                    </div>
+
+                    <div class="glass-strong p-8 relative z-10">
+                        <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">
+                            <i class="bi bi-code-square text-purple-400"></i>
+                            Lógica de Negocio
+                        </h3>
+
+                        <div class="space-y-8">
+                            <!-- AI Section -->
+                            <div class="flex flex-col gap-4">
+                                <label
+                                    class="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <i class="bi bi-robot text-purple-400"></i>
+                                    Asistente de Salud IA (Groq):
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="ai-prompt" placeholder="Ej: Mi perro tiene tos y fiebre..."
+                                        class="input-glass flex-1">
+                                    <button onclick="simulateAi()" id="btn-ai"
+                                        class="px-5 py-3 bg-purple-600 rounded-xl hover:bg-purple-500 transition-all flex items-center justify-center">
+                                        <i class="bi bi-robot text-lg"></i>
+                                    </button>
+                                </div>
+                                <div id="ai-response"
+                                    class="hidden p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-sm text-purple-200 font-medium">
+                                    Analizando síntomas...
+                                </div>
+                            </div>
+
+                            <hr class="border-white/5">
+
+                            <!-- SMS Section -->
+                            <div class="flex flex-col gap-4">
+                                <label
+                                    class="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <i class="bi bi-chat-dots text-green-400"></i>
+                                    Notificaciones Móviles (Twilio):
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="sms-to" placeholder="+57 300..." class="input-glass w-1/3">
+                                    <input type="text" id="sms-msg" placeholder="Mensaje..." class="input-glass flex-1">
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="sendMobile('sms')"
+                                        class="flex-1 py-3 bg-slate-700 rounded-xl hover:bg-slate-600 transition-all text-xs font-bold flex items-center justify-center gap-2">
+                                        <i class="bi bi-chat-text"></i> Enviar SMS
+                                    </button>
+                                    <button onclick="sendMobile('whatsapp')"
+                                        class="flex-1 py-3 bg-green-600 rounded-xl hover:bg-green-500 transition-all text-xs font-bold flex items-center justify-center gap-2">
+                                        <i class="bi bi-whatsapp"></i> WhatsApp
+                                    </button>
+                                </div>
+                            </div>
+
+                            <hr class="border-white/5">
+
+                            <!-- Payment Section -->
+                            <div class="flex flex-col gap-4">
+                                <label
+                                    class="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                    <i class="bi bi-credit-card text-indigo-400"></i>
+                                    Cobros y Facturación (Stripe):
+                                </label>
+                                <button onclick="simulatePayment()" id="btn-pay"
+                                    class="w-full py-4 bg-indigo-600 rounded-xl hover:bg-indigo-500 transition-all font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+                                    <i class="bi bi-credit-card-2-back"></i>
+                                    Simular Pago $50.00 USD
+                                </button>
+                                <div id="payment-status"
+                                    class="hidden p-4 rounded-xl border border-white/10 text-sm font-mono bg-black/20">
+                                    Conectando con Stripe...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Code Preview -->
+                        <div class="mt-10 p-5 rounded-2xl bg-white/3 border border-white/8">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="text-[10px] text-slate-500 font-mono uppercase flex items-center gap-2">
+                                    <i class="bi bi-file-code text-blue-400"></i>
+                                    Preview del Controlador
+                                </div>
+                                <span class="text-[10px] text-slate-600 font-mono">Spring Boot</span>
+                            </div>
+                            <pre class="text-[11px] text-blue-300/80 font-mono leading-relaxed overflow-x-auto">
+@PostMapping("/api/notificar")
+public ResponseEntity&lt;?&gt; send(@RequestBody EmailDTO dto) {
+    emailService.sendAsync(dto.getTo(), dto.getSubject(), dto.getBody());
+    return ResponseEntity.ok().build();
+}</pre>
+                        </div>
+                    </div>
+
+                    <div id="logic-log" class="mt-8 pt-8 border-t border-white/5 hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Log de
+                                Operaciones</span>
+                            <span class="text-[10px] text-purple-500 font-mono flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                                GATEWAY: ACTIVE
+                            </span>
+                        </div>
+                        <div class="code-block text-purple-400/90 font-mono text-[11px] leading-relaxed max-h-40 overflow-y-auto"
+                            id="logic-console">
+                            // Escuchando peticiones...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== DASHBOARD / COMMAND CENTER ===== -->
+    <section id="dashboard" class="py-32 px-6 relative overflow-hidden grid-pattern">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="section-label">
+                        <i class="bi bi-speedometer2"></i>
+                        Analytics
+                    </div>
+                    <h2 class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight">
+                        El Centro de <span class="text-gradient-blue">Control</span>
+                    </h2>
+                    <p class="text-slate-400 text-lg mb-10 leading-relaxed">
+                        Toma decisiones basadas en datos. Nuestro panel administrativo centraliza el rendimiento de cada
+                        clínica en tiempo real.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="glass p-5">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-medium text-slate-300">Eficacia del Diagnóstico IA</span>
+                                <span class="text-blue-400 text-sm font-bold">94.2%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill bg-gradient-to-r from-blue-500 to-blue-400"
+                                    style="width: 94%"></div>
+                            </div>
+                        </div>
+
+                        <div class="glass p-5">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-medium text-slate-300">Satisfacción del Cliente</span>
+                                <span class="text-purple-400 text-sm font-bold">4.9/5</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill bg-gradient-to-r from-purple-500 to-purple-400"
+                                    style="width: 98%"></div>
+                            </div>
+                        </div>
+
+                        <div class="glass p-5">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-medium text-slate-300">Tiempo de Respuesta API</span>
+                                <span class="text-emerald-400 text-sm font-bold">45ms</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill bg-gradient-to-r from-emerald-500 to-emerald-400"
+                                    style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-strong p-8 relative">
+                    <div
+                        class="absolute -top-4 -right-4 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none">
+                    </div>
+
+                    <div class="flex items-center justify-between mb-8">
+                        <h4 class="font-bold text-lg flex items-center gap-2">
+                            <i class="bi bi-graph-up text-blue-400"></i>
+                            Métricas de Actividad
+                        </h4>
+                        <select
+                            class="bg-slate-800/80 border border-white/10 rounded-lg text-xs p-2.5 outline-none text-slate-300 cursor-pointer">
+                            <option>Últimos 7 días</option>
+                            <option>Último mes</option>
+                            <option>Último trimestre</option>
+                        </select>
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="h-64 flex items-end gap-3 px-2 mb-4">
+                        <div class="flex-1 chart-bar bg-blue-500/20 hover:bg-blue-500/40 h-[40%]">
+                            <div class="tooltip">120</div>
+                        </div>
+                        <div class="flex-1 chart-bar bg-blue-500/30 hover:bg-blue-500/50 h-[60%]">
+                            <div class="tooltip">180</div>
+                        </div>
+                        <div class="flex-1 chart-bar bg-blue-500/40 hover:bg-blue-500/60 h-[50%]">
+                            <div class="tooltip">150</div>
+                        </div>
+                        <div class="flex-1 chart-bar bg-blue-500/50 hover:bg-blue-500/70 h-[80%]">
+                            <div class="tooltip">240</div>
+                        </div>
+                        <div class="flex-1 chart-bar bg-blue-500/60 hover:bg-blue-500/80 h-[70%]">
+                            <div class="tooltip">210</div>
+                        </div>
+                        <div class="flex-1 chart-bar bg-blue-500/80 hover:bg-blue-500 h-[95%]">
+                            <div class="tooltip">290</div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider px-2">
+                        <span>Lun</span><span>Mar</span><span>Mie</span><span>Jue</span><span>Vie</span><span>Sab</span>
+                    </div>
+
+                    <!-- Mini Stats -->
+                    <div class="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-white/5">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-white">1,284</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Consultas</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-white">98.2%</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Uptime</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-white">4.9</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MOBILE APP ECOSYSTEM ===== -->
+    <section id="mobile" class="py-32 px-6 relative">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+            <div class="order-2 lg:order-1 flex justify-center relative">
+                <div class="absolute w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="phone-mockup floating">
+                    <div class="phone-screen">
+                        <!-- Header -->
+                        <div class="p-6 pt-12 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Bienvenido</span>
+                                <span class="text-sm font-bold">Dr. ClinicaApp</span>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center relative">
+                                <i class="bi bi-bell-fill text-blue-400 text-xs"></i>
+                                <span
+                                    class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-900"></span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1 p-4 space-y-4 overflow-y-auto" id="mobile-screen-content">
+                            <div
+                                class="p-5 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2">
+                                </div>
+                                <div class="text-[10px] text-white/70 uppercase font-bold tracking-wider">Citas de hoy
+                                </div>
+                                <div class="text-3xl font-bold mt-1">12 Pacientes</div>
+                                <div class="mt-4 flex gap-2">
+                                    <div class="h-1.5 flex-1 bg-white/20 rounded-full overflow-hidden">
+                                        <div class="h-full w-2/3 bg-white rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="text-[9px] text-white/50 mt-1">8 completadas · 4 pendientes</div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div
+                                    class="p-4 rounded-2xl bg-slate-800/50 border border-white/5 flex flex-col items-center gap-2 hover:bg-slate-800/80 transition-colors cursor-pointer">
+                                    <i class="bi bi-chat-dots-fill text-blue-400 text-lg"></i>
+                                    <span class="text-[10px] font-bold">Consultas</span>
+                                </div>
+                                <div
+                                    class="p-4 rounded-2xl bg-slate-800/50 border border-white/5 flex flex-col items-center gap-2 hover:bg-slate-800/80 transition-colors cursor-pointer">
+                                    <i class="bi bi-file-earmark-medical-fill text-purple-400 text-lg"></i>
+                                    <span class="text-[10px] font-bold">Historial</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-800/50 border border-white/5">
+                                <div
+                                    class="text-[10px] text-slate-500 font-bold mb-3 uppercase tracking-wider flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    Pacientes en espera
+                                </div>
+                                <div class="space-y-3">
+                                    <div
+                                        class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-lg">
+                                            🐶</div>
+                                        <div class="flex-1">
+                                            <div class="text-xs font-bold">Max (Labrador)</div>
+                                            <div class="text-[9px] text-slate-500">10:30 AM · Vacunación</div>
+                                        </div>
+                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                    </div>
+                                    <div
+                                        class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-lg">
+                                            🐱</div>
+                                        <div class="flex-1">
+                                            <div class="text-xs font-bold">Luna (Siames)</div>
+                                            <div class="text-[9px] text-slate-500">11:15 AM · Control</div>
+                                        </div>
+                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navbar -->
+                        <div
+                            class="h-16 bg-slate-900/90 backdrop-blur-md border-t border-white/5 flex justify-around items-center px-2">
+                            <i class="bi bi-house-door-fill text-blue-400 text-lg"></i>
+                            <i
+                                class="bi bi-calendar-event text-slate-500 text-lg hover:text-slate-300 transition-colors cursor-pointer"></i>
+                            <div
+                                class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 -mt-8 border-4 border-slate-900 flex items-center justify-center shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-110 transition-transform">
+                                <i class="bi bi-plus-lg text-white text-lg"></i>
+                            </div>
+                            <i
+                                class="bi bi-graph-up text-slate-500 text-lg hover:text-slate-300 transition-colors cursor-pointer"></i>
+                            <i
+                                class="bi bi-person text-slate-500 text-lg hover:text-slate-300 transition-colors cursor-pointer"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-1 lg:order-2">
+                <div class="section-label">
+                    <i class="bi bi-phone"></i>
+                    Mobile
+                </div>
+                <h2 class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight">
+                    Tu Clínica en el <span class="text-gradient-blue">Bolsillo</span>
+                </h2>
+                <p class="text-slate-400 text-lg mb-10 leading-relaxed">
+                    La aplicación móvil sincroniza cada dato en milisegundos con la versión web.
+                    Diseñada para doctores y dueños de mascotas que buscan movilidad total.
+                </p>
+
+                <div class="space-y-4">
+                    <div class="glass p-6 hover:bg-white/5 transition-all cursor-pointer group"
+                        onclick="animateMobile('consultas')">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all">
+                                <i class="bi bi-camera-video text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold mb-1">Telemedicina Nativa</h4>
+                                <p class="text-sm text-slate-500">Consultas por video sin salir de la app.</p>
+                            </div>
+                            <i
+                                class="bi bi-chevron-right text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6 hover:bg-white/5 transition-all cursor-pointer group"
+                        onclick="animateMobile('notificaciones')">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all">
+                                <i class="bi bi-app-indicator text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold mb-1">Push Notifications</h4>
+                                <p class="text-sm text-slate-500">Recordatorios de citas y estados de salud.</p>
+                            </div>
+                            <i
+                                class="bi bi-chevron-right text-slate-600 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6 hover:bg-white/5 transition-all cursor-pointer group"
+                        onclick="animateMobile('tienda')">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all">
+                                <i class="bi bi-bag-heart text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold mb-1">E-Commerce Integrado</h4>
+                                <p class="text-sm text-slate-500">Compra productos y medicamentos desde la app.</p>
+                            </div>
+                            <i
+                                class="bi bi-chevron-right text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass p-6 hover:bg-white/5 transition-all cursor-pointer group"
+                        onclick="animateMobile('historial')">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-400 group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
+                                <i class="bi bi-file-medical text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold mb-1">Historial Clínico</h4>
+                                <p class="text-sm text-slate-500">Consulta vacunas y exámenes en un tap.</p>
+                            </div>
+                            <i
+                                class="bi bi-chevron-right text-slate-600 group-hover:text-pink-400 group-hover:translate-x-1 transition-all"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECURITY & ARCHITECTURE ===== -->
+    <section id="security" class="py-32 px-6 relative grid-pattern">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="section-label mx-auto">
+                <i class="bi bi-shield-lock"></i>
+                Seguridad
+            </div>
+            <h2 class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight">
+                Infraestructura de <span class="text-gradient">Grado Médico</span>
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto mb-16 text-lg">
+                Seguridad de nivel enterprise para proteger los datos más sensibles: la salud de tus mascotas.
+            </p>
+
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="glass p-8 feature-card group">
+                    <div
+                        class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 mx-auto mb-6 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all">
+                        <i class="bi bi-shield-lock text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold mb-3 text-lg">JWT Auth</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">Autenticación robusta basada en tokens para
+                        proteger cada endpoint de la API.</p>
+                    <div class="mt-4 flex justify-center">
+                        <span class="tech-tag text-[10px]">RS256</span>
+                    </div>
+                </div>
+
+                <div class="glass p-8 feature-card group">
+                    <div
+                        class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 mx-auto mb-6 group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all">
+                        <i class="bi bi-database-lock text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold mb-3 text-lg">MongoDB Encryption</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">Datos de pacientes y dueños cifrados en reposo
+                        para máxima privacidad.</p>
+                    <div class="mt-4 flex justify-center">
+                        <span class="tech-tag text-[10px]">AES-256</span>
+                    </div>
+                </div>
+
+                <div class="glass p-8 feature-card group">
+                    <div
+                        class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-400 mx-auto mb-6 group-hover:scale-110 group-hover:bg-purple-500/20 transition-all">
+                        <i class="bi bi-cloud-check text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold mb-3 text-lg">Spring Security</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">Políticas de control de acceso granulares para
+                        doctores, staff y usuarios.</p>
+                    <div class="mt-4 flex justify-center">
+                        <span class="tech-tag text-[10px]">RBAC</span>
+                    </div>
+                </div>
+
+                <div class="glass p-8 feature-card group">
+                    <div
+                        class="w-16 h-16 bg-pink-500/10 rounded-2xl flex items-center justify-center text-pink-400 mx-auto mb-6 group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
+                        <i class="bi bi-lightning-charge text-3xl"></i>
+                    </div>
+                    <h4 class="font-bold mb-3 text-lg">Escalabilidad</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">Arquitectura desacoplada lista para manejar miles
+                        de peticiones simultáneas.</p>
+                    <div class="mt-4 flex justify-center">
+                        <span class="tech-tag text-[10px]">Microservices</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Architecture Diagram -->
+            <div class="mt-16 glass-strong p-8 max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <h4 class="text-lg font-bold mb-2">Arquitectura de Seguridad</h4>
+                    <p class="text-sm text-slate-500">Flujo de autenticación y autorización</p>
+                </div>
+
+                <div class="flex flex-wrap justify-center items-center gap-4">
+                    <div class="glass px-6 py-4 text-center min-w-[140px]">
+                        <i class="bi bi-person text-2xl text-blue-400 mb-2"></i>
+                        <div class="text-xs font-bold">Usuario</div>
+                    </div>
+                    <i class="bi bi-arrow-right text-slate-600 text-xl"></i>
+                    <div class="glass px-6 py-4 text-center min-w-[140px] border-blue-500/20">
+                        <i class="bi bi-shield-check text-2xl text-blue-400 mb-2"></i>
+                        <div class="text-xs font-bold">API Gateway</div>
+                    </div>
+                    <i class="bi bi-arrow-right text-slate-600 text-xl"></i>
+                    <div class="glass px-6 py-4 text-center min-w-[140px] border-purple-500/20">
+                        <i class="bi bi-key text-2xl text-purple-400 mb-2"></i>
+                        <div class="text-xs font-bold">Auth Service</div>
+                    </div>
+                    <i class="bi bi-arrow-right text-slate-600 text-xl"></i>
+                    <div class="glass px-6 py-4 text-center min-w-[140px] border-emerald-500/20">
+                        <i class="bi bi-database text-2xl text-emerald-400 mb-2"></i>
+                        <div class="text-xs font-bold">Resources</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="py-20 px-6 border-t border-white/5 relative overflow-hidden">
+        <div
+            class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 relative z-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <span class="text-white font-bold text-lg">14</span>
+                </div>
+                <span class="font-display text-2xl font-bold tracking-tight">
+                    1428<span class="text-blue-400">.tech</span>
+                </span>
+            </div>
+
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <p class="text-slate-500 text-sm">© 2026 ClínicaApp Ecosystem. Todos los derechos reservados.</p>
+                <div class="flex gap-4 text-xs text-slate-600">
+                    <a href="#" class="hover:text-slate-400 transition-colors">Privacidad</a>
+                    <a href="#" class="hover:text-slate-400 transition-colors">Términos</a>
+                    <a href="#" class="hover:text-slate-400 transition-colors">API Docs</a>
+                </div>
+            </div>
+
+            <div class="flex gap-4">
+                <a href="#"
+                    class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all">
+                    <i class="bi bi-github text-lg"></i>
+                </a>
+                <a href="#"
+                    class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all">
+                    <i class="bi bi-linkedin text-lg"></i>
+                </a>
+                <a href="#"
+                    class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all">
+                    <i class="bi bi-twitter-x text-lg"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        /*<![CDATA[*/
+        // ===== GSAP Initialization =====
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // ===== Hero Animations =====
+        gsap.from("#intro h1", {
+            opacity: 0,
+            y: 60,
+            duration: 1.2,
+            ease: "power4.out",
+            delay: 0.2
+        });
+
+        gsap.from("#intro p", {
+            opacity: 0,
+            y: 40,
+            duration: 1,
+            delay: 0.5,
+            ease: "power4.out"
+        });
+
+        gsap.from("#intro .flex-wrap", {
+            opacity: 0,
+            y: 30,
+            duration: 1,
+            delay: 0.8,
+            ease: "power4.out"
+        });
+
+        gsap.from("#intro .grid", {
+            opacity: 0,
+            y: 40,
+            duration: 1,
+            delay: 1.1,
+            stagger: 0.1,
+            ease: "power3.out"
+        });
+
+        // ===== Scroll Reveal Animations =====
+        gsap.utils.toArray('.glass, .journey-step, .feature-card').forEach((el, i) => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                delay: i * 0.05,
+                ease: "power3.out"
+            });
+        });
+
+        // ===== Dashboard Chart Animation =====
+        gsap.from("#dashboard .chart-bar", {
+            scrollTrigger: {
+                trigger: "#dashboard",
+                start: "top 70%"
+            },
+            scaleY: 0,
+            transformOrigin: "bottom",
+            stagger: 0.08,
+            duration: 1.2,
+            ease: "elastic.out(1, 0.6)"
+        });
+
+        // ===== Progress Bars Animation =====
+        gsap.utils.toArray('.progress-fill').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            gsap.to(bar, {
+                scrollTrigger: {
+                    trigger: bar,
+                    start: "top 90%"
+                },
+                width: width,
+                duration: 1.5,
+                ease: "power3.out"
+            });
+        });
+
+        // ===== Email Simulator Logic =====
+        async function simulateEmail() {
+            const to = document.getElementById('email-to').value;
+            const subject = document.getElementById('email-subject').value;
+            const body = document.getElementById('email-body').value;
+            const btn = document.getElementById('btn-send-email');
+            const log = document.getElementById('email-log');
+            const consoleEl = document.getElementById('email-console');
+
+            if (!to || !subject || !body) {
+                alert('Por favor completa todos los campos (Destinatario, Asunto y Mensaje).');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> <span class="ml-2">Conectando con Servidor...</span>';
+            log.classList.remove('hidden');
+            consoleEl.innerHTML = "> [15:33:45] Iniciando protocolo SMTP...<br>";
+
+            try {
+                const response = await fetch('/api/1428/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ to, subject, body })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    consoleEl.innerHTML += `> [15:33:47] Autenticación exitosa.<br>`;
+                    consoleEl.innerHTML += `> [15:33:49] Mensaje procesado por JavaMailSender.<br>`;
+                    consoleEl.innerHTML += `> [15:33:50] ¡${data.message}!<br>`;
+                    btn.innerHTML = '<span>¡Enviado con Éxito!</span> <i class="bi bi-check-all text-xl"></i>';
+                    btn.classList.remove('from-blue-600', 'to-indigo-600');
+                    btn.classList.add('bg-green-600');
+                } else {
+                    consoleEl.innerHTML += `> [ERROR] ${data.error}<br>`;
+                    btn.innerHTML = '<span>Error al enviar</span>';
+                    btn.classList.remove('from-blue-600', 'to-indigo-600');
+                    btn.classList.add('bg-red-600');
+                }
+            } catch (err) {
+                consoleEl.innerHTML += `> [FATAL ERROR] Fallo de conexión.<br>`;
+                btn.innerHTML = '<span>Error Crítico</span>';
+                btn.classList.remove('from-blue-600', 'to-indigo-600');
+                btn.classList.add('bg-red-600');
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Enviar Simulación Pro</span> <i class="bi bi-magic"></i>';
+                    btn.classList.remove('bg-green-600', 'bg-red-600');
+                    btn.classList.add('from-blue-600', 'to-indigo-600');
+                }, 4000);
+            }
+        }
+
+        // ===== AI Simulator Logic =====
+        async function simulateAi() {
+            const prompt = document.getElementById('ai-prompt').value;
+            const btn = document.getElementById('btn-ai');
+            const responseEl = document.getElementById('ai-response');
+            const logContainer = document.getElementById('logic-log');
+            const logConsole = document.getElementById('logic-console');
+
+            if (!prompt) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div>';
+            responseEl.classList.remove('hidden');
+            responseEl.innerHTML = '<div class="flex items-center gap-2"><div class="spinner"></div> Analizando síntomas con Llama 3...</div>';
+
+            logContainer.classList.remove('hidden');
+            logConsole.innerHTML += `<br>> [IA] Procesando lenguaje natural: "${prompt}"`;
+
+            try {
+                const response = await fetch('/api/1428/analyze-ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseEl.innerHTML = `<i class="bi bi-check-circle me-2 text-green-400"></i> ${data.analysis}`;
+                    responseEl.classList.remove('animate-pulse');
+                    logConsole.innerHTML += `<br><span class="text-green-400">> [IA] Análisis completado exitosamente.</span>`;
+                } else {
+                    responseEl.innerHTML = `<i class="bi bi-exclamation-triangle me-2 text-red-400"></i> Error en el motor de IA.`;
+                    logConsole.innerHTML += `<br><span class="text-red-400">> [IA] Error en el modelo.</span>`;
+                }
+            } catch (err) {
+                responseEl.innerHTML = "Error de red al conectar con IA.";
+                logConsole.innerHTML += `<br><span class="text-red-400">> [IA] Fallo de conexión con Groq.</span>`;
+            } finally {
+                logConsole.scrollTop = logConsole.scrollHeight;
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-robot text-lg"></i>';
+                }, 3000);
+            }
+        }
+
+        // ===== Mobile Notification Logic =====
+        async function sendMobile(type) {
+            const to = document.getElementById('sms-to').value;
+            const message = document.getElementById('sms-msg').value;
+            if (!to || !message) {
+                alert('Por favor ingresa número y mensaje.');
+                return;
+            }
+
+            const logContainer = document.getElementById('logic-log');
+            const logConsole = document.getElementById('logic-console');
+
+            logContainer.classList.remove('hidden');
+            logConsole.innerHTML += `<br>> [${type.toUpperCase()}] Iniciando protocolo de entrega a ${to}...`;
+
+            try {
+                const response = await fetch('/api/1428/send-sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ to, message, type })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    logConsole.innerHTML += `<br><span class="text-green-400">> [EXITO] ${data.message}</span>`;
+                } else {
+                    logConsole.innerHTML += `<br><span class="text-red-400">> [ERROR] Fallo en gateway: ${data.error}</span>`;
+                }
+            } catch (err) {
+                logConsole.innerHTML += `<br><span class="text-red-400">> [FATAL] Error de red en el puente Twilio.</span>`;
+            }
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }
+
+        // ===== Load Stats =====
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/1428/stats');
+                const data = await res.json();
+                document.querySelectorAll('#intro .glass-strong .text-3xl').forEach((el, i) => {
+                    if (i === 0) el.innerText = "ONLINE";
+                    if (i === 1) el.innerText = data.responseTime || "45ms";
+                    if (i === 2) el.innerText = data.totalUsers || "2.4K";
+                    if (i === 3) el.innerText = data.totalClinics || "156";
+                });
+            } catch (err) {
+                console.error("Error al cargar stats");
+                // Fallback values
+                document.querySelectorAll('#intro .glass-strong .text-3xl').forEach((el, i) => {
+                    if (i === 0) el.innerText = "ONLINE";
+                    if (i === 1) el.innerText = "45ms";
+                    if (i === 2) el.innerText = "2.4K";
+                    if (i === 3) el.innerText = "156";
+                });
+            }
+        }
+        loadStats();
+
+        // ===== Payment Simulator Logic =====
+        async function simulatePayment() {
+            const btn = document.getElementById('btn-pay');
+            const status = document.getElementById('payment-status');
+            const logContainer = document.getElementById('logic-log');
+            const logConsole = document.getElementById('logic-console');
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> <span class="ml-2">Conectando...</span>';
+            status.classList.remove('hidden');
+            status.innerHTML = "> [STRIPE] Iniciando sesión segura...<br>";
+
+            logContainer.classList.remove('hidden');
+            logConsole.innerHTML += `<br>> [PAY] Iniciando transacción de $50.00 USD...`;
+
+            try {
+                const response = await fetch('/api/1428/simulate-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    status.innerHTML += `> [STRIPE] PaymentIntent creado: ${data.clientSecret.substring(0, 15)}...<br>`;
+                    status.innerHTML += `> [STRIPE] Estado: ${data.status}<br>`;
+                    status.innerHTML += `> [EXITO] Transacción lista para confirmar en el frontend.`;
+                    btn.innerHTML = '<span>Pago Iniciado</span> <i class="bi bi-check-circle"></i>';
+                    btn.classList.remove('bg-indigo-600');
+                    btn.classList.add('bg-emerald-600');
+                    logConsole.innerHTML += `<br><span class="text-green-400">> [PAY] Intento de pago registrado en Stripe.</span>`;
+                } else {
+                    status.innerHTML += `> [ERROR] ${data.error}<br>`;
+                    btn.innerHTML = '<span>Error de Pago</span>';
+                    btn.classList.remove('bg-indigo-600');
+                    btn.classList.add('bg-red-600');
+                    logConsole.innerHTML += `<br><span class="text-red-400">> [PAY] Transacción rechazada.</span>`;
+                }
+            } catch (err) {
+                status.innerHTML += `> [FATAL] Fallo de pasarela.`;
+                logConsole.innerHTML += `<br><span class="text-red-400">> [PAY] Error de conexión con el gateway de pagos.</span>`;
+            } finally {
+                logConsole.scrollTop = logConsole.scrollHeight;
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-credit-card-2-back"></i> Simular Pago $50.00 USD';
+                    btn.classList.remove('bg-emerald-600', 'bg-red-600');
+                    btn.classList.add('bg-indigo-600');
+                }, 5000);
+            }
+        }
+
+        // ===== Mobile Animation Logic =====
+        function animateMobile(action) {
+            const content = document.getElementById('mobile-screen-content');
+            gsap.to(content, {
+                opacity: 0,
+                x: -20,
+                duration: 0.3,
+                onComplete: () => {
+                    if (action === 'consultas') {
+                        content.innerHTML = `
+                            <div class="p-4 rounded-2xl bg-blue-600/20 border border-blue-500/30">
+                                <h3 class="text-sm font-bold mb-3 flex items-center gap-2">
+                                    <i class="bi bi-camera-video text-blue-400"></i>
+                                    Teleconsulta Activa
+                                </h3>
+                                <div class="aspect-video bg-slate-900 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                    <div class="w-full h-full bg-blue-500/10 animate-pulse flex items-center justify-center">
+                                        <i class="bi bi-person-video text-3xl text-blue-400"></i>
+                                    </div>
+                                    <div class="absolute bottom-3 right-3 px-3 py-1 bg-red-500 text-[10px] font-bold rounded-lg flex items-center gap-1">
+                                        <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                                        LIVE
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex items-center justify-between text-xs">
+                                    <span class="text-slate-400">Dr. María González</span>
+                                    <span class="text-blue-400">00:04:32</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (action === 'notificaciones') {
+                        content.innerHTML = `
+                            <div class="space-y-3">
+                                <div class="p-4 rounded-xl bg-slate-800 border border-white/10 flex items-center gap-3 hover:bg-slate-700/50 transition-colors">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                        <i class="bi bi-calendar-check text-blue-400"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-xs font-bold">Cita Confirmada</div>
+                                        <div class="text-[10px] text-slate-500">Mañana 9:00 AM · Vacunación</div>
+                                    </div>
+                                    <span class="text-[9px] text-slate-600">2m</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-slate-800 border border-white/10 flex items-center gap-3 hover:bg-slate-700/50 transition-colors">
+                                    <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                        <i class="bi bi-capsule text-green-400"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-xs font-bold">Recordatorio Medicina</div>
+                                        <div class="text-[10px] text-slate-500">En 15 minutos · Antibiótico</div>
+                                    </div>
+                                    <span class="text-[9px] text-slate-600">15m</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-slate-800 border border-white/10 flex items-center gap-3 hover:bg-slate-700/50 transition-colors">
+                                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <i class="bi bi-heart-pulse text-purple-400"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-xs font-bold">Resultados Listos</div>
+                                        <div class="text-[10px] text-slate-500">Examen de sangre · Max</div>
+                                    </div>
+                                    <span class="text-[9px] text-slate-600">1h</span>
+                                </div>
+                            </div>
+                        `;
+                    } else if (action === 'tienda') {
+                        content.innerHTML = `
+                            <div class="space-y-3">
+                                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Productos Destacados</div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="p-3 rounded-xl bg-slate-800 border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
+                                        <div class="aspect-square bg-slate-700 rounded-lg mb-3 flex items-center justify-center text-2xl">🦴</div>
+                                        <div class="text-[10px] font-bold mb-1">Snack Premium</div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-[10px] text-blue-400 font-bold">$12.00</div>
+                                            <div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                                <i class="bi bi-plus text-blue-400 text-xs"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-800 border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
+                                        <div class="aspect-square bg-slate-700 rounded-lg mb-3 flex items-center justify-center text-2xl">🧴</div>
+                                        <div class="text-[10px] font-bold mb-1">Champú Vet Pro</div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-[10px] text-blue-400 font-bold">$25.00</div>
+                                            <div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                                <i class="bi bi-plus text-blue-400 text-xs"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-xs font-bold">Total del carrito</div>
+                                        <div class="text-sm font-bold text-blue-400">$37.00</div>
+                                    </div>
+                                    <button class="w-full mt-3 py-2 bg-blue-600 rounded-lg text-xs font-bold hover:bg-blue-500 transition-colors">
+                                        Pagar con Stripe
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else if (action === 'historial') {
+                        content.innerHTML = `
+                            <div class="space-y-3">
+                                <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="text-xs font-bold">Vacuna Rabia</div>
+                                        <span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-1 rounded">Completada</span>
+                                    </div>
+                                    <div class="text-[9px] text-slate-500 mb-2">Aplicada: 12/04/2026 · Dr. López</div>
+                                    <div class="h-1.5 bg-purple-500/20 rounded-full overflow-hidden">
+                                        <div class="h-full w-full bg-purple-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="text-xs font-bold">Desparasitación</div>
+                                        <span class="text-[9px] bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded">Pendiente</span>
+                                    </div>
+                                    <div class="text-[9px] text-slate-500 mb-2">Próxima: 12/06/2026</div>
+                                    <div class="h-1.5 bg-blue-500/20 rounded-full overflow-hidden">
+                                        <div class="h-full w-3/4 bg-blue-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-slate-800 border border-white/5">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase mb-2">Exámenes recientes</div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span class="flex items-center gap-2">
+                                                <i class="bi bi-file-earmark-text text-slate-500"></i>
+                                                Sangre completa
+                                            </span>
+                                            <i class="bi bi-download text-blue-400"></i>
+                                        </div>
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span class="flex items-center gap-2">
+                                                <i class="bi bi-file-earmark-image text-slate-500"></i>
+                                                Rayos X
+                                            </span>
+                                            <i class="bi bi-download text-blue-400"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        content.innerHTML = `
+                            <div class="text-center py-10">
+                                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800 flex items-center justify-center">
+                                    <i class="bi bi-wifi-off text-3xl text-slate-600"></i>
+                                </div>
+                                <div class="text-xs font-bold mb-2">Modo Offline Activo</div>
+                                <p class="text-[9px] text-slate-500 max-w-[200px] mx-auto">Accediendo a caché local de MongoDB Realm. Se sincronizará al reconectar.</p>
+                                <div class="mt-4 flex items-center justify-center gap-2 text-[9px] text-emerald-400">
+                                    <i class="bi bi-check-circle"></i>
+                                    <span>12 registros locales</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    gsap.to(content, { opacity: 1, x: 0, duration: 0.3 });
+                }
+            });
+        }
+
+        // ===== Enhanced Particle System =====
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        const particleCount = 100;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(14, 165, 233, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            // Connect particles
+            particles.forEach((a, index) => {
+                particles.slice(index + 1).forEach(b => {
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        ctx.strokeStyle = `rgba(14, 165, 233, ${0.1 * (1 - distance / 100)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // ===== Three.js Background (Fallback/Enhancement) =====
+        let animationFrame;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+        renderer.domElement.style.position = 'fixed';
+        renderer.domElement.style.top = '0';
+        renderer.domElement.style.left = '0';
+        renderer.domElement.style.zIndex = '-1';
+        renderer.domElement.style.pointerEvents = 'none';
+
+        let particles3D;
+        function init() {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let i = 0; i < 3000; i++) {
+                vertices.push(THREE.MathUtils.randFloatSpread(2000));
+                vertices.push(THREE.MathUtils.randFloatSpread(2000));
+                vertices.push(THREE.MathUtils.randFloatSpread(2000));
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const pointsMaterial = new THREE.PointsMaterial({
+                color: 0x0ea5e9,
+                size: 1.5,
+                transparent: true,
+                opacity: 0.4
+            });
+            particles3D = new THREE.Points(geometry, pointsMaterial);
+            scene.add(particles3D);
+        }
+        init();
+
+        camera.position.z = 1000;
+
+        function animate() {
+            animationFrame = requestAnimationFrame(animate);
+            particles3D.rotation.x += 0.0002;
+            particles3D.rotation.y += 0.0003;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ===== Keyboard Shortcuts =====
+        document.addEventListener('keydown', (e) => {
+            if ((e.altKey && e.key.toLowerCase() === 'r') || (e.ctrlKey && e.key.toLowerCase() === 'k')) {
+                e.preventDefault();
+
+                // Create toast notification
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-sm font-medium z-50 animate-bounce';
+                toast.innerHTML = '<i class="bi bi-lightning-charge text-yellow-400 me-2"></i> ¡Ya estás en el corazón de la innovación (1428)!';
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        });
+
+        // ===== Smooth Scroll for Nav Links =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1,
+                        scrollTo: { y: target, offsetY: 80 },
+                        ease: "power3.inOut"
+                    });
+                }
+            });
+        });
+
+        // ===== Nav Background on Scroll =====
+        ScrollTrigger.create({
+            start: 'top -80',
+            end: 99999,
+            toggleClass: { className: 'nav-glass-scrolled', targets: 'nav' }
+        });
+        /*]]>*/
+    </script>
+</body>
+
+</html>

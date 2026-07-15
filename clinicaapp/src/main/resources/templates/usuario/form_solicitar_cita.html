@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar Nueva Cita - Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+    <!-- AOS Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+            --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.1);
+            --shadow-glow: 0 0 40px -10px var(--primary-glow);
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+        }
+
+        [data-theme="dark"] {
+            --dark: #f8fafc;
+            --gray-50: #0f172a;
+            --gray-100: #1e293b;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --gray-400: #94a3b8;
+            --gray-500: #cbd5e1;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
+            --gray-900: #f8fafc;
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            color: var(--gray-400);
+        }
+
+        [data-theme="dark"] .dashboard-card,
+        [data-theme="dark"] .summary-card {
+            background: var(--glass) !important;
+            border-color: var(--glass-border) !important;
+            backdrop-filter: blur(24px);
+        }
+
+        [data-theme="dark"] .step-header {
+            border-bottom-color: var(--gray-200);
+        }
+
+        [data-theme="dark"] .step-header h4,
+        [data-theme="dark"] .form-label,
+        [data-theme="dark"] #resumenTotal,
+        [data-theme="dark"] .resumen-item span:last-child {
+            color: white !important;
+        }
+
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select,
+        [data-theme="dark"] .input-group-text,
+        [data-theme="dark"] .suggestions-list {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border-color: var(--gray-200) !important;
+            color: white !important;
+        }
+
+        [data-theme="dark"] .suggestion-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        [data-theme="dark"] .suggestion-item strong {
+            color: white;
+        }
+
+        [data-theme="dark"] #serviciosContainer,
+        [data-theme="dark"] #contenedorHoras {
+            background: rgba(15, 23, 42, 0.4) !important;
+            border-color: var(--gray-200) !important;
+        }
+
+        [data-theme="dark"] .service-option-item {
+            border-color: var(--gray-200) !important;
+        }
+
+        [data-theme="dark"] .resumen-item {
+            border-bottom-color: var(--gray-200);
+        }
+
+        [data-theme="dark"] .resumen-total {
+            background: rgba(99, 102, 241, 0.1) !important;
+            border-color: var(--primary) !important;
+        }
+
+        [data-theme="dark"] .slot-btn {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: var(--gray-200);
+            color: var(--gray-400);
+        }
+
+        [data-theme="dark"] .slot-btn:hover {
+            border-color: var(--primary);
+            color: white;
+        }
+
+        [data-theme="dark"] .slot-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: -0.02em;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 30%, #faf5ff 60%, #f0fdfa 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND ANIMATED SHAPES ===== */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-shape-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shape-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -5s;
+        }
+
+        .bg-shape-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            top: 40%;
+            left: 60%;
+            animation-delay: -10s;
+            opacity: 0.25;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.05);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.95);
+            }
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard-container {
+            padding: 2rem 0 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER SECTION ===== */
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px -3px var(--primary-glow);
+            animation: slideDown 0.6s ease-out;
+            letter-spacing: 0.02em;
+        }
+
+        .welcome-title {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+            line-height: 1.15;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .welcome-subtitle {
+            color: var(--gray-500);
+            font-size: 1.125rem;
+            font-weight: 400;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* ===== CARDS - GLASSMORPHISM ===== */
+        .dashboard-card {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            border: none;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 0 60px -20px var(--primary-glow);
+        }
+
+        .summary-card {
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border) inset;
+            border: none;
+            overflow: hidden;
+            position: sticky;
+            top: 2rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        }
+
+        .summary-card:hover {
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255, 255, 255, 0.8) inset, 0 0 60px -20px var(--primary-glow);
+        }
+
+        /* ===== STEP HEADER ===== */
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-100);
+            transition: all 0.3s ease;
+        }
+
+        .step-number {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 15px -3px var(--primary-glow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+
+        .step-header:hover .step-number {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px -5px var(--primary-glow);
+        }
+
+        .step-header h4 {
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 1.25rem;
+            margin: 0;
+        }
+
+        /* ===== FORM CONTROLS PREMIUM ===== */
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 0.9375rem 1rem;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            color: var(--gray-800);
+            font-size: 1rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow), 0 4px 12px -2px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .input-group-text {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-right: none;
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+            color: var(--gray-400);
+            padding: 0.9375rem 1rem;
+            font-size: 1.125rem;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        /* ===== AUTOCOMPLETE ===== */
+        .autocomplete-wrapper {
+            position: relative;
+            display: flex;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .autocomplete-container {
+            position: relative;
+            flex: 1;
+        }
+
+        .btn-ver-todas {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.9375rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.9375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px -3px rgba(139, 92, 246, 0.3);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-ver-todas:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px -5px rgba(139, 92, 246, 0.4);
+            color: white;
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+        }
+
+        .suggestions-list {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            z-index: 1000;
+            display: none;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .suggestions-list.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .suggestion-item {
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: linear-gradient(90deg, var(--primary-light) 0%, white 100%);
+            padding-left: 1.5rem;
+        }
+
+        .suggestion-item strong {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
+
+        .suggestion-item small {
+            color: var(--gray-500);
+        }
+
+        /* ===== SERVICIOS ===== */
+        #serviciosContainer {
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border: 2px dashed var(--gray-200);
+            border-radius: var(--radius-md);
+            min-height: 100px;
+            transition: all 0.4s ease;
+        }
+
+        #serviciosContainer.has-content {
+            border-style: solid;
+            border-color: var(--gray-200);
+            background: white;
+        }
+
+        .service-option-item {
+            transition: all 0.3s ease;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-100);
+        }
+
+        .service-option-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .service-option-item.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        /* ===== SLOTS DE HORA ===== */
+        #contenedorHoras {
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border: 2px dashed var(--gray-200);
+            border-radius: var(--radius-md);
+            min-height: 100px;
+            transition: all 0.4s ease;
+        }
+
+        #contenedorHoras.has-content {
+            border-style: solid;
+            border-color: var(--gray-200);
+            background: white;
+        }
+
+        .slot-btn {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            padding: 0.625rem 1.25rem;
+            border-width: 2px;
+            position: relative;
+            overflow: hidden;
+            background: white;
+            border-color: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .slot-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .slot-btn:hover::before {
+            left: 100%;
+        }
+
+        .slot-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .slot-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            border-color: transparent;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px -4px var(--primary-glow);
+        }
+
+        /* ===== RESUMEN ===== */
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray-100);
+            transition: all 0.2s ease;
+        }
+
+        .resumen-item:hover {
+            background: rgba(99, 102, 241, 0.03);
+            margin: 0 -1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .resumen-item:last-child {
+            border-bottom: none;
+        }
+
+        .resumen-total {
+            background: linear-gradient(135deg, var(--primary-light) 0%, rgba(99, 102, 241, 0.05) 100%);
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--primary);
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resumen-total::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+        }
+
+        .resumen-total span:first-child {
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        #resumenTotal {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        /* ===== SUBMIT BUTTON ===== */
+        #submitButton {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.02em;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -10px var(--primary-glow);
+        }
+
+        #submitButton::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        #submitButton:hover::before {
+            left: 100%;
+        }
+
+        #submitButton:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -10px var(--primary-glow);
+        }
+
+        #submitButton:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: none;
+        }
+
+        /* ===== SECURITY BADGE ===== */
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--success-light) 0%, rgba(16, 185, 129, 0.05) 100%);
+            color: #065f46;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid #a7f3d0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .autocomplete-wrapper {
+                flex-direction: column;
+            }
+
+            .btn-ver-todas {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .dashboard-card,
+            .summary-card {
+                border-radius: var(--radius-md);
+            }
+
+            .step-number {
+                width: 44px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 1.5rem 0;
+            }
+
+            .welcome-title {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animated Shapes -->
+    <div class="bg-shapes">
+        <div class="bg-shape bg-shape-1"></div>
+        <div class="bg-shape bg-shape-2"></div>
+        <div class="bg-shape bg-shape-3"></div>
+    </div>
+
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <main class="dashboard-container">
+        <div class="container">
+
+            <!-- ===== HEADER SECTION ===== -->
+            <div class="dashboard-header text-center" data-aos="fade-down">
+                <div class="welcome-badge" style="margin-bottom: 1.25rem;">
+                    <i class="bi bi-calendar-heart-fill"></i>
+                    Agenda una Cita
+                </div>
+                <h1 class="welcome-title" style="font-size: 2.25rem;">
+                    Reserva en segundos
+                </h1>
+                <p class="welcome-subtitle" style="margin: 0 auto;">
+                    Con disponibilidad en tiempo real y confirmación instantánea
+                </p>
+            </div>
+
+            <form th:if="${!misMascotas.isEmpty()}" id="citaForm" th:action="@{/usuario/citas/guardar}"
+                th:object="${citaDTO}" method="post">
+                <div class="row g-4">
+
+                    <!-- ===== COLUMNA PRINCIPAL ===== -->
+                    <div class="col-lg-8">
+
+                        <!-- ===== PASO 1: CLÍNICA Y SERVICIO ===== -->
+                        <div class="dashboard-card p-4 p-lg-5" data-aos="fade-up" data-aos-delay="100">
+                            <div class="step-header">
+                                <div class="step-number">1</div>
+                                <h4 class="mb-0">Selecciona Clínica y Servicio</h4>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-search me-2 text-primary"></i>
+                                    Buscar Clínica
+                                </label>
+                                <div class="autocomplete-wrapper">
+                                    <div class="autocomplete-container">
+                                        <div class="input-group shadow-sm">
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            <input id="clinicaInput" class="form-control" type="text"
+                                                placeholder="Escribe el nombre de la sede..." autocomplete="off"
+                                                th:value="${clinicaPreseleccionada != null} ? ${clinicaPreseleccionada.nombre} : ''" />
+                                        </div>
+                                        <div id="clinicaSuggestions" class="suggestions-list shadow"></div>
+                                    </div>
+                                    <a th:href="@{/buscar-clinicas}" class="btn-ver-todas text-decoration-none">
+                                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                                        Ver todas
+                                    </a>
+                                </div>
+                                <input type="hidden" id="clinicaIdHidden" th:field="*{clinicaId}" required />
+                            </div>
+
+                            <div class="mb-0">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-heart-pulse me-2 text-primary"></i>
+                                    Servicios Requeridos
+                                </label>
+                                <div id="serviciosContainer" class="p-3 text-center">
+                                    <span class="text-muted small">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Selecciona una clínica para ver los servicios disponibles
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== PASO 2: DETALLES Y HORARIOS ===== -->
+                        <div class="dashboard-card p-4 p-lg-5" data-aos="fade-up" data-aos-delay="200">
+                            <div class="step-header">
+                                <div class="step-number">2</div>
+                                <h4 class="mb-0">Detalles de la Cita</h4>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-heart-fill me-2 text-primary"></i>
+                                        Selecciona tu Mascota
+                                    </label>
+                                    <select id="mascota" class="form-select" th:field="*{mascotaId}" required>
+                                        <option value="">-- Elegir mascota --</option>
+                                        <option th:each="m : ${misMascotas}" th:value="${m.id}" th:text="${m.nombre}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-calendar-event me-2 text-primary"></i>
+                                        Elige el Día
+                                    </label>
+                                    <input type="date" id="fechaPicker" class="form-control" required>
+                                </div>
+
+                                <div class="col-12 mb-0">
+                                    <label class="form-label fw-bold">
+                                        <i class="bi bi-clock me-2 text-primary"></i>
+                                        Horarios Disponibles
+                                    </label>
+                                    <div id="contenedorHoras" class="d-flex flex-wrap gap-2 p-3"
+                                        style="min-height: 80px;">
+                                        <p class="text-muted small mb-0 w-100 text-center py-3">
+                                            <i class="bi bi-calendar3 me-2"></i>
+                                            Selecciona una fecha para ver horarios disponibles...
+                                        </p>
+                                    </div>
+                                    <input type="hidden" id="fechaHoraFinal" th:field="*{fechaHora}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ===== COLUMNA DERECHA: RESUMEN ===== -->
+                    <div class="col-lg-4">
+                        <div class="summary-card p-4" data-aos="fade-left" data-aos-delay="300">
+                            <h5 class="fw-bold mb-4"
+                                style="color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="bi bi-receipt"></i>
+                                Resumen de Cita
+                            </h5>
+
+                            <div class="resumen-item">
+                                <span class="text-muted">Servicios</span>
+                                <div id="resumenServiciosList" class="text-end fw-bold text-dark">--</div>
+                            </div>
+                            <div class="resumen-item">
+                                <span class="text-muted">Fecha y Hora</span>
+                                <span id="resumenHora" class="fw-bold" style="color: var(--primary);">--</span>
+                            </div>
+                            <div class="resumen-item">
+                                <span class="text-muted">Mascota</span>
+                                <span id="resumenMascota" class="fw-bold text-dark">--</span>
+                            </div>
+                            <div class="resumen-total d-flex justify-content-between align-items-center">
+                                <span>Total a pagar:</span>
+                                <span id="resumenTotal" class="h4 mb-0">$0.00</span>
+                            </div>
+
+                            <button id="submitButton" type="submit" class="btn btn-primary w-100 mt-4 py-3" disabled>
+                                <span id="btnText">Confirmar y Pagar</span>
+                                <i id="btnIcon" class="bi bi-credit-card ms-2"></i>
+                            </button>
+
+                            <div class="text-center mt-3">
+                                <div class="security-badge"
+                                    style="display: inline-flex; font-size: 0.75rem; padding: 0.5rem 1rem;">
+                                    <i class="bi bi-shield-check"></i>
+                                    Pago seguro garantizado
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== TIP CARD ===== -->
+                        <div class="dashboard-card p-4 mt-4" data-aos="fade-left" data-aos-delay="400">
+                            <div style="display: flex; align-items: flex-start; gap: 0.875rem;">
+                                <div
+                                    style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--warning-light) 0%, #fde68a 100%); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: #d97706; flex-shrink: 0;">
+                                    <i class="bi bi-lightbulb-fill"></i>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-weight: 700; color: var(--gray-800); font-size: 0.9375rem; margin-bottom: 0.375rem;">
+                                        Consejo rápido</div>
+                                    <div style="font-size: 0.875rem; color: var(--gray-500); line-height: 1.6;">
+                                        Selecciona la clínica más cercana a tu ubicación para mayor comodidad.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer-usuario}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script th:inline="javascript">
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const clinicaInput = document.getElementById('clinicaInput');
+            const clinicaHidden = document.getElementById('clinicaIdHidden');
+            const suggestions = document.getElementById('clinicaSuggestions');
+            const servicioContainer = document.getElementById('serviciosContainer');
+            const mascotaSelect = document.getElementById('mascota');
+            const fechaPicker = document.getElementById('fechaPicker');
+            const contenedorHoras = document.getElementById('contenedorHoras');
+            const fechaHoraFinal = document.getElementById('fechaHoraFinal');
+            const citaForm = document.getElementById('citaForm');
+
+            const submitButton = document.getElementById('submitButton');
+            const resumenTotal = document.getElementById('resumenTotal');
+            const resumenHora = document.getElementById('resumenHora');
+            const resumenServiciosList = document.getElementById('resumenServiciosList');
+            const resumenMascota = document.getElementById('resumenMascota');
+
+            // 1. AUTOCOMPLETE DE CLÍNICAS
+            let debounceTimer;
+            clinicaInput.addEventListener('input', function () {
+                const q = this.value;
+                clearTimeout(debounceTimer);
+                if (q.length < 2) { suggestions.classList.remove('active'); return; }
+
+                debounceTimer = setTimeout(() => {
+                    fetch(`/api/clinicas/buscar?term=${encodeURIComponent(q)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            suggestions.innerHTML = '';
+                            data.forEach(it => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.innerHTML = `<strong>${it.nombre}</strong><br><small class="text-muted">${it.direccion}</small>`;
+                                div.onclick = () => {
+                                    clinicaInput.value = it.nombre;
+                                    clinicaHidden.value = it.id;
+                                    suggestions.classList.remove('active');
+                                    cargarServicios(it.id);
+                                };
+                                suggestions.appendChild(div);
+                            });
+                            suggestions.classList.add('active');
+                        });
+                }, 300);
+            });
+
+            // Cerrar sugerencias al hacer clic fuera
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.autocomplete-container')) {
+                    suggestions.classList.remove('active');
+                }
+            });
+
+            // 2. CARGAR SERVICIOS DE LA CLÍNICA (CON PRECIOS REALES)
+            function cargarServicios(id) {
+                servicioContainer.innerHTML = '<div class="text-center py-3"><i class="bi bi-arrow-repeat spin me-2"></i>Cargando servicios...</div>';
+
+                fetch(`/api/clinicas/${id}/servicios`)
+                    .then(res => res.json())
+                    .then(data => {
+                        servicioContainer.innerHTML = '';
+                        servicioContainer.classList.add('has-content');
+
+                        if (data.length === 0) {
+                            servicioContainer.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle me-2"></i>No hay servicios disponibles en esta clínica</span>';
+                            return;
+                        }
+
+                        data.forEach(s => {
+                            const div = document.createElement('div');
+                            div.className = 'form-check mb-2 p-2 service-option-item';
+                            div.innerHTML = `
+                                <input class="form-check-input ms-0 me-3 servicio-checkbox" type="checkbox" name="serviciosIds" value="${s.id}" id="s_${s.id}" data-precio="${s.precio}" data-nombre="${s.nombre}">
+                                <label class="form-check-label d-flex justify-content-between align-items-center w-100" for="s_${s.id}" style="cursor: pointer;">
+                                    <span>${s.nombre}</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); color: white; padding: 0.375rem 0.75rem; border-radius: var(--radius-full); font-weight: 600;">$${s.precio.toLocaleString()}</span>
+                                </label>
+                            `;
+
+                            const checkbox = div.querySelector('input');
+                            checkbox.addEventListener('change', function () {
+                                if (this.checked) {
+                                    div.classList.add('selected');
+                                } else {
+                                    div.classList.remove('selected');
+                                }
+                                actualizarResumenServicios();
+                            });
+
+                            servicioContainer.appendChild(div);
+                        });
+                        resetSlots();
+                    })
+                    .catch(err => {
+                        servicioContainer.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-2"></i>Error al cargar servicios</span>';
+                    });
+            }
+
+            function actualizarResumenServicios() {
+                const checked = document.querySelectorAll('.servicio-checkbox:checked');
+                let total = 0;
+                let nombres = [];
+
+                checked.forEach(cb => {
+                    total += parseFloat(cb.dataset.precio);
+                    nombres.push(cb.dataset.nombre);
+                });
+
+                if (nombres.length === 0) {
+                    resumenServiciosList.textContent = '--';
+                    resumenTotal.textContent = '$0.00';
+                } else {
+                    resumenServiciosList.innerHTML = nombres.join('<br>');
+                    resumenTotal.textContent = `$${total.toLocaleString()}`;
+                }
+                validarFormulario();
+            }
+
+            // 3. CARGAR HORAS DISPONIBLES (SLOTS)
+            fechaPicker.addEventListener('change', function () {
+                const id = clinicaHidden.value;
+                const fecha = this.value;
+
+                if (!id) {
+                    alert("Por favor, elige una clínica primero");
+                    this.value = '';
+                    return;
+                }
+
+                contenedorHoras.innerHTML = '<div class="w-100 text-center py-4"><i class="bi bi-arrow-repeat spin fs-4 text-primary me-2"></i><span class="text-muted">Buscando horarios disponibles...</span></div>';
+                contenedorHoras.classList.add('has-content');
+
+                fetch(`/api/clinicas/${id}/disponibilidad?fecha=${fecha}`)
+                    .then(res => res.json())
+                    .then(horas => {
+                        contenedorHoras.innerHTML = '';
+
+                        if (horas.length === 0) {
+                            contenedorHoras.innerHTML = `
+                                <div class="text-center w-100 py-4">
+                                    <i class="bi bi-calendar-x fs-2 text-muted mb-2 d-block"></i>
+                                    <span class="text-danger fw-medium">No hay turnos disponibles para esta fecha</span>
+                                </div>`;
+                            return;
+                        }
+
+                        horas.forEach(h => {
+                            const btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'btn btn-outline-primary slot-btn';
+                            btn.textContent = h;
+                            btn.onclick = () => {
+                                document.querySelectorAll('.slot-btn').forEach(b => {
+                                    b.classList.remove('active');
+                                    b.classList.add('btn-outline-primary');
+                                });
+                                btn.classList.remove('btn-outline-primary');
+                                btn.classList.add('active');
+
+                                fechaHoraFinal.value = `${fecha}T${h}`;
+                                resumenHora.textContent = `${fecha} a las ${h}`;
+                                validarFormulario();
+                            };
+                            contenedorHoras.appendChild(btn);
+                        });
+                        validarFormulario();
+                    })
+                    .catch(err => {
+                        contenedorHoras.innerHTML = '<span class="text-danger w-100 text-center"><i class="bi bi-x-circle me-2"></i>Error al cargar horarios</span>';
+                    });
+            });
+
+            function resetSlots() {
+                fechaPicker.value = '';
+                fechaHoraFinal.value = '';
+                contenedorHoras.innerHTML = '<p class="text-muted small mb-0 w-100 text-center py-3"><i class="bi bi-calendar3 me-2"></i>Selecciona una fecha para ver horarios...</p>';
+                contenedorHoras.classList.remove('has-content');
+                resumenHora.textContent = '--';
+                validarFormulario();
+            }
+
+            mascotaSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                resumenMascota.textContent = opt.text || '--';
+                validarFormulario();
+            });
+
+            function validarFormulario() {
+                const checkedCount = document.querySelectorAll('.servicio-checkbox:checked').length;
+                const ok = clinicaHidden.value &&
+                    checkedCount > 0 &&
+                    mascotaSelect.value &&
+                    fechaHoraFinal.value;
+
+                submitButton.disabled = !ok;
+
+                if (ok) {
+                    submitButton.innerHTML = '<span>Confirmar y Pagar</span><i class="bi bi-credit-card ms-2"></i>';
+                }
+            }
+
+            // Set min date to today
+            const today = new Date().toISOString().split('T')[0];
+            fechaPicker.min = today;
+        });
+    </script>
+
+    <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
+</body>
+
+</html>

@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Citas - Recepción</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #0891b2;
+            --info-light: #cffafe;
+            --purple: #8b5cf6;
+            --purple-light: #f3e8ff;
+            --secondary: #64748b;
+            --dark: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.98);
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+            min-height: 100vh;
+            color: #334155;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.025;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .bg-shapes .shape-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shapes .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--success);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -8s;
+        }
+
+        .bg-shapes .shape-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--purple);
+            top: 40%;
+            right: 20%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(40px, -40px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        /* ===== HEADER PREMIUM ===== */
+        .page-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(14, 165, 233, 0.4);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title i {
+            font-size: 2.25rem;
+            animation: pulse-calendar 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-calendar {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.85;
+            }
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== BUTTONS HEADER ===== */
+        .btn-header {
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .btn-new {
+            background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.35);
+        }
+
+        .btn-new::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-new:hover::before {
+            left: 100%;
+        }
+
+        .btn-new:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(5, 150, 105, 0.45);
+            color: white;
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-20deg) translateX(150%);
+            transition: transform 0.6s;
+        }
+
+        .stat-card:hover::after {
+            transform: skewX(-20deg) translateX(-50%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .stat-icon.yellow {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: #6b21a8;
+        }
+
+        .stat-info h6 {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin: 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin: 0.25rem 0 0 0;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ===== MAIN CARD ===== */
+        .main-card {
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 1.75rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title i {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        /* ===== NAV PILLS ===== */
+        .nav-pills-custom {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-pills-custom .nav-link {
+            border-radius: 50px;
+            padding: 0.625rem 1.5rem;
+            font-weight: 800;
+            font-size: 0.875rem;
+            color: var(--secondary);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-pills-custom .nav-link:hover {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            color: #0f172a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-pills-custom .nav-link.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .nav-pills-custom .nav-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-pills-custom .nav-link:hover i {
+            transform: scale(1.2);
+        }
+
+        /* ===== TABLE PREMIUM ===== */
+        .table-container {
+            padding: 0;
+        }
+
+        .table-custom {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .table-custom thead th {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #475569;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .table-custom tbody td {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+
+        .table-custom tbody tr {
+            transition: all 0.3s ease;
+            animation: fadeInRow 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .table-custom tbody tr:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .table-custom tbody tr:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .table-custom tbody tr:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .table-custom tbody tr:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .table-custom tbody tr:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .table-custom tbody tr:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            transform: scale(1.005);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+            position: relative;
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== CLIENTE INFO ===== */
+        .cliente-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .cliente-nombre {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 0.95rem;
+        }
+
+        .cliente-email {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .cliente-email i {
+            color: var(--primary);
+        }
+
+        /* ===== BADGES PREMIUM ===== */
+        .badge-custom {
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .badge-pendiente {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .badge-confirmada {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .badge-completada {
+            background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+            color: #0e7490;
+        }
+
+        .badge-cancelada {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+        }
+
+        .badge-pago-pendiente {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .badge-pagado {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        /* ===== TABLE ACTIONS ===== */
+        .btn-action-table {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-confirmar {
+            background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-confirmar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-confirmar:hover::before {
+            left: 100%;
+        }
+
+        .btn-confirmar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+            color: white;
+        }
+
+        .btn-visita {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-visita::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-visita:hover::before {
+            left: 100%;
+        }
+
+        .btn-visita:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+            color: white;
+        }
+
+        .btn-disabled {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* ===== RIESGO AI BADGE ===== */
+        .riesgo-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .riesgo-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .riesgo-alto {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+        }
+
+        .riesgo-medio {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .riesgo-bajo {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+        }
+
+        .btn-whatsapp-sm {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            color: white;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--secondary);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        /* ===== ALERTS PREMIUM ===== */
+        .alert-custom {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-custom::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #166534;
+        }
+
+        .alert-success-custom::before {
+            background: linear-gradient(180deg, #22c55e, #16a34a);
+        }
+
+        .alert-success-custom i {
+            color: #22c55e;
+            font-size: 1.25rem;
+        }
+
+        .alert-danger-custom {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
+        }
+
+        .alert-danger-custom::before {
+            background: linear-gradient(180deg, #ef4444, #dc2626);
+        }
+
+        .alert-danger-custom i {
+            color: #ef4444;
+            font-size: 1.25rem;
+        }
+
+        /* ===== MODAL PREMIUM ===== */
+        .modal-content {
+            border: none;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header-custom {
+            background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+            color: white;
+            padding: 1.75rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-header-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .modal-title-custom {
+            font-weight: 800;
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-close-white {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-white:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        .modal-body-custom {
+            padding: 2rem;
+        }
+
+        .form-label-custom {
+            font-weight: 800;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-control-custom {
+            border: 2.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 5px rgba(5, 150, 105, 0.15);
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .modal-footer-custom {
+            padding: 1.5rem 2rem 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.75rem 0;
+                margin-bottom: 2rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .page-title i {
+                font-size: 1.75rem;
+            }
+
+            .card-header-custom {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1.25rem 1.5rem;
+            }
+
+            .nav-pills-custom {
+                width: 100%;
+            }
+
+            .nav-pills-custom .nav-link {
+                flex: 1;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .table-responsive {
+                border-radius: 0;
+            }
+
+            .btn-header {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 1.15rem;
+            }
+
+            .header-title i {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .table-custom tbody td {
+                padding: 1rem;
+            }
+
+            .btn-action-table {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Animated Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div th:replace="~{fragments/header :: header-recepcion}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- Header Premium -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="page-title">
+                        <i class="bi bi-calendar-week-fill"></i>
+                        Gestión de Citas
+                    </h1>
+                    <p class="page-subtitle">Visualiza y administra todas las citas del sistema</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <a th:href="@{/recepcion/dashboard}" class="btn-header btn-back me-2">
+                        <i class="bi bi-arrow-left-circle"></i>
+                        Volver al Panel
+                    </a>
+                    <a th:href="@{/recepcion/citas/nueva}" class="btn-header btn-new">
+                        <i class="bi bi-calendar-plus-fill"></i>
+                        Agendar Nueva
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container pb-5" style="position:relative; z-index:1;">
+        <!-- Alertas -->
+        <div th:if="${param.visitaRegistrada}"
+            class="alert alert-custom alert-success-custom alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>¡Visita registrada y cita completada exitosamente!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${param.errorVisita}" class="alert alert-custom alert-danger-custom alert-dismissible fade show">
+            <i class="bi bi-x-circle-fill"></i>
+            <span>Hubo un error al registrar la visita.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h6>Total Citas</h6>
+                    <div class="stat-value" th:text="${#lists.size(citas)}">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon yellow">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="stat-info">
+                    <h6>Pendientes</h6>
+                    <div class="stat-value" th:text="${#lists.size(citas.?[estado == 'Pendiente'])}">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h6>Confirmadas</h6>
+                    <div class="stat-value" th:text="${#lists.size(citas.?[estado == 'Confirmada'])}">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h6>Completadas</h6>
+                    <div class="stat-value" th:text="${#lists.size(citas.?[estado == 'Completada'])}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla Principal -->
+        <div class="main-card">
+            <div class="card-header-custom">
+                <h5 class="header-title">
+                    <i class="bi bi-list-check"></i>
+                    Historial Completo
+                </h5>
+
+                <ul class="nav nav-pills-custom">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/recepcion/citas}"
+                            th:classappend="${estadoActual == null ? 'active' : ''}">
+                            <i class="bi bi-grid me-1"></i>Todas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/recepcion/citas(estado='Pendientes')}"
+                            th:classappend="${#strings.equals(estadoActual, 'Pendientes') ? 'active' : ''}">
+                            <i class="bi bi-hourglass me-1"></i>Pendientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/recepcion/citas(estado='Confirmadas')}"
+                            th:classappend="${#strings.equals(estadoActual, 'Confirmadas') ? 'active' : ''}">
+                            <i class="bi bi-check2-circle me-1"></i>Confirmadas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/recepcion/citas(estado='Completadas')}"
+                            th:classappend="${#strings.equals(estadoActual, 'Completadas') ? 'active' : ''}">
+                            <i class="bi bi-clipboard-check me-1"></i>Completadas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Mascota</th>
+                                <th>Fecha y Hora</th>
+                                <th>Estado Cita</th>
+                                <th>Estado Pago</th>
+                                <th>Riesgo Ausencia (AI)</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="cita : ${citas}">
+                                <td>
+                                    <div class="cliente-info">
+                                        <div class="cliente-nombre" th:text="${cita.nombreUsuario}">Nombre Cliente</div>
+                                        <div class="cliente-email">
+                                            <i class="bi bi-envelope-fill"></i>
+                                            <span th:text="${cita.emailUsuario}">email@ejemplo.com</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-heart-pulse-fill text-danger"></i>
+                                        <span th:text="${cita.nombreMascota}">Mascota</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <!-- CORREGIDO: Manejo seguro de fechas tanto String como LocalDateTime -->
+                                    <div class="d-flex flex-column">
+                                        <!-- Si es String (formato ISO o similar), mostrar directo o parsear manualmente -->
+                                        <span class="fw-bold" th:if="${cita.fechaHora instanceof T(java.lang.String)}"
+                                            th:text="${#strings.length(cita.fechaHora) >= 10 ? #strings.substring(cita.fechaHora, 0, 10) : cita.fechaHora}">
+                                            2024-01-01
+                                        </span>
+                                        <!-- Si es LocalDateTime, usar temporals -->
+                                        <span class="fw-bold"
+                                            th:if="${cita.fechaHora instanceof T(java.time.LocalDateTime)}"
+                                            th:text="${#temporals.format(cita.fechaHora, 'dd/MM/yyyy')}">
+                                            01/01/2024
+                                        </span>
+                                        <span class="fw-bold"
+                                            th:if="${cita.fechaHora instanceof T(java.time.LocalDate)}"
+                                            th:text="${#temporals.format(cita.fechaHora, 'dd/MM/yyyy')}">
+                                            01/01/2024
+                                        </span>
+                                        <span class="fw-bold" th:if="${cita.fechaHora instanceof T(java.util.Date)}"
+                                            th:text="${#dates.format(cita.fechaHora, 'dd/MM/yyyy')}">
+                                            01/01/2024
+                                        </span>
+
+                                        <!-- Hora -->
+                                        <small class="text-muted"
+                                            th:if="${cita.fechaHora instanceof T(java.lang.String) and #strings.length(cita.fechaHora) >= 16}"
+                                            th:text="${#strings.substring(cita.fechaHora, 11, 16)}">
+                                            14:30
+                                        </small>
+                                        <small class="text-muted"
+                                            th:if="${cita.fechaHora instanceof T(java.time.LocalDateTime)}"
+                                            th:text="${#temporals.format(cita.fechaHora, 'HH:mm')}">
+                                            14:30
+                                        </small>
+                                        <small class="text-muted" th:if="${cita.fechaHora instanceof T(java.util.Date)}"
+                                            th:text="${#dates.format(cita.fechaHora, 'HH:mm')}">
+                                            14:30
+                                        </small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-custom"
+                                        th:classappend="${#strings.equals(cita.estado, 'Pendiente') ? 'badge-pendiente' : 
+                                                           (#strings.equals(cita.estado, 'Confirmada') ? 'badge-confirmada' : 
+                                                           (#strings.equals(cita.estado, 'Completada') ? 'badge-completada' : 
+                                                           (#strings.equals(cita.estado, 'Cancelada') ? 'badge-cancelada' : 'badge-pendiente')))}">
+                                        <i th:class="${#strings.equals(cita.estado, 'Pendiente') ? 'bi bi-hourglass-split' : 
+                                                      (#strings.equals(cita.estado, 'Confirmada') ? 'bi bi-check-circle-fill' : 
+                                                      (#strings.equals(cita.estado, 'Completada') ? 'bi bi-clipboard-check-fill' : 
+                                                      (#strings.equals(cita.estado, 'Cancelada') ? 'bi bi-x-circle-fill' : 'bi bi-circle-fill')))}"></i>
+                                        <span th:text="${cita.estado}">Estado</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge-custom"
+                                        th:classappend="${#strings.equals(cita.estadoPago, 'PAGADO') ? 'badge-pagado' : 'badge-pago-pendiente'}">
+                                        <i th:class="${#strings.equals(cita.estadoPago, 'PAGADO') ? 'bi bi-cash-stack' : 'bi bi-credit-card-2-front'}"></i>
+                                        <span th:text="${cita.estadoPago}">Pago</span>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <!-- Riesgo Ausencia AI -->
+                                    <div th:if="${cita.estado == 'Pendiente' or cita.estado == 'Confirmada'}">
+                                        <div th:if="${cita.probabilidadAusencia != null}">
+                                            <span class="riesgo-badge"
+                                                th:classappend="${cita.probabilidadAusencia >= 70 ? 'riesgo-alto' : (cita.probabilidadAusencia >= 30 ? 'riesgo-medio' : 'riesgo-bajo')}"
+                                                data-bs-toggle="tooltip" title="Ver análisis detallado de IA"
+                                                th:attr="data-prob=${cita.probabilidadAusencia}, data-cliente=${cita.nombreUsuario}, data-mascota=${cita.nombreMascota}, data-fecha=${cita.fechaHoraIso != null ? cita.fechaHoraIso : cita.fechaHora}"
+                                                onclick="showPredictionModal(this)">
+                                                <i class="bi bi-robot"></i>
+                                                <span th:text="${#numbers.formatDecimal(cita.probabilidadAusencia, 1, 1)} + '%'">0%</span>
+                                            </span>
+
+                                            <div th:if="${cita.probabilidadAusencia >= 70}" class="mt-2">
+                                                <a th:href="'https://wa.me/' + ${#strings.replace(cita.telefonoUsuario != null ? cita.telefonoUsuario : '', '+', '')} + '?text=Hola ' + ${cita.nombreUsuario} + ', te escribimos de la Clínica Veterinaria para recordar tu cita programada. Por favor confirma tu asistencia.'"
+                                                    target="_blank" class="btn-whatsapp-sm">
+                                                    <i class="bi bi-whatsapp"></i> Chat
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div th:unless="${cita.estado == 'Pendiente' or cita.estado == 'Confirmada'}">
+                                        <span class="text-muted small">-</span>
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <!-- Esperando pago -->
+                                    <div
+                                        th:if="${!#strings.equals(cita.estadoPago, 'PAGADO') and !#strings.equals(cita.estado, 'Cancelada')}">
+                                        <button class="btn-action-table btn-disabled" disabled
+                                            title="Esperando pago del cliente">
+                                            <i class="bi bi-hourglass-split"></i>
+                                            Esperando Pago
+                                        </button>
+                                    </div>
+
+                                    <!-- Pagado - acciones disponibles -->
+                                    <div th:if="${#strings.equals(cita.estadoPago, 'PAGADO')}">
+                                        <div th:switch="${cita.estado}">
+                                            <!-- Pendiente: Confirmar -->
+                                            <div th:case="'Pendiente'">
+                                                <button type="button" class="btn-action-table btn-confirmar"
+                                                    data-bs-toggle="modal" data-bs-target="#confirmarCitaModal" th:attr="data-cita-id=${cita.id}, 
+                                                                 data-usuario-nombre=${cita.nombreUsuario}, 
+                                                                 data-usuario-email=${cita.emailUsuario}, 
+                                                                 data-usuario-telefono=${cita.telefonoUsuario}">
+                                                    <i class="bi bi-check-lg"></i>
+                                                    Confirmar
+                                                </button>
+                                            </div>
+
+                                            <!-- Confirmada: Registrar Visita -->
+                                            <div th:case="'Confirmada'">
+                                                <a th:href="@{/recepcion/visitas/nueva(citaId=${cita.id})}"
+                                                    class="btn-action-table btn-visita" title="Registrar Visita">
+                                                    <i class="bi bi-clipboard2-plus-fill"></i>
+                                                    Registrar Visita
+                                                </a>
+                                            </div>
+
+                                            <!-- Completada u otros -->
+                                            <div th:case="*">
+                                                <button class="btn-action-table btn-disabled" disabled>
+                                                    <i class="bi bi-check-all"></i>
+                                                    Finalizada
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Empty State -->
+                            <tr th:if="${citas == null or #lists.isEmpty(citas)}">
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="bi bi-calendar-check"></i>
+                                        <div class="empty-title">¡Todo al día!</div>
+                                        <p>No hay citas activas por gestionar</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Weka Prediction (Luxury Aurora Theme) -->
+    <div class="modal fade" id="wekaPredictionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 1.5rem; border: none;">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-cpu-fill me-2"></i>Predicción Weka (No-Show)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter: brightness(0) invert(1); opacity: 0.8;"></button>
+                </div>
+                <div class="modal-body p-4" style="background: #f8fafc;">
+                    <div class="text-center mb-4">
+                        <h6 class="text-muted fw-bold mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">RIESGO DE INASISTENCIA</h6>
+                        <div id="ai-prob-value" class="display-3 fw-bolder mb-2" style="color: #0f172a; letter-spacing: -2px;">0%</div>
+                        <span id="ai-risk-badge" class="badge rounded-pill px-4 py-2 fs-6 shadow-sm">Riesgo</span>
+                    </div>
+
+                    <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: white;">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3" style="color: #334155;"><i class="bi bi-diagram-3-fill me-2 text-primary"></i>Factores Analizados (J48)</h6>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <span class="text-muted fw-semibold"><i class="bi bi-person me-2"></i>Cliente</span>
+                                <strong id="ai-cliente-name" style="color: #0f172a;">---</strong>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <span class="text-muted fw-semibold"><i class="bi bi-heart-pulse me-2"></i>Paciente</span>
+                                <strong id="ai-mascota-name" style="color: #0f172a;">---</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <span class="text-muted fw-semibold"><i class="bi bi-calendar-event me-2"></i>Días de Anticipación</span>
+                                <strong id="ai-dias-anticipacion" style="color: #0f172a;">---</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted fw-semibold"><i class="bi bi-clock-history me-2"></i>Historial (Ausencias)</span>
+                                <strong style="color: #0f172a;">Ponderado Automático</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert mb-0 border-0 shadow-sm" id="ai-recommendation-alert" style="border-radius: 16px;">
+                        <div class="d-flex gap-3 align-items-start">
+                            <i class="bi bi-lightbulb-fill fs-3" id="ai-recommendation-icon"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Acción Sugerida</h6>
+                                <p class="mb-0 fs-6" id="ai-recommendation-text" style="font-weight: 500;">Cargando recomendación...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0" style="background: #f8fafc;">
+                    <button type="button" class="btn btn-outline-secondary w-100 rounded-pill fw-bold py-2" data-bs-dismiss="modal" style="border-width: 2px;">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmar Cita -->
+    <div class="modal fade" id="confirmarCitaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header-custom">
+                    <h5 class="modal-title-custom">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Confirmar Cita
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formConfirmarCita" th:action="@{/dummy}" method="post">
+                    <div class="modal-body-custom">
+                        <p class="mb-3">Vas a confirmar la cita para <strong id="nombreClienteConfirmar"
+                                style="color: var(--primary-dark);"></strong>. Verifica los datos de contacto:</p>
+
+                        <div class="mb-3">
+                            <label for="emailConfirmar" class="form-label-custom">Correo Electrónico</label>
+                            <input type="email" class="form-control-custom" id="emailConfirmar" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="telefonoConfirmar" class="form-label-custom">Teléfono</label>
+                            <input type="tel" class="form-control-custom" id="telefonoConfirmar" name="telefono"
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer-custom">
+                        <button type="button" class="btn btn-secondary btn-header btn-back" data-bs-dismiss="modal" style="border-color: var(--border); color: var(--secondary);">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success btn-header btn-new">
+                            <i class="bi bi-check-lg"></i>
+                            Confirmar y Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Modal Predicción Weka AI
+        function showPredictionModal(btn) {
+            const probStr = btn.getAttribute('data-prob');
+            const prob = parseFloat(probStr);
+            const cliente = btn.getAttribute('data-cliente');
+            const mascota = btn.getAttribute('data-mascota');
+            const fechaStr = btn.getAttribute('data-fecha');
+            
+            // Populate Modal
+            document.getElementById('ai-prob-value').innerText = prob.toFixed(1) + '%';
+            document.getElementById('ai-cliente-name').innerText = cliente;
+            document.getElementById('ai-mascota-name').innerText = mascota;
+            
+            // Calculate anticipacion
+            try {
+                if(fechaStr && fechaStr.length >= 10) {
+                    const citaDate = new Date(fechaStr);
+                    const today = new Date();
+                    const diffTime = citaDate - today;
+                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if(diffDays < 0) diffDays = 0;
+                    document.getElementById('ai-dias-anticipacion').innerText = diffDays + ' días';
+                } else {
+                    document.getElementById('ai-dias-anticipacion').innerText = 'Reciente';
+                }
+            } catch(e) {
+                document.getElementById('ai-dias-anticipacion').innerText = 'No disp.';
+            }
+
+            // Set Risk Styles & Recommendation
+            const riskBadge = document.getElementById('ai-risk-badge');
+            const alertBox = document.getElementById('ai-recommendation-alert');
+            const recText = document.getElementById('ai-recommendation-text');
+
+            if (prob >= 70) {
+                riskBadge.className = 'badge rounded-pill px-4 py-2 fs-6 shadow-sm';
+                riskBadge.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                riskBadge.style.color = 'white';
+                riskBadge.innerText = 'Riesgo Alto';
+                
+                alertBox.style.background = 'linear-gradient(135deg, #fee2e2, #fecaca)';
+                alertBox.style.color = '#991b1b';
+                recText.innerText = 'Probabilidad crítica de inasistencia. Se sugiere contactar al cliente de inmediato para reconfirmar o liberar la agenda.';
+            } else if (prob >= 30) {
+                riskBadge.className = 'badge rounded-pill px-4 py-2 fs-6 shadow-sm';
+                riskBadge.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                riskBadge.style.color = 'white';
+                riskBadge.innerText = 'Riesgo Medio';
+                
+                alertBox.style.background = 'linear-gradient(135deg, #fef3c7, #fde68a)';
+                alertBox.style.color = '#92400e';
+                recText.innerText = 'Riesgo moderado. El recordatorio automático estándar (1 día antes) debería ser suficiente. Mantener en monitoreo.';
+            } else {
+                riskBadge.className = 'badge rounded-pill px-4 py-2 fs-6 shadow-sm';
+                riskBadge.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                riskBadge.style.color = 'white';
+                riskBadge.innerText = 'Riesgo Bajo';
+                
+                alertBox.style.background = 'linear-gradient(135deg, #d1fae5, #a7f3d0)';
+                alertBox.style.color = '#065f46';
+                recText.innerText = 'Excelente patrón de asistencia predictivo. No requiere intervención adicional de recepción.';
+            }
+
+            // Hide tooltip if open
+            const tooltip = bootstrap.Tooltip.getInstance(btn);
+            if(tooltip) tooltip.hide();
+
+            // Show Modal
+            const modalEl = document.getElementById('wekaPredictionModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+
+    </script>
+    <script>
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Modal confirmar cita
+        const confirmarCitaModal = document.getElementById('confirmarCitaModal');
+        if (confirmarCitaModal) {
+            confirmarCitaModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const citaId = button.getAttribute('data-cita-id');
+                const nombre = button.getAttribute('data-usuario-nombre');
+                const email = button.getAttribute('data-usuario-email');
+                const telefono = button.getAttribute('data-usuario-telefono');
+
+                document.getElementById('nombreClienteConfirmar').textContent = nombre;
+                document.getElementById('emailConfirmar').value = email || '';
+                document.getElementById('telefonoConfirmar').value = telefono || '';
+                document.getElementById('formConfirmarCita').action = `/recepcion/citas/${citaId}/confirmar`;
+            });
+        }
+    </script>
+</body>
+
+</html>

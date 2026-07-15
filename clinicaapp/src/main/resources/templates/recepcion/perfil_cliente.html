@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Cliente - Recepción</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #e0f2fe;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #0891b2;
+            --info-light: #cffafe;
+            --purple: #8b5cf6;
+            --purple-light: #f3e8ff;
+            --pink: #ec4899;
+            --pink-light: #fce7f3;
+            --secondary: #64748b;
+            --dark: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 20px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+            min-height: 100vh;
+            color: #334155;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.03;
+            animation: float 25s infinite ease-in-out;
+        }
+
+        .bg-shapes .shape-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+            top: -200px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shapes .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--success);
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -8s;
+        }
+
+        .bg-shapes .shape-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--pink);
+            top: 40%;
+            right: 20%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(40px, -40px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
+        }
+
+        /* ===== HEADER PREMIUM ===== */
+        .page-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(14, 165, 233, 0.4);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title i {
+            font-size: 2.25rem;
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.85;
+            }
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== BOTONES HEADER ===== */
+        .btn-header {
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        /* ===== QUICK ACTIONS BAR ===== */
+        .quick-actions-bar {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .quick-action-btn {
+            background: var(--glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 700;
+            color: #334155;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            flex: 1;
+            min-width: 200px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: skewX(-20deg) translateX(150%);
+            transition: transform 0.6s;
+        }
+
+        .quick-action-btn:hover::after {
+            transform: skewX(-20deg) translateX(-50%);
+        }
+
+        .quick-action-btn:hover {
+            background: white;
+            border-color: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .quick-action-btn i {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .quick-action-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* ===== PROFILE CARD PREMIUM ===== */
+        .profile-card {
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
+            padding: 2.5rem;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .profile-avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            box-shadow: 0 10px 40px rgba(14, 165, 233, 0.4), 0 0 0 6px rgba(255, 255, 255, 0.8);
+            border: 4px solid white;
+            transition: all 0.4s ease;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 10px 40px rgba(14, 165, 233, 0.4), 0 0 0 6px rgba(255, 255, 255, 0.8);
+            }
+
+            50% {
+                box-shadow: 0 15px 50px rgba(14, 165, 233, 0.6), 0 0 0 8px rgba(255, 255, 255, 0.9);
+            }
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05) rotate(-5deg);
+        }
+
+        .profile-info h2 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-info p {
+            color: var(--secondary);
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--success);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
+            margin-top: 0.75rem;
+            border: 1px solid var(--success-light);
+            animation: fadeInUp 0.5s ease-out 0.5s both;
+        }
+
+        .profile-badge i {
+            animation: pulse-check 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-check {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .profile-body {
+            padding: 2rem 2.5rem;
+        }
+
+        /* ===== INFO GRID PREMIUM ===== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: white;
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+        }
+
+        .info-item:hover::before {
+            opacity: 1;
+        }
+
+        .info-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-item:hover .info-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .info-icon.email {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .info-icon.phone {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .info-icon.id {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: #7c3aed;
+        }
+
+        .info-icon.calendar {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .info-content h6 {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin: 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-content p {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0.25rem 0 0 0;
+        }
+
+        .info-content small {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-top: 0.25rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+        }
+
+        .badge-count {
+            background: linear-gradient(135deg, var(--secondary), #475569);
+            color: white;
+            padding: 0.375rem 0.875rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+        }
+
+        .btn-add-pet {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-add-pet::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-add-pet:hover::before {
+            left: 100%;
+        }
+
+        .btn-add-pet:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(236, 72, 153, 0.45);
+            color: white;
+        }
+
+        /* ===== PET CARDS PREMIUM ===== */
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.75rem;
+        }
+
+        .pet-card {
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .pet-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .pet-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .pet-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .pet-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .pet-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .pet-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg) translateX(200%);
+            transition: transform 0.8s;
+            pointer-events: none;
+        }
+
+        .pet-card:hover::after {
+            transform: skewX(-20deg) translateX(-100%);
+        }
+
+        .pet-header {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fff1f2 100%);
+            padding: 1.75rem;
+            position: relative;
+            border-bottom: 1px solid #fbcfe8;
+        }
+
+        .pet-avatar {
+            width: 72px;
+            height: 72px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.25rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            transition: all 0.4s ease;
+        }
+
+        .pet-card:hover .pet-avatar {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15), 0 0 0 6px rgba(255, 255, 255, 0.9);
+        }
+
+        .pet-name {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #334155);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pet-species {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #be185d;
+            margin-top: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #fbcfe8;
+        }
+
+        .pet-body {
+            padding: 1.5rem;
+        }
+
+        .pet-details {
+            display: grid;
+            gap: 0.875rem;
+        }
+
+        .pet-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .pet-detail-item:hover {
+            background: white;
+            border-color: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateX(4px);
+        }
+
+        .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .detail-label i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .detail-value {
+            font-weight: 800;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .pet-footer {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .btn-schedule {
+            width: 100%;
+            background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-schedule::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-schedule:hover::before {
+            left: 100%;
+        }
+
+        .btn-schedule:hover {
+            background: linear-gradient(135deg, #047857, #059669);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(5, 150, 105, 0.4);
+        }
+
+        /* ===== EMPTY STATES ===== */
+        .empty-pets {
+            background: var(--glass-bg);
+            border-radius: var(--radius-xl);
+            padding: 5rem 2rem;
+            text-align: center;
+            border: 2px dashed var(--border);
+            box-shadow: var(--shadow-soft);
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .empty-pets-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.2);
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-pets h3 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-pets p {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.75rem 0;
+                margin-bottom: 2rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .page-title i {
+                font-size: 1.75rem;
+            }
+
+            .profile-avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-header {
+                padding: 1.5rem;
+            }
+
+            .profile-body {
+                padding: 1.5rem;
+            }
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .quick-action-btn {
+                width: 100%;
+            }
+
+            .btn-header {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .profile-info h2 {
+                font-size: 1.35rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .section-title i {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .pet-avatar {
+                width: 56px;
+                height: 56px;
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Animated Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div th:replace="~{fragments/header :: header-recepcion}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- Header Premium -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title">
+                        <i class="bi bi-person-badge-fill"></i>
+                        Perfil del Cliente
+                    </h1>
+                    <p class="page-subtitle">Información detallada y mascotas registradas</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a th:href="@{/recepcion/clientes}" class="btn-header btn-back">
+                        <i class="bi bi-arrow-left-circle"></i>
+                        Volver a la Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container pb-5" style="position:relative; z-index:1;">
+
+        <!-- Quick Actions -->
+        <div class="quick-actions-bar">
+            <a th:href="@{/recepcion/citas/nueva(clienteId=${cliente.id})}" class="quick-action-btn">
+                <i class="bi bi-calendar-plus-fill text-success"></i>
+                <span>Agendar Cita</span>
+            </a>
+            <a href="#" class="quick-action-btn" onclick="alert('Función en desarrollo')">
+                <i class="bi bi-pencil-square text-primary"></i>
+                <span>Editar Datos</span>
+            </a>
+            <a href="#" class="quick-action-btn" onclick="alert('Función en desarrollo')">
+                <i class="bi bi-file-text text-info"></i>
+                <span>Ver Historial</span>
+            </a>
+        </div>
+
+        <!-- Profile Card Principal -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar">
+                        <span th:text="${cliente.getIniciales()}">IN</span>
+                    </div>
+                    <div class="profile-info">
+                        <h2 th:text="${cliente.getNombreCompleto()}">Nombre Completo</h2>
+
+                        <p>Cliente registrado en el sistema</p>
+
+                        <div class="profile-badge">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Cliente Activo
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon email">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+                        <div class="info-content">
+                            <h6>Correo Electrónico</h6>
+                            <p th:text="${cliente.email != null ? cliente.email : 'No especificado'}">email@ejemplo.com
+                            </p>
+                            <small>Principal</small>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon phone">
+                            <i class="bi bi-telephone-fill"></i>
+                        </div>
+                        <div class="info-content">
+                            <h6>Teléfono</h6>
+                            <p th:text="${cliente.telefono != null ? cliente.telefono : 'No especificado'}">+57 300 123
+                                4567</p>
+                            <small th:if="${cliente.telefono == null}">Haz clic en editar para agregar</small>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon id">
+                            <i class="bi bi-fingerprint"></i>
+                        </div>
+                        <div class="info-content">
+                            <h6>ID Cliente</h6>
+                            <p th:if="${cliente.id != null}"
+                                th:text="${#strings.substring(cliente.id, 0, (#strings.length(cliente.id) < 12 ? #strings.length(cliente.id) : 12))} + '...'">
+                                abc123...</p>
+                            <p th:if="${cliente.id == null}">--</p>
+                            <small>Identificador único</small>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon calendar">
+                            <i class="bi bi-calendar3"></i>
+                        </div>
+                        <div class="info-content">
+                            <h6>Estado de Citas</h6>
+                            <p th:text="${mascotas != null and !#lists.isEmpty(mascotas) ? 'Con historial' : 'Sin citas'}">--</p>
+                            <small th:text="${mascotas != null ? #lists.size(mascotas) + ' mascotas' : 'Sin mascotas'}">Próxima: Pendiente</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Mascotas -->
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="bi bi-heart-pulse-fill"></i>
+                Mascotas Registradas
+                <span class="badge-count" th:text="${mascotas != null ? #lists.size(mascotas) : 0}">0</span>
+            </h2>
+            <a href="#" class="btn-add-pet" onclick="alert('Función en desarrollo')">
+                <i class="bi bi-plus-lg"></i>
+                Agregar Mascota
+            </a>
+        </div>
+
+        <div class="pet-grid" th:if="${mascotas != null and !#lists.isEmpty(mascotas)}">
+            <div th:each="mascota, iterStat : ${mascotas}" class="pet-card" th:style="'animation-delay: ' + ${iterStat.index * 0.1 + 0.3} + 's'">
+                <div class="pet-header">
+                    <div class="pet-avatar">
+                        <span
+                            th:text="${mascota.especie == 'Perro' ? '🐕' : (mascota.especie == 'Gato' ? '🐈' : '🐾')}">🐾</span>
+                    </div>
+                    <h5 class="pet-name" th:text="${mascota.nombre != null ? mascota.nombre : 'Sin nombre'}">Nombre
+                        Mascota</h5>
+                    <span class="pet-species">
+                        <i class="bi bi-tag-fill"></i>
+                        <span th:text="${mascota.especie != null ? mascota.especie : 'No especificada'}">Especie</span>
+                    </span>
+                </div>
+
+                <div class="pet-body">
+                    <div class="pet-details">
+                        <div class="pet-detail-item">
+                            <span class="detail-label">
+                                <i class="bi bi-award"></i>
+                                Raza
+                            </span>
+                            <span class="detail-value" th:text="${mascota.getRaza()}">
+                                Raza
+                            </span>
+                        </div>
+
+                        <div class="pet-detail-item">
+                            <span class="detail-label">
+                                <i class="bi bi-calendar-event"></i>
+                                Nacimiento
+                            </span>
+                            <span class="detail-value"
+                                th:text="${mascota.fechaNacimiento != null ? #temporals.format(mascota.fechaNacimiento, 'dd/MM/yyyy') : 'No especificada'}">
+                                01/01/2020
+                            </span>
+                        </div>
+
+                        <div class="pet-detail-item">
+                            <span class="detail-label">
+                                <i class="bi bi-clipboard-pulse"></i>
+                                Edad
+                            </span>
+                            <span class="detail-value" th:if="${mascota.fechaNacimiento != null}">
+                                <span
+                                    th:text="${T(java.time.Period).between(mascota.fechaNacimiento, T(java.time.LocalDate).now()).getYears() + ' años'}">3
+                                    años</span>
+                            </span>
+                            <span class="detail-value text-muted" th:if="${mascota.fechaNacimiento == null}">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-footer">
+                    <a th:if="${mascota.id != null}"
+                        th:href="@{/recepcion/citas/nueva(clienteId=${cliente.id}, mascotaId=${mascota.id})}"
+                        class="btn-schedule">
+                        <i class="bi bi-calendar-plus"></i>
+                        Agendar Cita
+                    </a>
+                    <button th:if="${mascota.id == null}" class="btn-schedule" disabled
+                        style="opacity: 0.6; cursor: not-allowed;">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        ID no disponible
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State (Sin mascotas) -->
+        <div class="empty-pets" th:if="${mascotas == null or #lists.isEmpty(mascotas)}">
+            <div class="empty-pets-icon">
+                <i class="bi bi-heart"></i>
+            </div>
+            <h3>Sin mascotas registradas</h3>
+            <p>Este cliente aún no tiene mascotas en el sistema. Agrega una para comenzar a agendar citas.</p>
+            <a href="#" class="btn-add-pet" onclick="alert('Función en desarrollo')">
+                <i class="bi bi-plus-lg"></i>
+                Agregar Primera Mascota
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

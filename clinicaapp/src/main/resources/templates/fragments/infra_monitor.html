@@ -1,0 +1,196 @@
+    <div th:fragment="infra-monitor">
+        <!-- Marcador de Seguridad -->
+        <div sec:authorize="hasRole('ADMIN')" id="hex-admin-marker" style="display:none;"></div>
+
+        <style>
+            .maint-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 45px;
+                background: linear-gradient(90deg, #ef4444, #b91c1c);
+                color: white;
+                z-index: 20000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-weight: 800;
+                font-size: 0.95rem;
+                letter-spacing: 0.5px;
+            }
+            .broadcast-banner {
+                position: fixed;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #06b6d4, #0891b2);
+                color: white;
+                padding: 10px 30px;
+                border-radius: 100px;
+                font-size: 0.9rem;
+                font-weight: 700;
+                z-index: 15000;
+                box-shadow: 0 10px 30px rgba(6, 182, 212, 0.4);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                animation: hexSlideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            @keyframes hexSlideDown {
+                from { transform: translate(-50%, -100px); opacity: 0; }
+                to { transform: translate(-50%, 0); opacity: 1; }
+            }
+            body.hex-maint-active {
+                margin-top: 45px !important;
+            }
+            .maint-timer-box {
+                background: rgba(0,0,0,0.4);
+                padding: 4px 12px;
+                border-radius: 8px;
+                margin-left: 15px;
+                font-family: 'Fira Code', monospace;
+                font-size: 1.2rem;
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+        </style>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                console.log("HEX CORE: Iniciando monitor de infraestructura...");
+                
+                const isAdmin = document.getElementById('hex-admin-marker') !== null;
+                console.log("HEX CORE: Rol detectado -> " + (isAdmin ? "ADMIN (Inmune)" : "USUARIO (Restringido)"));
+                
+                let maintenanceActive = false;
+                let timerInterval = null;
+
+                async function updateSystemStatus() {
+                    try {
+                        const response = await fetch('/api/system/status');
+                        const data = await response.json();
+                        console.log("HEX CORE: Sincronización ->", data);
+
+                        // 1. Mensajes Globales
+                        if(data.broadcastActivo && data.mensajeGlobal && data.mensajeGlobal.trim() !== "") {
+                            renderBroadcast(data.mensajeGlobal, data.broadcastColor);
+                        } else {
+                            removeBroadcast();
+                        }
+
+                        // 2. Protocolo de Mantenimiento
+                        if(data.modoMantenimiento) {
+                            if(!maintenanceActive) {
+                                activateMaintenance(data.minutosParaCierre, data.mantenimientoDesde, isAdmin);
+                            }
+                        } else if(maintenanceActive) {
+                            deactivateMaintenance();
+                        }
+                    } catch (e) {
+                        console.error("HEX CORE ERROR: Fallo en sincronización", e);
+                    }
+                }
+
+                function renderBroadcast(msg, color) {
+                    let banner = document.getElementById('hex-broadcast');
+                    if(!banner) {
+                        banner = document.createElement('div');
+                        banner.id = 'hex-broadcast';
+                        banner.className = 'broadcast-banner';
+                        document.body.appendChild(banner);
+                    }
+                    
+                    // Ajuste dinámico de color
+                    const colors = {
+                        info: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                        warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                        danger: 'linear-gradient(135deg, #ef4444, #dc2626)'
+                    };
+                    
+                    banner.style.background = colors[color] || colors.info;
+                    banner.innerHTML = `<i class="bi bi-broadcast"></i> ${msg}`;
+                    banner.style.display = 'flex';
+                }
+
+                function removeBroadcast() {
+                    const banner = document.getElementById('hex-broadcast');
+                    if(banner) banner.remove();
+                }
+
+                function activateMaintenance(mins, startTS, isUserAdmin) {
+                    console.log("HEX CORE: ACTIVANDO PROTOCOLO DE VISUALIZACIÓN (Admin: " + isUserAdmin + ")");
+                    maintenanceActive = true;
+                    document.body.classList.add('hex-maint-active');
+                    
+                    let bar = document.getElementById('hex-maint-bar');
+                    if(!bar) {
+                        bar = document.createElement('div');
+                        bar.id = 'hex-maint-bar';
+                        bar.className = 'maint-bar';
+                        if(isUserAdmin) {
+                            // Estilo informativo para Admin
+                            bar.style.background = 'linear-gradient(90deg, #6366f1, #4338ca)';
+                            bar.innerHTML = `
+                                <i class="bi bi-shield-check me-2"></i>
+                                MANTENIMIENTO ACTIVO (MODO ADMIN - INMUNE) - CIERRE EN:
+                                <span id="hex-maint-timer" class="maint-timer-box">00:00</span>
+                            `;
+                        } else {
+                            // Estilo de alerta para Usuario
+                            bar.innerHTML = `
+                                <i class="bi bi-shield-fill-exclamation me-2"></i>
+                                MANTENIMIENTO DE INFRAESTRUCTURA - CIERRE EN:
+                                <span id="hex-maint-timer" class="maint-timer-box">00:00</span>
+                            `;
+                        }
+                        document.body.appendChild(bar);
+                    }
+
+                    const timerEl = document.getElementById('hex-maint-timer');
+                    
+                    function runTimer() {
+                        const now = new Date();
+                        const start = new Date(startTS || now);
+                        const end = new Date(start.getTime() + (mins * 60 * 1000));
+                        let diff = Math.floor((end - now) / 1000);
+
+                        if(diff <= 0) {
+                            clearInterval(timerInterval);
+                            timerEl.innerText = "00:00";
+                            setTimeout(() => {
+                                if(!isUserAdmin) window.location.href = "/logout?maintenance";
+                                else console.log("HEX CORE: Tiempo agotado - Inmunidad Admin activa.");
+                            }, 1000);
+                        } else {
+                            const m = Math.floor(diff / 60);
+                            const s = diff % 60;
+                            timerEl.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                        }
+                    }
+
+                    if(timerInterval) clearInterval(timerInterval);
+                    runTimer();
+                    timerInterval = setInterval(runTimer, 1000);
+                }
+
+                function deactivateMaintenance() {
+                    console.log("HEX CORE: DESACTIVANDO PROTOCOLO - SISTEMA RESTAURADO");
+                    maintenanceActive = false;
+                    document.body.classList.remove('hex-maint-active');
+                    const bar = document.getElementById('hex-maint-bar');
+                    if(bar) bar.remove();
+                    if(timerInterval) clearInterval(timerInterval);
+                    window.location.reload();
+                }
+
+                setInterval(updateSystemStatus, 5000);
+                setTimeout(updateSystemStatus, 1000);
+                console.log("HEX CORE: Monitor inicializado correctamente.");
+            })();
+            /*]]>*/
+        </script>
+    </div>

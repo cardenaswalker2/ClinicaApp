@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Consola de Administración | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-strong: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 4px 24px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 20px 50px rgba(99, 102, 241, 0.18);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #ede9fe 25%, #e0e7ff 50%, #f5f3ff 75%, #fff1f2 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #334155;
+            padding-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            33% {
+                background-position: 100% 50%;
+            }
+
+            66% {
+                background-position: 50% 100%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Partículas flotantes de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Contenedor Principal */
+        .admin-container {
+            padding: 1.5rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER DE BIENVENIDA ===== */
+        .admin-welcome {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-text p {
+            color: #64748b;
+            font-weight: 600;
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .welcome-date {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.05));
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .welcome-date i {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .welcome-date span {
+            font-weight: 700;
+            color: #475569;
+            font-size: 0.85rem;
+        }
+
+        /* KPI Cards - Glassmorphism Premium */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        .kpi-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
+            opacity: 0.8;
+        }
+
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 60%);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.8s ease;
+            pointer-events: none;
+        }
+
+        .kpi-card:hover::after {
+            opacity: 0.15;
+            transform: scale(1);
+        }
+
+        .kpi-card:nth-child(1) {
+            animation-delay: 0.1s;
+            --card-color-1: #6366f1;
+            --card-color-2: #8b5cf6;
+        }
+
+        .kpi-card:nth-child(2) {
+            animation-delay: 0.2s;
+            --card-color-1: #10b981;
+            --card-color-2: #34d399;
+        }
+
+        .kpi-card:nth-child(3) {
+            animation-delay: 0.3s;
+            --card-color-1: #0ea5e9;
+            --card-color-2: #22d3ee;
+        }
+
+        .kpi-card:nth-child(4) {
+            animation-delay: 0.4s;
+            --card-color-1: #f59e0b;
+            --card-color-2: #fbbf24;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .trend-chip {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.3rem 0.75rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .trend-up {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.1));
+            color: #059669;
+        }
+
+        .trend-down {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(248, 113, 113, 0.1));
+            color: #dc2626;
+        }
+
+        .trend-neutral {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+        }
+
+        .kpi-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+            color: var(--primary);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover .kpi-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .kpi-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.5) 100%);
+        }
+
+        .kpi-card:nth-child(2) .kpi-icon {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(52, 211, 153, 0.08) 100%);
+            color: #10b981;
+        }
+
+        .kpi-card:nth-child(3) .kpi-icon {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(34, 211, 238, 0.08) 100%);
+            color: #0ea5e9;
+        }
+
+        .kpi-card:nth-child(4) .kpi-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(251, 191, 36, 0.08) 100%);
+            color: #f59e0b;
+        }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (min-width: 768px) {
+            .kpi-value {
+                font-size: 2.25rem;
+            }
+        }
+
+        .kpi-footer {
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Activity Monitor */
+        .activity-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .activity-item {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(6px) scale(1.01);
+            box-shadow: var(--shadow-soft);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .activity-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px currentColor;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px currentColor;
+                opacity: 1;
+            }
+
+            50% {
+                box-shadow: 0 0 16px currentColor;
+                opacity: 0.7;
+            }
+        }
+
+        .activity-content {
+            flex-grow: 1;
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 600;
+            background: rgba(241, 245, 249, 0.8);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #ec4899, #06b6d4);
+            opacity: 0.6;
+        }
+
+        .chart-container {
+            height: 350px;
+            position: relative;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(180deg, #6366f1, #ec4899);
+            border-radius: 2px;
+        }
+
+        .section-title i {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .section-title:hover i {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        /* User Cards Mobile */
+        .users-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #6366f1, #ec4899);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateX(6px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .user-card:hover::before {
+            opacity: 1;
+        }
+
+        .user-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .user-info h6 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .user-info small {
+            color: #64748b;
+            font-size: 0.875rem;
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .badge-role {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #4338ca;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+        }
+
+        .user-body {
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid transparent;
+        }
+
+        .status-badge.active {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.suspended {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-user-action {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-user-action::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.4) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-user-action:hover::before {
+            opacity: 1;
+        }
+
+        .btn-user-action.suspend {
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        .btn-user-action.suspend:hover {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-user-action.activate {
+            border-color: #bbf7d0;
+            color: #16a34a;
+        }
+
+        .btn-user-action.activate:hover {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-user-action.key {
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-user-action.key:hover {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Config Panel */
+        .config-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            position: relative;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.5s;
+        }
+
+        .config-panel::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .config-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+            position: relative;
+        }
+
+        .config-header h6 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .config-header i {
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .config-list {
+            padding: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: #334155;
+            font-weight: 600;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid transparent;
+        }
+
+        .config-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateX(10px);
+            color: #1e293b;
+            border-color: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+        }
+
+        .config-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .config-item:hover .config-icon {
+            transform: scale(1.15) rotate(8deg);
+        }
+
+        .config-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.5) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .config-item:hover .config-icon::after {
+            opacity: 1;
+        }
+
+        .config-item:nth-child(1) .config-icon {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #4338ca;
+        }
+
+        .config-item:nth-child(2) .config-icon {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #059669;
+        }
+
+        .config-item:nth-child(3) .config-icon {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #b45309;
+        }
+
+        .config-item:nth-child(4) .config-icon {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #0369a1;
+        }
+
+        .config-item:nth-child(5) .config-icon {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            color: #be185d;
+        }
+
+        .config-arrow {
+            margin-left: auto;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .config-item:hover .config-arrow {
+            transform: translateX(6px);
+            color: #6366f1;
+        }
+
+        /* Security Alert */
+        .security-alert {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 2px solid rgba(252, 211, 77, 0.5);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.6s;
+            backdrop-filter: blur(10px);
+        }
+
+        .security-alert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .security-alert h6 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .security-alert h6 i {
+            font-size: 1.25rem;
+            animation: pulse-warning 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-warning {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .security-alert p {
+            color: #b45309;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Alerta de Pendientes */
+        .alert-warning-custom {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: none;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .alert-warning-custom::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, #f97316, #fbbf24);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Footer */
+        .admin-footer {
+            margin-top: 3rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Desktop Table */
+        @media (min-width: 992px) {
+            .users-container {
+                display: none;
+            }
+
+            .table-container-desktop {
+                display: block;
+                background: var(--glass-bg);
+                backdrop-filter: blur(15px);
+                border-radius: var(--radius-xl);
+                box-shadow: var(--shadow-soft);
+                border: 1px solid var(--glass-border);
+                overflow: hidden;
+                animation: fadeIn 0.8s ease forwards;
+                opacity: 0;
+                animation-delay: 0.4s;
+            }
+
+            .table-header {
+                padding: 1.5rem;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+                border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-header h5 {
+                font-size: 1.25rem;
+                font-weight: 800;
+                color: #1e293b;
+                margin: 0;
+            }
+
+            .search-box {
+                width: 320px;
+                position: relative;
+            }
+
+            .search-box .form-control {
+                border: 2px solid #e2e8f0;
+                border-radius: 50px;
+                padding-left: 1.5rem;
+                padding-right: 3rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.8);
+            }
+
+            .search-box .form-control:focus {
+                border-color: #6366f1;
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+                background: white;
+            }
+
+            .search-box .btn-search {
+                position: absolute;
+                right: 5px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: none;
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                transition: transform 0.3s ease;
+            }
+
+            .search-box .btn-search:hover {
+                transform: translateY(-50%) scale(1.1);
+            }
+
+            .table {
+                margin: 0;
+            }
+
+            .table thead th {
+                background: rgba(248, 250, 252, 0.8);
+                color: #475569;
+                font-weight: 700;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                padding: 1.25rem;
+                border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+            }
+
+            .table tbody tr {
+                transition: all 0.3s ease;
+            }
+
+            .table tbody tr:hover {
+                background: rgba(99, 102, 241, 0.04);
+                transform: scale(1.005);
+            }
+
+            .table td {
+                padding: 1.25rem;
+                vertical-align: middle;
+                color: #334155;
+                font-weight: 500;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .table-container-desktop {
+                display: none;
+            }
+
+            .users-container {
+                display: flex;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(226, 232, 240, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c7d2fe, #ddd6fe);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .kpi-grid {
+                gap: 0.75rem;
+            }
+
+            .kpi-card {
+                padding: 1.25rem;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .chart-container {
+                height: 280px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .admin-welcome {
+                padding: 1.25rem;
+            }
+
+            .welcome-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .welcome-date {
+                display: none;
+            }
+        }
+
+        /* Loading shimmer para valores */
+        .kpi-value {
+            position: relative;
+        }
+
+        /* Efecto de brillo sutil en hover para cards */
+        .kpi-card,
+        .user-card,
+        .config-panel,
+        .chart-card {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar Admin Unificado -->
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <div class="container admin-container">
+
+        <!-- ===== HEADER DE BIENVENIDA ===== -->
+        <div class="admin-welcome">
+            <div class="welcome-text">
+                <h1>¡Hola, Administrador! 👋</h1>
+                <p>Bienvenido a tu consola maestra. Aquí tienes el control total de ClínicaApp.</p>
+            </div>
+            <div class="welcome-date">
+                <i class="bi bi-calendar3"></i>
+                <span id="currentDate">Cargando fecha...</span>
+            </div>
+        </div>
+
+        <!-- ===== KPIs ===== -->
+        <div class="kpi-grid">
+            <!-- Ingresos Globales -->
+            <div class="kpi-card">
+                <div class="trend-chip" th:classappend="${tendenciaIngresos >= 0 ? 'trend-up' : 'trend-down'}">
+                    <i class="bi"
+                        th:classappend="${tendenciaIngresos >= 0 ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}"></i>
+                    <span th:text="${(tendenciaIngresos >= 0 ? '+' : '') + tendenciaIngresos + '%'}">+0%</span>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="kpi-label">Ingresos Globales</div>
+                <div class="kpi-value" th:text="${'$' + #numbers.formatDecimal(totalIngresos, 1, 'COMMA', 2, 'POINT')}">
+                    $0.00</div>
+                <div class="kpi-footer text-primary-emphasis">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Vs mes anterior</span>
+                </div>
+            </div>
+
+            <!-- Citas del Mes -->
+            <div class="kpi-card">
+                <div class="trend-chip" th:classappend="${tendenciaCitas >= 0 ? 'trend-up' : 'trend-down'}">
+                    <i class="bi"
+                        th:classappend="${tendenciaCitas >= 0 ? 'bi-caret-up-fill' : 'bi-caret-down-fill'}"></i>
+                    <span th:text="${(tendenciaCitas >= 0 ? '+' : '') + tendenciaCitas + '%'}">+0%</span>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="kpi-label">Citas del Mes</div>
+                <div class="kpi-value" th:text="${totalCitas}">0</div>
+                <div class="kpi-footer text-success">
+                    <i class="bi bi-activity"></i>
+                    <span>Rendimiento citas</span>
+                </div>
+            </div>
+
+            <!-- Sedes Activas -->
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div class="kpi-label">Sedes Activas</div>
+                <div class="kpi-value" th:text="${totalClinicas}">0</div>
+                <div class="kpi-footer text-info">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span>Suscripciones activas</span>
+                </div>
+            </div>
+
+            <!-- Usuarios Globales -->
+            <div class="kpi-card">
+                <div class="kpi-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="kpi-label">Usuarios Globales</div>
+                <div class="kpi-value" th:text="${totalUsuarios}">0</div>
+                <div class="kpi-footer text-warning">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Cuentas verificadas</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Master Analytics Chart ===== -->
+        <div class="chart-card">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h5 class="section-title mb-0">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    Crecimiento de la Plataforma
+                </h5>
+                <div class="d-flex gap-2">
+                    <span class="badge rounded-pill px-3 py-2"
+                        style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4338ca; font-weight: 700; font-size: 0.75rem;">
+                        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; color: #6366f1;"></i> Citas
+                    </span>
+                    <span class="badge rounded-pill px-3 py-2"
+                        style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; font-weight: 700; font-size: 0.75rem;">
+                        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem; color: #10b981;"></i> Ingresos
+                    </span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- ===== Alerta de Pendientes ===== -->
+        <div th:if="${totalPendientes > 0}"
+            class="alert alert-warning-custom border-0 shadow-sm d-flex align-items-center mb-4 p-4">
+            <div class="d-flex align-items-center justify-content-center rounded-circle me-3"
+                style="width: 50px; height: 50px; background: linear-gradient(135deg, #f97316, #fbbf24); flex-shrink: 0; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);">
+                <i class="bi bi-exclamation-diamond-fill text-white fs-4"
+                    style="animation: pulse-warning 2s ease-in-out infinite;"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h6 class="fw-bold text-dark mb-1" style="font-size: 1.1rem;">¡Atención Requerida!</h6>
+                <span class="text-muted" style="font-weight: 500;">Tienes <span class="badge fw-bold px-2 py-1"
+                        style="background: linear-gradient(135deg, #f97316, #fbbf24); color: white; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);"
+                        th:text="${totalPendientes}">0</span> solicitudes de clínicas esperando tu aprobación.</span>
+            </div>
+            <a th:href="@{/admin/solicitudes}" class="btn fw-bold rounded-pill px-4 py-2 shadow-sm"
+                style="background: linear-gradient(135deg, #f97316, #fbbf24); color: white; border: none; transition: all 0.3s ease;">
+                Revisar ahora <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- ===== INICIO COLUMNA IZQUIERDA: Gestión de Usuarios ===== -->
+            <div class="col-lg-8">
+                <h5 class="section-title">
+                    <i class="bi bi-person-gear"></i>
+                    Control de Acceso
+                </h5>
+
+                <!-- Monitor de Operaciones Globales (Actividad en Tiempo Real) - VISTA MÓVIL -->
+                <div class="users-container">
+                    <div th:each="cita : ${citasRecientes}" class="activity-item">
+                        <div class="activity-dot"
+                            th:style="'background-color: ' + (cita.estado == 'COMPLETADA' ? '#10b981' : (cita.estado == 'CANCELADA' ? '#ef4444' : '#6366f1')) + '; color: ' + (cita.estado == 'COMPLETADA' ? '#10b981' : (cita.estado == 'CANCELADA' ? '#ef4444' : '#6366f1'))">
+                        </div>
+                        <i class="bi fs-4"
+                            th:classappend="${cita.estado == 'COMPLETADA' ? 'bi-check-circle-fill text-success' : (cita.estado == 'CANCELADA' ? 'bi-x-circle-fill text-danger' : 'bi-clock-history text-primary')}"></i>
+                        <div class="activity-content">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-dark"
+                                    th:text="${cita.nombreUsuario ?: 'Cliente Desconocido'}">Cliente</span>
+                                <span class="activity-time"
+                                    th:text="${cita.fechaHora != null ? (cita.fechaHora.contains(',') ? cita.fechaHora.split(',')[1].trim() : cita.fechaHora) : '--:--'}">12:00</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.85rem; margin-top: 0.25rem;">
+                                <span th:text="${cita.nombreClinica ?: 'Sede no asignada'}">Sede</span> •
+                                <span class="fw-semibold" th:text="${cita.estado ?: 'S/E'}"
+                                    th:style="'color: ' + (cita.estado == 'COMPLETADA' ? '#059669' : (cita.estado == 'CANCELADA' ? '#dc2626' : '#4f46e5'))">Estado</span>
+                            </div>
+                        </div>
+                        <div class="ms-auto fw-bold"
+                            style="font-size: 0.95rem; color: #6366f1; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); padding: 0.4rem 0.8rem; border-radius: 12px; white-space: nowrap;"
+                            th:text="${cita.costo != null ? '$' + #numbers.formatDecimal(cita.costo, 1, 'COMMA', 2, 'POINT') : '$0.00'}">
+                            $0.00</div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(citasRecientes)}" class="text-center py-5 text-muted"
+                        style="background: rgba(255,255,255,0.5); border-radius: var(--radius-lg); backdrop-filter: blur(10px);">
+                        <div
+                            style="width: 60px; height: 60px; background: linear-gradient(135deg, #e2e8f0, #cbd5e1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="bi bi-clock-history fs-2" style="color: #94a3b8;"></i>
+                        </div>
+                        <p class="fw-semibold mb-0">No hay actividad reciente registrada.</p>
+                        <small>Las operaciones aparecerán aquí en tiempo real</small>
+                    </div>
+                </div>
+
+                <!-- Vista Desktop: Tabla de Usuarios -->
+                <div class="table-container-desktop d-none d-lg-block">
+                    <div class="table-header">
+                        <h5><i class="bi bi-people me-2" style="color: #6366f1;"></i>Cuentas del Sistema</h5>
+                        <div class="search-box position-relative">
+                            <input type="text" class="form-control" placeholder="Buscar por email o nombre..."
+                                id="userSearch">
+                            <button class="btn btn-search">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user, iterStat : ${usuarios}"
+                                    th:style="${iterStat.odd} ? 'background: rgba(248, 250, 252, 0.5);' : ''">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div style="width: 42px; height: 42px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #4338ca; font-size: 0.9rem;"
+                                                th:text="${#strings.substring(user.nombre, 0, 1)}">A</div>
+                                            <div>
+                                                <div class="fw-bold" style="color: #1e293b;" th:text="${user.nombre}">
+                                                    Nombre</div>
+                                                <small class="text-muted" style="font-size: 0.8rem;"
+                                                    th:text="${user.email}">email@ejemplo.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge-role" th:text="${user.role}">CLIENTE</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${user.activo}" class="status-badge active">
+                                            <i class="bi bi-check-circle-fill" style="font-size: 0.7rem;"></i> Activo
+                                        </span>
+                                        <span th:unless="${user.activo}" class="status-badge suspended">
+                                            <i class="bi bi-x-circle-fill" style="font-size: 0.7rem;"></i> Suspendido
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form th:action="@{'/admin/usuarios/toggle-status/' + ${user.id}}" method="post"
+                                            style="display:inline;">
+                                            <button th:if="${user.activo}" class="btn btn-sm btn-outline-danger"
+                                                title="Suspender"
+                                                style="border-radius: 10px; padding: 0.5rem 0.75rem; transition: all 0.3s ease;">
+                                                <i class="bi bi-person-x"></i>
+                                            </button>
+                                            <button th:unless="${user.activo}" class="btn btn-sm btn-outline-success"
+                                                title="Activar"
+                                                style="border-radius: 10px; padding: 0.5rem 0.75rem; transition: all 0.3s ease;">
+                                                <i class="bi bi-person-check"></i>
+                                            </button>
+                                        </form>
+                                        <button class="btn btn-sm btn-light border ms-1" title="Resetear contraseña"
+                                            style="border-radius: 10px; padding: 0.5rem 0.75rem; transition: all 0.3s ease;">
+                                            <i class="bi bi-key"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- ===== FIN COLUMNA IZQUIERDA ===== -->
+            <!-- ===== COLUMNA DERECHA: Panel de Configuración ===== -->
+            <div class="col-lg-4">
+                <!-- Panel de Ajustes Maestros -->
+                <div class="config-panel mb-4">
+                    <div class="config-header">
+                        <h6>
+                            <i class="bi bi-gear-fill"></i>
+                            Ajustes Maestros
+                        </h6>
+                    </div>
+                    <div class="config-list">
+                        <a th:href="@{/admin/servicios}" class="config-item">
+                            <div class="config-icon">
+                                <i class="bi bi-list-check"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span>Catálogo Global de Servicios</span>
+                                <small style="font-size: 0.75rem; font-weight: 500; color: #94a3b8;">Gestionar servicios
+                                    disponibles</small>
+                            </div>
+                            <i class="bi bi-chevron-right config-arrow"></i>
+                        </a>
+                        <a th:href="@{/admin/reportes}" class="config-item">
+                            <div class="config-icon">
+                                <i class="bi bi-file-earmark-bar-graph"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span>Reporte Contable Anual</span>
+                                <small style="font-size: 0.75rem; font-weight: 500; color: #94a3b8;">Estadísticas
+                                    financieras</small>
+                            </div>
+                            <i class="bi bi-chevron-right config-arrow"></i>
+                        </a>
+                        <a th:href="@{/admin/configuracion/stripe}" class="config-item">
+                            <div class="config-icon">
+                                <i class="bi bi-percent"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span>Configurar Comisión Stripe</span>
+                                <small style="font-size: 0.75rem; font-weight: 500; color: #94a3b8;">Tarifas y
+                                    pagos</small>
+                            </div>
+                            <i class="bi bi-chevron-right config-arrow"></i>
+                        </a>
+                        <a th:href="@{/admin/configuracion/email}" class="config-item">
+                            <div class="config-icon">
+                                <i class="bi bi-envelope-paper"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span>Plantillas de Email</span>
+                                <small style="font-size: 0.75rem; font-weight: 500; color: #94a3b8;">Personalizar
+                                    notificaciones</small>
+                            </div>
+                            <i class="bi bi-chevron-right config-arrow"></i>
+                        </a>
+                        <a th:href="@{/admin/solicitudes}" class="config-item">
+                            <div class="config-icon">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span>Aprobar Nuevas Clínicas</span>
+                                <small style="font-size: 0.75rem; font-weight: 500; color: #94a3b8;">Solicitudes
+                                    pendientes de revisión</small>
+                            </div>
+                            <i class="bi bi-chevron-right config-arrow"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ===== Mini Estadísticas Rápidas ===== -->
+                <div class="config-panel mb-4" style="animation-delay: 0.55s;">
+                    <div class="config-header">
+                        <h6>
+                            <i class="bi bi-lightning-charge-fill"
+                                style="background: linear-gradient(135deg, #f59e0b, #fbbf24);"></i>
+                            Resumen Rápido
+                        </h6>
+                    </div>
+                    <div class="config-list">
+                        <div class="config-item" style="cursor: default; pointer-events: none;">
+                            <div class="config-icon"
+                                style="background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #7c3aed;">
+                                <i class="bi bi-calendar-week"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span style="font-size: 0.85rem;">Citas esta semana</span>
+                                <span style="font-size: 1.1rem; font-weight: 800; color: #1e293b;"
+                                    th:text="${citasSemana ?: '0'}">0</span>
+                            </div>
+                        </div>
+                        <div class="config-item" style="cursor: default; pointer-events: none;">
+                            <div class="config-icon"
+                                style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d;">
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span style="font-size: 0.85rem;">Calificación promedio</span>
+                                <span style="font-size: 1.1rem; font-weight: 800; color: #1e293b;">
+                                    <span th:text="${calificacionPromedio ?: '0.0'}">0.0</span>
+                                    <i class="bi bi-star-fill" style="color: #fbbf24; font-size: 0.8rem;"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="config-item" style="cursor: default; pointer-events: none;">
+                            <div class="config-icon"
+                                style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0369a1;">
+                                <i class="bi bi-clock"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span style="font-size: 0.85rem;">Tiempo respuesta promedio</span>
+                                <span style="font-size: 1.1rem; font-weight: 800; color: #1e293b;"
+                                    th:text="${tiempoRespuesta ?: '0 min'}">0 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== Alerta de Seguridad ===== -->
+                <div class="security-alert">
+                    <h6>
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Zona de Seguridad
+                    </h6>
+                    <p>Como administrador global, tus cambios afectan a todas las sedes y usuarios del país. Verifica
+                        antes de confirmar.</p>
+                </div>
+            </div>
+            <!-- ===== FIN COLUMNA DERECHA ===== -->
+        </div>
+        <!-- ===== FIN ROW ===== -->
+    </div>
+    <!-- ===== FIN CONTAINER ===== -->
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="admin-footer">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div
+                style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;">
+            </div>
+            <span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">Sistema Operativo</span>
+        </div>
+        <small>© 2024 ClínicaApp - Dashboard Maestro Evolucionado v2.0</small>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        // ===== FECHA DINÁMICA EN EL HEADER =====
+        document.addEventListener('DOMContentLoaded', function () {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            dateElement.textContent = now.toLocaleDateString('es-ES', options);
+        });
+
+        // ===== CONFIGURACIÓN DE CHART.JS PREMIUM =====
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        const labels = /*[[${labelsGrafico}]]*/[];
+        const dataCitas = /*[[${dataCitas}]]*/[];
+        const dataIngresos = /*[[${dataIngresos}]]*/[];
+
+        const gradientCitas = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientCitas.addColorStop(0, 'rgba(99, 102, 241, 0.5)');
+        gradientCitas.addColorStop(0.5, 'rgba(99, 102, 241, 0.1)');
+        gradientCitas.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+        const gradientIngresos = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientIngresos.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+        gradientIngresos.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Número de Citas',
+                        data: dataCitas,
+                        borderColor: '#6366f1',
+                        backgroundColor: gradientCitas,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#6366f1',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    },
+                    {
+                        label: 'Ingresos ($)',
+                        data: dataIngresos,
+                        borderColor: '#10b981',
+                        backgroundColor: gradientIngresos,
+                        borderWidth: 3,
+                        borderDash: [8, 4],
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y1',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 7
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 16,
+                        titleFont: { size: 14, weight: '800', family: 'Plus Jakarta Sans' },
+                        bodyFont: { size: 13, family: 'Plus Jakarta Sans' },
+                        cornerRadius: 16,
+                        displayColors: true,
+                        boxPadding: 6,
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        label += '$' + context.parsed.y.toLocaleString();
+                                    } else {
+                                        label += context.parsed.y;
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: {
+                            color: 'rgba(99, 102, 241, 0.06)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: { weight: '600', family: 'Plus Jakarta Sans' },
+                            color: '#64748b',
+                            padding: 10
+                        },
+                        border: { display: false }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: { display: false },
+                        ticks: {
+                            callback: value => '$' + value.toLocaleString(),
+                            font: { weight: '600', family: 'Plus Jakarta Sans' },
+                            color: '#059669',
+                            padding: 10
+                        },
+                        border: { display: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { weight: '700', family: 'Plus Jakarta Sans' },
+                            color: '#64748b'
+                        },
+                        border: { display: false }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

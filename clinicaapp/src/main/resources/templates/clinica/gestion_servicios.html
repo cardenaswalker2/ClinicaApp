@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Servicios y Precios | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.1);
+            --shadow-xl: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --shadow-primary: 0 8px 24px rgba(79, 70, 229, 0.18);
+            --shadow-success: 0 8px 24px rgba(16, 185, 129, 0.18);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--gray-50);
+            min-height: 100vh;
+            color: var(--gray-700);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar .container {
+            padding-top: 0.875rem;
+            padding-bottom: 0.875rem;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .btn-back {
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-section {
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.1s;
+        }
+
+        .search-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 50px;
+            padding: 0.375rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1), var(--shadow-md);
+        }
+
+        .search-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-400);
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.625rem 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.625rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        /* ===== MAIN CARD ===== */
+        .main-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.2s;
+        }
+
+        /* Card Header */
+        .card-header-custom {
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: linear-gradient(135deg, #fafafa, #f8f9fa);
+        }
+
+        .card-header-custom h5 {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .card-header-custom h5 i {
+            background: linear-gradient(135deg, var(--warning), #fbbf24);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .card-header-custom p {
+            color: var(--gray-500);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0.375rem 0 0 0;
+            padding-left: 2.875rem;
+        }
+
+        .badge-count {
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1.5px solid rgba(79, 70, 229, 0.12);
+            white-space: nowrap;
+        }
+
+        /* ===== TABLE ===== */
+        .table-container {
+            padding: 0.5rem 1.25rem 1.25rem;
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+        }
+
+        .table-custom thead th {
+            background: var(--gray-50);
+            color: var(--gray-500);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.875rem 1.25rem;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .table-custom thead th:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .table-custom thead th:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .table-custom tbody tr {
+            background: white;
+            transition: var(--transition);
+            border-radius: var(--radius-md);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .table-custom tbody tr:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+            z-index: 1;
+            position: relative;
+        }
+
+        .table-custom tbody td {
+            padding: 1.125rem 1.25rem;
+            border: none;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .table-custom tbody td:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .table-custom tbody td:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        /* ===== SWITCH ===== */
+        .switch-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-switch {
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-check-input {
+            width: 2.75rem;
+            height: 1.5rem;
+            margin: 0;
+            background-color: var(--gray-300);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .form-check-input::after {
+            content: '';
+            position: absolute;
+            top: 0.2rem;
+            left: 0.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-check-input:checked {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .form-check-input:checked::after {
+            transform: translateX(1.25rem);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        /* ===== SERVICE INFO ===== */
+        .service-name {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--gray-800);
+            letter-spacing: -0.01em;
+        }
+
+        .service-desc {
+            color: var(--gray-500);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            font-weight: 500;
+            max-width: 300px;
+        }
+
+        /* ===== PRICE INPUT ===== */
+        .price-input-group {
+            display: flex;
+            align-items: center;
+            max-width: 180px;
+            box-shadow: var(--shadow-xs);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1.5px solid var(--gray-200);
+        }
+
+        .price-input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+        }
+
+        .price-prefix {
+            background: var(--gray-50);
+            padding: 0.625rem 0.875rem;
+            color: var(--success);
+            font-weight: 800;
+            font-size: 0.9rem;
+            border-right: 1.5px solid var(--gray-200);
+        }
+
+        .price-input {
+            border: none;
+            padding: 0.625rem 0.875rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+            width: 100%;
+            outline: none;
+            background: white;
+        }
+
+        .price-input:focus {
+            background: var(--gray-50);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray-300);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state p {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .btn-view-all {
+            background: white;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            border-radius: 50px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .btn-view-all:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .pagination-custom {
+            display: flex;
+            gap: 0.375rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-item-custom .page-link-custom {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--gray-200);
+            color: var(--gray-600);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .page-item-custom .page-link-custom:hover {
+            background: var(--gray-50);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-item-custom.active .page-link-custom {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .page-item-custom.disabled .page-link-custom {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .page-link-custom i {
+            font-size: 0.875rem;
+        }
+
+        /* ===== FOOTER ACTIONS ===== */
+        .form-footer {
+            padding: 1.25rem 1.75rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .form-footer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-500);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .form-footer-info i {
+            color: var(--info);
+            font-size: 1rem;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 0.875rem 2rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-primary);
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-save i {
+            font-size: 1.1rem;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .table-custom thead {
+                display: none;
+            }
+
+            .table-custom tbody tr {
+                display: block;
+                margin-bottom: 0.75rem;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .table-custom tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.875rem 1.25rem;
+                border-bottom: 1px solid var(--gray-100);
+            }
+
+            .table-custom tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--gray-500);
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 0.5px;
+            }
+
+            .table-custom tbody td:first-child {
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            }
+
+            .table-custom tbody td:last-child {
+                border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+                border-bottom: none;
+            }
+
+            .service-desc {
+                max-width: none;
+                text-align: right;
+            }
+
+            .price-input-group {
+                max-width: none;
+            }
+
+            .form-footer {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .card-header-custom {
+                padding: 1.25rem;
+            }
+
+            .card-header-custom h5 {
+                font-size: 1rem;
+            }
+
+            .search-box {
+                border-radius: var(--radius-lg);
+            }
+
+            .btn-search {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="bi bi-tags-fill"></i>
+                Configuración de Tarifas
+            </span>
+            <a th:href="@{/clinica/dashboard}" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                <span class="d-none d-sm-inline">Volver</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- Buscador -->
+        <div class="search-section">
+            <form th:action="@{/clinica/mis-servicios}" method="get" class="search-form">
+                <div class="search-box">
+                    <div class="search-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <input type="text" name="search" th:value="${search}" class="search-input"
+                        placeholder="Buscar por nombre de servicio o descripción...">
+                    <button class="btn-search" type="submit">
+                        <i class="bi bi-search"></i>
+                        Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Card Principal -->
+        <div class="main-card">
+            <!-- Header -->
+            <div class="card-header-custom">
+                <div>
+                    <h5>
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                        Catálogo de Servicios
+                    </h5>
+                    <p>Gestiona la disponibilidad y precios de tus servicios especializados.</p>
+                </div>
+                <div class="badge-count">
+                    <span th:text="${serviciosPage.totalElements}">0</span> Servicios
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body" style="padding: 0;">
+                <form th:action="@{/clinica/mis-servicios/guardar}" method="post" id="serviciosForm">
+                    <!-- Campo oculto para mantener la página actual al guardar -->
+                    <input type="hidden" name="page" th:value="${currentPage}">
+
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table-custom">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="width: 80px;">Ofrecer</th>
+                                        <th>Servicio</th>
+                                        <th>Descripción</th>
+                                        <th style="width: 200px;">Mi Precio (COP)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="s : ${serviciosMaestros}">
+                                        <!-- Campo oculto para identificar qué servicios estamos viendo/editando -->
+                                        <input type="hidden" name="displayedIds" th:value="${s.id}">
+
+                                        <td data-label="Ofrecer" class="text-center">
+                                            <div class="switch-wrapper">
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        th:name="'ofrece_' + ${s.id}"
+                                                        th:checked="${misPrecios.containsKey(s.id)}">
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Servicio">
+                                            <div class="service-name" th:text="${s.nombre}">Nombre del servicio</div>
+                                        </td>
+                                        <td data-label="Descripción">
+                                            <div class="service-desc" th:text="${s.descripcion}">Descripción del
+                                                servicio</div>
+                                        </td>
+                                        <td data-label="Precio">
+                                            <div class="price-input-group">
+                                                <span class="price-prefix">$</span>
+                                                <input type="number" step="0.01" class="price-input"
+                                                    th:name="'precio_' + ${s.id}"
+                                                    th:value="${misPrecios.get(s.id) != null ? misPrecios.get(s.id).intValue() : s.costo.intValue()}">
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Empty State -->
+                                    <tr th:if="${serviciosMaestros.empty}">
+                                        <td colspan="4">
+                                            <div class="empty-state">
+                                                <i class="bi bi-inbox"></i>
+                                                <p>No se encontraron servicios que coincidan con la búsqueda.</p>
+                                                <a th:href="@{/clinica/mis-servicios}" class="btn-view-all">
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                    Ver todos
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div th:if="${serviciosPage.totalPages > 1}" class="pagination-wrapper">
+                        <ul class="pagination-custom">
+                            <!-- Previous -->
+                            <li class="page-item-custom" th:classappend="${!serviciosPage.hasPrevious()} ? 'disabled'">
+                                <a class="page-link-custom"
+                                    th:href="@{/clinica/mis-servicios(page=${currentPage - 1}, search=${search})}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            <!-- Numbers -->
+                            <li class="page-item-custom"
+                                th:each="i : ${#numbers.sequence(0, serviciosPage.totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link-custom"
+                                    th:href="@{/clinica/mis-servicios(page=${i}, search=${search})}"
+                                    th:text="${i + 1}">1</a>
+                            </li>
+
+                            <!-- Next -->
+                            <li class="page-item-custom" th:classappend="${!serviciosPage.hasNext()} ? 'disabled'">
+                                <a class="page-link-custom"
+                                    th:href="@{/clinica/mis-servicios(page=${currentPage + 1}, search=${search})}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Footer del Formulario -->
+                    <div class="form-footer">
+                        <div class="form-footer-info">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Al guardar se actualizarán solo los servicios de esta página.</span>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-cloud-upload-fill"></i>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para mejorar interacción de switches -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const switches = document.querySelectorAll('.form-check-input[type="checkbox"]');
+
+            switches.forEach(sw => {
+                sw.addEventListener('change', function () {
+                    const row = this.closest('tr');
+                    if (this.checked) {
+                        row.style.background = 'rgba(79, 70, 229, 0.02)';
+                    } else {
+                        row.style.background = 'white';
+                    }
+                });
+
+                // Inicializar estado visual
+                if (sw.checked) {
+                    sw.closest('tr').style.background = 'rgba(79, 70, 229, 0.02)';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

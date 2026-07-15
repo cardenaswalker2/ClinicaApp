@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comms Control Center | HEX Infrastructure</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --hex-bg: #020617;
+            --hex-surface: #0f172a;
+            --hex-elevated: #1e293b;
+            --hex-primary: #00d4ff;
+            --hex-primary-dim: rgba(0, 212, 255, 0.1);
+            --hex-accent: #a855f7;
+            --hex-accent-dim: rgba(168, 85, 247, 0.1);
+            --hex-danger: #f43f5e;
+            --hex-danger-dim: rgba(244, 63, 94, 0.1);
+            --hex-warning: #f59e0b;
+            --hex-warning-dim: rgba(245, 158, 11, 0.1);
+            --hex-success: #10b981;
+            --hex-success-dim: rgba(16, 185, 129, 0.1);
+            --hex-text: #f1f5f9;
+            --hex-text-secondary: #94a3b8;
+            --hex-border: rgba(148, 163, 184, 0.1);
+            --hex-glow-primary: rgba(0, 212, 255, 0.4);
+            --hex-glow-accent: rgba(168, 85, 247, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'Space Grotesk', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.6s ease, color 0.6s ease;
+        }
+
+        /* ===== BACKGROUND EFFECTS ===== */
+        .hex-bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .hex-bg-grid::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        .orb-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-glow-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.04) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-glow-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.04) 0%, transparent 70%);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--hex-success);
+            box-shadow: 0 0 8px var(--hex-success);
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ===== HEADER ===== */
+        .hex-header {
+            position: fixed;
+            top: 36px;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 999;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.25rem;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .brand-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text span {
+            font-size: 0.7rem;
+            color: var(--hex-text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link-premium {
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--hex-text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link-premium:hover {
+            color: var(--hex-text);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-link-premium.active {
+            color: var(--hex-primary);
+            background: var(--hex-primary-dim);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 130px 24px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            margin-bottom: 30px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--hex-accent);
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--hex-primary), var(--hex-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 0.95rem;
+            color: var(--hex-text-secondary);
+            max-width: 800px;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* ===== TELEMETRY GRID ===== */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .telemetry-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .telemetry-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .telemetry-card {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--hex-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+
+        .telemetry-card:hover {
+            border-color: var(--hex-accent);
+            box-shadow: 0 0 15px var(--hex-accent-dim);
+            transform: translateY(-2px);
+        }
+
+        .telemetry-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .telemetry-icon.success-rate { background: rgba(16, 185, 129, 0.1); color: var(--hex-success); }
+        .telemetry-icon.email { background: rgba(0, 212, 255, 0.1); color: var(--hex-primary); }
+        .telemetry-icon.sms { background: rgba(245, 158, 11, 0.1); color: var(--hex-warning); }
+        .telemetry-icon.whatsapp { background: rgba(168, 85, 247, 0.1); color: var(--hex-accent); }
+
+        .telemetry-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .telemetry-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.1;
+        }
+
+        .telemetry-label {
+            font-size: 0.75rem;
+            color: var(--hex-text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* ===== FILTER TOOLBAR ===== */
+        .filter-card {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--hex-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .hex-input-wrap {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .hex-input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--hex-text-secondary);
+        }
+
+        .hex-input {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.4);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 10px 14px 10px 42px;
+            color: var(--hex-text);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .hex-input:focus {
+            outline: none;
+            border-color: var(--hex-accent);
+            box-shadow: 0 0 15px var(--hex-accent-dim);
+        }
+
+        .hex-select {
+            background: rgba(2, 6, 23, 0.4);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 10px 36px 10px 14px;
+            color: var(--hex-text);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+            min-width: 160px;
+        }
+
+        .hex-select:focus {
+            outline: none;
+            border-color: var(--hex-accent);
+        }
+
+        .btn-hex-search {
+            background: linear-gradient(90deg, var(--hex-primary), var(--hex-accent));
+            border: none;
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-hex-search:hover {
+            box-shadow: 0 0 20px var(--hex-glow-accent);
+            transform: translateY(-1px);
+        }
+
+        .btn-hex-purge {
+            background: var(--hex-danger-dim);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            color: var(--hex-danger);
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-hex-purge:hover {
+            background: var(--hex-danger);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+        }
+
+        /* ===== TABLE CONSOLE ===== */
+        .console-card {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--hex-border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 24px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .hex-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .hex-table th {
+            text-align: left;
+            padding: 14px 16px;
+            color: var(--hex-text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--hex-border);
+        }
+
+        .hex-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--hex-border);
+            vertical-align: middle;
+        }
+
+        .hex-table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .hex-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Row Pulse Highlight (After resending message) */
+        @keyframes pulseRow {
+            0% { background: rgba(0, 212, 255, 0.15); }
+            100% { background: transparent; }
+        }
+
+        .row-pulse {
+            animation: pulseRow 2.5s ease-out;
+        }
+
+        /* ===== BADGES ===== */
+        .badge-hex {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-hex-success {
+            background: var(--hex-success-dim);
+            color: var(--hex-success);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .badge-hex-failed {
+            background: var(--hex-danger-dim);
+            color: var(--hex-danger);
+            border: 1px solid rgba(244, 63, 94, 0.15);
+        }
+
+        .channel-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .channel-indicator i {
+            font-size: 1.1rem;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--hex-border);
+        }
+
+        .pagination-info {
+            font-size: 0.78rem;
+            color: var(--hex-text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-hex-page {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .btn-hex-page:hover:not(.disabled) {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--hex-accent);
+        }
+
+        .btn-hex-page.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ===== GLASS MODAL ===== */
+        .hex-modal {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--hex-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            color: var(--hex-text);
+        }
+
+        .hex-modal-header {
+            border-bottom: 1px solid var(--hex-border);
+            padding: 20px 24px;
+        }
+
+        .hex-modal-body {
+            padding: 24px;
+        }
+
+        .hex-modal-footer {
+            border-top: 1px solid var(--hex-border);
+            padding: 16px 24px;
+        }
+
+        .modal-telemetry {
+            background: rgba(2, 6, 23, 0.4);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.82rem;
+        }
+
+        .message-payload-view {
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* HTML Email preview pane */
+        .html-preview-frame {
+            width: 100%;
+            height: 350px;
+            background: #ffffff;
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-action-hex {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--hex-border);
+            background: rgba(255,255,255,0.02);
+            color: var(--hex-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            padding: 0;
+        }
+
+        .btn-action-hex:hover {
+            color: var(--hex-text);
+            border-color: var(--hex-accent);
+            background: var(--hex-accent-dim);
+        }
+
+        .btn-action-hex.btn-resend:hover {
+            color: var(--hex-primary);
+            border-color: var(--hex-primary);
+            background: var(--hex-primary-dim);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-hex-back {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            font-size: 0.78rem;
+            padding: 10px 20px;
+            border-radius: 10px;
+            width: auto;
+        }
+
+        .btn-hex-back:hover {
+            color: var(--hex-text);
+            background: rgba(255,255,255,0.05);
+            transform: translateX(-3px);
+        }
+
+        .footer-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 1px solid var(--hex-border);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Effects -->
+    <div class="hex-bg-grid"></div>
+    <div class="orb-glow orb-glow-1"></div>
+    <div class="orb-glow orb-glow-2"></div>
+
+    <!-- Top Status Bar -->
+    <div class="status-bar">
+        <div class="status-bar-left d-flex align-items-center gap-3">
+            <div class="status-indicator d-flex align-items-center gap-2">
+                <div class="status-dot"></div>
+                <span>CONTROL CENTRAL DE COMUNICACIONES</span>
+            </div>
+            <span style="color: var(--hex-border);">|</span>
+            <span>GATEWAY ONLINE</span>
+        </div>
+        <div class="status-bar-right">
+            <span id="liveClock">00:00:00</span> <span style="color: var(--hex-text-secondary)">UTC</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="hex-header">
+        <div class="header-brand">
+            <a th:href="@{/admin/dashboard}" style="text-decoration: none; display: flex; align-items: center; gap: 14px;">
+                <div class="brand-icon">
+                    <i class="bi bi-hexagon-fill"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>HEX Infrastructure</h1>
+                    <span>Gateway Console v1.0</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-link-premium">Dashboard</a>
+            <a th:href="@{/admin/clinicas}" class="nav-link-premium">Clínicas</a>
+            <a th:href="@{/admin/servicios?success}" class="nav-link-premium">Servicios</a>
+            <a th:href="@{/admin/usuarios}" class="nav-link-premium">Usuarios</a>
+            <a th:href="@{/admin/centro-control}" class="nav-link-premium"><i class="bi bi-cpu-fill"></i> Control Core</a>
+            <a th:href="@{/admin/reportes}" class="nav-link-premium">Reportes</a>
+        </nav>
+
+        <div class="header-actions d-flex align-items-center gap-3">
+            <div class="user-badge d-flex align-items-center gap-2" style="background: rgba(255,255,255,0.03); border: 1px solid var(--hex-border); padding: 6px 12px; border-radius: 8px;">
+                <div class="user-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: var(--hex-accent); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AD</div>
+                <span style="font-size: 0.8rem; font-weight: 600;">Admin</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Hero -->
+        <div class="hero-section">
+            <div class="hero-badge">
+                <i class="bi bi-broadcast-pin"></i>
+                Comms Gateway Audit Control
+            </div>
+            <h1 class="hero-title">
+                Registro de <span class="gradient-text">Comunicaciones y Gateway</span>
+            </h1>
+            <p class="hero-subtitle">
+                Supervisa el flujo integral de mensajería saliente de ClínicaApp. Monitorea los canales de correos HTML, SMS e integraciones móviles por WhatsApp. Audita los estados de envío y fuerza re-despachos instantáneos en un clic.
+            </p>
+        </div>
+
+        <!-- Telemetry Grid -->
+        <div class="telemetry-grid">
+            <!-- Card 1: Success Rate -->
+            <div class="telemetry-card">
+                <div class="telemetry-icon success-rate">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <div class="telemetry-info">
+                    <span class="telemetry-value" th:text="${successRate} + '%'">100.0%</span>
+                    <span class="telemetry-label">Tasa de Entrega</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Emails Sent -->
+            <div class="telemetry-card">
+                <div class="telemetry-icon email">
+                    <i class="bi bi-envelope-fill"></i>
+                </div>
+                <div class="telemetry-info">
+                    <span class="telemetry-value" th:text="${totalEmails}">0</span>
+                    <span class="telemetry-label">Correos Enviados</span>
+                </div>
+            </div>
+
+            <!-- Card 3: SMS Sent -->
+            <div class="telemetry-card">
+                <div class="telemetry-icon sms">
+                    <i class="bi bi-chat-left-text-fill"></i>
+                </div>
+                <div class="telemetry-info">
+                    <span class="telemetry-value" th:text="${totalSms}">0</span>
+                    <span class="telemetry-label">SMS Despachados</span>
+                </div>
+            </div>
+
+            <!-- Card 4: WhatsApp Sent -->
+            <div class="telemetry-card">
+                <div class="telemetry-icon whatsapp">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <div class="telemetry-info">
+                    <span class="telemetry-value" th:text="${totalWhatsApp}">0</span>
+                    <span class="telemetry-label">WhatsApp Enviados</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="filter-card">
+            <form th:action="@{/admin/mensajeria}" method="get" class="m-0">
+                <div class="filter-row">
+                    <!-- Search query input -->
+                    <div class="hex-input-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text" name="query" class="hex-input" placeholder="Buscar por destinatario, asunto o contenido..." th:value="${query}">
+                    </div>
+
+                    <!-- Channel selection dropdown -->
+                    <select name="canal" class="hex-select">
+                        <option value="TODOS" th:selected="${canal == 'TODOS'}">📺 Todos los Canales</option>
+                        <option value="EMAIL" th:selected="${canal == 'EMAIL'}">📧 Solo Correos (Email)</option>
+                        <option value="SMS" th:selected="${canal == 'SMS'}">💬 Solo Mensajes SMS</option>
+                        <option value="WHATSAPP" th:selected="${canal == 'WHATSAPP'}">🟢 Solo WhatsApp</option>
+                    </select>
+
+                    <!-- Status selection dropdown -->
+                    <select name="estado" class="hex-select">
+                        <option value="TODOS" th:selected="${estado == 'TODOS'}">📌 Todos los Estados</option>
+                        <option value="SUCCESS" th:selected="${estado == 'SUCCESS'}">✔️ Entregados con Éxito</option>
+                        <option value="FAILED" th:selected="${estado == 'FAILED'}">❌ Envíos Fallidos</option>
+                    </select>
+
+                    <!-- Submit search -->
+                    <button type="submit" class="btn-hex-search">
+                        <i class="bi bi-funnel-fill"></i> Filtrar
+                    </button>
+
+                    <!-- Purge database logs button -->
+                    <button type="button" class="btn-hex-purge" onclick="triggerPurgeModal()">
+                        <i class="bi bi-trash3-fill"></i> Vaciar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Notifications Log Table Card -->
+        <div class="console-card">
+            <div class="table-responsive">
+                <table class="hex-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha de Registro</th>
+                            <th>Canal / Vía</th>
+                            <th>Destinatario</th>
+                            <th>Asunto / Prefacio</th>
+                            <th>Estado de Envío</th>
+                            <th class="text-center">Acciones Operativas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Fallback empty trace row -->
+                        <tr th:if="${#lists.isEmpty(logs.content)}">
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-shield-slash-fill fs-3 mb-2 d-block"></i>
+                                Ningún registro de comunicación coincide con los filtros aplicados en el Gateway.
+                            </td>
+                        </tr>
+
+                        <!-- Iterated logs row -->
+                        <tr th:each="log : ${logs.content}" th:id="'row-' + ${log.id}">
+                            <td style="font-family: 'JetBrains Mono', monospace;" th:text="${#temporals.format(log.fecha, 'yyyy-MM-dd HH:mm:ss')}">
+                                2026-05-16 12:00:00
+                            </td>
+                            <td>
+                                <div class="channel-indicator">
+                                    <i th:class="'bi ' + ${log.getIcono()}"></i>
+                                    <span th:text="${log.tipo}">EMAIL</span>
+                                </div>
+                            </td>
+                            <td style="font-family: 'JetBrains Mono', monospace; font-weight: 500;" th:text="${log.destinatario}">
+                                admin@example.com
+                            </td>
+                            <td>
+                                <span th:if="${log.asunto != null}" th:text="${log.asunto}" style="font-weight: 600;">Confirmación Cita</span>
+                                <span th:if="${log.asunto == null}" class="text-muted" style="font-style: italic;">
+                                    Texto SMS: <span th:text="${#strings.abbreviate(log.mensaje, 30)}">Hola, tu cita...</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${log.estado == 'SUCCESS'}" class="badge-hex badge-hex-success">
+                                    <i class="bi bi-check-circle-fill"></i> SUCCESS
+                                </span>
+                                <span th:if="${log.estado != 'SUCCESS'}" class="badge-hex badge-hex-failed">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> FAILED
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <!-- Inspect payload -->
+                                    <button class="btn-action-hex" title="Inspeccionar Contenido" 
+                                            th:data-id="${log.id}"
+                                            th:data-tipo="${log.tipo}"
+                                            th:data-destinatario="${log.destinatario}"
+                                            th:data-asunto="${log.asunto != null ? log.asunto : 'N/A (SMS/WhatsApp)'}"
+                                            th:data-detalles="${log.detalles}"
+                                            th:data-mensaje="${log.mensaje}"
+                                            onclick="inspectMessagePayload(this)">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+
+                                    <!-- Async re-send trigger -->
+                                    <button class="btn-action-hex btn-resend" title="Forzar Re-envío"
+                                            th:data-id="${log.id}"
+                                            onclick="triggerAsyncResend(this)">
+                                        <i class="bi bi-send-fill" th:id="'icon-resend-' + ${log.id}"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination block -->
+            <div class="pagination-container" th:if="${totalPages > 0}">
+                <span class="pagination-info">
+                    PÁGINA <span th:text="${currentPage + 1}">1</span> DE <span th:text="${totalPages}">1</span>
+                </span>
+                <div class="pagination-buttons">
+                    <!-- Page back -->
+                    <a th:href="@{/admin/mensajeria(query=${query}, canal=${canal}, estado=${estado}, page=${currentPage - 1})}"
+                       class="btn-hex-page" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <i class="bi bi-arrow-left"></i> Anterior
+                    </a>
+
+                    <!-- Page next -->
+                    <a th:href="@{/admin/mensajeria(query=${query}, canal=${canal}, estado=${estado}, page=${currentPage + 1})}"
+                       class="btn-hex-page" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="footer-action">
+            <a th:href="@{/admin/centro-control}" class="btn-hex btn-hex-back">
+                <i class="bi bi-arrow-left"></i> Volver al Centro de Control
+            </a>
+            <span style="font-size: 0.75rem; color: var(--hex-text-secondary); font-family: 'JetBrains Mono', monospace;">
+                HEX OPERATIONAL COMMUNICATIONS CONTROL • SYSTEM SECURE
+            </span>
+        </div>
+
+    </main>
+
+    <!-- Modal Inspector Dialog -->
+    <div class="modal fade" id="inspectModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content hex-modal">
+                <div class="hex-modal-header d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title font-weight-bold d-flex align-items-center gap-2" style="font-size: 1.1rem; font-weight: 700;">
+                        <i class="bi bi-cpu text-info"></i> Inspección del Contenido del Gateway
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="hex-modal-body">
+                    <!-- Technical metadata -->
+                    <div class="modal-telemetry">
+                        <div class="row g-2">
+                            <div class="col-sm-6"><strong>Canal:</strong> <span id="modalCanal" class="text-primary font-weight-bold">EMAIL</span></div>
+                            <div class="col-sm-6"><strong>Destinatario:</strong> <span id="modalDestinatario" style="font-family: 'JetBrains Mono';">admin@example.com</span></div>
+                            <div class="col-sm-6"><strong>Asunto:</strong> <span id="modalAsunto">Confirmación Cita</span></div>
+                            <div class="col-sm-6"><strong>Metadatos Gateway:</strong> <span id="modalDetalles" class="text-muted" style="font-size: 0.76rem;">N/A</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Output payload container -->
+                    <label class="hex-label">Contenido Despachado</label>
+                    <div id="payloadTextView" class="message-payload-view d-none">
+                        Texto de prueba...
+                    </div>
+                    <!-- Safe frame for HTML Emails -->
+                    <div id="payloadHtmlView" class="d-none">
+                        <iframe id="htmlPreviewFrame" class="html-preview-frame" sandbox></iframe>
+                    </div>
+                </div>
+                <div class="hex-modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn-hex btn-hex-secondary" style="width: auto;" data-bs-dismiss="modal">Cerrar Inspector</button>
+                    <button type="button" class="btn-hex btn-hex-primary" style="width: auto;" id="btnModalResend" onclick="triggerModalResend()">
+                        <i class="bi bi-send-fill"></i> Re-enviar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Purge Dangerous Action Confirm -->
+    <div class="modal fade" id="purgeConfirmModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content hex-modal" style="border-color: rgba(244, 63, 94, 0.3);">
+                <div class="hex-modal-header d-flex justify-content-between align-items-center" style="border-color: rgba(244, 63, 94, 0.2);">
+                    <h5 class="modal-title font-weight-bold text-danger d-flex align-items-center gap-2" style="font-weight: 700;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirmación de Purga Crítica
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="hex-modal-body text-center py-4">
+                    <i class="bi bi-trash-fill text-danger fs-1 mb-3 d-block"></i>
+                    <p class="fs-6" style="line-height: 1.5;">
+                        ¿Estás absolutamente seguro de que deseas vaciar el historial de comunicaciones?
+                        <strong class="text-danger d-block mt-2">Esta acción borrará de forma irreversible cada registro de correos, SMS y WhatsApp despachados en MongoDB.</strong>
+                    </p>
+                </div>
+                <div class="hex-modal-footer d-flex justify-content-between" style="border-color: rgba(244, 63, 94, 0.2);">
+                    <button type="button" class="btn-hex btn-hex-secondary" style="width: auto;" data-bs-dismiss="modal">Cancelar Operación</button>
+                    
+                    <form th:action="@{/admin/mensajeria/limpiar}" method="post" class="m-0">
+                        <button type="submit" class="btn-hex btn-hex-primary" style="width: auto; background: var(--hex-danger); box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);">
+                            <i class="bi bi-trash3-fill"></i> Proceder y Vaciar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Toast / Notification System -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+        <div id="statusToast" class="toast align-items-center text-white border-0 rounded-4" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); border: 1px solid var(--hex-border) !important;">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i id="toastIcon" class="bi bi-check-circle-fill text-success fs-5"></i>
+                    <span id="toastMessage" style="font-size: 0.85rem; font-weight: 600;">Operación realizada.</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentlySelectedLogIdForModal = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // ===== LIVE CLOCK =====
+            function updateClock() {
+                const now = new Date();
+                const h = String(now.getUTCHours()).padStart(2, '0');
+                const m = String(now.getUTCMinutes()).padStart(2, '0');
+                const s = String(now.getUTCSeconds()).padStart(2, '0');
+                
+                const clockEl = document.getElementById('liveClock');
+                if (clockEl) {
+                    clockEl.textContent = `${h}:${m}:${s}`;
+                }
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // ===== ALERTA DE PURGA COMPLETADA =====
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('clearSuccess')) {
+                showToast("El historial de mensajería ha sido purgado con éxito.", "bi-trash3-fill", "text-warning");
+            }
+        });
+
+        // ===== MOSTRAR TOAST NOTIFICADOR =====
+        function showToast(message, iconClass, iconColorClass) {
+            document.getElementById('toastMessage').textContent = message;
+            const iconEl = document.getElementById('toastIcon');
+            iconEl.className = `bi ${iconClass} ${iconColorClass}`;
+            
+            const toastEl = document.getElementById('statusToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        // ===== COMPROBAR E INSPECCIONAR MENSAJE EN MODAL =====
+        function inspectMessagePayload(button) {
+            const id = button.getAttribute('data-id');
+            const tipo = button.getAttribute('data-tipo');
+            const destinatario = button.getAttribute('data-destinatario');
+            const asunto = button.getAttribute('data-asunto');
+            const detalles = button.getAttribute('data-detalles');
+            const mensaje = button.getAttribute('data-mensaje');
+
+            currentlySelectedLogIdForModal = id;
+
+            // Rellenar datos fijos en cabecera
+            document.getElementById('modalCanal').textContent = tipo;
+            document.getElementById('modalDestinatario').textContent = destinatario;
+            document.getElementById('modalAsunto').textContent = asunto;
+            document.getElementById('modalDetalles').textContent = detalles ? detalles : 'Sin metadatos Twilio/SMTP.';
+
+            const txtView = document.getElementById('payloadTextView');
+            const htmlView = document.getElementById('payloadHtmlView');
+            const frame = document.getElementById('htmlPreviewFrame');
+
+            if ("EMAIL".equalsIgnoreCase(tipo)) {
+                txtView.classList.add('d-none');
+                htmlView.classList.remove('d-none');
+                
+                // Cargar HTML en sandbox iframe de forma segura
+                frame.srcdoc = mensaje;
+            } else {
+                htmlView.classList.add('d-none');
+                txtView.classList.remove('d-none');
+                
+                // Mostrar cuerpo en pre contenedor
+                txtView.textContent = mensaje;
+            }
+
+            const myModal = new bootstrap.Modal(document.getElementById('inspectModal'));
+            myModal.show();
+        }
+
+        // ===== TRIGGER DISPARADOR MODAL RESEND =====
+        function triggerModalResend() {
+            if (!currentlySelectedLogIdForModal) return;
+            
+            // Cerrar modal actual
+            bootstrap.Modal.getInstance(document.getElementById('inspectModal')).hide();
+
+            // Ubicar el botón original de la fila
+            const rowBtn = document.querySelector(`.btn-resend[data-id="${currentlySelectedLogIdForModal}"]`);
+            if (rowBtn) {
+                triggerAsyncResend(rowBtn);
+            }
+        }
+
+        // ===== ENVIAR PETICIÓN ASÍNCRONA DE RE-ENVÍO =====
+        function triggerAsyncResend(button) {
+            const id = button.getAttribute('data-id');
+            const iconEl = document.getElementById(`icon-resend-${id}`);
+            const rowEl = document.getElementById(`row-${id}`);
+
+            // Bloquear botón y animar icono de envío
+            button.disabled = true;
+            iconEl.className = 'bi bi-arrow-clockwise d-inline-block';
+            iconEl.style.animation = 'gridMove 1s linear infinite'; // Rotación genérica reutilizada
+
+            // Ejecutar POST Request con FormData
+            const formData = new FormData();
+            formData.append('id', id);
+
+            fetch('/admin/mensajeria/reenviar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast("Notificación re-despachada de forma exitosa.", "bi-cloud-check-fill", "text-info");
+                    
+                    // Efecto de pulso en la fila para realce visual
+                    if (rowEl) {
+                        rowEl.classList.remove('row-pulse');
+                        void rowEl.offsetWidth; // Disparar reflow para re-ejecutar animación CSS
+                        rowEl.classList.add('row-pulse');
+                    }
+                } else {
+                    showToast(`Error al reenviar: ${data.message}`, "bi-exclamation-octagon-fill", "text-danger");
+                }
+            })
+            .catch(err => {
+                showToast("Ocurrió un error crítico al conectar con el servidor.", "bi-exclamation-triangle-fill", "text-danger");
+            })
+            .finally(() => {
+                // Desbloquear botón e icono original
+                button.disabled = false;
+                iconEl.className = 'bi bi-send-fill';
+                iconEl.style.animation = '';
+            });
+        }
+
+        // ===== MOSTRAR MODAL DE PURGA DE LOGS =====
+        function triggerPurgeModal() {
+            const myModal = new bootstrap.Modal(document.getElementById('purgeConfirmModal'));
+            myModal.show();
+        }
+
+        // Extensión String Helper case-insensitive
+        String.prototype.equalsIgnoreCase = function (compareString) {
+            return this.toLowerCase() === compareString.toLowerCase();
+        };
+    </script>
+</body>
+
+</html>

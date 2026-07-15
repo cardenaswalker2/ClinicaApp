@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestión de Usuarios | Admin</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-soft: 0 8px 32px rgba(99, 102, 241, 0.12);
+            --shadow-hover: 0 20px 60px rgba(99, 102, 241, 0.18);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 25%, #ddd6fe 50%, #e0e7ff 75%, #c7d2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #334155;
+            padding-bottom: 3rem;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ===== HEADER PREMIUM ESTILO DASHBOARD ===== */
+        .page-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(224, 231, 255, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title i {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .breadcrumb-custom {
+            color: #6366f1;
+            font-weight: 600;
+            font-size: 0.9rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .breadcrumb-custom a {
+            color: #818cf8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb-custom a:hover {
+            color: #4f46e5;
+        }
+
+        .breadcrumb-custom .active {
+            color: #4f46e5;
+        }
+
+        /* ===== BOTÓN NUEVO USUARIO PREMIUM ===== */
+        .btn-add-user {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 0.875rem 1.75rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .btn-add-user::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-add-user:hover::before {
+            left: 100%;
+        }
+
+        .btn-add-user:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        /* ===== SEARCH BAR PREMIUM ===== */
+        .search-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 2rem;
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-group {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-group i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #818cf8;
+            font-size: 1.1rem;
+        }
+
+        .search-input {
+            padding-left: 3rem;
+            height: 52px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(99, 102, 241, 0.15);
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .search-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+
+        .filter-select {
+            height: 52px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0 1rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-search {
+            height: 52px;
+            padding: 0 1.5rem;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+            color: white;
+        }
+
+        .btn-clear {
+            color: #818cf8;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .btn-clear:hover {
+            color: #4f46e5;
+        }
+
+        /* ===== CARDS ESTILO DASHBOARD ===== */
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .main-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* ===== TABLA PREMIUM ===== */
+        .table-container {
+            padding: 1.5rem;
+        }
+
+        .table {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1rem 1.25rem;
+            border: none;
+        }
+
+        .table thead th:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .table thead th:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .table tbody tr {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-md);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+        }
+
+        .table td {
+            padding: 1.25rem;
+            vertical-align: middle;
+            color: #475569;
+            font-weight: 500;
+            border: none;
+        }
+
+        .table td:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+
+        .table td:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        /* ===== AVATAR USUARIO ===== */
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #6366f1;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+
+        .user-id {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* ===== BADGES ROLES ===== */
+        .badge-role {
+            padding: 0.4rem 0.875rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .badge-role.admin {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .badge-role.recepcionista {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            color: #9d174d;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .badge-role.clinica {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #3730a3;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-role.user {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* ===== BADGE ESTADO ===== */
+        .badge-estado {
+            padding: 0.4rem 0.875rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .badge-estado.activo {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-estado.suspendido {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* ===== BOTONES ACCIÓN TABLA ===== */
+        .btn-table-action {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 2px solid;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn-table-action.edit {
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #6366f1;
+        }
+
+        .btn-table-action.edit:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-table-action.toggle-active {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .btn-table-action.toggle-active:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-table-action.toggle-suspended {
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .btn-table-action.toggle-suspended:hover {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ===== VISTA MÓVIL: CARDS ===== */
+        .users-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .user-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: fadeUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .user-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .user-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .user-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .user-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .user-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .user-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px);
+        }
+
+        .user-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(224, 231, 255, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .user-actions-mobile {
+            display: flex;
+            padding: 1rem;
+            gap: 0.75rem;
+            background: rgba(224, 231, 255, 0.2);
+        }
+
+        .btn-mobile-action {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid;
+        }
+
+        .btn-mobile-action.suspender {
+            background: white;
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .btn-mobile-action.suspender:hover {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-mobile-action.activar {
+            background: white;
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .btn-mobile-action.activar:hover {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-mobile-edit {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            background: white;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            color: #6366f1;
+            transition: all 0.3s ease;
+        }
+
+        .btn-mobile-edit:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* ===== PAGINACIÓN PREMIUM ===== */
+        .pagination-container {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 0.5rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .page-link-modern {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+        }
+
+        .page-link-modern:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+
+        .page-link-modern.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .page-link-modern.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ===== ESTADO VACÍO ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--glass-border);
+            animation: fadeUp 0.8s ease;
+        }
+
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-icon i {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .empty-state h4 {
+            color: #4f46e5;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* ===== INFO FOOTER ===== */
+        .info-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(224, 231, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+            border-radius: 4px;
+        }
+
+        /* ===== ANIMACIONES ENTRADA ===== */
+        .table tbody tr {
+            animation: slideInRow 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .table tbody tr:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .table tbody tr:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .table tbody tr:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .table tbody tr:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .table tbody tr:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes slideInRow {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .page-title {
+                font-size: 1.4rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .page-header {
+                border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+                padding: 1.5rem 0;
+            }
+
+            .search-container {
+                padding: 1rem;
+            }
+
+            .search-group,
+            .filter-select,
+            .btn-search {
+                width: 100%;
+            }
+
+            .btn-add-user {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table thead {
+                display: none;
+            }
+
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-soft);
+                background: white;
+                border: 1px solid var(--glass-border);
+            }
+
+            .table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                border: none;
+            }
+
+            .table td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #6366f1;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 0.5px;
+            }
+
+            .table td:last-child {
+                justify-content: center;
+                background: rgba(224, 231, 255, 0.3);
+                border-radius: 0 0 var(--radius-md) var(--radius-md);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Fragmento header admin -->
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+
+    <!-- ===== HEADER PREMIUM ===== -->
+    <div class="page-header">
+        <div class="container header-content">
+            <div class="row align-items-center">
+                <div class="col-lg-8 col-md-7">
+                    <h1 class="page-title">
+                        <i class="bi bi-people-fill"></i>
+                        Gestión de Usuarios
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-custom mb-0">
+                            <li>
+                                <a th:href="@{/admin/dashboard}">
+                                    <i class="bi bi-grid-fill me-1"></i>Dashboard
+                                </a>
+                            </li>
+                            <li><i class="bi bi-chevron-right mx-2" style="font-size: 0.7rem;"></i></li>
+                            <li class="active">
+                                <i class="bi bi-shield-lock me-1"></i>Control de Cuentas
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-4 col-md-5 text-md-end mt-3 mt-md-0">
+                    <a th:href="@{/admin/usuarios/nuevo}" class="btn-add-user">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Nuevo Usuario</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <div class="container">
+
+        <!-- ===== SEARCH & FILTER BAR ===== -->
+        <div class="search-container">
+            <form th:action="@{/admin/usuarios}" method="get" class="row g-3 align-items-end">
+                <div class="col-lg-6 col-md-6">
+                    <div class="search-group">
+                        <i class="bi bi-search"></i>
+                        <input type="text" name="keyword" class="form-control search-input"
+                            placeholder="Buscar por nombre, apellido o correo..." th:value="${keyword}">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <select name="roleFilter" class="form-select filter-select">
+                        <option value="">Todos los roles</option>
+                        <option th:each="role : ${roles}" th:value="${role}"
+                            th:text="${#strings.replace(role.name(), 'ROLE_', '')}"
+                            th:selected="${currentRole == role}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <button type="submit" class="btn-search w-100">
+                        <i class="bi bi-funnel-fill"></i>
+                        <span>Filtrar</span>
+                    </button>
+                    <div class="text-center mt-2" th:if="${keyword != null or currentRole != null}">
+                        <a th:href="@{/admin/usuarios}" class="btn-clear">
+                            <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ===== ESTADO VACÍO ===== -->
+        <div th:if="${usuarios == null or usuarios.isEmpty()}" class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-person-slash"></i>
+            </div>
+            <h4>No se encontraron usuarios</h4>
+            <p>Intenta con otros términos de búsqueda o filtros.</p>
+            <a th:href="@{/admin/usuarios}" class="btn-add-user mt-3"
+                style="padding: 0.75rem 1.5rem; font-size: 0.9rem;">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Ver todos los usuarios
+            </a>
+        </div>
+
+        <!-- ===== CONTENIDO CON USUARIOS ===== -->
+        <div th:if="${usuarios != null and !usuarios.isEmpty()}">
+
+            <!-- ===== VISTA MÓVIL: CARDS ===== -->
+            <div class="users-container d-lg-none">
+                <div th:each="u : ${usuarios}" class="user-card">
+                    <div class="user-header">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="user-avatar" th:text="${#strings.substring(u.nombre, 0, 1)}">J</div>
+                            <div>
+                                <div class="user-name" th:text="${u.nombre + ' ' + u.apellido}">Juan Pérez</div>
+                                <small th:text="${u.email}" class="text-muted d-block"
+                                    style="font-size: 0.8rem;"></small>
+                                <span class="badge-role mt-2 d-inline-block"
+                                    th:classappend="${#strings.toLowerCase(#strings.replace(u.role.name(), 'ROLE_', ''))}"
+                                    th:text="${#strings.replace(u.role.name(), 'ROLE_', '')}">
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span th:if="${u.activo}" class="badge-estado activo">
+                                <i class="bi bi-check-circle-fill"></i>Activo
+                            </span>
+                            <span th:unless="${u.activo}" class="badge-estado suspendido">
+                                <i class="bi bi-x-circle-fill"></i>Suspendido
+                            </span>
+                        </div>
+                    </div>
+                    <div class="user-actions-mobile">
+                        <form th:action="@{'/admin/usuarios/toggle-status/' + ${u.id}}" method="post"
+                            class="flex-grow-1">
+                            <button type="submit" class="btn-mobile-action w-100"
+                                th:classappend="${u.activo ? 'suspender' : 'activar'}">
+                                <i class="bi" th:classappend="${u.activo ? 'bi-person-x' : 'bi-person-check'}"></i>
+                                <span th:text="${u.activo ? 'Suspender' : 'Activar'}"></span>
+                            </button>
+                        </form>
+                        <a th:href="@{'/admin/usuarios/editar/' + ${u.id}}" class="btn-mobile-edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VISTA DESKTOP: TABLA ===== -->
+            <div class="main-card d-none d-lg-block">
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4"><i class="bi bi-person me-2"></i>Usuario</th>
+                                    <th><i class="bi bi-envelope me-2"></i>Contacto</th>
+                                    <th><i class="bi bi-shield me-2"></i>Rol</th>
+                                    <th><i class="bi bi-circle-fill me-2"></i>Estado</th>
+                                    <th class="text-center"><i class="bi bi-gear me-2"></i>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="u : ${usuarios}">
+                                    <td class="ps-4" data-label="Usuario">
+                                        <div class="user-info">
+                                            <div class="user-avatar" th:text="${#strings.substring(u.nombre, 0, 1)}">J
+                                            </div>
+                                            <div>
+                                                <div class="user-name" th:text="${u.nombre + ' ' + u.apellido}">Juan
+                                                    Pérez</div>
+                                                <div class="user-id"
+                                                    th:text="${'ID: ' + #strings.substring(u.id, 0, 8)}">ID: abc12345
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td data-label="Contacto" th:text="${u.email}">email@ejemplo.com</td>
+                                    <td data-label="Rol">
+                                        <span class="badge-role"
+                                            th:classappend="${#strings.toLowerCase(#strings.replace(u.role.name(), 'ROLE_', ''))}"
+                                            th:text="${#strings.replace(u.role.name(), 'ROLE_', '')}">
+                                        </span>
+                                    </td>
+                                    <td data-label="Estado">
+                                        <span th:if="${u.activo}" class="badge-estado activo">
+                                            <i class="bi bi-check-circle-fill"></i>Activo
+                                        </span>
+                                        <span th:unless="${u.activo}" class="badge-estado suspendido">
+                                            <i class="bi bi-x-circle-fill"></i>Suspendido
+                                        </span>
+                                    </td>
+                                    <td data-label="Acciones">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <form th:action="@{'/admin/usuarios/toggle-status/' + ${u.id}}"
+                                                method="post">
+                                                <button type="submit" class="btn-table-action"
+                                                    th:classappend="${u.activo ? 'toggle-active' : 'toggle-suspended'}"
+                                                    th:title="${u.activo ? 'Suspender cuenta' : 'Reactivar cuenta'}">
+                                                    <i class="bi"
+                                                        th:classappend="${u.activo ? 'bi-person-x' : 'bi-person-check'}"></i>
+                                                </button>
+                                            </form>
+                                            <a th:href="@{'/admin/usuarios/editar/' + ${u.id}}"
+                                                class="btn-table-action edit" title="Editar cuenta">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PAGINACIÓN ===== -->
+            <div class="pagination-container" th:if="${usuariosPage.totalPages > 1}">
+                <nav>
+                    <ul class="pagination">
+                        <!-- Anterior -->
+                        <li class="page-item" th:classappend="${!usuariosPage.hasPrevious()} ? 'disabled'">
+                            <a class="page-link-modern"
+                                th:href="@{/admin/usuarios(page=${usuariosPage.number - 1}, keyword=${keyword}, roleFilter=${currentRole})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        <!-- Páginas Numéricas -->
+                        <li th:each="pageNumber : ${pageNumbers}" class="page-item">
+                            <a class="page-link-modern" th:classappend="${pageNumber == usuariosPage.number} ? 'active'"
+                                th:href="@{/admin/usuarios(page=${pageNumber}, keyword=${keyword}, roleFilter=${currentRole})}"
+                                th:text="${pageNumber + 1}">
+                            </a>
+                        </li>
+
+                        <!-- Siguiente -->
+                        <li class="page-item" th:classappend="${!usuariosPage.hasNext()} ? 'disabled'">
+                            <a class="page-link-modern"
+                                th:href="@{/admin/usuarios(page=${usuariosPage.number + 1}, keyword=${keyword}, roleFilter=${currentRole})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- ===== INFO FOOTER ===== -->
+            <div class="info-footer" th:if="${usuariosPage.totalElements > 0}">
+                Mostrando <strong th:text="${usuarios.size()}">0</strong> de
+                <strong th:text="${usuariosPage.totalElements}">0</strong> usuarios totales
+                <span th:if="${usuariosPage.totalPages > 1}">
+                    • Página <strong th:text="${usuariosPage.number + 1}">1</strong> de
+                    <strong th:text="${usuariosPage.totalPages}">1</strong>
+                </span>
+            </div>
+
+            <!-- ===== MINI RESUMEN (NUEVO) ===== -->
+            <div class="row mt-4">
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="main-card p-3 text-center">
+                        <i class="bi bi-people fs-2 text-primary mb-2"></i>
+                        <div class="fw-bold text-dark" th:text="${usuariosPage.totalElements}">0</div>
+                        <small class="text-muted">Total usuarios</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="main-card p-3 text-center">
+                        <i class="bi bi-person-check fs-2 text-success mb-2"></i>
+                        <div class="fw-bold text-dark" id="activosCount">-</div>
+                        <small class="text-muted">Activos</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="main-card p-3 text-center">
+                        <i class="bi bi-person-x fs-2 text-danger mb-2"></i>
+                        <div class="fw-bold text-dark" id="suspendidosCount">-</div>
+                        <small class="text-muted">Suspendidos</small>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="main-card p-3 text-center">
+                        <i class="bi bi-shield fs-2 text-warning mb-2"></i>
+                        <div class="fw-bold text-dark" th:text="${#lists.size(roles)}">0</div>
+                        <small class="text-muted">Roles disponibles</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para contar activos/suspendidos (opcional, no afecta lógica) -->
+    <script th:if="${usuarios != null and !usuarios.isEmpty()}">
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('tbody tr');
+            let activos = 0, suspendidos = 0;
+            rows.forEach(row => {
+                if (row.querySelector('.badge-estado.activo')) activos++;
+                if (row.querySelector('.badge-estado.suspendido')) suspendidos++;
+            });
+            const activosEl = document.getElementById('activosCount');
+            const suspendidosEl = document.getElementById('suspendidosCount');
+            if (activosEl) activosEl.textContent = activos;
+            if (suspendidosEl) suspendidosEl.textContent = suspendidos;
+        });
+    </script>
+</body>
+
+</html>

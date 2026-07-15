@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consola de Auditoría | HEX Infrastructure</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --hex-bg: #020617;
+            --hex-surface: #0f172a;
+            --hex-elevated: #1e293b;
+            --hex-primary: #00d4ff;
+            --hex-primary-dim: rgba(0, 212, 255, 0.1);
+            --hex-accent: #a855f7;
+            --hex-accent-dim: rgba(168, 85, 247, 0.1);
+            --hex-danger: #f43f5e;
+            --hex-danger-dim: rgba(244, 63, 94, 0.1);
+            --hex-warning: #f59e0b;
+            --hex-warning-dim: rgba(245, 158, 11, 0.1);
+            --hex-success: #10b981;
+            --hex-success-dim: rgba(16, 185, 129, 0.1);
+            --hex-text: #f1f5f9;
+            --hex-text-secondary: #94a3b8;
+            --hex-border: rgba(148, 163, 184, 0.1);
+            --hex-glow: rgba(0, 212, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'Space Grotesk', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .hex-bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 25s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .orb-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, transparent 70%);
+            top: -150px;
+            left: -100px;
+            animation: orbFloat 10s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
+            bottom: -100px;
+            right: -100px;
+            animation: orbFloat 12s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(20px, -30px) scale(1.05);
+            }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes scanline {
+            0% {
+                top: -5%;
+            }
+
+            100% {
+                top: 105%;
+            }
+        }
+
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 34px;
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .status-left,
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--hex-primary);
+            box-shadow: 0 0 10px var(--hex-primary);
+            animation: dotPulse 2s infinite;
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+
+        .status-sep {
+            color: var(--hex-border);
+        }
+
+        .status-label {
+            color: var(--hex-text-secondary);
+        }
+
+        .status-value {
+            color: var(--hex-primary);
+            font-weight: 600;
+        }
+
+        /* ===== HEADER ===== */
+        .hex-header {
+            position: fixed;
+            top: 34px;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--hex-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 999;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        .brand-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--hex-text);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text span {
+            font-size: 0.7rem;
+            color: var(--hex-text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link-hex {
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: var(--hex-text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .nav-link-hex:hover {
+            color: var(--hex-primary);
+            background: var(--hex-primary-dim);
+            border-color: rgba(0, 212, 255, 0.15);
+        }
+
+        .nav-link-hex.active {
+            color: var(--hex-primary);
+            background: var(--hex-primary-dim);
+            border-color: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 15px var(--hex-primary-dim);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hex-border);
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .user-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HERO ===== */
+        .hero-section {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: var(--hex-accent-dim);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--hex-accent);
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--hex-primary), var(--hex-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--hex-text-secondary);
+            max-width: 700px;
+            line-height: 1.7;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== SUCCESS ALERT ===== */
+        .hex-alert-success {
+            background: var(--hex-success-dim);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== MAIN CARD ===== */
+        .hex-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--hex-border);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            animation: cardEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+        }
+
+        .hex-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--hex-primary), var(--hex-accent), transparent);
+            opacity: 0.5;
+        }
+
+        @keyframes cardEntry {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== FILTER PANEL ===== */
+        .filter-panel {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.2fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 992px) {
+            .filter-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hex-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--hex-text-secondary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+        .input-icon-wrap i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--hex-text-secondary);
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .hex-input {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid var(--hex-border);
+            border-radius: 14px;
+            padding: 12px 16px 12px 44px;
+            color: var(--hex-text);
+            font-size: 0.85rem;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .hex-input:focus {
+            outline: none;
+            border-color: var(--hex-primary);
+            box-shadow: 0 0 0 3px var(--hex-primary-dim), 0 0 20px var(--hex-primary-dim);
+        }
+
+        .hex-input:focus+i,
+        .input-icon-wrap:focus-within i {
+            color: var(--hex-primary);
+        }
+
+        .hex-select {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid var(--hex-border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            color: var(--hex-text);
+            font-size: 0.85rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .hex-select:focus {
+            outline: none;
+            border-color: var(--hex-primary);
+            box-shadow: 0 0 0 3px var(--hex-primary-dim);
+        }
+
+        /* ===== PILLS ===== */
+        .pills-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pill-btn:hover {
+            color: var(--hex-text);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .pill-btn.active {
+            transform: translateY(-1px);
+        }
+
+        .pill-btn.active.todos {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--hex-text);
+            border-color: var(--hex-text-secondary);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+        }
+
+        .pill-btn.active.info {
+            background: var(--hex-primary-dim);
+            color: var(--hex-primary);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.1);
+        }
+
+        .pill-btn.active.success {
+            background: var(--hex-success-dim);
+            color: var(--hex-success);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+
+        .pill-btn.active.warning {
+            background: var(--hex-warning-dim);
+            color: var(--hex-warning);
+            border-color: rgba(245, 158, 11, 0.3);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+        }
+
+        .pill-btn.active.error {
+            background: var(--hex-danger-dim);
+            color: var(--hex-danger);
+            border-color: rgba(244, 63, 94, 0.3);
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.1);
+        }
+
+        /* ===== TABLE ===== */
+        .console-table-wrap {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--hex-border);
+            background: rgba(2, 6, 23, 0.3);
+        }
+
+        .console-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.82rem;
+        }
+
+        .console-table th {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 14px 16px;
+            color: var(--hex-text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--hex-border);
+            white-space: nowrap;
+        }
+
+        .console-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--hex-border);
+            vertical-align: middle;
+        }
+
+        .console-table tbody tr {
+            background: rgba(255, 255, 255, 0.01);
+            transition: all 0.3s;
+        }
+
+        .console-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.03);
+            transform: scale(1.002);
+        }
+
+        .console-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Badges */
+        .badge-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-premium.info {
+            background: var(--hex-primary-dim);
+            color: var(--hex-primary);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .badge-premium.success {
+            background: var(--hex-success-dim);
+            color: var(--hex-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-premium.warning {
+            background: var(--hex-warning-dim);
+            color: var(--hex-warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge-premium.error {
+            background: var(--hex-danger-dim);
+            color: var(--hex-danger);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        .badge-module {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: var(--hex-text);
+            font-size: 0.8rem;
+        }
+
+        .badge-module i {
+            color: var(--hex-primary);
+            font-size: 0.9rem;
+        }
+
+        .font-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+        }
+
+        .font-timestamp {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--hex-text-secondary);
+        }
+
+        .user-email-wrap {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--hex-primary);
+        }
+
+        /* Inspect Button */
+        .btn-inspect {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-inspect:hover {
+            background: var(--hex-primary-dim);
+            border-color: var(--hex-primary);
+            color: var(--hex-primary);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .pagination-info {
+            font-size: 0.8rem;
+            color: var(--hex-text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .pagination-list {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-item-custom a,
+        .page-item-custom span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 38px;
+            padding: 0 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+        }
+
+        .page-item-custom a:hover {
+            color: var(--hex-text);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--hex-primary);
+            box-shadow: 0 0 10px var(--hex-primary-dim);
+        }
+
+        .page-item-custom.active span {
+            background: var(--hex-primary-dim);
+            color: var(--hex-primary);
+            border-color: var(--hex-primary);
+            box-shadow: 0 0 15px var(--hex-primary-dim);
+        }
+
+        .page-item-custom.disabled span {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ===== BOTTOM ACTIONS ===== */
+        .bottom-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--hex-border);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .btn-hex {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.4s;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-hex-back {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+        }
+
+        .btn-hex-back:hover {
+            color: var(--hex-text);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(-4px);
+        }
+
+        .btn-hex-purge {
+            background: var(--hex-danger-dim);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            color: var(--hex-danger);
+        }
+
+        .btn-hex-purge:hover {
+            background: var(--hex-danger);
+            color: white;
+            border-color: var(--hex-danger);
+            box-shadow: 0 0 25px rgba(244, 63, 94, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* ===== MODALS ===== */
+        .modal-glass .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--hex-border);
+            border-radius: 24px;
+            color: var(--hex-text);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px var(--hex-glow);
+        }
+
+        .modal-glass .modal-header {
+            border-bottom: 1px solid var(--hex-border);
+            padding: 24px;
+        }
+
+        .modal-glass .modal-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-glass .modal-title i {
+            color: var(--hex-primary);
+        }
+
+        .modal-glass .btn-close {
+            filter: invert(1);
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+
+        .modal-glass .btn-close:hover {
+            opacity: 1;
+        }
+
+        .modal-glass .modal-body {
+            padding: 24px;
+        }
+
+        .modal-glass .modal-footer {
+            border-top: 1px solid var(--hex-border);
+            padding: 20px 24px;
+        }
+
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .telemetry-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .telemetry-item label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--hex-text-secondary);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .telemetry-item span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-box {
+            background: #010409;
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            max-height: 250px;
+            overflow-y: auto;
+            color: var(--hex-primary);
+            line-height: 1.6;
+        }
+
+        /* Purge modal special */
+        .modal-glass.purge-modal .modal-content {
+            border-color: rgba(244, 63, 94, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(244, 63, 94, 0.2);
+        }
+
+        .modal-glass.purge-modal .modal-header {
+            border-bottom-color: rgba(244, 63, 94, 0.2);
+        }
+
+        .modal-glass.purge-modal .modal-footer {
+            border-top-color: rgba(244, 63, 94, 0.2);
+        }
+
+        .hex-btn-outline {
+            background: transparent;
+            border: 1px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .hex-btn-outline:hover {
+            border-color: var(--hex-primary);
+            color: var(--hex-primary);
+            background: var(--hex-primary-dim);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--hex-text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            opacity: 0.2;
+            color: var(--hex-text-secondary);
+        }
+
+        .empty-state h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--hex-text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 120px 16px 30px;
+            }
+
+            .hex-header {
+                padding: 0 16px;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hex-card {
+                padding: 20px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--hex-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--hex-elevated);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--hex-primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="hex-bg-grid"></div>
+    <div class="orb-glow orb-1"></div>
+    <div class="orb-glow orb-2"></div>
+    <div class="scanline"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-dot"></div>
+            <span class="status-value">AUDITOR DE NÚCLEO</span>
+            <span class="status-sep">|</span>
+            <span class="status-label">SECURE STREAM</span>
+            <span class="status-sep">|</span>
+            <span class="status-label">MONGODB IMMUTABLE</span>
+        </div>
+        <div class="status-right">
+            <span class="status-label">LATENCY: <span class="status-value">8ms</span></span>
+            <span class="status-sep">|</span>
+            <span id="liveClock" class="status-value">00:00:00</span>
+            <span class="status-label">UTC</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="hex-header">
+        <a th:href="@{/admin/dashboard}" class="header-brand">
+            <div class="brand-icon">
+                <i class="bi bi-hexagon-fill"></i>
+            </div>
+            <div class="brand-text">
+                <h1>HEX Infrastructure</h1>
+                <span>Auditor Core v2.4</span>
+            </div>
+        </a>
+
+        <nav class="header-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-link-hex">Dashboard</a>
+            <a th:href="@{/admin/clinicas}" class="nav-link-hex">Clínicas</a>
+            <a th:href="@{/admin/servicios}" class="nav-link-hex">Servicios</a>
+            <a th:href="@{/admin/usuarios}" class="nav-link-hex">Usuarios</a>
+            <a th:href="@{/admin/centro-control}" class="nav-link-hex active"><i class="bi bi-cpu-fill"></i> Control
+                Core</a>
+            <a th:href="@{/admin/reportes}" class="nav-link-hex">Reportes</a>
+        </nav>
+
+        <div class="user-badge">
+            <div class="user-avatar">AD</div>
+            <span class="user-name">Admin</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Hero -->
+        <div class="hero-section">
+            <div class="hero-badge">
+                <i class="bi bi-shield-check"></i>
+                Inmutabilidad de logs garantizada por MongoDB
+            </div>
+            <h1 class="hero-title">
+                Consola de <span class="gradient-text">Auditoría Avanzada</span>
+            </h1>
+            <p class="hero-subtitle">
+                Supervisa de forma integral las peticiones, eventos de seguridad y cambios de infraestructura en
+                ClínicaApp.
+            </p>
+        </div>
+
+        <!-- Success Alert -->
+        <div th:if="${mensajeExito}" class="hex-alert-success">
+            <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+            <span class="fw-bold" th:text="${mensajeExito}">Operación completada con éxito.</span>
+        </div>
+
+        <!-- Main Card -->
+        <div class="hex-card">
+
+            <!-- Filter Panel -->
+            <form th:action="@{/admin/auditoria}" method="get" id="filterForm">
+                <input type="hidden" name="tipo" id="filterTipo" th:value="${tipo}">
+
+                <div class="filter-panel">
+                    <div>
+                        <label class="hex-label">Búsqueda Contextual</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="query" class="hex-input" th:value="${query}"
+                                placeholder="Buscar por acción, usuario, IP o detalle técnico...">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="hex-label">Módulo</label>
+                        <select name="modulo" class="hex-select"
+                            onchange="document.getElementById('filterForm').submit()">
+                            <option value="TODOS" th:selected="${modulo == 'TODOS'}">Todos los Módulos</option>
+                            <option value="SEGURIDAD" th:selected="${modulo == 'SEGURIDAD'}">🛡️ SEGURIDAD</option>
+                            <option value="CONFIGURACION" th:selected="${modulo == 'CONFIGURACION'}">⚙️ CONFIGURACIÓN
+                            </option>
+                            <option value="CLINICAS" th:selected="${modulo == 'CLINICAS'}">🏥 CLÍNICAS</option>
+                            <option value="CITAS" th:selected="${modulo == 'CITAS'}">📅 CITAS</option>
+                            <option value="SISTEMA" th:selected="${modulo == 'SISTEMA'}">💻 SISTEMA</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="hex-label">Nivel de Criticidad</label>
+                        <div class="pills-group">
+                            <button type="button" class="pill-btn todos"
+                                th:classappend="${tipo == 'TODOS'} ? 'active' : ''"
+                                onclick="submitSeverity('TODOS')">Todos</button>
+                            <button type="button" class="pill-btn info"
+                                th:classappend="${tipo == 'INFO'} ? 'active' : ''"
+                                onclick="submitSeverity('INFO')">Info</button>
+                            <button type="button" class="pill-btn success"
+                                th:classappend="${tipo == 'SUCCESS'} ? 'active' : ''"
+                                onclick="submitSeverity('SUCCESS')">Success</button>
+                            <button type="button" class="pill-btn warning"
+                                th:classappend="${tipo == 'WARNING'} ? 'active' : ''"
+                                onclick="submitSeverity('WARNING')">Warn</button>
+                            <button type="button" class="pill-btn error"
+                                th:classappend="${tipo == 'ERROR'} ? 'active' : ''"
+                                onclick="submitSeverity('ERROR')">Error</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Table -->
+            <div class="console-table-wrap">
+                <table class="console-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha (UTC)</th>
+                            <th>Módulo</th>
+                            <th>Criticidad</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>IP Origen</th>
+                            <th class="text-center">Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="logItem : ${logsPage.content}">
+                            <td class="font-timestamp"
+                                th:text="${#temporals.format(logItem.fecha, 'dd/MM/yyyy HH:mm:ss')}">16/05/2026 19:58:12
+                            </td>
+                            <td>
+                                <span class="badge-module">
+                                    <i th:class="${logItem.icono}"></i>
+                                    <span th:text="${logItem.modulo}">CONFIGURACION</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-premium" th:classappend="${#strings.toLowerCase(logItem.tipo)}"
+                                    th:text="${logItem.tipo}">INFO</span>
+                            </td>
+                            <td>
+                                <div class="user-email-wrap font-code" th:text="${logItem.usuario}"
+                                    th:title="${logItem.usuario}">admin@clinica.app</div>
+                            </td>
+                            <td class="fw-medium" th:text="${logItem.accion}">Modo mantenimiento activado</td>
+                            <td class="font-code text-secondary" th:text="${logItem.ip}">127.0.0.1</td>
+                            <td class="text-center">
+                                <button type="button" class="btn-inspect" th:data-id="${logItem.id}"
+                                    th:data-fecha="${#temporals.format(logItem.fecha, 'dd/MM/yyyy HH:mm:ss')} + ' UTC'"
+                                    th:data-modulo="${logItem.modulo}" th:data-tipo="${logItem.tipo}"
+                                    th:data-usuario="${logItem.usuario}" th:data-accion="${logItem.accion}"
+                                    th:data-ip="${logItem.ip}" th:data-detalles="${logItem.detalles}"
+                                    onclick="inspectLog(this)">
+                                    <i class="bi bi-terminal"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${logsPage.isEmpty()}">
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="bi bi-slash-circle"></i>
+                                    <h4>No se encontraron logs</h4>
+                                    <p>No hay registros de auditoría que coincidan con los filtros seleccionados.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" th:if="${totalPages > 0}">
+                <div class="pagination-info">
+                    Total: <span class="text-primary fw-bold" th:text="${totalItems}">0</span>
+                    • Página <span class="text-primary fw-bold" th:text="${currentPage + 1}">1</span> de <span
+                        th:text="${totalPages}">1</span>
+                </div>
+
+                <ul class="pagination-list">
+                    <li class="page-item-custom" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <a th:if="${currentPage > 0}"
+                            th:href="@{/admin/auditoria(query=${query}, modulo=${modulo}, tipo=${tipo}, page=${currentPage - 1})}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                        <span th:if="${currentPage == 0}">
+                            <i class="bi bi-chevron-left"></i>
+                        </span>
+                    </li>
+
+                    <li class="page-item-custom" th:each="pageIdx : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${pageIdx == currentPage} ? 'active' : ''"
+                        th:if="${totalPages <= 5 || (pageIdx >= currentPage - 2 && pageIdx <= currentPage + 2)}">
+                        <a th:if="${pageIdx != currentPage}"
+                            th:href="@{/admin/auditoria(query=${query}, modulo=${modulo}, tipo=${tipo}, page=${pageIdx})}"
+                            th:text="${pageIdx + 1}">1</a>
+                        <span th:if="${pageIdx == currentPage}" th:text="${pageIdx + 1}">1</span>
+                    </li>
+
+                    <li class="page-item-custom" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled' : ''">
+                        <a th:if="${currentPage + 1 < totalPages}"
+                            th:href="@{/admin/auditoria(query=${query}, modulo=${modulo}, tipo=${tipo}, page=${currentPage + 1})}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                        <span th:if="${currentPage + 1 >= totalPages}">
+                            <i class="bi bi-chevron-right"></i>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="bottom-actions">
+                <a th:href="@{/admin/centro-control}" class="btn-hex btn-hex-back">
+                    <i class="bi bi-arrow-left"></i> Volver al Centro de Control
+                </a>
+
+                <button type="button" class="btn-hex btn-hex-purge" onclick="confirmPurge()"
+                    th:if="${!logsPage.isEmpty()}">
+                    <i class="bi bi-trash3-fill"></i> Vaciar Auditoría
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Inspector Modal -->
+    <div class="modal fade modal-glass" id="logInspectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-terminal-fill"></i>
+                        Detalles del Evento de Auditoría
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="telemetry-grid">
+                        <div class="telemetry-item">
+                            <label>Timestamp</label>
+                            <span id="modalTimestamp">--</span>
+                        </div>
+                        <div class="telemetry-item">
+                            <label>Usuario</label>
+                            <span id="modalUsuario" class="text-primary">--</span>
+                        </div>
+                        <div class="telemetry-item">
+                            <label>Módulo</label>
+                            <span id="modalModulo">--</span>
+                        </div>
+                        <div class="telemetry-item">
+                            <label>IP Origen</label>
+                            <span id="modalIp" class="text-primary">--</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="hex-label">Acción Registrada</label>
+                        <div class="p-3 rounded-3 font-code"
+                            style="background: rgba(0,0,0,0.3); border: 1px solid var(--hex-border); font-size: 0.9rem;"
+                            id="modalAccion">
+                            --
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="hex-label">Metadatos & Detalles Extendidos</label>
+                        <div class="code-box" id="modalDetalles">
+                            --
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="hex-btn-outline" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cerrar Consola
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purge Modal -->
+    <div class="modal fade modal-glass purge-modal" id="purgeConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Confirmar Purga Completa
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/auditoria/limpiar}" method="post">
+                    <div class="modal-body">
+                        <p class="mb-3">¿Estás completamente seguro de que deseas vaciar toda la base de datos de logs
+                            de auditoría?</p>
+
+                        <div class="alert border-0 rounded-3"
+                            style="background: var(--hex-danger-dim); color: var(--hex-danger); border: 1px solid rgba(244, 63, 94, 0.2) !important; font-size: 0.85rem;">
+                            <i class="bi bi-shield-fill-exclamation me-1"></i>
+                            <strong>ATENCIÓN:</strong> Esta acción es irreversible. Se eliminará el historial inmutable
+                            de forma permanente.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="hex-btn-outline" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn-hex btn-hex-purge">Sí, Vaciar Base de Datos</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // ===== LIVE CLOCK =====
+            function updateClock() {
+                const now = new Date();
+                const h = String(now.getUTCHours()).padStart(2, '0');
+                const m = String(now.getUTCMinutes()).padStart(2, '0');
+                const s = String(now.getUTCSeconds()).padStart(2, '0');
+                document.getElementById('liveClock').textContent = `${h}:${m}:${s}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // ===== CARD ENTRANCE ANIMATION =====
+            const cards = document.querySelectorAll('.hex-card');
+            const cardObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0) scale(1)';
+                        cardObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px) scale(0.98)';
+                card.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                cardObserver.observe(card);
+            });
+
+            // ===== TABLE ROW ANIMATIONS =====
+            const tableRows = document.querySelectorAll('.console-table tbody tr');
+            const rowObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateX(0)';
+                        }, index * 50);
+                        rowObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            tableRows.forEach((row, index) => {
+                if (!row.querySelector('.empty-state')) {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(-10px)';
+                    row.style.transition = 'all 0.3s ease';
+                    rowObserver.observe(row);
+                }
+            });
+
+            // ===== PILL BUTTON SOUND =====
+            const pillButtons = document.querySelectorAll('.pill-btn');
+            pillButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    playClickSound();
+                });
+            });
+
+            function playClickSound() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const ctx = new AudioContext();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1000, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.05);
+
+                    gain.gain.setValueAtTime(0.015, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.08);
+                } catch (e) { }
+            }
+
+            // ===== INSPECT BUTTON HOVER =====
+            const inspectButtons = document.querySelectorAll('.btn-inspect');
+            inspectButtons.forEach(btn => {
+                btn.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-2px) scale(1.1)';
+                });
+                btn.addEventListener('mouseleave', function () {
+                    this.style.transform = '';
+                });
+            });
+
+            // ===== CONSOLE BRANDING =====
+            console.log('%c ⚡ HEX Infrastructure | Auditor Core v2.4', 'color: #00d4ff; font-size: 14px; font-weight: bold;');
+            console.log('%c Consola de Auditoría Avanzada — Sistema de trazabilidad inmutable', 'color: #94a3b8; font-size: 11px;');
+        });
+
+        // ===== INSPECT LOG FUNCTION =====
+        function inspectLog(btn) {
+            document.getElementById('modalTimestamp').textContent = btn.dataset.fecha;
+            document.getElementById('modalUsuario').textContent = btn.dataset.usuario;
+            document.getElementById('modalModulo').textContent = btn.dataset.modulo;
+            document.getElementById('modalIp').textContent = btn.dataset.ip;
+            document.getElementById('modalAccion').textContent = btn.dataset.accion;
+
+            const detalles = btn.dataset.detalles || 'Sin metadatos adicionales';
+            document.getElementById('modalDetalles').textContent = detalles;
+
+            const modal = new bootstrap.Modal(document.getElementById('logInspectModal'));
+            modal.show();
+        }
+
+        // ===== PURGE CONFIRMATION =====
+        function confirmPurge() {
+            const modal = new bootstrap.Modal(document.getElementById('purgeConfirmModal'));
+            modal.show();
+        }
+
+        // ===== SEVERITY FILTER =====
+        function submitSeverity(tipo) {
+            document.getElementById('filterTipo').value = tipo;
+            document.getElementById('filterForm').submit();
+        }
+    </script>
+</body>
+
+</html>

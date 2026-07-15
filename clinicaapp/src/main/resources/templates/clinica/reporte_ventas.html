@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Ventas | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.1);
+            --shadow-xl: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --shadow-primary: 0 8px 24px rgba(79, 70, 229, 0.18);
+            --shadow-success: 0 8px 24px rgba(16, 185, 129, 0.18);
+            --shadow-info: 0 8px 24px rgba(14, 165, 233, 0.18);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--gray-50);
+            min-height: 100vh;
+            color: var(--gray-700);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar .container {
+            padding-top: 0.875rem;
+            padding-bottom: 0.875rem;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        .btn-back {
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ===== KPI CARDS ===== */
+        .kpi-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .kpi-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .kpi-card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .kpi-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        .kpi-card.success::before {
+            background: linear-gradient(90deg, var(--success), #34d399);
+        }
+
+        .kpi-card.dark::before {
+            background: linear-gradient(90deg, var(--gray-800), var(--gray-600));
+        }
+
+        .kpi-card.info::before {
+            background: linear-gradient(90deg, var(--info), #38bdf8);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .kpi-value.success {
+            color: var(--success);
+        }
+
+        .kpi-value.dark {
+            color: var(--gray-800);
+        }
+
+        .kpi-value.info {
+            color: var(--info);
+        }
+
+        .kpi-icon {
+            position: absolute;
+            right: -5px;
+            bottom: -5px;
+            font-size: 3.5rem;
+            opacity: 0.04;
+            transform: rotate(-10deg);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover .kpi-icon {
+            opacity: 0.08;
+            transform: rotate(-5deg) scale(1.05);
+        }
+
+        /* ===== TABLE CARD ===== */
+        .table-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.25s;
+        }
+
+        .table-header {
+            padding: 1.5rem 1.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            background: linear-gradient(135deg, #fafafa, #f8f9fa);
+        }
+
+        .table-header h5 {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        .table-header h5 i {
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Table */
+        .table-custom {
+            margin: 0;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-custom thead th {
+            background: var(--gray-50);
+            color: var(--gray-500);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1rem 1.25rem;
+            border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        .table-custom tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-custom tbody tr:hover {
+            background: rgba(79, 70, 229, 0.02);
+        }
+
+        .table-custom td {
+            padding: 1rem 1.25rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .table-custom td.paciente {
+            font-weight: 800;
+            color: var(--gray-800);
+        }
+
+        .table-custom td.monto {
+            font-weight: 800;
+            color: var(--success);
+            font-size: 1rem;
+            text-align: right;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray-300);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state p {
+            color: var(--gray-500);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ===== PRINT BUTTON ===== */
+        .action-section {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            animation-delay: 0.35s;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--info), #0284c7);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.875rem 2rem;
+            font-weight: 800;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-info);
+            cursor: pointer;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-print i {
+            font-size: 1.1rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .app-footer {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .app-footer p {
+            color: var(--gray-400);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .kpi-value {
+                font-size: 1.75rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .kpi-card {
+                padding: 1.25rem;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .table-custom thead {
+                display: none;
+            }
+
+            .table-custom tbody tr {
+                display: block;
+                margin-bottom: 0.75rem;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--gray-200);
+            }
+
+            .table-custom td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.875rem 1rem;
+                border-bottom: 1px solid var(--gray-100);
+            }
+
+            .table-custom td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--gray-500);
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 0.5px;
+            }
+
+            .table-custom td:last-child {
+                border-bottom: none;
+            }
+
+            .table-custom td.monto {
+                text-align: right;
+                font-size: 1.1rem;
+            }
+
+            .btn-print {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-section {
+                justify-content: center;
+            }
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            .navbar {
+                background: var(--gray-900) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .kpi-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1.5px solid var(--gray-200);
+            }
+
+            .table-card {
+                box-shadow: none;
+                border: 1.5px solid var(--gray-200);
+            }
+
+            .table-custom tbody tr {
+                background: white !important;
+            }
+
+            .app-footer {
+                border-top: 1px solid var(--gray-200);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="bi bi-graph-up-arrow"></i>
+                Balance Financiero de Sede
+            </span>
+            <a href="/clinica/dashboard" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                <span class="d-none d-sm-inline">Volver al Panel</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <!-- KPIs -->
+        <div class="row g-4 kpi-section">
+            <div class="col-md-4">
+                <div class="kpi-card success">
+                    <div class="kpi-label">
+                        <i class="bi bi-cash-stack"></i>
+                        Total Recaudado
+                    </div>
+                    <h2 class="kpi-value success"
+                        th:text="'$' + ${#numbers.formatDecimal(totalRecaudado, 1, 'COMMA', 2, 'POINT')}">$0.00</h2>
+                    <i class="bi bi-cash-coin kpi-icon"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kpi-card dark">
+                    <div class="kpi-label">
+                        <i class="bi bi-cart-check"></i>
+                        Servicios Vendidos
+                    </div>
+                    <h2 class="kpi-value dark" th:text="${ventas.size()}">0</h2>
+                    <i class="bi bi-bag-check kpi-icon"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kpi-card info">
+                    <div class="kpi-label">
+                        <i class="bi bi-receipt"></i>
+                        Ticket Promedio
+                    </div>
+                    <h2 class="kpi-value info"
+                        th:text="'$' + ${#numbers.formatDecimal(ticketPromedio, 1, 'COMMA', 2, 'POINT')}">$0.00</h2>
+                    <i class="bi bi-ticket-detailed kpi-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Transacciones -->
+        <div class="table-card">
+            <div class="table-header">
+                <h5>
+                    <i class="bi bi-list-ul"></i>
+                    Desglose de Transacciones
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Paciente</th>
+                            <th>Servicio Realizado</th>
+                            <th>Propietario</th>
+                            <th class="text-end">Monto Recibido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${ventas}">
+                            <td data-label="Fecha" th:text="${v.fechaHora}">--</td>
+                            <td class="paciente" data-label="Paciente" th:text="${v.nombreMascota}">--</td>
+                            <td data-label="Servicio" th:text="${v.nombreServicio}">--</td>
+                            <td data-label="Propietario" th:text="${v.nombreUsuario}">--</td>
+                            <td class="monto" data-label="Monto"
+                                th:text="'$' + ${#numbers.formatDecimal(v.costo, 1, 'COMMA', 2, 'POINT')}">$0.00</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ventas)}">
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <p>Aún no se han registrado ventas pagadas en esta sede.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Botón Imprimir -->
+        <div class="action-section no-print">
+            <button class="btn-print" onclick="window.print()">
+                <i class="bi bi-printer"></i>
+                Imprimir Reporte Mensual
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer">
+            <p>© 2024 ClínicaApp — Módulo de Auditoría Clínica</p>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

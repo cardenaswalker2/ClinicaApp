@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de la Cita | Clínica App</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════
+           LUXURY AURORA DESIGN SYSTEM
+           ═══════════════════════════════════════ */
+        :root {
+            /* Primary Aurora Gradient */
+            --aurora-start: #6366f1;
+            --aurora-mid: #8b5cf6;
+            --aurora-end: #d946ef;
+
+            /* Secondary Palette */
+            --ocean: #06b6d4;
+            --ocean-light: rgba(6, 182, 212, 0.1);
+            --mint: #10b981;
+            --mint-light: rgba(16, 185, 129, 0.1);
+            --sunset: #f59e0b;
+            --sunset-light: rgba(245, 158, 11, 0.1);
+            --rose: #f43f5e;
+            --rose-light: rgba(244, 63, 94, 0.1);
+
+            /* Neutrals */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --border-light: rgba(226, 232, 240, 0.6);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            /* Shadows - Soft & Layered */
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+
+            /* Radius */
+            --r-sm: 10px;
+            --r-md: 16px;
+            --r-lg: 20px;
+            --r-xl: 24px;
+            --r-2xl: 32px;
+            --r-full: 9999px;
+
+            /* Transitions */
+            --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: rgba(30, 41, 59, 0.8);
+            --surface-hover: rgba(51, 65, 85, 0.6);
+            --border: rgba(148, 163, 184, 0.2);
+            --border-light: rgba(148, 163, 184, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            background-attachment: fixed;
+            color: var(--text-secondary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+        }
+
+        /* ═══════════════════════════════════════
+           ANIMATIONS
+           ═══════════════════════════════════════ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes pulse-soft {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes hero-zoom {
+            from {
+                transform: scale(1.05);
+            }
+
+            to {
+                transform: scale(1.15);
+            }
+        }
+
+        .animate-fade-up {
+            animation: fadeInUp 0.6s var(--ease-out) both;
+        }
+
+        .animate-fade-scale {
+            animation: fadeInScale 0.5s var(--ease-out) both;
+        }
+
+        .animate-slide-right {
+            animation: slideInRight 0.5s var(--ease-out) both;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+
+        /* ═══════════════════════════════════════
+           GLASSMORPHISM UTILITIES
+           ═══════════════════════════════════════ */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        [data-theme="dark"] .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ═══════════════════════════════════════
+           NAV HEADER - GLASS BACK
+           ═══════════════════════════════════════ */
+        .nav-header-aurora {
+            position: absolute;
+            top: 2rem;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .btn-back-aurora {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--r-full);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.4s var(--ease-spring);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back-aurora:hover {
+            background: white;
+            color: var(--aurora-start);
+            transform: translateX(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-back-aurora i {
+            transition: transform 0.3s;
+        }
+
+        .btn-back-aurora:hover i {
+            transform: translateX(-4px);
+        }
+
+        /* ═══════════════════════════════════════
+           HERO SECTION - AURORA
+           ═══════════════════════════════════════ */
+        .hero-aurora {
+            height: 480px;
+            position: relative;
+            border-radius: 0 0 var(--r-2xl) var(--r-2xl);
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+        }
+
+        .hero-aurora::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .hero-image-aurora {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            transform: scale(1.05);
+            transition: transform 8s var(--ease-out);
+        }
+
+        .hero-aurora:hover .hero-image-aurora {
+            transform: scale(1.15);
+        }
+
+        .hero-gradient-aurora {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 30%, rgba(15, 23, 42, 0.85) 90%);
+            z-index: 2;
+        }
+
+        .hero-container-aurora {
+            position: absolute;
+            bottom: 5rem;
+            left: 0;
+            right: 0;
+            z-index: 3;
+        }
+
+        .hero-badge-aurora {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--r-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            animation: fadeInUp 0.6s var(--ease-out) forwards;
+        }
+
+        .hero-title-aurora {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.02em;
+            margin: 0;
+            line-height: 1.1;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s var(--ease-out) 0.2s forwards;
+            opacity: 0;
+        }
+
+        /* ═══════════════════════════════════════
+           MAIN WRAPPER
+           ═══════════════════════════════════════ */
+        .main-wrapper-aurora {
+            margin-top: -100px;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 6rem;
+        }
+
+        /* ═══════════════════════════════════════
+           GLASS CONTAINER
+           ═══════════════════════════════════════ */
+        .glass-container-aurora {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .glass-container-aurora {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ═══════════════════════════════════════
+           SECTION CARDS
+           ═══════════════════════════════════════ */
+        .section-aurora {
+            padding: 2.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s var(--ease-out);
+        }
+
+        .section-aurora:last-child {
+            border-bottom: none;
+        }
+
+        .section-aurora:hover {
+            background: linear-gradient(135deg, var(--surface), var(--surface-hover));
+        }
+
+        /* ═══════════════════════════════════════
+           TYPOGRAPHY
+           ═══════════════════════════════════════ */
+        .label-aurora {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--aurora-start);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .label-aurora i {
+            font-size: 0.9rem;
+        }
+
+        .title-aurora {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        /* ═══════════════════════════════════════
+           INFO PILLS - AURORA
+           ═══════════════════════════════════════ */
+        .info-pill-aurora {
+            background: var(--bg);
+            border: 1px solid var(--border-light);
+            padding: 1.25rem;
+            border-radius: var(--r-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.4s var(--ease-spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-pill-aurora::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--aurora-start), var(--aurora-end));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .info-pill-aurora:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            background: var(--surface);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-pill-aurora:hover::before {
+            opacity: 1;
+        }
+
+        .pill-icon-aurora {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08));
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            color: var(--aurora-start);
+            flex-shrink: 0;
+            transition: all 0.3s var(--ease-spring);
+        }
+
+        .info-pill-aurora:hover .pill-icon-aurora {
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .pill-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .pill-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pill-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ═══════════════════════════════════════
+           MOTIVE CONTAINER
+           ═══════════════════════════════════════ */
+        .motive-aurora {
+            margin-top: 2rem;
+            padding: 1.75rem;
+            background: linear-gradient(135deg, var(--bg), var(--surface));
+            border-left: 4px solid var(--aurora-start);
+            border-radius: 0 var(--r-lg) var(--r-lg) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .motive-aurora::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .motive-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .motive-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: 1.7;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════
+           SIDEBAR - AURORA DARK
+           ═══════════════════════════════════════ */
+        .sidebar-aurora {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+            background-size: 200% 200%;
+            animation: gradient-shift 10s ease infinite;
+            color: white;
+            border-radius: var(--r-xl);
+            padding: 2.5rem;
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .sidebar-price {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin: 0.75rem 0 1.5rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-aurora {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--r-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success-aurora {
+            background: rgba(16, 185, 129, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-warning-aurora {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* ═══════════════════════════════════════
+           BUTTONS - AURORA
+           ═══════════════════════════════════════ */
+        .btn-aurora-luxury {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: var(--r-md);
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.4s var(--ease-spring);
+            border: none;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-aurora-luxury::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+            pointer-events: none;
+        }
+
+        .btn-aurora-luxury:hover::before {
+            left: 100%;
+        }
+
+        .btn-aurora-primary {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-aurora-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.5);
+            color: white;
+        }
+
+        .btn-aurora-outline {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .btn-aurora-outline:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-aurora-danger {
+            background: rgba(244, 63, 94, 0.1);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            margin-top: 0.75rem;
+        }
+
+        .btn-aurora-danger:hover {
+            background: linear-gradient(135deg, var(--rose), #be123c);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(244, 63, 94, 0.3);
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .security-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--r-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--aurora-start);
+            flex-shrink: 0;
+        }
+
+        .security-text {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════ */
+        @media (max-width: 991px) {
+            .hero-aurora {
+                height: 380px;
+            }
+
+            .hero-title-aurora {
+                font-size: 2.5rem;
+            }
+
+            .main-wrapper-aurora {
+                margin-top: -60px;
+            }
+
+            .sidebar-aurora {
+                margin-top: 2rem;
+                position: static;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-title-aurora {
+                font-size: 2rem;
+            }
+
+            .section-aurora {
+                padding: 1.75rem;
+            }
+
+            .info-pill-aurora {
+                padding: 1rem;
+            }
+
+            .pill-icon-aurora {
+                width: 44px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           SCROLLBAR
+           ═══════════════════════════════════════ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--r-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Dark mode overrides */
+        [data-theme="dark"] .section-aurora {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        [data-theme="dark"] .info-pill-aurora {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(148, 163, 184, 0.15);
+        }
+
+        [data-theme="dark"] .pill-value,
+        [data-theme="dark"] .title-aurora {
+            color: white;
+        }
+
+        [data-theme="dark"] .motive-aurora {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.8));
+        }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <!-- ═══════════════════════════════════════
+         NAV HEADER - GLASS BACK
+         ═══════════════════════════════════════ -->
+    <div class="nav-header-aurora">
+        <div class="container">
+            <a th:href="@{/usuario/mis-citas}" class="btn-back-aurora">
+                <i class="bi bi-chevron-left"></i> Volver al panel
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         HERO SECTION - AURORA
+         ═══════════════════════════════════════ -->
+    <div class="hero-aurora">
+        <img th:if="${cita.imagenClinicaUrl != null}" th:src="${cita.imagenClinicaUrl}" class="hero-image-aurora"
+            alt="Clínica">
+        <img th:unless="${cita.imagenClinicaUrl != null}"
+            src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=2000"
+            class="hero-image-aurora" alt="Default">
+        <div class="hero-gradient-aurora"></div>
+
+        <div class="hero-container-aurora">
+            <div class="container">
+                <div class="hero-badge-aurora">
+                    <i class="bi bi-star-fill"></i> Experiencia Premium
+                </div>
+                <h1 class="hero-title-aurora" th:text="${cita.nombreServicio}">Consulta Veterinaria</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         MAIN CONTENT
+         ═══════════════════════════════════════ -->
+    <main class="main-wrapper-aurora">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Columna Izquierda -->
+                <div class="col-lg-8">
+                    <div class="glass-container-aurora animate-fade-up">
+
+                        <!-- Sección Clínica -->
+                        <div class="section-aurora">
+                            <div class="label-aurora">
+                                <i class="bi bi-building"></i> Centro Médico
+                            </div>
+                            <h2 class="title-aurora" th:text="${cita.nombreClinica}">Clinica Veterinaria</h2>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="info-pill-aurora">
+                                        <div class="pill-icon-aurora">
+                                            <i class="bi bi-geo-alt"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <div class="pill-label">Ubicación</div>
+                                            <div class="pill-value" th:text="${cita.direccionClinica}">Calle Principal
+                                                123</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-pill-aurora">
+                                        <div class="pill-icon-aurora">
+                                            <i class="bi bi-telephone"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <div class="pill-label">Teléfono</div>
+                                            <div class="pill-value" th:text="${cita.telefonoClinica}">+57 300 000 0000
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección Paciente & Doctor -->
+                        <div class="section-aurora">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="label-aurora">
+                                        <i class="bi bi-heart-pulse"></i> Paciente
+                                    </div>
+                                    <div class="info-pill-aurora">
+                                        <div class="pill-icon-aurora"
+                                            style="background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(244, 63, 94, 0.08)); color: var(--rose);">
+                                            <i class="bi bi-heart-pulse"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <div class="pill-label">Mascota</div>
+                                            <div class="pill-value" th:text="${cita.nombreMascota}">Doki</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="label-aurora">
+                                        <i class="bi bi-person-check"></i> Especialista
+                                    </div>
+                                    <div class="info-pill-aurora">
+                                        <div class="pill-icon-aurora"
+                                            style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.08)); color: var(--ocean);">
+                                            <i class="bi bi-person-check"></i>
+                                        </div>
+                                        <div class="pill-content">
+                                            <div class="pill-label">Médico Asignado</div>
+                                            <div class="pill-value"
+                                                th:text="${cita.nombreDoctor != null ? cita.nombreDoctor : 'Por confirmar'}">
+                                                Dra. Claudia</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección Agenda -->
+                        <div class="section-aurora">
+                            <div class="label-aurora">
+                                <i class="bi bi-calendar-check"></i> Detalles de la Agenda
+                            </div>
+                            <div class="info-pill-aurora mb-4">
+                                <div class="pill-icon-aurora"
+                                    style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid)); color: white;">
+                                    <i class="bi bi-calendar-check"></i>
+                                </div>
+                                <div class="pill-content">
+                                    <div class="pill-label">Fecha y Hora Programada</div>
+                                    <div class="pill-value" style="font-size: 1.1rem;" th:text="${cita.fechaHora}">10 de
+                                        Mayo, 2026 - 10:00 AM</div>
+                                </div>
+                            </div>
+
+                            <div class="motive-aurora">
+                                <div class="motive-label">
+                                    <i class="bi bi-chat-left-text"></i> Motivo de la Consulta
+                                </div>
+                                <p class="motive-text"
+                                    th:text="${cita.motivo != null ? cita.motivo : 'Sin observaciones adicionales registradas.'}">
+                                    Sin observaciones registradas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha - Sidebar -->
+                <div class="col-lg-4">
+                    <div class="sidebar-aurora animate-fade-scale delay-200">
+                        <div class="sidebar-label">Resumen Financiero</div>
+                        <div class="sidebar-price" th:text="${#numbers.formatCurrency(cita.costo)}">$0.00</div>
+
+                        <div class="sidebar-status-row">
+                            <span class="sidebar-label">Estado de Pago</span>
+                            <span class="status-aurora"
+                                th:classappend="${cita.estadoPago == 'PAGADO' ? 'status-success-aurora' : 'status-warning-aurora'}">
+                                <i class="bi"
+                                    th:classappend="${cita.estadoPago == 'PAGADO' ? 'bi-check-circle-fill' : 'bi-clock-history'}"></i>
+                                <span th:text="${cita.estadoPago}">PENDIENTE</span>
+                            </span>
+                        </div>
+
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 2rem 0;">
+
+                        <!-- Acciones Principales -->
+                        <div class="d-grid gap-3">
+                            <!-- Pagar -->
+                            <a th:if="${cita.estadoPago != 'PAGADO' and cita.estado != 'Cancelada'}"
+                                th:href="@{/usuario/checkout/{id}(id=${cita.id})}"
+                                class="btn-aurora-luxury btn-aurora-primary">
+                                <i class="bi bi-credit-card-2-front"></i> Realizar Pago Ahora
+                            </a>
+
+                            <!-- Receta -->
+                            <a th:if="${cita.estado == 'Completada'}"
+                                th:href="@{/usuario/citas/{id}/receta(id=${cita.id})}"
+                                class="btn-aurora-luxury btn-aurora-primary" target="_blank">
+                                <i class="bi bi-file-earmark-medical"></i> Ver Receta Médica
+                            </a>
+
+                            <!-- Historial -->
+                            <a th:href="@{/usuario/historial/{id}/pdf(id=${cita.mascotaId})}"
+                                class="btn-aurora-luxury btn-aurora-outline">
+                                <i class="bi bi-journal-medical"></i> Historial Clínico
+                            </a>
+
+                            <!-- Cancelar -->
+                            <div th:if="${cita.estado == 'Pendiente' or cita.estado == 'Confirmada'}">
+                                <form th:action="@{/usuario/mis-citas/{id}/cancelar(id=${cita.id})}" method="post"
+                                    onsubmit="return confirm('¿Seguro que deseas cancelar?');">
+                                    <button type="submit" class="btn-aurora-luxury btn-aurora-danger">
+                                        <i class="bi bi-x-circle"></i> Cancelar Cita
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Footer Sidebar - Seguridad -->
+                        <div class="sidebar-footer">
+                            <div class="security-badge">
+                                <div class="security-icon">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <div class="security-text">
+                                    Transacción segura protegida por encriptación de 256 bits.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer-usuario}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
+</body>
+
+</html>

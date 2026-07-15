@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title th:text="${usuarioId != null ? 'Editar Usuario' : 'Nuevo Usuario'} + ' | ClínicaApp Admin'">Usuario |
+        ClínicaApp Admin</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-strong: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 4px 24px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 20px 50px rgba(99, 102, 241, 0.18);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #ede9fe 25%, #e0e7ff 50%, #f5f3ff 75%, #fff1f2 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #334155;
+            padding-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            33% {
+                background-position: 100% 50%;
+            }
+
+            66% {
+                background-position: 50% 100%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Partículas flotantes de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Contenedor Principal */
+        .admin-container {
+            padding: 1.5rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER DE PÁGINA ===== */
+        .page-header {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-weight: 600;
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .page-header i.main-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.05));
+            color: #4338ca;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CARD PRINCIPAL ===== */
+        .main-card {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.1s;
+            position: relative;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .card-header-custom {
+            padding: 1.75rem 2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .card-header-custom i.header-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .icon-new {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .icon-edit {
+            background: linear-gradient(135deg, var(--warning), #f59e0b);
+            color: white;
+        }
+
+        .card-header-custom h5 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .card-header-custom p {
+            color: #64748b;
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .card-body-custom {
+            padding: 2rem;
+        }
+
+        /* ===== FORMULARIOS PREMIUM ===== */
+        .form-group {
+            margin-bottom: 1.75rem;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .form-group:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-label-custom {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label-custom::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+        }
+
+        .required-badge::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 0.25rem;
+            font-weight: 800;
+        }
+
+        /* Input Premium */
+        .input-group-premium {
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            background: rgba(248, 250, 252, 0.8);
+            border: 2px solid #e0e7ff;
+        }
+
+        .input-group-premium:focus-within {
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .input-group-text-custom {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border: none;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-control-custom {
+            border: none;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: transparent;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .form-control-custom:focus {
+            background: white;
+            outline: none;
+        }
+
+        .form-control-custom::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Select Premium */
+        .select-premium {
+            border: 2px solid #e0e7ff;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: rgba(248, 250, 252, 0.8);
+            transition: all 0.3s ease;
+            width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236366f1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+        }
+
+        .select-premium:focus {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+            background: white;
+            outline: none;
+        }
+
+        /* Password Strength Bar */
+        .password-strength-container {
+            margin-top: 0.75rem;
+        }
+
+        .password-strength-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .password-strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: all 0.4s ease;
+        }
+
+        .strength-weak {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            width: 33%;
+        }
+
+        .strength-medium {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            width: 66%;
+        }
+
+        .strength-strong {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 100%;
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Role Preview Badges */
+        .role-preview-container {
+            margin-top: 1rem;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .role-preview {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .role-preview i {
+            font-size: 1.1rem;
+        }
+
+        .role-admin {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 2px solid #f59e0b;
+        }
+
+        .role-recepcionista {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            color: #9d174d;
+            border: 2px solid #ec4899;
+        }
+
+        .role-clinica {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #0369a1;
+            border: 2px solid #0ea5e9;
+        }
+
+        .role-user {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        /* Helper text */
+        .form-text-custom {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.75rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(224, 231, 255, 0.5), rgba(199, 210, 254, 0.3));
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .btn-group-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid rgba(226, 232, 240, 0.5);
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.5s;
+        }
+
+        .btn-cancel {
+            background: rgba(241, 245, 249, 0.8);
+            border: 2px solid #e2e8f0;
+            color: #475569;
+            border-radius: var(--radius-md);
+            padding: 1rem 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            color: #334155;
+            transform: translateY(-2px);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 1rem 2.5rem;
+            font-weight: 800;
+            font-size: 1rem;
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-save::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        .btn-save:hover::before {
+            left: 100%;
+        }
+
+        /* ===== FOOTER ===== */
+        .admin-footer {
+            margin-top: 3rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(226, 232, 240, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c7d2fe, #ddd6fe);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.25rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .card-body-custom {
+                padding: 1.5rem;
+            }
+
+            .btn-group-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn-cancel,
+            .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card-header-custom {
+                padding: 1.25rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 575px) {
+
+            .form-control-custom,
+            .input-group-text-custom,
+            .select-premium {
+                padding: 0.875rem 1rem;
+            }
+        }
+
+        /* Animación del punto pulsante del footer */
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar Admin Unificado -->
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <div class="container admin-container">
+
+        <!-- ===== HEADER DE PÁGINA ===== -->
+        <div class="page-header">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-person-gear main-icon"></i>
+                <div>
+                    <h1 th:text="${usuarioId != null ? 'Editar Usuario' : 'Nuevo Usuario'}">Usuario</h1>
+                    <p
+                        th:text="${usuarioId != null ? 'Actualiza la información del usuario' : 'Crea un nuevo acceso al sistema'}">
+                        Gestión de usuarios</p>
+                </div>
+            </div>
+            <a th:href="@{/admin/usuarios}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Volver al Directorio
+            </a>
+        </div>
+
+        <!-- ===== CARD PRINCIPAL ===== -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <div class="main-card">
+
+                    <!-- Header del Card -->
+                    <div class="card-header-custom">
+                        <i class="bi bi-person-plus-fill header-icon icon-new" th:if="${usuarioId == null}"></i>
+                        <i class="bi bi-person-gear header-icon icon-edit" th:if="${usuarioId != null}"></i>
+                        <div>
+                            <h5 th:text="${usuarioId != null ? 'Editar Usuario Existente' : 'Crear Nuevo Acceso'}">
+                                Formulario</h5>
+                            <p>Completa todos los datos requeridos para continuar</p>
+                        </div>
+                    </div>
+
+                    <!-- Body del Card -->
+                    <div class="card-body-custom">
+
+                        <form th:action="@{/admin/usuarios/guardar}" th:object="${usuarioDTO}" method="post"
+                            id="usuarioForm">
+                            <input type="hidden" th:field="*{id}">
+
+                            <!-- Campo: Nombre Completo -->
+                            <div class="form-group">
+                                <label class="form-label-custom required-badge">Nombre Completo</label>
+                                <div class="input-group-premium">
+                                    <span class="input-group-text-custom"><i class="bi bi-person-fill"></i></span>
+                                    <input type="text" class="form-control-custom" th:field="*{nombre}" required
+                                        placeholder="Ej: Juan Pérez González">
+                                </div>
+                            </div>
+
+                            <!-- Campo: Correo Electrónico -->
+                            <div class="form-group">
+                                <label class="form-label-custom required-badge">Correo Electrónico</label>
+                                <div class="input-group-premium">
+                                    <span class="input-group-text-custom"><i class="bi bi-envelope-fill"></i></span>
+                                    <input type="email" class="form-control-custom" th:field="*{email}" required
+                                        placeholder="usuario@clinicaapp.com">
+                                </div>
+                            </div>
+
+                            <!-- Campo: Contraseña (Solo en creación) -->
+                            <div class="form-group" th:if="${usuarioId == null}">
+                                <label class="form-label-custom required-badge">Contraseña Provisional</label>
+                                <div class="input-group-premium">
+                                    <span class="input-group-text-custom"><i class="bi bi-lock-fill"></i></span>
+                                    <input type="password" class="form-control-custom" th:field="*{password}" required
+                                        placeholder="Mínimo 8 caracteres" id="passwordInput" minlength="8">
+                                </div>
+                                <div class="password-strength-container">
+                                    <div class="password-strength-bar">
+                                        <div class="password-strength-fill" id="strengthFill"></div>
+                                    </div>
+                                    <div class="password-strength-text" id="strengthText" style="display: none;">
+                                        <i class="bi bi-shield-exclamation"></i>
+                                        <span>Fuerza de la contraseña</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campo: Rol en el Sistema -->
+                            <div class="form-group mb-0">
+                                <label class="form-label-custom required-badge">Rol en el Sistema</label>
+                                <select class="select-premium" th:field="*{role}" required id="roleSelect">
+                                    <option value="" disabled selected>-- Seleccionar rol --</option>
+                                    <option th:each="r : ${rolesDisponibles}" th:value="${r}"
+                                        th:text="${#strings.replace(r.name(), 'ROLE_', '')}">
+                                    </option>
+                                </select>
+
+                                <!-- Previews de Rol (Se muestran dinámicamente) -->
+                                <div class="role-preview-container" id="rolePreviewContainer" style="display: none;">
+
+                                    <!-- Preview ADMIN -->
+                                    <div class="role-preview role-admin" id="previewAdmin" style="display: none;">
+                                        <i class="bi bi-shield-lock-fill"></i>
+                                        <span>Acceso Total al Sistema</span>
+                                    </div>
+
+                                    <!-- Preview RECEPCIONISTA -->
+                                    <div class="role-preview role-recepcionista" id="previewRecepcionista"
+                                        style="display: none;">
+                                        <i class="bi bi-headset"></i>
+                                        <span>Gestión de Citas y Recepción</span>
+                                    </div>
+
+                                    <!-- Preview CLINICA -->
+                                    <div class="role-preview role-clinica" id="previewClinica" style="display: none;">
+                                        <i class="bi bi-hospital-fill"></i>
+                                        <span>Perfil de Clínica Veterinaria</span>
+                                    </div>
+
+                                    <!-- Preview USER -->
+                                    <div class="role-preview role-user" id="previewUser" style="display: none;">
+                                        <i class="bi bi-person-fill"></i>
+                                        <span>Acceso Estándar de Cliente</span>
+                                    </div>
+                                </div>
+
+                                <!-- Previews iniciales (al editar) -->
+                                <div class="role-preview-container" th:if="*{role != null}">
+                                    <div class="role-preview role-admin" th:if="*{role.name() == 'ROLE_ADMIN'}">
+                                        <i class="bi bi-shield-lock-fill"></i>
+                                        <span>Acceso Total al Sistema</span>
+                                    </div>
+                                    <div class="role-preview role-recepcionista"
+                                        th:if="*{role.name() == 'ROLE_RECEPCIONISTA'}">
+                                        <i class="bi bi-headset"></i>
+                                        <span>Gestión de Citas y Recepción</span>
+                                    </div>
+                                    <div class="role-preview role-clinica" th:if="*{role.name() == 'ROLE_CLINICA'}">
+                                        <i class="bi bi-hospital-fill"></i>
+                                        <span>Perfil de Clínica Veterinaria</span>
+                                    </div>
+                                    <div class="role-preview role-user" th:if="*{role.name() == 'ROLE_USER'}">
+                                        <i class="bi bi-person-fill"></i>
+                                        <span>Acceso Estándar de Cliente</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-text-custom">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    El rol determina los permisos y funcionalidades disponibles para el usuario en la
+                                    plataforma.
+                                </div>
+                            </div>
+
+                            <!-- ===== BOTONES DE ACCIÓN ===== -->
+                            <div class="btn-group-actions">
+                                <a th:href="@{/admin/usuarios}" class="btn-cancel">
+                                    <i class="bi bi-x-lg"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn-save">
+                                    <i class="bi bi-save"></i>
+                                    <span
+                                        th:text="${usuarioId != null ? 'Guardar Cambios' : 'Crear Usuario'}">Guardar</span>
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== CARD DE INFORMACIÓN ADICIONAL ===== -->
+                <div class="main-card mt-4" style="animation-delay: 0.6s;">
+                    <div class="card-header-custom"
+                        style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(254, 215, 170, 0.95) 100%);">
+                        <h5 style="color: #92400e;">
+                            <i class="bi bi-lightbulb"
+                                style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);"></i>
+                            Guía de Roles del Sistema
+                        </h5>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-shield-lock" style="color: #92400e; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Administrador
+                                        (ADMIN)</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Control total
+                                        del sistema: gestión de clínicas, usuarios, servicios, configuración y reportes.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #fce7f3, #fbcfe8); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-headset" style="color: #9d174d; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Recepcionista
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Gestión de
+                                        citas, atención al cliente, registro de mascotas y coordinación de horarios.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-hospital" style="color: #0369a1; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Clínica</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Perfil
+                                        exclusivo para clínicas veterinarias: gestión de servicios, veterinarios y
+                                        estadísticas.</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="bi bi-person" style="color: #065f46; font-size: 1.1rem;"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Cliente (USER)
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Acceso
+                                        estándar: agendar citas, ver historial de mascotas, explorar clínicas y
+                                        servicios.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="admin-footer">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div
+                style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;">
+            </div>
+            <span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">Sistema Operativo</span>
+        </div>
+        <small>© 2024 ClínicaApp - Panel de Administración</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ===== CONFIRMACIÓN ANTES DE SALIR CON CAMBIOS =====
+        let formModified = false;
+        const form = document.getElementById('usuarioForm');
+
+        form.addEventListener('input', () => formModified = true);
+        form.addEventListener('change', () => formModified = true);
+
+        window.addEventListener('beforeunload', (e) => {
+            if (formModified) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Resetear flag al enviar
+        form.addEventListener('submit', () => {
+            formModified = false;
+        });
+
+        // Cancelar también resetea
+        document.querySelector('.btn-cancel').addEventListener('click', () => {
+            formModified = false;
+        });
+
+        // ===== VALIDACIÓN DEL FORMULARIO =====
+        form.addEventListener('submit', function (e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Scroll al primer campo inválido con animación suave
+                const firstInvalid = this.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
+            this.classList.add('was-validated');
+        });
+
+        // ===== ANIMACIONES DE ENTRADA CON INTERSECTION OBSERVER =====
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -30px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.form-group').forEach(el => {
+            observer.observe(el);
+        });
+
+        // ===== PREVIEW DE ROL DINÁMICO =====
+        const roleSelect = document.getElementById('roleSelect');
+        const rolePreviewContainer = document.getElementById('rolePreviewContainer');
+
+        if (roleSelect) {
+            roleSelect.addEventListener('change', function () {
+                const selectedRole = this.value;
+
+                // Ocultar todos los previews primero
+                document.querySelectorAll('.role-preview').forEach(preview => {
+                    preview.style.display = 'none';
+                });
+
+                // Mostrar el contenedor
+                if (selectedRole) {
+                    rolePreviewContainer.style.display = 'block';
+
+                    // Mostrar el preview correspondiente
+                    const roleMap = {
+                        'ROLE_ADMIN': 'previewAdmin',
+                        'ROLE_RECEPCIONISTA': 'previewRecepcionista',
+                        'ROLE_CLINICA': 'previewClinica',
+                        'ROLE_USER': 'previewUser'
+                    };
+
+                    const previewId = roleMap[selectedRole];
+                    if (previewId) {
+                        const preview = document.getElementById(previewId);
+                        if (preview) {
+                            preview.style.display = 'inline-flex';
+                            // Animación de entrada
+                            preview.style.opacity = '0';
+                            preview.style.transform = 'scale(0.9)';
+                            setTimeout(() => {
+                                preview.style.transition = 'all 0.3s ease';
+                                preview.style.opacity = '1';
+                                preview.style.transform = 'scale(1)';
+                            }, 50);
+                        }
+                    }
+                } else {
+                    rolePreviewContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // ===== STRENGTH METER DE CONTRASEÑA =====
+        const passwordInput = document.getElementById('passwordInput');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+
+        if (passwordInput && strengthFill && strengthText) {
+            passwordInput.addEventListener('input', function () {
+                const value = this.value;
+
+                if (value.length === 0) {
+                    strengthFill.className = 'password-strength-fill';
+                    strengthText.style.display = 'none';
+                    return;
+                }
+
+                strengthText.style.display = 'flex';
+
+                // Calcular fuerza
+                let strength = 0;
+                if (value.length >= 8) strength++;
+                if (value.match(/[a-z]/) && value.match(/[A-Z]/)) strength++;
+                if (value.match(/[0-9]/)) strength++;
+                if (value.match(/[^a-zA-Z0-9]/)) strength++;
+
+                // Aplicar clase según fuerza
+                strengthFill.className = 'password-strength-fill';
+                if (strength <= 1) {
+                    strengthFill.classList.add('strength-weak');
+                    strengthText.querySelector('span').textContent = 'Débil - Usa mayúsculas, números y símbolos';
+                    strengthText.querySelector('i').className = 'bi bi-shield-exclamation text-danger';
+                } else if (strength === 2 || strength === 3) {
+                    strengthFill.classList.add('strength-medium');
+                    strengthText.querySelector('span').textContent = 'Media - Agrega más variedad de caracteres';
+                    strengthText.querySelector('i').className = 'bi bi-shield-half text-warning';
+                } else {
+                    strengthFill.classList.add('strength-strong');
+                    strengthText.querySelector('span').textContent = 'Fuerte - Excelente seguridad';
+                    strengthText.querySelector('i').className = 'bi bi-shield-fill-check text-success';
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

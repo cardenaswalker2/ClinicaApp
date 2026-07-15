@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configuración Maestra | ClínicaApp Admin</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-strong: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 4px 24px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 20px 50px rgba(99, 102, 241, 0.18);
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #ede9fe 25%, #e0e7ff 50%, #f5f3ff 75%, #fff1f2 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            color: #334155;
+            padding-bottom: 2rem;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            33% {
+                background-position: 100% 50%;
+            }
+
+            66% {
+                background-position: 50% 100%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Partículas flotantes de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Contenedor Principal */
+        .admin-container {
+            padding: 1.5rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER DE PÁGINA ===== */
+        .page-header {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: #64748b;
+            font-weight: 600;
+            margin: 0.25rem 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        .page-header i.main-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+            animation: spin-gear 10s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin-gear {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Alerta de éxito flotante */
+        .alert-success-custom {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: var(--radius-xl);
+            padding: 1rem 1.5rem;
+            color: #065f46;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-soft);
+            animation: slideDown 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .alert-success-custom::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, #10b981, #34d399);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CARDS DE CONFIGURACIÓN ===== */
+        .config-card {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            position: relative;
+        }
+
+        .config-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .config-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-6px);
+        }
+
+        .card-header-custom {
+            padding: 1.75rem 2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-bottom: 2px solid rgba(226, 232, 240, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .card-header-custom i {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        /* Icono Finanzas */
+        .icon-finance {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #059669;
+        }
+
+        /* Icono Comunicaciones */
+        .icon-comm {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #0284c7;
+        }
+
+        .card-header-custom h5 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .card-body-custom {
+            padding: 2rem;
+        }
+
+        /* ===== FORMULARIOS PREMIUM ===== */
+        .form-group {
+            margin-bottom: 1.75rem;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-label-custom {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label-custom::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+        }
+
+        /* Input Group Premium */
+        .input-group-premium {
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            background: rgba(248, 250, 252, 0.8);
+            border: 2px solid #e0e7ff;
+        }
+
+        .input-group-premium:focus-within {
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .input-group-text-custom {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border: none;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-control-custom {
+            border: none;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: transparent;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .form-control-custom:focus {
+            background: white;
+            outline: none;
+        }
+
+        .form-control-custom::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Textarea Premium */
+        .textarea-premium {
+            border: 2px solid #e0e7ff;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+            background: rgba(248, 250, 252, 0.8);
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 140px;
+            line-height: 1.6;
+            width: 100%;
+        }
+
+        .textarea-premium:focus {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+            background: white;
+            outline: none;
+        }
+
+        /* Helper text */
+        .form-text-custom {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.75rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, rgba(224, 231, 255, 0.5), rgba(199, 210, 254, 0.3));
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Alerta info interna */
+        .alert-info-custom {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            border: 2px solid #7dd3fc;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .alert-info-custom i {
+            color: #0ea5e9;
+            font-size: 1.25rem;
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info-custom small {
+            color: #0369a1;
+            font-weight: 600;
+            line-height: 1.5;
+            font-size: 0.85rem;
+        }
+
+        /* ===== BOTÓN DE GUARDADO ===== */
+        .save-section {
+            margin-top: 2rem;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+            animation-delay: 0.4s;
+        }
+
+        .btn-save-master {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 1.25rem 3rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-save-master::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-save-master:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        .btn-save-master:hover::before {
+            left: 100%;
+        }
+
+        /* ===== FOOTER ===== */
+        .admin-footer {
+            margin-top: 3rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(226, 232, 240, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c7d2fe, #ddd6fe);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.25rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .alert-success-custom {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card-body-custom {
+                padding: 1.5rem;
+            }
+
+            .save-section {
+                text-align: center;
+            }
+
+            .btn-save-master {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .page-header i.main-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .card-header-custom {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .card-header-custom i {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+
+            .form-control-custom,
+            .input-group-text-custom,
+            .textarea-premium {
+                padding: 0.875rem 1rem;
+            }
+        }
+
+        /* Animación del punto pulsante del footer */
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar Admin Unificado -->
+    <div th:replace="~{fragments/header :: header-admin}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
+
+    <div class="container admin-container">
+
+        <!-- ===== HEADER DE PÁGINA ===== -->
+        <div class="page-header">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-gear-wide-connected main-icon"></i>
+                <div>
+                    <h1>Ajustes Maestros del Sistema</h1>
+                    <p>Configura los parámetros globales de la plataforma.</p>
+                </div>
+            </div>
+            <div th:if="${param.success}" class="alert-success-custom position-relative">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>¡Cambios guardados correctamente!</span>
+            </div>
+        </div>
+
+        <!-- ===== FORMULARIO PRINCIPAL ===== -->
+        <form th:action="@{/admin/configuracion/guardar}" th:object="${config}" method="post">
+            <div class="row g-4">
+
+                <!-- ===== BLOQUE 1: FINANZAS Y STRIPE ===== -->
+                <div class="col-lg-6">
+                    <div class="config-card" style="animation-delay: 0.1s;">
+                        <div class="card-header-custom">
+                            <i class="bi bi-bank icon-finance"></i>
+                            <h5>Tarifas y Comisiones</h5>
+                        </div>
+                        <div class="card-body-custom">
+
+                            <!-- Campo: Comisión Stripe -->
+                            <div class="form-group">
+                                <label class="form-label-custom">Comisión por Cita (%)</label>
+                                <div class="input-group-premium">
+                                    <span class="input-group-text-custom">%</span>
+                                    <input type="number" step="0.1" class="form-control-custom"
+                                        th:field="*{comisionStripe}" required placeholder="2.9" min="0" max="100">
+                                </div>
+                                <div class="form-text-custom">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Este porcentaje se deduce automáticamente de cada pago realizado por el cliente a
+                                    través de Stripe.
+                                </div>
+                            </div>
+
+                            <!-- Campo: Email de Soporte -->
+                            <div class="form-group mb-0">
+                                <label class="form-label-custom">Email de Soporte Técnico</label>
+                                <div class="input-group-premium">
+                                    <span class="input-group-text-custom"><i class="bi bi-envelope-fill"></i></span>
+                                    <input type="email" class="form-control-custom" th:field="*{emailContacto}" required
+                                        placeholder="soporte@clinicaapp.com">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== BLOQUE 2: COMUNICACIONES Y EMAIL ===== -->
+                <div class="col-lg-6">
+                    <div class="config-card" style="animation-delay: 0.2s;">
+                        <div class="card-header-custom">
+                            <i class="bi bi-envelope-paper icon-comm"></i>
+                            <h5>Plantillas de Mensajería</h5>
+                        </div>
+                        <div class="card-body-custom">
+
+                            <!-- Campo: Mensaje de Bienvenida -->
+                            <div class="form-group">
+                                <label class="form-label-custom">Mensaje de Bienvenida</label>
+                                <textarea class="textarea-premium" rows="5" th:field="*{mensajeBienvenida}"
+                                    placeholder="Escribe el texto que recibirán los nuevos usuarios al registrarse..."></textarea>
+                            </div>
+
+                            <!-- Alerta informativa -->
+                            <div class="alert-info-custom">
+                                <i class="bi bi-info-circle-fill"></i>
+                                <small>Los recordatorios de citas se envían automáticamente 24 horas antes de la fecha
+                                    programada. Asegúrate de que el email de soporte esté configurado
+                                    correctamente.</small>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== CARD EXTRA: RESUMEN DE CONFIGURACIÓN (NUEVO) ===== -->
+                <div class="col-12">
+                    <div class="config-card" style="animation-delay: 0.3s;">
+                        <div class="card-header-custom"
+                            style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(254, 215, 170, 0.95) 100%);">
+                            <i class="bi bi-lightbulb"
+                                style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);"></i>
+                            <h5 style="color: #92400e;">Resumen de Configuración Activa</h5>
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div
+                                            style="width: 40px; height: 40px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <i class="bi bi-1-circle-fill"
+                                                style="color: #4338ca; font-size: 1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Comisión
+                                                Stripe</div>
+                                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Se
+                                                aplica a cada transacción procesada.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div
+                                            style="width: 40px; height: 40px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <i class="bi bi-2-circle-fill"
+                                                style="color: #059669; font-size: 1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Email de
+                                                Soporte</div>
+                                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Canal
+                                                principal de contacto para usuarios.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div
+                                            style="width: 40px; height: 40px; background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <i class="bi bi-3-circle-fill"
+                                                style="color: #b45309; font-size: 1.1rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 700; color: #1e293b; font-size: 0.95rem;">Mensaje
+                                                de Bienvenida</div>
+                                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.25rem;">Primer
+                                                contacto con nuevos registrados.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== BOTÓN DE GUARDADO GLOBAL ===== -->
+                <div class="col-12 save-section text-center text-lg-end">
+                    <button type="submit" class="btn-save-master">
+                        <i class="bi bi-save"></i>
+                        Aplicar Cambios Maestros
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="admin-footer">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <div
+                style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-dot 2s infinite;">
+            </div>
+            <span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">Sistema Operativo</span>
+        </div>
+        <small>© 2024 ClínicaApp - Panel de Administración</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ===== ANIMACIONES DE ENTRADA =====
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Intersection Observer para animar elementos al hacer scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -30px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.form-group, .alert-info-custom').forEach(el => {
+                observer.observe(el);
+            });
+
+            // ===== EFECTO TYPING EN TEXTAREA =====
+            const textarea = document.querySelector('.textarea-premium');
+            if (textarea) {
+                textarea.addEventListener('focus', function () {
+                    this.style.minHeight = '180px';
+                });
+                textarea.addEventListener('blur', function () {
+                    if (this.value === '') {
+                        this.style.minHeight = '140px';
+                    }
+                });
+            }
+
+            // ===== CONFIRMACIÓN ANTES DE SALIR CON CAMBIOS =====
+            let formModified = false;
+            const form = document.querySelector('form');
+
+            form.addEventListener('input', () => formModified = true);
+
+            window.addEventListener('beforeunload', (e) => {
+                if (formModified) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+
+            // Resetear flag al enviar
+            form.addEventListener('submit', () => {
+                formModified = false;
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>
