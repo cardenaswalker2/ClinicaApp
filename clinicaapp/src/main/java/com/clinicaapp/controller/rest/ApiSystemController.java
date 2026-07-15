@@ -104,6 +104,15 @@ public class ApiSystemController {
         return response;
     }
 
+    @PostMapping("/restore")
+    public Map<String, Object> restoreDevice(@RequestParam("id") String id) {
+        deviceTracker.restoreDevice(id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "RESTORED");
+        response.put("id", id);
+        return response;
+    }
+
     @PostMapping("/verify-pin")
     public Map<String, Object> verifyPin(@RequestParam("pin") String pin, jakarta.servlet.http.HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();

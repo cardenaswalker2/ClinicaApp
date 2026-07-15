@@ -1114,6 +1114,12 @@
             border: 1px solid rgba(245, 158, 11, 0.2);
         }
 
+        .badge-dev-status.revoked {
+            background: var(--hex-danger-dim);
+            color: var(--hex-danger);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
         /* ===== TERMINAL GRAPHIC ===== */
         .terminal-box {
             background: #020617;
@@ -1816,6 +1822,10 @@
 
             function getAccessUrl() {
                 let route = routeSelector.value;
+                // Si estamos en un servidor de producción (Render u otro) y la IP no es manual, usar el dominio actual
+                if (!isManualIp && (window.location.protocol === 'https:' || (!window.location.hostname.includes('localhost') && !window.location.hostname.startsWith('192.168.') && !window.location.hostname.startsWith('127.0.0.') && !window.location.hostname.startsWith('10.') && !window.location.hostname.startsWith('172.')))) {
+                    return `${window.location.origin}${route}`;
+                }
                 return `http://${currentIp}:${currentPort}${route}`;
             }
 
@@ -2135,6 +2145,21 @@
                     if (device.type === 'PC') iconClass = "bi-laptop";
                     if (device.type === 'Tablet') iconClass = "bi-tablet";
 
+                    let actionButton = "";
+                    if (device.status === 'REVOKED') {
+                        actionButton = `
+                            <button type="button" class="btn btn-sm btn-outline-success py-1 px-3 restore-btn" data-id="${device.id}" style="border-radius: 8px; font-size: 0.72rem;">
+                                <i class="bi bi-check-circle"></i> Habilitar
+                            </button>
+                        `;
+                    } else {
+                        actionButton = `
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 disconnect-btn" data-id="${device.id}" style="border-radius: 8px; font-size: 0.72rem;">
+                                <i class="bi bi-x-circle"></i> Revocar
+                            </button>
+                        `;
+                    }
+
                     tr.innerHTML = `
                         <td>
                             <div class="device-info-cell">
@@ -2152,14 +2177,12 @@
                         <td><span>${device.accessTime}</span></td>
                         <td>
                             <span class="badge-dev-status ${device.status.toLowerCase()}">
-                                <span class="pulse-dot-green ${device.status === 'IDLE' ? 'offline' : ''}" style="width: 5px; height: 5px;"></span>
+                                <span class="pulse-dot-green ${(device.status === 'IDLE' || device.status === 'REVOKED') ? 'offline' : ''}" style="width: 5px; height: 5px;"></span>
                                 ${device.status}
                             </span>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-3 disconnect-btn" data-id="${device.id}" style="border-radius: 8px; font-size: 0.72rem;">
-                                <i class="bi bi-x-circle"></i> Revocar
-                            </button>
+                            ${actionButton}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -2171,6 +2194,13 @@
                         revokeDevice(id);
                     });
                 });
+
+                document.querySelectorAll('.restore-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        restoreDevice(id);
+                    });
+                });
             }
 
             function revokeDevice(id) {
@@ -2178,8 +2208,8 @@
                 
                 const row = document.getElementById(`device-row-${id}`);
                 if (row) {
-                    row.style.opacity = '0';
-                    row.style.transform = 'translateX(50px)';
+                    row.style.opacity = '0.5';
+                    row.style.transform = 'translateX(20px)';
                 }
                 
                 fetch(`/api/system/revoke?id=${id}`, {
@@ -2193,6 +2223,29 @@
                 })
                 .catch(err => {
                     console.error("Error revoking device", err);
+                    loadNetworkData();
+                });
+            }
+
+            function restoreDevice(id) {
+                playTechBeep('success');
+                
+                const row = document.getElementById(`device-row-${id}`);
+                if (row) {
+                    row.style.opacity = '0.5';
+                }
+                
+                fetch(`/api/system/restore?id=${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        loadNetworkData();
+                    }, 300);
+                })
+                .catch(err => {
+                    console.error("Error restoring device", err);
                     loadNetworkData();
                 });
             }

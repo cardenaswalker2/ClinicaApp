@@ -184,10 +184,9 @@ public class NetworkDeviceTracker {
         
         for (DeviceSession dev : devices.values()) {
             if (revokedDeviceIds.contains(dev.getId())) {
-                continue;
-            }
-            
-            if (!dev.isSimulated()) {
+                dev.setStatus("REVOKED");
+                dev.setAccessTime("Bloqueado");
+            } else if (!dev.isSimulated()) {
                 long diff = now - dev.getLastAccessMs();
                 if (diff > 15 * 60 * 1000) {
                     dev.setStatus("IDLE");
@@ -206,6 +205,8 @@ public class NetworkDeviceTracker {
                 long diff = now - dev.getLastAccessMs();
                 if (diff > 10 * 60 * 1000) {
                     dev.setStatus("IDLE");
+                } else {
+                    dev.setStatus("ACTIVE");
                 }
                 
                 if (diff < 15 * 1000) {
@@ -224,6 +225,8 @@ public class NetworkDeviceTracker {
             if (d1.getStatus().equals(d2.getStatus())) {
                 return Long.compare(d2.getLastAccessMs(), d1.getLastAccessMs());
             }
+            if (d1.getStatus().equals("REVOKED")) return 1;
+            if (d2.getStatus().equals("REVOKED")) return -1;
             return d1.getStatus().equals("ACTIVE") ? -1 : 1;
         });
         
@@ -237,10 +240,16 @@ public class NetworkDeviceTracker {
             if (!dev.isSimulated()) {
                 blacklistedIps.add(dev.getIp());
             }
-            devices.remove(id);
         } else {
             revokedDeviceIds.add(id);
-            devices.remove(id);
+        }
+    }
+
+    public void restoreDevice(String id) {
+        revokedDeviceIds.remove(id);
+        DeviceSession dev = devices.get(id);
+        if (dev != null && !dev.isSimulated()) {
+            blacklistedIps.remove(dev.getIp());
         }
     }
 
