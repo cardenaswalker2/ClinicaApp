@@ -14,5 +14,7 @@ COPY --from=build /app/target/*.jar app.jar
 COPY no_show_citas.model .
 COPY riesgo_articular.model .
 COPY health_advanced.model .
+# Copiar imágenes subidas existentes
+COPY uploads ./uploads
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

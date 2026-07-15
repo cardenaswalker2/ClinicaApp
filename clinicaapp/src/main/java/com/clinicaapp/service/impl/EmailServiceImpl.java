@@ -11,6 +11,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class EmailServiceImpl implements IEmailService {
     @Autowired
     private com.clinicaapp.repository.LogNotificacionRepository logNotificacionRepo;
 
+    @Async
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
         try {
@@ -66,6 +68,7 @@ public class EmailServiceImpl implements IEmailService {
         }
     }
 
+    @Async
     @Override
     public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment) {
         try {
@@ -108,6 +111,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     // --- MÉTODO NUEVO Y MÁS IMPORTANTE (QUE FALTABA) ---
+    @Async
     @Override
     public void sendMessageWithAttachment(String to, String subject, String text, String attachmentName, byte[] attachmentBytes) {
         try {

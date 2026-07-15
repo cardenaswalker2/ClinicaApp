@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 // --- IMPORT CORREGIDO ---
 import jakarta.annotation.PostConstruct;
+import org.springframework.scheduling.annotation.Async;
 // ------------------------
 
 @Service
@@ -34,6 +35,7 @@ public class SmsServiceImpl implements ISmsService {
         Twilio.init(accountSid, authToken);
     }
 
+    @Async
     @Override
     public void sendSms(String toPhoneNumber, String messageBody) {
         try {
@@ -63,6 +65,7 @@ public class SmsServiceImpl implements ISmsService {
         }
     }
 
+    @Async
     @Override
     public void sendWhatsApp(String toPhoneNumber, String messageBody) {
         try {
