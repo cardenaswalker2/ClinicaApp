@@ -153,6 +153,13 @@ class _LoginPageState extends State<LoginPage>
   Future<void> _loginWithGoogle() async {
     setState(() => _loading = true);
     try {
+      // Forzar que Google siempre muestre el selector de cuentas
+      try {
+        await _googleSignIn.signOut();
+      } catch (e) {
+        // Ignorar si no había sesión iniciada
+      }
+      
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => _loading = false);
