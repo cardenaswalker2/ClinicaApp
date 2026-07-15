@@ -32,6 +32,7 @@ class _LoginPageState extends State<LoginPage>
   bool _loading = false;
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 
   // ── Animaciones ──
   late AnimationController _bgController;
@@ -143,6 +144,51 @@ class _LoginPageState extends State<LoginPage>
     } catch (e) {
       if (mounted) {
         _showSnackBar("Error de conexión");
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    setState(() => _loading = true);
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        setState(() => _loading = false);
+        return;
+      }
+
+      final res = await http.post(
+        Uri.parse("${AppConfig.baseUrl}/auth/google"),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "email": googleUser.email,
+          "nombre": googleUser.displayName ?? "Usuario Google",
+        }),
+      );
+
+      final data = json.decode(res.body);
+      if (res.statusCode == 200 && data['success']) {
+        AppConfig.userEmail = data['email'];
+        AppConfig.userName = data['nombre'];
+        AppConfig.userId = data['id'];
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MainNavigationPage(),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          _showSnackBar(data['message'] ?? "Error de autenticación con Google");
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar("Error al conectar con Google: $e");
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -848,9 +894,7 @@ class _LoginPageState extends State<LoginPage>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            _showSnackBar("Configuración de Google en progreso...");
-          },
+          onTap: _loading ? null : _loginWithGoogle,
           borderRadius: BorderRadius.circular(20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

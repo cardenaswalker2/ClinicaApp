@@ -66,4 +66,54 @@ public class ApiAuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload) {
+        try {
+            String email = payload.get("email");
+            String nombre = payload.get("nombre");
+
+            if (email == null || email.isBlank()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "El email de Google es requerido");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            Usuario usuario = usuarioRepository.findByEmail(email);
+            if (usuario == null) {
+                // Registrar automáticamente al usuario si ingresa con Google por primera vez
+                usuario = new Usuario();
+                usuario.setEmail(email);
+                // Dividir el nombre completo en nombre y apellido si es posible
+                if (nombre != null && nombre.contains(" ")) {
+                    int firstSpace = nombre.indexOf(" ");
+                    usuario.setNombre(nombre.substring(0, firstSpace));
+                    usuario.setApellido(nombre.substring(firstSpace + 1));
+                } else {
+                    usuario.setNombre(nombre != null ? nombre : "Usuario Google");
+                    usuario.setApellido("");
+                }
+                usuario.setRole(com.clinicaapp.model.enums.Role.ROLE_USER);
+                usuario.setActivo(true);
+                usuario.setFechaCreacion(java.time.LocalDateTime.now());
+                // Contraseña dummy encriptada aleatoria
+                usuario.setPassword(passwordEncoder.encode(java.util.UUID.randomUUID().toString()));
+                usuario = usuarioRepository.save(usuario);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("email", usuario.getEmail());
+            response.put("nombre", usuario.getNombre());
+            response.put("id", usuario.getId());
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error al procesar login de Google: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }
