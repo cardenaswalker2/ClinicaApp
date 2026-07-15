@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'login_page.dart';
+import 'info_detail_page.dart';
 
 // ============================================================
 // WELCOME PAGE - LUXURY AURORA EDITION
@@ -881,7 +882,32 @@ class _WelcomePageState extends State<WelcomePage>
             );
           },
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 14),
+        // Botón Explorar
+        _buildGlassButton(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const InfoDetailPage()),
+            );
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.stars_rounded, color: _auroraGlow, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                "Explorar el ecosistema digital",
+                style: GoogleFonts.outfit(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
         // Texto secundario
         TextButton(
           onPressed: _toLogin,
