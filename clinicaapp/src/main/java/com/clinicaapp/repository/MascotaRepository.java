@@ -17,7 +17,4 @@ public interface MascotaRepository extends MongoRepository<Mascota, String> {
 
     // Buscar mascotas por especie
     List<Mascota> findByEspecie(com.clinicaapp.model.enums.Especie especie);
-
-    // Buscar mascotas por sede clinicaId
-    List<Mascota> findByClinicaId(String clinicaId);
 }

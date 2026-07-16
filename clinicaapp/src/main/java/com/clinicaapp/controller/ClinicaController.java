@@ -190,9 +190,16 @@ public class ClinicaController {
         long receptionists = usuarioRepository.findByClinicaIdAndRole(clinica.getId(), Role.ROLE_RECEPCIONISTA).stream()
                 .filter(u -> "Activo".equalsIgnoreCase(u.getEstadoEmpleado())).count();
         
-        List<Mascota> mascotasSede = mascotaRepository.findByClinicaId(clinica.getId());
-        long totalMascotas = mascotasSede.size();
-        long totalClientes = mascotasSede.stream().map(Mascota::getPropietarioId).filter(Objects::nonNull).distinct().count();
+        long totalMascotas = todas.stream()
+                .map(CitaDisplayDTO::getMascotaId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
+        long totalClientes = todas.stream()
+                .map(CitaDisplayDTO::getEmailUsuario)
+                .filter(Objects::nonNull)
+                .distinct()
+                .count();
 
         // Productos con bajo stock
         List<Producto> bajoStock = productoRepository.findByClinicaId(clinica.getId()).stream()
