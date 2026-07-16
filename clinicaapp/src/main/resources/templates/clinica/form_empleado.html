@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guardar Empleado | Panel Clínica</title>
+    <title>Configuración de Colaborador | Panel Clínica</title>
     <link th:replace="~{fragments/header :: favIcon}">
 
     <!-- Bootstrap 5.3 -->
@@ -27,7 +27,7 @@
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
             --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
+            --gray-450: #94a3b8;
             --gray-500: #64748b;
             --gray-600: #475569;
             --gray-700: #334155;
@@ -92,7 +92,7 @@
             border-radius: var(--radius-xl);
             border: 1px solid var(--gray-200);
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-            padding: 2rem;
+            padding: 2.5rem;
             margin-top: 2rem;
             margin-bottom: 3rem;
         }
@@ -121,12 +121,12 @@
 
         .section-title {
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: var(--dark);
             border-bottom: 1.5px dashed var(--gray-200);
             padding-bottom: 0.5rem;
-            margin-top: 2rem;
-            margin-bottom: 1.25rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -140,7 +140,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.25rem;
             border: 1.5px solid var(--gray-200);
             border-radius: 50px;
             font-size: 0.85rem;
@@ -162,7 +162,7 @@
             background: var(--primary);
             color: white;
             font-weight: 700;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 2.5rem;
             border-radius: var(--radius-md);
             border: none;
             transition: var(--transition);
@@ -178,7 +178,7 @@
             background: var(--gray-100);
             color: var(--gray-600);
             font-weight: 700;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 2.5rem;
             border-radius: var(--radius-md);
             border: none;
             transition: var(--transition);
@@ -213,58 +213,123 @@
         </div>
     </nav>
 
-    <div class="container" style="max-width: 800px;">
+    <div class="container" style="max-width: 900px;">
         <div class="form-card">
-            <h4 class="fw-bold mb-4" th:text="${empleadoDto.id != null ? '📝 Editar Colaborador' : '👤 Nuevo Colaborador'}">Datos de Colaborador</h4>
+            <h3 class="fw-bold mb-2" th:text="${empleadoDto.id != null ? '📝 Editar Colaborador' : '👤 Nuevo Colaborador'}">Ficha de Empleado</h3>
+            <p class="text-muted mb-4">Ingresa la información detallada para configurar permisos, perfiles médicos y disponibilidad laboral.</p>
 
-            <form th:action="@{/clinica/personal/guardar}" th:object="${empleadoDto}" method="post">
+            <form th:action="@{/clinica/personal/guardar}" th:object="${empleadoDto}" method="post" enctype="multipart/form-data">
                 <input type="hidden" th:field="*{id}" />
 
                 <div class="section-title">
                     <i class="bi bi-person-bounding-box text-primary"></i>
-                    Información Básica
+                    Información Básica y Contacto
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Nombre</label>
+                        <label class="form-label">Nombre *</label>
                         <input type="text" class="form-control" th:field="*{nombre}" required placeholder="Ej: Juan" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Apellido</label>
+                        <label class="form-label">Apellidos *</label>
                         <input type="text" class="form-control" th:field="*{apellido}" required placeholder="Ej: Pérez" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Correo Electrónico</label>
+                        <label class="form-label">Correo Electrónico *</label>
                         <input type="email" class="form-control" th:field="*{email}" required placeholder="Ej: juan.perez@clinica.com" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Teléfono</label>
+                        <label class="form-label">Teléfono *</label>
                         <input type="text" class="form-control" th:field="*{telefono}" required placeholder="Ej: +57 300 123 4567" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label" th:text="${empleadoDto.id != null ? 'Contraseña (Dejar en blanco para conservar)' : 'Contraseña'}">Contraseña</label>
+                        <label class="form-label">DNI / Documento de Identidad</label>
+                        <input type="text" class="form-control" name="documento" th:value="${empleado != null ? empleado.documento : ''}" placeholder="Ej: 10204050" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Dirección Domiciliaria</label>
+                        <input type="text" class="form-control" name="direccion" th:value="${empleado != null ? empleado.direccion : ''}" placeholder="Calle 123 #45-67" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" th:text="${empleadoDto.id != null ? 'Contraseña (En blanco para conservar)' : 'Contraseña *'}">Contraseña</label>
                         <input type="password" class="form-control" th:field="*{password}" th:required="${empleadoDto.id == null}" placeholder="Mínimo 6 caracteres" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Rol / Cargo</label>
+                        <label class="form-label">Foto de Perfil</label>
+                        <input type="file" class="form-control" name="fotoFile" accept="image/*" />
+                        <div class="mt-1 small text-muted" th:if="${empleado != null and empleado.fotoPerfilUrl != null}">
+                            Foto actual: <a th:href="${empleado.fotoPerfilUrl}" target="_blank">Ver foto</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <i class="bi bi-briefcase text-primary"></i>
+                    Información Profesional y Roles
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Rol del Sistema *</label>
                         <select class="form-select" th:field="*{role}" required>
                             <option value="" disabled selected>Selecciona un rol...</option>
                             <option th:each="r : ${rolesDisponibles}" th:value="${r}" 
                                     th:text="${#strings.replace(r.name(), 'ROLE_', '')}">ROL</option>
                         </select>
                     </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Cargo / Puesto</label>
+                        <input type="text" class="form-control" name="cargo" th:value="${empleado != null ? empleado.cargo : ''}" placeholder="Ej: Veterinario Residente, Recepcionista Principal" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Especialidad (Veterinarios)</label>
+                        <input type="text" class="form-control" name="especialidad" th:value="${empleado != null ? empleado.especialidad : ''}" placeholder="Ej: Traumatología, Cirugía" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Número de Licencia</label>
+                        <input type="text" class="form-control" name="nLicencia" th:value="${empleado != null ? empleado.nLicencia : ''}" placeholder="Ej: Reg. Prof. 84729" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha de Ingreso</label>
+                        <input type="date" class="form-control" name="fechaIngreso" th:value="${empleado != null ? empleado.fechaIngreso : ''}" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Estado Laboral</label>
+                        <select class="form-select" name="estadoEmpleado">
+                            <option value="Activo" th:selected="${empleado == null or empleado.estadoEmpleado == 'Activo'}">Activo</option>
+                            <option value="Inactivo" th:selected="${empleado != null and empleado.estadoEmpleado == 'Inactivo'}">Inactivo</option>
+                            <option value="Vacaciones" th:selected="${empleado != null and empleado.estadoEmpleado == 'Vacaciones'}">En Vacaciones</option>
+                            <option value="Suspendido" th:selected="${empleado != null and empleado.estadoEmpleado == 'Suspendido'}">Suspendido</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Años de Experiencia</label>
+                        <input type="number" class="form-control" name="experiencia" th:value="${empleado != null ? empleado.experiencia : 0}" min="0" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Calificación Inicial (1.0 - 5.0)</label>
+                        <input type="number" step="0.1" class="form-control" name="calificacion" th:value="${empleado != null ? empleado.calificacion : 5.0}" min="1.0" max="5.0" />
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Biografía Pública (Se muestra a los clientes)</label>
+                        <textarea class="form-control" name="biografia" rows="3" placeholder="Biografía corta del médico, especializaciones..." th:text="${empleado != null ? empleado.biografia : ''}"></textarea>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Observaciones Internas (Privadas)</label>
+                        <textarea class="form-control" name="observacionesInternas" rows="2" placeholder="Notas sobre contrato, legajo médico..." th:text="${empleado != null ? empleado.observacionesInternas : ''}"></textarea>
+                    </div>
                 </div>
 
                 <div class="section-title">
-                    <i class="bi bi-calendar-range text-primary"></i>
-                    Horario de Trabajo y Disponibilidad
+                    <i class="bi bi-clock-history text-primary"></i>
+                    Horarios y Descansos
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label d-block">Días Laborales</label>
                     <div class="d-flex flex-wrap gap-2 mt-1">
-                        <th:block th:each="dia : ${T(java.util.Arrays).asList('LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO')}">
+                        <th:block th:each="dia : ${diasSemana}">
                             <input type="checkbox" name="diasLaborales" th:value="${dia}" th:id="${'dia_' + dia}" class="day-checkbox"
                                    th:checked="${empleado != null and empleado.getDiasLaborales().contains(dia)} or ${empleado == null and (dia != 'SABADO' and dia != 'DOMINGO')}" />
                             <label th:for="${'dia_' + dia}" class="day-label" th:text="${#strings.capitalize(#strings.toLowerCase(dia))}"></label>
@@ -273,25 +338,47 @@
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Hora Inicio Turno</label>
+                    <div class="col-md-3">
+                        <label class="form-label">Hora Entrada Turno</label>
                         <input type="time" class="form-control" name="horaInicioTrabajo" 
                                th:value="${empleado != null ? empleado.getHoraInicioTrabajo() : '08:00'}" required />
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Hora Fin Turno</label>
+                    <div class="col-md-3">
+                        <label class="form-label">Hora Salida Turno</label>
                         <input type="time" class="form-control" name="horaFinTrabajo" 
                                th:value="${empleado != null ? empleado.getHoraFinTrabajo() : '17:00'}" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Inicio Descanso</label>
+                        <input type="time" class="form-control" name="horaInicioDescanso" 
+                               th:value="${empleado != null ? empleado.getHoraInicioDescanso() : '13:00'}" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Fin Descanso</label>
+                        <input type="time" class="form-control" name="horaFinDescanso" 
+                               th:value="${empleado != null ? empleado.getHoraFinDescanso() : '14:00'}" required />
                     </div>
                 </div>
 
                 <div class="section-title">
-                    <i class="bi bi-airplane text-primary"></i>
-                    Vacaciones y Días Libres
+                    <i class="bi bi-geo-alt text-primary"></i>
+                    Sedes y Consultorios Asignados
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Fechas Especiales / Días Libres (Separados por coma)</label>
+                    <label class="form-label">Consultorios / Salas Disponibles (Separados por coma)</label>
+                    <input type="text" class="form-control" name="consultoriosStr" 
+                           th:value="${empleado != null ? #strings.listJoin(empleado.getConsultoriosDisponibles(), ', ') : 'Consultorio A, Consultorio B'}"
+                           placeholder="Ej: Consultorio 1, Quirófano A, Peluquería 2" />
+                </div>
+
+                <div class="section-title">
+                    <i class="bi bi-calendar-x text-primary"></i>
+                    Vacaciones y Días Festivos
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Fechas de Inactividad / Vacaciones (Separados por coma)</label>
                     <input type="text" class="form-control" name="vacacionesStr" 
                            th:value="${empleado != null ? #strings.listJoin(empleado.getDiasLibresVacaciones(), ', ') : ''}"
                            placeholder="Ej: 2026-07-20, 2026-12-25" />

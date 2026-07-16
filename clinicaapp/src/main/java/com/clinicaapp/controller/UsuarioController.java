@@ -10,8 +10,11 @@ import com.clinicaapp.model.*; // Importar Visita
 import com.clinicaapp.model.enums.Especie;
 import com.clinicaapp.model.enums.RazaGato;
 import com.clinicaapp.model.enums.RazaPerro;
+import com.clinicaapp.model.enums.Role;
 // <-- Asegúrate de tener este import y el Autowired
 import com.clinicaapp.service.*; // Importar IVisitaService
+import com.clinicaapp.repository.UsuarioRepository;
+import com.clinicaapp.repository.CitaRepository;
 
 // lombok.AllArgsConstructor removed (unused)
 import lombok.Data;
@@ -57,6 +60,10 @@ public class UsuarioController {
 
     @Autowired
     private IUsuarioService usuarioService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private CitaRepository citaRepository;
     @Autowired
     private IMascotaService mascotaService;
     @Autowired
@@ -1173,4 +1180,90 @@ public Map<String, Object> getContextoIA(Principal principal) {
     
     return ctx;
 }
+
+    // 19. APIS PARA AGENDAMIENTO INTELIGENTE (CLIENT-FACING)
+    @GetMapping("/api/veterinarios-activos")
+    @ResponseBody
+    public List<Map<String, Object>> getVeterinariosActivos(@RequestParam String clinicaId) {
+        List<Usuario> vets = usuarioRepository.findByClinicaIdAndRole(clinicaId, Role.ROLE_VETERINARIO);
+        List<Map<String, Object>> res = new ArrayList<>();
+        for (Usuario v : vets) {
+            if (v.isActivo() && !"Inactivo".equalsIgnoreCase(v.getEstadoEmpleado()) && !"Suspendido".equalsIgnoreCase(v.getEstadoEmpleado())) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", v.getId());
+                map.put("nombreCompleto", v.getNombreCompleto());
+                map.put("especialidad", v.getEspecialidad() != null ? v.getEspecialidad() : "Medicina General");
+                map.put("cargo", v.getCargo() != null ? v.getCargo() : "Médico Veterinario");
+                map.put("calificacion", v.getCalificacion());
+                map.put("experiencia", v.getExperiencia());
+                map.put("fotoPerfilUrl", v.getFotoPerfilUrl() != null ? v.getFotoPerfilUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
+                map.put("estadoEmpleado", v.getEstadoEmpleado());
+                res.add(map);
+            }
+        }
+        return res;
+    }
+
+    @GetMapping("/api/horarios-disponibles")
+    @ResponseBody
+    public List<String> getHorariosDisponibles(@RequestParam String veterinarioId, @RequestParam String fecha) {
+        List<String> slots = new ArrayList<>();
+        Optional<Usuario> vetOpt = usuarioRepository.findById(veterinarioId);
+        if (vetOpt.isEmpty()) return slots;
+
+        Usuario vet = vetOpt.get();
+        
+        java.time.LocalDate localDate = java.time.LocalDate.parse(fecha);
+        String diaSemana = localDate.getDayOfWeek().name();
+        
+        Map<String, String> mapDias = new HashMap<>();
+        mapDias.put("MONDAY", "LUNES");
+        mapDias.put("TUESDAY", "MARTES");
+        mapDias.put("WEDNESDAY", "MIERCOLES");
+        mapDias.put("THURSDAY", "JUEVES");
+        mapDias.put("FRIDAY", "VIERNES");
+        mapDias.put("SATURDAY", "SABADO");
+        mapDias.put("SUNDAY", "DOMINGO");
+
+        String diaTraducido = mapDias.get(diaSemana);
+        
+        if (vet.getDiasLaborales() == null || !vet.getDiasLaborales().contains(diaTraducido)) {
+            return slots;
+        }
+        if (vet.getDiasLibresVacaciones() != null && vet.getDiasLibresVacaciones().contains(fecha)) {
+            return slots;
+        }
+
+        List<Cita> citasExistentes = citaRepository.findByClinicaId(vet.getClinicaId()).stream()
+                .filter(c -> veterinarioId.equals(c.getVeterinarioId()))
+                .filter(c -> c.getFechaHora().toLocalDate().toString().equals(fecha))
+                .filter(c -> !"Cancelada".equalsIgnoreCase(c.getEstado()))
+                .collect(Collectors.toList());
+
+        String hInicio = vet.getHoraInicioTrabajo();
+        String hFin = vet.getHoraFinTrabajo();
+        String dInicio = vet.getHoraInicioDescanso();
+        String dFin = vet.getHoraFinDescanso();
+
+        java.time.LocalTime timeStart = java.time.LocalTime.parse(hInicio);
+        java.time.LocalTime timeEnd = java.time.LocalTime.parse(hFin);
+        java.time.LocalTime breakStart = java.time.LocalTime.parse(dInicio);
+        java.time.LocalTime breakEnd = java.time.LocalTime.parse(dFin);
+
+        java.time.LocalTime current = timeStart;
+        while (current.isBefore(timeEnd)) {
+            boolean isBreak = !current.isBefore(breakStart) && current.isBefore(breakEnd);
+            
+            if (!isBreak) {
+                final java.time.LocalTime finalCurrent = current;
+                boolean block = citasExistentes.stream().anyMatch(c -> c.getFechaHora().toLocalTime().equals(finalCurrent));
+                if (!block) {
+                    slots.add(current.toString());
+                }
+            }
+            current = current.plusMinutes(30);
+        }
+
+        return slots;
+    }
 }

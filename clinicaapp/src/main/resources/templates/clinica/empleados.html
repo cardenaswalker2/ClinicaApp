@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Personal | ClínicaApp</title>
+    <title>Equipo & Colaboradores | ClínicaApp</title>
     <link th:replace="~{fragments/header :: favIcon}">
 
     <!-- Bootstrap 5.3 -->
@@ -27,17 +27,14 @@
             --gray-50: #f8fafc;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
             --gray-500: #64748b;
             --gray-600: #475569;
             --gray-700: #334155;
-            --gray-800: #1e293b;
             --gray-900: #0f172a;
-            --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 20px;
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.05);
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -52,9 +49,6 @@
             background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             padding: 0.875rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
         }
 
         .navbar-brand {
@@ -95,34 +89,6 @@
             transform: translateY(-1px);
         }
 
-        .main-card {
-            background: white;
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--gray-200);
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-            overflow: hidden;
-            margin-top: 2rem;
-        }
-
-        .card-header-custom {
-            padding: 1.5rem 1.75rem;
-            border-bottom: 1px solid var(--gray-100);
-            background: linear-gradient(135deg, #fafafa, #f8f9fa);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-header-custom h5 {
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: var(--gray-800);
-            display: flex;
-            align-items: center;
-            gap: 0.625rem;
-            margin: 0;
-        }
-
         .btn-add {
             background: var(--primary);
             color: white;
@@ -145,106 +111,96 @@
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
 
-        .avatar-initials {
-            width: 42px;
-            height: 42px;
+        .collaborator-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            position: relative;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .collaborator-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .collab-avatar {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            color: white;
+            border: 3px solid var(--gray-100);
+            box-shadow: var(--shadow-md);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
             font-weight: 800;
-            font-size: 0.95rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .status-activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-inactivo { background-color: rgba(100, 116, 139, 0.1); color: var(--gray-500); }
+        .status-vacaciones { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-suspendido { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .role-pill {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            display: inline-block;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            margin-top: 0.5rem;
+        }
+
+        .meta-list {
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .meta-item {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
         }
 
-        .table-custom th {
-            font-weight: 800;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray-500);
-            background-color: var(--gray-50);
-            padding: 1rem 1.25rem;
-            border-bottom: 2px solid var(--gray-200);
+        .action-row {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
-        .table-custom td {
-            padding: 1.25rem;
-            vertical-align: middle;
-            border-bottom: 1px solid var(--gray-100);
-            font-size: 0.9rem;
-            color: var(--gray-700);
-        }
-
-        .role-badge {
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 0.35rem 0.75rem;
-            border-radius: 50px;
-            display: inline-block;
-            text-transform: uppercase;
-        }
-
-        .badge-recep { background: rgba(14, 165, 233, 0.1); color: var(--info); }
-        .badge-vet { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
-        .badge-aux { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .badge-estilista { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .badge-admin-int { background: rgba(15, 23, 42, 0.1); color: var(--dark); }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.375rem;
-        }
-
-        .status-active { background-color: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
-        .status-inactive { background-color: var(--danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
-
-        .btn-action {
-            width: 34px;
-            height: 34px;
-            border-radius: var(--radius-sm);
+        .btn-card-action {
+            flex: 1;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            text-align: center;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 0.25rem;
             transition: var(--transition);
-            border: 1px solid var(--gray-200);
-            background: white;
-            color: var(--gray-600);
-            font-size: 0.9rem;
-            text-decoration: none;
-        }
-
-        .btn-action:hover {
-            background: var(--gray-50);
-            color: var(--gray-900);
-        }
-
-        .btn-action.btn-delete:hover {
-            background: rgba(239, 68, 68, 0.05);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-
-        .btn-action.btn-toggle:hover {
-            background: rgba(16, 185, 129, 0.05);
-            border-color: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--gray-400);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--gray-300);
         }
     </style>
 </head>
@@ -259,7 +215,7 @@
                 ClínicaApp <span>Admin Sede</span>
             </a>
             <div class="ms-auto">
-                <a class="btn-back" th:href="@{/clinica/dashboard}">
+                <a class="btn-back border-0" th:href="@{/clinica/dashboard}">
                     <i class="bi bi-arrow-left"></i>
                     Volver al Dashboard
                 </a>
@@ -268,111 +224,91 @@
     </nav>
 
     <div class="container mt-4">
-
-        <!-- Mensajes de Alerta -->
+        <!-- Notificaciones de éxito/error -->
         <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md); background-color: rgba(16, 185, 129, 0.1); color: var(--success);">
             <i class="bi bi-check-circle-fill me-2"></i>
-            <span th:text="${mensajeExito}">Éxito</span>
+            <span th:text="${mensajeExito}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md); background-color: rgba(239, 68, 68, 0.1); color: var(--danger);">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <span th:text="${mensajeError}">Error</span>
+            <span th:text="${mensajeError}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <div class="main-card">
-            <div class="card-header-custom">
-                <h5>
-                    <i class="bi bi-people-fill" style="color: var(--primary);"></i>
-                    Equipo de Trabajo
-                </h5>
-                <a th:href="@{/clinica/personal/nuevo}" class="btn-add">
-                    <i class="bi bi-person-plus-fill"></i>
-                    Agregar Empleado
-                </a>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Equipo & Personal</h3>
+                <p class="text-muted mb-0 small">Administra los profesionales médicos, recepcionistas y auxiliares de tu clínica veterinaria.</p>
+            </div>
+            <a th:href="@{/clinica/personal/nuevo}" class="btn-add">
+                <i class="bi bi-person-plus-fill"></i>
+                Agregar Colaborador
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="emp : ${personal}">
+                <div class="collaborator-card">
+                    <!-- Status Badge -->
+                    <span th:class="'status-badge status-' + ${#strings.toLowerCase(emp.estadoEmpleado)}" 
+                          th:text="${emp.estadoEmpleado}">Activo</span>
+
+                    <!-- Info principal -->
+                    <div class="d-flex align-items-center gap-3">
+                        <img th:src="${emp.fotoPerfilUrl != null ? emp.fotoPerfilUrl : 'https://cdn-icons-png.flaticon.com/512/387/387561.png'}" 
+                             class="collab-avatar" alt="Avatar" />
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0" th:text="${emp.nombreCompleto}">Juan Pérez</h5>
+                            <span class="role-pill" th:text="${#strings.replace(emp.role.name(), 'ROLE_', '')}">VETERINARIO</span>
+                            <div class="text-primary fw-bold small mt-1" th:if="${emp.cargo != null}" th:text="${emp.cargo}">Especialista</div>
+                        </div>
+                    </div>
+
+                    <!-- Datos profesionales -->
+                    <div class="meta-list">
+                        <div class="meta-item" th:if="${emp.especialidad != null}">
+                            <i class="bi bi-award text-primary"></i>
+                            <span>Esp. <strong th:text="${emp.especialidad}">Cirugía</strong></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="bi bi-envelope text-muted"></i>
+                            <span th:text="${emp.email}">juan@correo.com</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="bi bi-clock text-muted"></i>
+                            <span th:text="${emp.horaInicioTrabajo + ' - ' + emp.horaFinTrabajo}">08:00 - 17:00</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="bi bi-calendar-week text-muted"></i>
+                            <span class="text-truncate" style="max-width: 220px;" th:text="${#strings.listJoin(emp.diasLaborales, ', ')}">LUNES, MARTES...</span>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="action-row">
+                        <a th:href="@{'/clinica/personal/perfil/' + ${emp.id}}" class="btn-card-action btn-outline-info border text-info bg-light">
+                            <i class="bi bi-eye"></i> Perfil
+                        </a>
+                        <a th:href="@{'/clinica/personal/editar/' + ${emp.id}}" class="btn-card-action btn-outline-primary border text-primary bg-light">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        
+                        <form th:action="@{'/clinica/personal/toggle-activo/' + ${emp.id}}" method="post" style="flex: 1; display: inline;">
+                            <button type="submit" 
+                                    th:class="'btn-card-action w-100 border-0 ' + ${emp.activo ? 'btn-danger text-white bg-danger' : 'btn-success text-white bg-success'}"
+                                    th:text="${emp.activo ? 'Desactivar' : 'Activar'}">
+                                Toggle
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-custom mb-0" th:if="${personal != null and not #lists.isEmpty(personal)}">
-                    <thead>
-                        <tr>
-                            <th>Personal</th>
-                            <th>Rol / Permiso</th>
-                            <th>Contacto</th>
-                            <th>Horarios</th>
-                            <th>Estado</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="emp : ${personal}">
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar-initials" th:text="${emp.getIniciales()}">US</div>
-                                    <div>
-                                        <h6 class="mb-0 fw-bold text-dark" th:text="${emp.getNombreCompleto()}">Nombre Completo</h6>
-                                        <small class="text-muted" th:text="${emp.email}">email@clinica.com</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span th:if="${emp.role.name() == 'ROLE_RECEPCIONISTA'}" class="role-badge badge-recep">Recepcionista</span>
-                                <span th:if="${emp.role.name() == 'ROLE_VETERINARIO'}" class="role-badge badge-vet">Veterinario</span>
-                                <span th:if="${emp.role.name() == 'ROLE_AUXILIAR'}" class="role-badge badge-aux">Auxiliar</span>
-                                <span th:if="${emp.role.name() == 'ROLE_ESTILISTA'}" class="role-badge badge-estilista">Estilista</span>
-                                <span th:if="${emp.role.name() == 'ROLE_ADMIN_INTERNO'}" class="role-badge badge-admin-int">Admin Interno</span>
-                            </td>
-                            <td>
-                                <div class="d-flex flex-column gap-1">
-                                    <span><i class="bi bi-telephone text-muted me-1"></i> <span th:text="${emp.telefono}">+57 300 000 0000</span></span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex flex-column" style="font-size: 0.825rem;">
-                                    <span><strong>Horario:</strong> <span th:text="${emp.getHoraInicioTrabajo() + ' - ' + emp.getHoraFinTrabajo()}">08:00 - 17:00</span></span>
-                                    <span class="text-muted"><strong>Días:</strong> <span th:text="${#strings.listJoin(emp.getDiasLaborales(), ', ')}">Lunes - Viernes</span></span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="status-dot" th:classappend="${emp.activo ? 'status-active' : 'status-inactive'}"></span>
-                                    <span th:text="${emp.activo ? 'Activo' : 'Inactivo'}" class="fw-bold" th:classappend="${emp.activo ? 'text-success' : 'text-danger'}">Estado</span>
-                                </div>
-                            </td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-2">
-                                    <!-- Toggle Activo -->
-                                    <form th:action="@{'/clinica/personal/toggle-activo/' + ${emp.id}}" method="post" class="d-inline">
-                                        <button type="submit" class="btn-action btn-toggle" th:title="${emp.activo ? 'Desactivar Empleado' : 'Activar Empleado'}">
-                                            <i th:class="${emp.activo ? 'bi bi-person-x-fill text-danger' : 'bi bi-person-check-fill text-success'}"></i>
-                                        </button>
-                                    </form>
-                                    <!-- Editar -->
-                                    <a th:href="@{'/clinica/personal/editar/' + ${emp.id}}" class="btn-action" title="Editar Empleado">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </a>
-                                    <!-- Eliminar -->
-                                    <form th:action="@{'/clinica/personal/eliminar/' + ${emp.id}}" method="post" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar permanentemente a este empleado?');">
-                                        <button type="submit" class="btn-action btn-delete" title="Eliminar Empleado">
-                                            <i class="bi bi-trash3-fill"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="empty-state" th:if="${personal == null or #lists.isEmpty(personal)}">
-                    <i class="bi bi-people"></i>
-                    <h4>No hay empleados registrados</h4>
-                    <p class="text-muted mb-3">Comienza a administrar tu equipo médico e interno agregando tu primer colaborador.</p>
-                    <a th:href="@{/clinica/personal/nuevo}" class="btn-add btn-sm">
-                        <i class="bi bi-person-plus-fill"></i>
-                        Agregar Colaborador
-                    </a>
-                </div>
+            <!-- Empty State -->
+            <div class="col-12 text-center py-5 text-muted bg-white border rounded shadow-sm" th:if="${#lists.isEmpty(personal)}">
+                <i class="bi bi-people fs-1 mb-2 d-block text-muted"></i>
+                <span>No hay colaboradores registrados para esta clínica todavía.</span>
             </div>
         </div>
     </div>

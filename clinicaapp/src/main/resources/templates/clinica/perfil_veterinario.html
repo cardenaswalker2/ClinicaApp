@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Colaborador | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --radius-md: 12px;
+            --radius-xl: 20px;
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.05);
+            --transition: 0.3s ease;
+        }
+
+        body {
+            background: var(--gray-50);
+            min-height: 100vh;
+            color: var(--gray-700);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 0.875rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-back {
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .profile-header-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #6366f1, #818cf8, #c084fc);
+        }
+
+        .avatar-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid var(--gray-100);
+            box-shadow: var(--shadow-md);
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+            text-transform: uppercase;
+        }
+
+        .status-activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-inactivo { background-color: rgba(100, 116, 139, 0.1); color: var(--gray-500); }
+        .status-vacaciones { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-suspendido { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .card-details {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .card-details-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--dark);
+            border-bottom: 1.5px dashed var(--gray-200);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/clinica/dashboard}">
+                <i class="bi bi-shield-plus"></i>
+                ClínicaApp <span>Admin Sede</span>
+            </a>
+            <div class="ms-auto">
+                <a class="btn-back" th:href="@{/clinica/personal}">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver al Listado
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header del Perfil -->
+        <div class="profile-header-card">
+            <div class="row align-items-center">
+                <div class="col-md-auto text-center mb-3 mb-md-0">
+                    <img th:src="${empleado.fotoPerfilUrl != null ? empleado.fotoPerfilUrl : 'https://cdn-icons-png.flaticon.com/512/387/387561.png'}" 
+                         class="avatar-img" alt="Foto Perfil" />
+                </div>
+                <div class="col text-center text-md-start">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center mb-2">
+                        <h2 class="fw-bold text-dark mb-0" th:text="${empleado.nombreCompleto}">Juan Pérez</h2>
+                        <span th:class="'status-badge status-' + ${#strings.toLowerCase(empleado.estadoEmpleado)}"
+                              th:text="${empleado.estadoEmpleado}">Activo</span>
+                    </div>
+                    <p class="text-muted mb-2">
+                        <strong th:text="${empleado.cargo != null ? empleado.cargo : 'Colaborador'}">Cargo</strong>
+                        <span th:if="${empleado.especialidad != null}" th:text="' - Especialidad en ' + ${empleado.especialidad}"> - Especialidad</span>
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start text-muted small">
+                        <span><i class="bi bi-envelope me-1"></i> <span th:text="${empleado.email}">correo@correo.com</span></span>
+                        <span><i class="bi bi-telephone me-1"></i> <span th:text="${empleado.telefono}">+123456789</span></span>
+                        <span th:if="${empleado.documento != null}"><i class="bi bi-card-text me-1"></i> DNI: <span th:text="${empleado.documento}">12345</span></span>
+                    </div>
+                </div>
+                <div class="col-md-auto text-center text-md-end mt-3 mt-md-0">
+                    <a th:href="@{'/clinica/personal/editar/' + ${empleado.id}}" class="btn btn-outline-primary fw-bold" style="border-radius: var(--radius-md);">
+                        <i class="bi bi-pencil-square me-1"></i> Editar Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicadores -->
+        <div class="row g-3 mt-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value text-primary" th:text="${empleado.experiencia != null ? empleado.experiencia + ' Años' : '0 Años'}">5 Años</div>
+                    <div class="stat-label">Experiencia</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value text-warning">
+                        <i class="bi bi-star-fill text-warning me-1"></i>
+                        <span th:text="${empleado.calificacion != null ? empleado.calificacion : '5.0'}">5.0</span>
+                    </div>
+                    <div class="stat-label">Calificación</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value text-success" th:text="${#lists.size(citas)}">12</div>
+                    <div class="stat-label">Citas Asignadas</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value text-info" th:text="${empleado.nLicencia != null and !empleado.nLicencia.isEmpty() ? 'Licencia OK' : 'Sin Reg.'}">Licencia</div>
+                    <div class="stat-label">Registro Médico</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Columna Izquierda: Información Detallada -->
+            <div class="col-lg-7">
+                <!-- Biografía -->
+                <div class="card-details">
+                    <div class="card-details-title">
+                        <i class="bi bi-chat-quote text-primary"></i>
+                        Biografía Profesional
+                    </div>
+                    <p class="mb-0 text-muted" style="white-space: pre-line;" 
+                       th:text="${empleado.biografia != null and !empleado.biografia.isEmpty() ? empleado.biografia : 'Este colaborador no ha redactado una biografía profesional todavía.'}">
+                        Biografía...
+                    </p>
+                </div>
+
+                <!-- Citas Agendadas -->
+                <div class="card-details">
+                    <div class="card-details-title">
+                        <i class="bi bi-calendar-event text-primary"></i>
+                        Próximas Citas y Turnos
+                    </div>
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(citas)}">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha / Hora</th>
+                                    <th>Motivo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="c : ${citas}">
+                                    <td class="fw-bold" th:text="${#temporals.format(c.fechaHora, 'dd/MM/yyyy HH:mm')}">12/12/2026</td>
+                                    <td th:text="${c.motivo}">Consulta general</td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${c.estado == 'Confirmada' ? 'bg-success' : (c.estado == 'Pendiente' ? 'bg-warning' : 'bg-secondary')}"
+                                              th:text="${c.estado}">Confirmada</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center py-4 text-muted" th:if="${#lists.isEmpty(citas)}">
+                        <i class="bi bi-calendar-check fs-2 mb-2 d-block text-muted"></i>
+                        <span>No hay citas programadas para este colaborador.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Configuración de Turnos y Notas -->
+            <div class="col-lg-5">
+                <!-- Horario de Trabajo -->
+                <div class="card-details">
+                    <div class="card-details-title">
+                        <i class="bi bi-clock-history text-primary"></i>
+                        Horario Laboral Configurado
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted fw-bold">Turno de Trabajo:</span>
+                            <span class="badge bg-primary fs-7" th:text="${empleado.horaInicioTrabajo + ' - ' + empleado.horaFinTrabajo}">08:00 - 17:00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted fw-bold">Horas de Descanso:</span>
+                            <span class="badge bg-secondary fs-7" th:text="${empleado.horaInicioDescanso + ' - ' + empleado.horaFinDescanso}">13:00 - 14:00</span>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <div class="text-muted fw-bold mb-2">Días Laborales:</div>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-light text-dark border" th:each="dia : ${empleado.diasLaborales}" th:text="${dia}">Lunes</span>
+                            </div>
+                        </li>
+                        <li class="list-group-item px-0" th:if="${!#lists.isEmpty(empleado.consultoriosDisponibles)}">
+                            <div class="text-muted fw-bold mb-2">Consultorios / Salas Asignadas:</div>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-light text-primary border border-primary" th:each="cons : ${empleado.consultoriosDisponibles}" th:text="${cons}">Consultorio A</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Observaciones Internas -->
+                <div class="card-details">
+                    <div class="card-details-title">
+                        <i class="bi bi-lock-fill text-danger"></i>
+                        Observaciones Internas (Privadas)
+                    </div>
+                    <p class="mb-0 text-muted small" style="white-space: pre-line;"
+                       th:text="${empleado.observacionesInternas != null and !empleado.observacionesInternas.isEmpty() ? empleado.observacionesInternas : 'Sin notas u observaciones internas registradas para este empleado.'}">
+                        Notas de contrato...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

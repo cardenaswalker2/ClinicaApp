@@ -725,7 +725,7 @@
             <div class="col-lg-6">
                 <div class="stat-card bg-gradient-indigo">
                     <i class="bi bi-calendar-check stat-icon"></i>
-                    <h6>Citas Registradas</h6>
+                    <h6>Citas Totales (Sede)</h6>
                     <h1 id="count-citas" th:text="${totalCitas ?: 0}">0</h1>
                     <a th:href="@{/clinica/citas}" class="stat-link">
                         Ver Agenda Completa
@@ -736,13 +736,58 @@
             <div class="col-lg-6">
                 <div class="stat-card bg-gradient-emerald">
                     <i class="bi bi-cash-stack stat-icon"></i>
-                    <h6>Ingresos Recaudados</h6>
+                    <h6>Ingresos Totales (Sede)</h6>
                     <h1 id="count-ingresos"
                         th:text="'$' + ${#numbers.formatDecimal(totalIngresos ?: 0, 0, 'POINT', 0, 'POINT')}">$0</h1>
                     <a th:href="@{/clinica/reporte-ventas}" class="stat-link">
                         Ver Reporte Financiero
                         <i class="bi bi-arrow-right"></i>
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAAS EXTENDED KPIS -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 border shadow-sm text-center" style="border-radius: var(--radius-md); background: white;">
+                    <h2 class="fw-bold text-primary mb-1" th:text="${citasHoy}">0</h2>
+                    <small class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Citas Hoy</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 border shadow-sm text-center" style="border-radius: var(--radius-md); background: white;">
+                    <h2 class="fw-bold text-success mb-1" th:text="'$' + ${ingresosHoy}">$0</h2>
+                    <small class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Ingresos Hoy</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 border shadow-sm text-center" style="border-radius: var(--radius-md); background: white;">
+                    <h2 class="fw-bold text-warning mb-1" th:text="${vetsActivos}">0</h2>
+                    <small class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Médicos Activos</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 border shadow-sm text-center" style="border-radius: var(--radius-md); background: white;">
+                    <h2 class="fw-bold text-dark mb-1" th:text="${totalClientesSede} + ' / ' + ${totalMascotasSede}">0</h2>
+                    <small class="text-muted fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Clientes / Mascotas</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTAS DE STOCK CRÍTICO -->
+        <div class="row mb-4" th:if="${bajoStock != null and not #lists.isEmpty(bajoStock)}">
+            <div class="col-12">
+                <div class="card border border-danger p-3 bg-light-danger" style="border-radius: var(--radius-md); background-color: rgba(239, 68, 68, 0.05);">
+                    <div class="d-flex align-items-center gap-2 text-danger mb-2">
+                        <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+                        <h6 class="fw-bold mb-0">Alertas de Inventario Crítico</h6>
+                    </div>
+                    <ul class="mb-0 small text-danger">
+                        <li th:each="p : ${bajoStock}">
+                            Medicamento <strong><span th:text="${p.nombre}">Fármaco</span></strong> está en stock mínimo. Stock disponible: <strong><span th:text="${p.stock}">0</span> unidades</strong>.
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

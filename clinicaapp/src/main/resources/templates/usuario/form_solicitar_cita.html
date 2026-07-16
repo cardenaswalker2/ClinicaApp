@@ -898,6 +898,20 @@
                                     </span>
                                 </div>
                             </div>
+
+                            <div class="mb-0 mt-4">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-person-badge-fill me-2 text-primary"></i>
+                                    Selecciona tu Veterinario
+                                </label>
+                                <input type="hidden" id="veterinarioIdHidden" th:field="*{veterinarioId}" required />
+                                <div id="vetsContainer" class="row g-3 p-2">
+                                    <p class="text-muted small mb-0 w-100 text-center py-3">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Selecciona una clínica para ver los veterinarios disponibles...
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- ===== PASO 2: DETALLES Y HORARIOS ===== -->
@@ -967,6 +981,10 @@
                             <div class="resumen-item">
                                 <span class="text-muted">Mascota</span>
                                 <span id="resumenMascota" class="fw-bold text-dark">--</span>
+                            </div>
+                            <div class="resumen-item">
+                                <span class="text-muted">Médico Veterinario</span>
+                                <span id="resumenVeterinario" class="fw-bold text-dark">--</span>
                             </div>
                             <div class="resumen-total d-flex justify-content-between align-items-center">
                                 <span>Total a pagar:</span>
@@ -1047,6 +1065,10 @@
             const resumenServiciosList = document.getElementById('resumenServiciosList');
             const resumenMascota = document.getElementById('resumenMascota');
 
+            const vetsContainer = document.getElementById('vetsContainer');
+            const veterinarioHidden = document.getElementById('veterinarioIdHidden');
+            const resumenVeterinario = document.getElementById('resumenVeterinario');
+
             // 1. AUTOCOMPLETE DE CLÍNICAS
             let debounceTimer;
             clinicaInput.addEventListener('input', function () {
@@ -1091,10 +1113,8 @@
                     .then(res => res.json())
                     .then(data => {
                         servicioContainer.innerHTML = '';
-                        servicioContainer.classList.add('has-content');
-
                         if (data.length === 0) {
-                            servicioContainer.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle me-2"></i>No hay servicios disponibles en esta clínica</span>';
+                            servicioContainer.innerHTML = '<span class="text-muted small">No hay servicios disponibles en esta sede.</span>';
                             return;
                         }
 
@@ -1121,10 +1141,65 @@
 
                             servicioContainer.appendChild(div);
                         });
-                        resetSlots();
+                        cargarVeterinarios(id);
                     })
                     .catch(err => {
                         servicioContainer.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-2"></i>Error al cargar servicios</span>';
+                    });
+            }
+
+            function cargarVeterinarios(id) {
+                vetsContainer.innerHTML = '<div class="w-100 text-center py-4"><i class="bi bi-arrow-repeat spin fs-4 text-primary me-2"></i><span class="text-muted">Cargando veterinarios activos...</span></div>';
+                fetch('/usuario/api/veterinarios-activos?clinicaId=' + id)
+                    .then(res => res.json())
+                    .then(data => {
+                        vetsContainer.innerHTML = '';
+                        if (data.length === 0) {
+                            vetsContainer.innerHTML = '<p class="text-danger small mb-0 w-100 text-center py-3"><i class="bi bi-exclamation-circle me-1"></i>No hay veterinarios activos en esta clínica.</p>';
+                            return;
+                        }
+
+                        data.forEach(v => {
+                            const col = document.createElement('div');
+                            col.className = 'col-md-6';
+                            col.innerHTML = `
+                                <div class="card p-3 border vet-card" style="cursor: pointer; border-radius: var(--radius-md); transition: var(--transition); background: white;" id="vet_${v.id}">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="${v.fotoPerfilUrl}" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover; border: 2px solid var(--gray-200);" />
+                                        <div style="flex: 1; min-width: 0;">
+                                            <h6 class="fw-bold text-dark mb-0 text-truncate">${v.nombreCompleto}</h6>
+                                            <small class="text-primary d-block text-truncate fw-bold">${v.especialidad}</small>
+                                            <div class="d-flex align-items-center gap-2 mt-1">
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>${v.calificacion}</span>
+                                                <small class="text-muted">${v.experiencia} años exp.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            const card = col.querySelector('.vet-card');
+                            card.onclick = () => {
+                                document.querySelectorAll('.vet-card').forEach(c => {
+                                    c.style.borderColor = 'var(--gray-200)';
+                                    c.style.backgroundColor = 'white';
+                                    c.style.boxShadow = 'none';
+                                });
+                                card.style.borderColor = 'var(--primary)';
+                                card.style.backgroundColor = 'rgba(79, 70, 229, 0.03)';
+                                card.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.15)';
+
+                                veterinarioHidden.value = v.id;
+                                resumenVeterinario.textContent = v.nombreCompleto;
+                                resetSlots();
+                            };
+
+                            vetsContainer.appendChild(col);
+                        });
+                        resetSlots();
+                    })
+                    .catch(err => {
+                        vetsContainer.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-2"></i>Error al cargar veterinarios</span>';
                     });
             }
 
@@ -1151,6 +1226,7 @@
             // 3. CARGAR HORAS DISPONIBLES (SLOTS)
             fechaPicker.addEventListener('change', function () {
                 const id = clinicaHidden.value;
+                const vetId = veterinarioHidden.value;
                 const fecha = this.value;
 
                 if (!id) {
@@ -1158,11 +1234,16 @@
                     this.value = '';
                     return;
                 }
+                if (!vetId) {
+                    alert("Por favor, selecciona un veterinario primero");
+                    this.value = '';
+                    return;
+                }
 
                 contenedorHoras.innerHTML = '<div class="w-100 text-center py-4"><i class="bi bi-arrow-repeat spin fs-4 text-primary me-2"></i><span class="text-muted">Buscando horarios disponibles...</span></div>';
                 contenedorHoras.classList.add('has-content');
 
-                fetch(`/api/clinicas/${id}/disponibilidad?fecha=${fecha}`)
+                fetch(`/usuario/api/horarios-disponibles?veterinarioId=${vetId}&fecha=${fecha}`)
                     .then(res => res.json())
                     .then(horas => {
                         contenedorHoras.innerHTML = '';
@@ -1220,6 +1301,7 @@
             function validarFormulario() {
                 const checkedCount = document.querySelectorAll('.servicio-checkbox:checked').length;
                 const ok = clinicaHidden.value &&
+                    veterinarioHidden.value &&
                     checkedCount > 0 &&
                     mascotaSelect.value &&
                     fechaHoraFinal.value;
@@ -1234,6 +1316,11 @@
             // Set min date to today
             const today = new Date().toISOString().split('T')[0];
             fechaPicker.min = today;
+
+            // Preselección si viene pre-cargado
+            if (clinicaHidden.value) {
+                cargarServicios(clinicaHidden.value);
+            }
         });
     </script>
 

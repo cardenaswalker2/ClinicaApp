@@ -111,4 +111,14 @@ public class CitaDTO {
             this.serviciosIds.add(servicioId);
         }
     }
+
+    private String veterinarioId;
+
+    public String getVeterinarioId() {
+        return veterinarioId;
+    }
+
+    public void setVeterinarioId(String veterinarioId) {
+        this.veterinarioId = veterinarioId;
+    }
 }

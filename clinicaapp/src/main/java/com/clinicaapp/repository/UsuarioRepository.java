@@ -14,6 +14,9 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
     // Buscar un usuario por su email (útil para login)
     Usuario findByEmail(String email);
 
+    // Buscar un usuario por su teléfono
+    Usuario findByTelefono(String telefono);
+
     // Buscar todos los usuarios con un rol específico (Paginado)
     Page<Usuario> findByRole(Role role, Pageable pageable);
 

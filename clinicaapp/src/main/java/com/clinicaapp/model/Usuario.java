@@ -39,6 +39,24 @@ public class Usuario {
     private String horaFinTrabajo = "17:00";
     private java.util.List<String> diasLibresVacaciones = new java.util.ArrayList<>();
 
+    // --- MÁS CAMPOS SAAS DE PERSONAL ---
+    private String fotoPerfilUrl;
+    private String documento;
+    private String direccion;
+    private String cargo;
+    private String especialidad;
+    private String nLicencia;
+    private String fechaIngreso;
+    private String estadoEmpleado = "Activo";
+    private String biografia;
+    private String observacionesInternas;
+    private String horaInicioDescanso = "13:00";
+    private String horaFinDescanso = "14:00";
+    private java.util.List<String> consultoriosDisponibles = new java.util.ArrayList<>();
+    private Double calificacion = 5.0;
+    private Integer experiencia = 0;
+
+
 
     // Constructor vacío
     public Usuario() {
@@ -250,4 +268,40 @@ public class Usuario {
     public void setDiasLibresVacaciones(java.util.List<String> diasLibresVacaciones) {
         this.diasLibresVacaciones = diasLibresVacaciones;
     }
+
+    public String getFotoPerfilUrl() { return fotoPerfilUrl; }
+    public void setFotoPerfilUrl(String fotoPerfilUrl) { this.fotoPerfilUrl = fotoPerfilUrl; }
+    public String getDocumento() { return documento; }
+    public void setDocumento(String documento) { this.documento = documento; }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
+    public String getCargo() { return cargo; }
+    public void setCargo(String cargo) { this.cargo = cargo; }
+    public String getEspecialidad() { return especialidad; }
+    public void setEspecialidad(String especialidad) { this.especialidad = especialidad; }
+    public String getnLicencia() { return nLicencia; }
+    public void setnLicencia(String nLicencia) { this.nLicencia = nLicencia; }
+    public String getFechaIngreso() { return fechaIngreso; }
+    public void setFechaIngreso(String fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+    public String getEstadoEmpleado() { return estadoEmpleado != null ? estadoEmpleado : "Activo"; }
+    public void setEstadoEmpleado(String estadoEmpleado) { this.estadoEmpleado = estadoEmpleado; }
+    public String getBiografia() { return biografia; }
+    public void setBiografia(String biografia) { this.biografia = biografia; }
+    public String getObservacionesInternas() { return observacionesInternas; }
+    public void setObservacionesInternas(String observacionesInternas) { this.observacionesInternas = observacionesInternas; }
+    public String getHoraInicioDescanso() { return horaInicioDescanso != null ? horaInicioDescanso : "13:00"; }
+    public void setHoraInicioDescanso(String horaInicioDescanso) { this.horaInicioDescanso = horaInicioDescanso; }
+    public String getHoraFinDescanso() { return horaFinDescanso != null ? horaFinDescanso : "14:00"; }
+    public void setHoraFinDescanso(String horaFinDescanso) { this.horaFinDescanso = horaFinDescanso; }
+    public java.util.List<String> getConsultoriosDisponibles() {
+        if (consultoriosDisponibles == null) {
+            consultoriosDisponibles = new java.util.ArrayList<>();
+        }
+        return consultoriosDisponibles;
+    }
+    public void setConsultoriosDisponibles(java.util.List<String> consultoriosDisponibles) { this.consultoriosDisponibles = consultoriosDisponibles; }
+    public Double getCalificacion() { return calificacion != null ? calificacion : 5.0; }
+    public void setCalificacion(Double calificacion) { this.calificacion = calificacion; }
+    public Integer getExperiencia() { return experiencia != null ? experiencia : 0; }
+    public void setExperiencia(Integer experiencia) { this.experiencia = experiencia; }
 }

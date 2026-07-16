@@ -184,6 +184,42 @@ public class ClinicaController {
         model.addAttribute("labelsTopServiciosJson", toJson(topServicios.stream().map(Map.Entry::getKey).collect(Collectors.toList())));
         model.addAttribute("dataTopServiciosJson", toJson(topServicios.stream().map(Map.Entry::getValue).collect(Collectors.toList())));
 
+        // KPIs adicionales para SaaS
+        long vetsActivos = usuarioRepository.findByClinicaIdAndRole(clinica.getId(), Role.ROLE_VETERINARIO).stream()
+                .filter(u -> "Activo".equalsIgnoreCase(u.getEstadoEmpleado())).count();
+        long receptionists = usuarioRepository.findByClinicaIdAndRole(clinica.getId(), Role.ROLE_RECEPCIONISTA).stream()
+                .filter(u -> "Activo".equalsIgnoreCase(u.getEstadoEmpleado())).count();
+        
+        List<Mascota> mascotasSede = mascotaRepository.findByClinicaId(clinica.getId());
+        long totalMascotas = mascotasSede.size();
+        long totalClientes = mascotasSede.stream().map(Mascota::getPropietarioId).filter(Objects::nonNull).distinct().count();
+
+        // Productos con bajo stock
+        List<Producto> bajoStock = productoRepository.findByClinicaId(clinica.getId()).stream()
+                .filter(p -> p.getStock() <= (p.getStockMinimo() != null ? p.getStockMinimo() : 5))
+                .collect(Collectors.toList());
+
+        // Citas de hoy
+        LocalDate today = LocalDate.now();
+        long citasHoy = todas.stream()
+                .filter(c -> c.getFechaHoraIso() != null && LocalDateTime.parse(c.getFechaHoraIso()).toLocalDate().equals(today))
+                .count();
+
+        // Ingresos de hoy
+        double ingresosHoy = todas.stream()
+                .filter(c -> c.getFechaHoraIso() != null && LocalDateTime.parse(c.getFechaHoraIso()).toLocalDate().equals(today))
+                .filter(c -> "PAGADO".equalsIgnoreCase(c.getEstadoPago()))
+                .mapToDouble(c -> c.getCosto() != null ? c.getCosto() : 0.0)
+                .sum();
+
+        model.addAttribute("vetsActivos", vetsActivos);
+        model.addAttribute("receptionists", receptionists);
+        model.addAttribute("totalMascotasSede", totalMascotas);
+        model.addAttribute("totalClientesSede", totalClientes);
+        model.addAttribute("bajoStock", bajoStock);
+        model.addAttribute("citasHoy", citasHoy);
+        model.addAttribute("ingresosHoy", ingresosHoy);
+
         return "clinica/dashboard";
     }
 
@@ -617,6 +653,7 @@ public class ClinicaController {
             Role.ROLE_ESTILISTA,
             Role.ROLE_ADMIN_INTERNO
         ));
+        model.addAttribute("diasSemana", List.of("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"));
         model.addAttribute("clinica", clinica);
         return "clinica/form_empleado";
     }
@@ -663,6 +700,21 @@ public class ClinicaController {
             @RequestParam(required = false) String horaInicioTrabajo,
             @RequestParam(required = false) String horaFinTrabajo,
             @RequestParam(required = false) String vacacionesStr,
+            @RequestParam(value = "fotoFile", required = false) MultipartFile fotoFile,
+            @RequestParam(required = false) String documento,
+            @RequestParam(required = false) String direccion,
+            @RequestParam(required = false) String cargo,
+            @RequestParam(required = false) String especialidad,
+            @RequestParam(required = false) String nLicencia,
+            @RequestParam(required = false) String fechaIngreso,
+            @RequestParam(required = false) String estadoEmpleado,
+            @RequestParam(required = false) String biografia,
+            @RequestParam(required = false) String observacionesInternas,
+            @RequestParam(required = false) String horaInicioDescanso,
+            @RequestParam(required = false) String horaFinDescanso,
+            @RequestParam(required = false) String consultoriosStr,
+            @RequestParam(required = false) Double calificacion,
+            @RequestParam(required = false) Integer experiencia,
             Authentication auth,
             RedirectAttributes redirectAttributes) {
         
@@ -680,6 +732,16 @@ public class ClinicaController {
                 }
                 empleado = usuarioService.update(empleadoDto.getId(), empleadoDto, empleadoDto.getRole());
             } else {
+                if (usuarioRepository.findByEmail(empleadoDto.getEmail()) != null) {
+                    redirectAttributes.addFlashAttribute("mensajeError", "El correo ingresado ya existe.");
+                    return "redirect:/clinica/personal/nuevo";
+                }
+                if (empleadoDto.getTelefono() != null && !empleadoDto.getTelefono().isEmpty()) {
+                    if (usuarioRepository.findByTelefono(empleadoDto.getTelefono()) != null) {
+                        redirectAttributes.addFlashAttribute("mensajeError", "El teléfono ingresado ya existe.");
+                        return "redirect:/clinica/personal/nuevo";
+                    }
+                }
                 empleado = usuarioService.createUsuarioWithRole(empleadoDto, empleadoDto.getRole());
                 empleado.setClinicaId(clinica.getId());
             }
@@ -701,6 +763,40 @@ public class ClinicaController {
                 empleado.setDiasLibresVacaciones(vacs);
             }
 
+            if (fotoFile != null && !fotoFile.isEmpty()) {
+                String uploadDir = "uploads";
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                String fileName = java.util.UUID.randomUUID().toString() + "_" + fotoFile.getOriginalFilename();
+                java.nio.file.Path filePath = uploadPath.resolve(fileName);
+                java.nio.file.Files.copy(fotoFile.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                empleado.setFotoPerfilUrl("/uploads/" + fileName);
+            }
+
+            if (documento != null) empleado.setDocumento(documento);
+            if (direccion != null) empleado.setDireccion(direccion);
+            if (cargo != null) empleado.setCargo(cargo);
+            if (especialidad != null) empleado.setEspecialidad(especialidad);
+            if (nLicencia != null) empleado.setnLicencia(nLicencia);
+            if (fechaIngreso != null) empleado.setFechaIngreso(fechaIngreso);
+            if (estadoEmpleado != null) empleado.setEstadoEmpleado(estadoEmpleado);
+            if (biografia != null) empleado.setBiografia(biografia);
+            if (observacionesInternas != null) empleado.setObservacionesInternas(observacionesInternas);
+            if (horaInicioDescanso != null) empleado.setHoraInicioDescanso(horaInicioDescanso);
+            if (horaFinDescanso != null) empleado.setHoraFinDescanso(horaFinDescanso);
+            if (calificacion != null) empleado.setCalificacion(calificacion);
+            if (experiencia != null) empleado.setExperiencia(experiencia);
+
+            if (consultoriosStr != null) {
+                List<String> cons = Arrays.stream(consultoriosStr.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
+                empleado.setConsultoriosDisponibles(cons);
+            }
+
             usuarioRepository.save(empleado);
             redirectAttributes.addFlashAttribute("mensajeExito", "Empleado guardado correctamente.");
 
@@ -710,6 +806,30 @@ public class ClinicaController {
         }
 
         return "redirect:/clinica/personal";
+    }
+
+    @GetMapping("/personal/perfil/{id}")
+    public String perfilEmpleado(@PathVariable String id, Authentication auth, Model model, RedirectAttributes redirectAttributes) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Usuario> empleadoOpt = usuarioService.findById(id);
+        if (empleadoOpt.isEmpty() || !clinica.getId().equals(empleadoOpt.get().getClinicaId())) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Empleado no encontrado o no autorizado.");
+            return "redirect:/clinica/personal";
+        }
+
+        Usuario empleado = empleadoOpt.get();
+        List<Cita> citas = citaRepository.findByClinicaId(clinica.getId()).stream()
+                .filter(c -> id.equals(c.getVeterinarioId()))
+                .sorted(Comparator.comparing(Cita::getFechaHora))
+                .collect(Collectors.toList());
+
+        model.addAttribute("empleado", empleado);
+        model.addAttribute("citas", citas);
+        model.addAttribute("clinica", clinica);
+        return "clinica/perfil_veterinario";
     }
 
     @PostMapping("/personal/toggle-activo/{id}")
