@@ -23,6 +23,10 @@ public class CitaDisplayDTO {
     private String direccionClinica; // <-- NUEVO PARA VER_CITA
     private String telefonoClinica;  // <-- NUEVO PARA VER_CITA
     private String clinicaId;        // <-- NUEVO PARA REPROGRAMAR CITAS
+    private String veterinarioId;
+    private String consultorioId;
+    private String estilistaId;
+
 
     // Datos del Usuario
     private String nombreUsuario;
@@ -88,6 +92,9 @@ public class CitaDisplayDTO {
         }
         
         this.mascotaId = (mascota != null) ? mascota.getId() : null;
+        this.veterinarioId = cita.getVeterinarioId();
+        this.consultorioId = cita.getConsultorioId();
+        this.estilistaId = cita.getEstilistaId();
     }
 
     // --- MÉTODOS GETTER Y SETTER EXPLÍCITOS (Para asegurar que el controlador los vea) ---
@@ -159,4 +166,11 @@ public class CitaDisplayDTO {
     public void setNombreServicio(String nombreServicio) {
         // No hace nada para el set, pero es para compatibilidad con serialización
     }
+
+    public String getVeterinarioId() { return veterinarioId; }
+    public void setVeterinarioId(String veterinarioId) { this.veterinarioId = veterinarioId; }
+    public String getConsultorioId() { return consultorioId; }
+    public void setConsultorioId(String consultorioId) { this.consultorioId = consultorioId; }
+    public String getEstilistaId() { return estilistaId; }
+    public void setEstilistaId(String estilistaId) { this.estilistaId = estilistaId; }
 }

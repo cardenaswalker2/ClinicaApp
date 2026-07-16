@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Clínico | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand i {
+            background: linear-gradient(135deg, #0ea5e9, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-back {
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .card-exam {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">
+                <i class="bi bi-prescription2"></i>
+                Laboratorio Clínico - Paciente: <span th:text="${mascota.nombre}">Firulais</span>
+            </span>
+            <button onclick="window.history.back()" class="btn-back border-0">
+                <i class="bi bi-arrow-left"></i>
+                <span>Volver</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Alertas -->
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md); background-color: rgba(16, 185, 129, 0.1); color: var(--success); margin-bottom: 1.5rem;">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-folder2-open me-1"></i> Historial de Exámenes</h5>
+            <button type="button" class="btn btn-primary fw-bold" style="border-radius: var(--radius-md);" data-bs-toggle="modal" data-bs-target="#examenModal">
+                <i class="bi bi-plus-circle me-1"></i> Registrar Examen
+            </button>
+        </div>
+
+        <!-- Lista de exámenes -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div th:each="ex : ${examenes}" class="card-exam">
+                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1" th:text="${ex.tipoExamen}">Examen</h5>
+                            <span class="text-muted small">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                <span th:text="${#temporals.format(ex.fechaExamen, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                            </span>
+                        </div>
+                        <a th:href="@{'/clinica/descargar-examen/' + ${ex.id}}" class="btn btn-outline-danger fw-bold btn-sm" style="border-radius: var(--radius-md);" target="_blank">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Descargar Reporte PDF
+                        </a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Parámetro</th>
+                                    <th>Resultado</th>
+                                    <th>Rango Referencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="entry : ${ex.resultados}">
+                                    <td class="fw-bold" th:text="${entry.key}">Hematocrito</td>
+                                    <td class="text-primary fw-bold" th:text="${entry.value}">42%</td>
+                                    <td th:text="${ex.rangosReferencia.get(entry.key)}">37% - 55%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2 bg-light p-3 rounded" th:if="${ex.conclusiones != null and !ex.conclusiones.isEmpty()}">
+                        <strong class="text-dark small d-block mb-1">Observaciones / Conclusiones:</strong>
+                        <p class="mb-0 text-muted small" th:text="${ex.conclusiones}"></p>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(examenes)}" class="text-center py-5 text-muted bg-white border rounded shadow-sm">
+                    <i class="bi bi-journal-medical fs-1 mb-2 d-block text-muted"></i>
+                    <span>No hay exámenes de laboratorio registrados para esta mascota.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nuevo Examen -->
+    <div class="modal fade" id="examenModal" tabindex="-1" aria-labelledby="examenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-lg);">
+                <div class="modal-header bg-primary text-white" style="border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);">
+                    <h5 class="modal-title fw-bold" id="examenModalLabel"><i class="bi bi-prescription2 me-2"></i> Registrar Examen de Laboratorio</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{'/clinica/mascota/' + ${mascota.id} + '/examenes/guardar'}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Tipo de Examen *</label>
+                            <select class="form-select" name="tipoExamen" required onchange="presetParams(this.value)">
+                                <option value="Hemograma Completo">Hemograma Completo</option>
+                                <option value="Perfil Bioquímico">Perfil Bioquímico</option>
+                                <option value="Uroanálisis">Uroanálisis</option>
+                                <option value="Examen Coprológico">Examen Coprológico</option>
+                                <option value="Otro Examen">Otro (Configuración libre)</option>
+                            </select>
+                        </div>
+
+                        <label class="form-label fw-bold small text-muted">Resultados del Examen</label>
+                        <div id="paramsWrapper">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+
+                        <button type="button" class="btn btn-outline-primary btn-sm mb-3 fw-bold" onclick="addParamRow('', '', '')">
+                            <i class="bi bi-plus-circle me-1"></i> Agregar Fila
+                        </button>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Observaciones / Conclusiones</label>
+                            <textarea class="form-control" name="conclusiones" rows="3" placeholder="Diagnóstico de laboratorio e interpretación médica..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid var(--gray-100);">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Registrar Examen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const presets = {
+            "Hemograma Completo": [
+                {p: "Hematocrito (HCT)", r: "37 - 55 %"},
+                {p: "Hemoglobina (HB)", r: "12 - 18 g/dL"},
+                {p: "Eritrocitos (RBC)", r: "5.5 - 8.5 M/µL"},
+                {p: "Leucocitos (WBC)", r: "6.0 - 17.0 K/µL"},
+                {p: "Plaquetas (PLT)", r: "200 - 500 K/µL"}
+            ],
+            "Perfil Bioquímico": [
+                {p: "Glucosa", r: "70 - 120 mg/dL"},
+                {p: "Urea", r: "10 - 30 mg/dL"},
+                {p: "Creatinina", r: "0.5 - 1.5 mg/dL"},
+                {p: "ALT / GPT", r: "10 - 80 U/L"},
+                {p: "AST / GOT", r: "10 - 50 U/L"}
+            ],
+            "Uroanálisis": [
+                {p: "Densidad Urinaria", r: "1.015 - 1.045"},
+                {p: "pH", r: "5.5 - 7.0"},
+                {p: "Proteínas", r: "Negativo"},
+                {p: "Glucosa en orina", r: "Negativo"},
+                {p: "Cuerpos Cetónicos", r: "Negativo"}
+            ]
+        };
+
+        function presetParams(type) {
+            const wrapper = document.getElementById('paramsWrapper');
+            wrapper.innerHTML = '';
+            const items = presets[type] || [];
+            
+            if (items.length > 0) {
+                items.forEach(it => addParamRow(it.p, '', it.r));
+            } else {
+                addParamRow('', '', '');
+            }
+        }
+
+        function addParamRow(param, val, rango) {
+            const wrapper = document.getElementById('paramsWrapper');
+            const row = document.createElement('div');
+            row.className = "row g-2 mb-2 align-items-center param-row";
+            row.innerHTML = `
+                <div class="col-4">
+                    <input type="text" class="form-control form-control-sm" name="parametro" required value="${param}" placeholder="Parámetro">
+                </div>
+                <div class="col-4">
+                    <input type="text" class="form-control form-control-sm" name="valor" required value="${val}" placeholder="Resultado">
+                </div>
+                <div class="col-3">
+                    <input type="text" class="form-control form-control-sm" name="rango" value="${rango}" placeholder="Referencia">
+                </div>
+                <div class="col-1 text-center">
+                    <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('.param-row').remove()"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+            wrapper.appendChild(row);
+        }
+
+        // Cargar por defecto
+        document.addEventListener('DOMContentLoaded', () => {
+            presetParams("Hemograma Completo");
+        });
+    </script>
+</body>
+</html>

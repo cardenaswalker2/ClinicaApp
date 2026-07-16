@@ -110,7 +110,13 @@ public class SecurityConfig {
                         .requestMatchers("/recepcion/**").hasAuthority("ROLE_RECEPCIONISTA")
 
                         // Clínicas
-                        .requestMatchers("/clinica/**").hasAuthority("ROLE_CLINICA")
+                        .requestMatchers("/clinica/**").hasAnyAuthority(
+                                "ROLE_CLINICA", 
+                                "ROLE_VETERINARIO", 
+                                "ROLE_AUXILIAR", 
+                                "ROLE_ESTILISTA", 
+                                "ROLE_ADMIN_INTERNO"
+                        )
 
                         // Usuarios Clientes
                         .requestMatchers("/usuario/**").authenticated()

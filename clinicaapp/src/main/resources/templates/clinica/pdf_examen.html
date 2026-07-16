@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Reporte de Laboratorio Clínico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Roboto', 'Arial', sans-serif; 
+            color: #1e293b; 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            padding: 40px;
+            line-height: 1.6;
+        }
+        
+        .header { 
+            text-align: center; 
+            padding-bottom: 25px; 
+            margin-bottom: 35px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, #0ea5e9, #6366f1, #0ea5e9);
+            border-radius: 2px;
+        }
+        
+        .clinic-name { 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: #0f172a;
+            margin: 0 0 10px 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 12px; 
+            color: #64748b;
+        }
+        
+        h2 {
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .info-section { 
+            margin-bottom: 28px; 
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .grid-info {
+            display: table;
+            width: 100%;
+        }
+        
+        .grid-row {
+            display: table-row;
+        }
+        
+        .grid-cell {
+            display: table-cell;
+            width: 50%;
+            padding: 5px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .value {
+            color: #0f172a;
+        }
+
+        .table-results {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .table-results th {
+            background-color: #f1f5f9;
+            color: #475569;
+            text-align: left;
+            padding: 12px;
+            font-weight: bold;
+        }
+
+        .table-results td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+
+        .conclusiones-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border-left: 4px solid #6366f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="clinic-name" th:text="${clinica.nombre}">Nombre de la Clínica</h1>
+        <p>Dirección: <span th:text="${clinica.direccion}">Dirección</span> | Teléfono: <span th:text="${clinica.telefono}">Teléfono</span></p>
+    </div>
+
+    <h2 th:text="'Reporte: ' + ${examen.tipoExamen}">Análisis de Laboratorio</h2>
+
+    <div class="info-section">
+        <div class="grid-info">
+            <div class="grid-row">
+                <div class="grid-cell">
+                    <span class="label">Propietario:</span>
+                    <span class="value" th:text="${dueno.nombre + ' ' + (dueno.apellido != null ? dueno.apellido : '')}">Dueño</span>
+                </div>
+                <div class="grid-cell">
+                    <span class="label">Paciente:</span>
+                    <span class="value" th:text="${mascota.nombre + ' (' + mascota.especie + ' - ' + mascota.raza + ')'}">Mascota</span>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-cell">
+                    <span class="label">Fecha Informe:</span>
+                    <span class="value" th:text="${examen.fechaExamen}">Fecha</span>
+                </div>
+                <div class="grid-cell">
+                    <span class="label">ID Examen:</span>
+                    <span class="value" th:text="${examen.id}">ID</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table-results">
+        <thead>
+            <tr>
+                <th>Parámetro Analizado</th>
+                <th>Valor Encontrado</th>
+                <th>Rango de Referencia</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="entry : ${examen.resultados}">
+                <td class="fw-bold" th:text="${entry.key}">Hemoglobina</td>
+                <td style="color: #6366f1; font-weight: bold;" th:text="${entry.value}">12.5</td>
+                <td th:text="${examen.rangosReferencia.get(entry.key)}">11.0 - 15.0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="conclusiones-box" th:if="${examen.conclusiones != null and !examen.conclusiones.isEmpty()}">
+        <h4 style="margin-bottom: 8px; color: #4f46e5; font-weight: 800;">Conclusiones y Observaciones</h4>
+        <p th:text="${examen.conclusiones}">Observaciones generales.</p>
+    </div>
+</body>
+</html>

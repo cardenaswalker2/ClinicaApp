@@ -69,8 +69,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 return;
             } 
             
-            // 3. NUEVA: Redirección para CLÍNICA
-            else if (authorityName.equals(Role.ROLE_CLINICA.name())) {
+            // 3. NUEVA: Redirección para CLÍNICA y su personal
+            else if (authorityName.equals(Role.ROLE_CLINICA.name()) 
+                    || authorityName.equals(Role.ROLE_VETERINARIO.name())
+                    || authorityName.equals(Role.ROLE_AUXILIAR.name())
+                    || authorityName.equals(Role.ROLE_ESTILISTA.name())
+                    || authorityName.equals(Role.ROLE_ADMIN_INTERNO.name())) {
                 response.sendRedirect("/clinica/dashboard");
                 return;
             } 

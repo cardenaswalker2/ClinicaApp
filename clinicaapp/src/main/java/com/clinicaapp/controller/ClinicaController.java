@@ -3,6 +3,8 @@ package com.clinicaapp.controller;
 import com.clinicaapp.dto.CitaDisplayDTO;
 import com.clinicaapp.dto.RegistroClinicaDTO;
 import com.clinicaapp.dto.VisitaDTO;
+import com.clinicaapp.dto.UsuarioRegistroDTO;
+import com.clinicaapp.model.enums.Role;
 import com.clinicaapp.model.Cita;
 import com.clinicaapp.model.Clinica;
 import com.clinicaapp.model.Mascota;
@@ -10,9 +12,15 @@ import com.clinicaapp.model.Servicio;
 import com.clinicaapp.model.Usuario;
 import com.clinicaapp.model.Visita;
 import com.clinicaapp.model.enums.EstadoClinica;
+import com.clinicaapp.model.Producto;
+import com.clinicaapp.model.ExamenLaboratorio;
 import com.clinicaapp.repository.ClinicaRepository;
 import com.clinicaapp.repository.UsuarioRepository;
 import com.clinicaapp.repository.VisitaRepository;
+import com.clinicaapp.repository.MascotaRepository;
+import com.clinicaapp.repository.CitaRepository;
+import com.clinicaapp.repository.ProductoRepository;
+import com.clinicaapp.repository.ExamenLaboratorioRepository;
 import com.clinicaapp.service.ICitaService;
 import com.clinicaapp.service.IMascotaService;
 import com.clinicaapp.service.IVisitaService;
@@ -61,6 +69,14 @@ public class ClinicaController {
     @Autowired
     private VisitaRepository visitaRepository;
     @Autowired
+    private MascotaRepository mascotaRepository;
+    @Autowired
+    private CitaRepository citaRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
+    @Autowired
+    private ExamenLaboratorioRepository examenLaboratorioRepository;
+    @Autowired
     private ICitaService citaService;
     @Autowired
     private IMascotaService mascotaService;
@@ -86,6 +102,9 @@ public class ClinicaController {
         Usuario usuario = usuarioRepository.findByEmail(auth.getName());
         if (usuario == null)
             return null;
+        if (usuario.getClinicaId() != null && !usuario.getClinicaId().isEmpty()) {
+            return clinicaRepository.findById(usuario.getClinicaId()).orElse(null);
+        }
         return clinicaRepository.findByUsuarioAdminId(usuario.getId());
     }
 
@@ -184,6 +203,12 @@ public class ClinicaController {
             return "redirect:/login";
         model.addAttribute("citas", citaService.getCitasByClinicaEmail(clinica.getEmail()));
         model.addAttribute("clinica", clinica);
+        
+        List<Usuario> veterinarios = usuarioService.findByClinicaIdAndRole(clinica.getId(), Role.ROLE_VETERINARIO);
+        List<Usuario> estilistas = usuarioService.findByClinicaIdAndRole(clinica.getId(), Role.ROLE_ESTILISTA);
+        model.addAttribute("veterinarios", veterinarios);
+        model.addAttribute("estilistas", estilistas);
+        
         return "clinica/citas";
     }
 
@@ -562,5 +587,579 @@ public class ClinicaController {
             flash.addFlashAttribute("error", "Hubo un error: " + e.getMessage());
             return "redirect:/clinica/registrar-clinica";
         }
+    }
+
+    // 13. GESTIÓN DE PERSONAL DE LA CLÍNICA (SAAS ENTERPRISE)
+    @GetMapping("/personal")
+    public String listarPersonal(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+        
+        List<Usuario> personal = usuarioService.findByClinicaId(clinica.getId());
+        model.addAttribute("personal", personal);
+        model.addAttribute("clinica", clinica);
+        return "clinica/empleados";
+    }
+
+    @GetMapping("/personal/nuevo")
+    public String nuevoEmpleado(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        UsuarioRegistroDTO empleadoDto = new UsuarioRegistroDTO();
+        model.addAttribute("empleadoDto", empleadoDto);
+        model.addAttribute("rolesDisponibles", List.of(
+            Role.ROLE_RECEPCIONISTA,
+            Role.ROLE_VETERINARIO,
+            Role.ROLE_AUXILIAR,
+            Role.ROLE_ESTILISTA,
+            Role.ROLE_ADMIN_INTERNO
+        ));
+        model.addAttribute("clinica", clinica);
+        return "clinica/form_empleado";
+    }
+
+    @GetMapping("/personal/editar/{id}")
+    public String editarEmpleado(@PathVariable String id, Authentication auth, Model model, RedirectAttributes redirectAttributes) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Usuario> empleadoOpt = usuarioService.findById(id);
+        if (empleadoOpt.isEmpty() || !clinica.getId().equals(empleadoOpt.get().getClinicaId())) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Empleado no encontrado o no pertenece a esta clínica.");
+            return "redirect:/clinica/personal";
+        }
+
+        Usuario empleado = empleadoOpt.get();
+        UsuarioRegistroDTO empleadoDto = new UsuarioRegistroDTO();
+        empleadoDto.setId(empleado.getId());
+        empleadoDto.setNombre(empleado.getNombre());
+        empleadoDto.setApellido(empleado.getApellido());
+        empleadoDto.setEmail(empleado.getEmail());
+        empleadoDto.setTelefono(empleado.getTelefono());
+        empleadoDto.setRole(empleado.getRole());
+
+        model.addAttribute("empleadoDto", empleadoDto);
+        model.addAttribute("empleado", empleado);
+        model.addAttribute("rolesDisponibles", List.of(
+            Role.ROLE_RECEPCIONISTA,
+            Role.ROLE_VETERINARIO,
+            Role.ROLE_AUXILIAR,
+            Role.ROLE_ESTILISTA,
+            Role.ROLE_ADMIN_INTERNO
+        ));
+        model.addAttribute("diasSemana", List.of("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"));
+        model.addAttribute("clinica", clinica);
+        return "clinica/form_empleado";
+    }
+
+    @PostMapping("/personal/guardar")
+    public String guardarEmpleado(
+            @ModelAttribute("empleadoDto") UsuarioRegistroDTO empleadoDto,
+            @RequestParam(required = false) List<String> diasLaborales,
+            @RequestParam(required = false) String horaInicioTrabajo,
+            @RequestParam(required = false) String horaFinTrabajo,
+            @RequestParam(required = false) String vacacionesStr,
+            Authentication auth,
+            RedirectAttributes redirectAttributes) {
+        
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        try {
+            Usuario empleado;
+            if (empleadoDto.getId() != null && !empleadoDto.getId().isEmpty()) {
+                Optional<Usuario> empOpt = usuarioService.findById(empleadoDto.getId());
+                if (empOpt.isEmpty() || !clinica.getId().equals(empOpt.get().getClinicaId())) {
+                    redirectAttributes.addFlashAttribute("mensajeError", "Empleado no autorizado.");
+                    return "redirect:/clinica/personal";
+                }
+                empleado = usuarioService.update(empleadoDto.getId(), empleadoDto, empleadoDto.getRole());
+            } else {
+                empleado = usuarioService.createUsuarioWithRole(empleadoDto, empleadoDto.getRole());
+                empleado.setClinicaId(clinica.getId());
+            }
+
+            if (diasLaborales != null) {
+                empleado.setDiasLaborales(diasLaborales);
+            }
+            if (horaInicioTrabajo != null && !horaInicioTrabajo.isEmpty()) {
+                empleado.setHoraInicioTrabajo(horaInicioTrabajo);
+            }
+            if (horaFinTrabajo != null && !horaFinTrabajo.isEmpty()) {
+                empleado.setHoraFinTrabajo(horaFinTrabajo);
+            }
+            if (vacacionesStr != null) {
+                List<String> vacs = Arrays.stream(vacacionesStr.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
+                empleado.setDiasLibresVacaciones(vacs);
+            }
+
+            usuarioRepository.save(empleado);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Empleado guardado correctamente.");
+
+        } catch (Exception e) {
+            log.error("Error al guardar empleado: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al guardar: " + e.getMessage());
+        }
+
+        return "redirect:/clinica/personal";
+    }
+
+    @PostMapping("/personal/toggle-activo/{id}")
+    public String toggleActivoEmpleado(@PathVariable String id, Authentication auth, RedirectAttributes redirectAttributes) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Usuario> empleadoOpt = usuarioService.findById(id);
+        if (empleadoOpt.isEmpty() || !clinica.getId().equals(empleadoOpt.get().getClinicaId())) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Empleado no encontrado.");
+            return "redirect:/clinica/personal";
+        }
+
+        Usuario empleado = empleadoOpt.get();
+        empleado.setActivo(!empleado.isActivo());
+        usuarioRepository.save(empleado);
+
+        String estado = empleado.isActivo() ? "activado" : "desactivado";
+        redirectAttributes.addFlashAttribute("mensajeExito", "Empleado " + estado + " con éxito.");
+        return "redirect:/clinica/personal";
+    }
+
+    @PostMapping("/personal/eliminar/{id}")
+    public String eliminarEmpleado(@PathVariable String id, Authentication auth, RedirectAttributes redirectAttributes) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Usuario> empleadoOpt = usuarioService.findById(id);
+        if (empleadoOpt.isEmpty() || !clinica.getId().equals(empleadoOpt.get().getClinicaId())) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Empleado no encontrado.");
+            return "redirect:/clinica/personal";
+        }
+
+        usuarioService.deleteById(id);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Empleado eliminado permanentemente.");
+        return "redirect:/clinica/personal";
+    }
+
+    // 14. EXPEDIENTE CLÍNICO DE MASCOTAS (SAAS ENTERPRISE)
+    @PostMapping("/mascota/{mascotaId}/actualizar-clinico")
+    public String actualizarClinico(
+            @PathVariable String mascotaId,
+            @RequestParam(required = false) String alertasMedicas,
+            @RequestParam(required = false) String alergias,
+            @RequestParam(required = false) String vacunas,
+            @RequestParam(required = false) String desparasitaciones,
+            @RequestParam(required = false) String historialCirugias,
+            @RequestParam(required = false) Double nuevoPeso,
+            Authentication auth,
+            RedirectAttributes redirectAttributes) {
+
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Mascota> mascotaOpt = mascotaRepository.findById(mascotaId);
+        if (mascotaOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Mascota no encontrada.");
+            return "redirect:/clinica/citas";
+        }
+
+        Mascota mascota = mascotaOpt.get();
+        mascota.setAlertasMedicas(alertasMedicas);
+
+        if (alergias != null) {
+            List<String> list = Arrays.stream(alergias.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+            mascota.setAlergias(list);
+        }
+        if (vacunas != null) {
+            List<String> list = Arrays.stream(vacunas.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+            mascota.setVacunas(list);
+        }
+        if (desparasitaciones != null) {
+            List<String> list = Arrays.stream(desparasitaciones.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+            mascota.setDesparasitaciones(list);
+        }
+        if (historialCirugias != null) {
+            List<String> list = Arrays.stream(historialCirugias.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+            mascota.setHistorialCirugias(list);
+        }
+
+        if (nuevoPeso != null && nuevoPeso > 0) {
+            String fechaHoy = LocalDate.now().toString();
+            mascota.getPesoHistorico().put(fechaHoy, nuevoPeso);
+        }
+
+        mascotaRepository.save(mascota);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Historial clínico actualizado correctamente.");
+        return "redirect:/clinica/mascota/" + mascotaId + "/historial";
+    }
+
+    @PostMapping("/mascota/{mascotaId}/subir-adjunto")
+    public String subirAdjuntoClinico(
+            @PathVariable String mascotaId,
+            @RequestParam("adjuntoFile") MultipartFile adjuntoFile,
+            Authentication auth,
+            RedirectAttributes redirectAttributes) {
+
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Mascota> mascotaOpt = mascotaRepository.findById(mascotaId);
+        if (mascotaOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Mascota no encontrada.");
+            return "redirect:/clinica/citas";
+        }
+
+        Mascota mascota = mascotaOpt.get();
+
+        if (adjuntoFile != null && !adjuntoFile.isEmpty()) {
+            try {
+                String uploadDir = "uploads";
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+
+                String fileName = UUID.randomUUID().toString() + "_" + adjuntoFile.getOriginalFilename();
+                java.nio.file.Path filePath = uploadPath.resolve(fileName);
+
+                java.nio.file.Files.copy(adjuntoFile.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                String adjuntoUrl = "/uploads/" + fileName;
+                mascota.getAdjuntosClinicos().add(adjuntoUrl);
+                mascotaRepository.save(mascota);
+
+                redirectAttributes.addFlashAttribute("mensajeExito", "Archivo adjunto subido correctamente.");
+            } catch (Exception e) {
+                log.error("Error al subir archivo adjunto: {}", e.getMessage());
+                redirectAttributes.addFlashAttribute("mensajeError", "No se pudo subir el archivo: " + e.getMessage());
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("mensajeError", "El archivo está vacío o no fue seleccionado.");
+        }
+
+        return "redirect:/clinica/mascota/" + mascotaId + "/historial";
+    }
+
+    // 15. REST ENDPOINTS PARA LA AGENDA INTELIGENTE
+    @GetMapping("/api/citas-eventos")
+    @ResponseBody
+    public List<Map<String, Object>> getCitasEventos(Authentication auth) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return List.of();
+        
+        List<CitaDisplayDTO> todas = citaService.getCitasByClinicaEmail(clinica.getEmail());
+        
+        List<Map<String, Object>> eventos = new ArrayList<>();
+        for (CitaDisplayDTO c : todas) {
+            Map<String, Object> ev = new HashMap<>();
+            ev.put("id", c.getId());
+            
+            ev.put("title", c.getNombreMascota() + " (" + c.getNombreUsuario() + ")");
+            ev.put("start", c.getFechaHoraIso());
+            
+            if (c.getFechaHoraIso() != null) {
+                try {
+                    LocalDateTime startDt = LocalDateTime.parse(c.getFechaHoraIso());
+                    ev.put("end", startDt.plusMinutes(clinica.getDuracionTurnoMinutos() > 0 ? clinica.getDuracionTurnoMinutos() : 30).toString());
+                } catch(Exception ex) {
+                    // Ignorar
+                }
+            }
+            
+            String color = "#4f46e5";
+            if ("En Espera".equalsIgnoreCase(c.getEstado())) color = "#f59e0b";
+            else if ("Completada".equalsIgnoreCase(c.getEstado())) color = "#10b981";
+            else if ("Cancelada".equalsIgnoreCase(c.getEstado())) color = "#ef4444";
+            else if ("Confirmada".equalsIgnoreCase(c.getEstado())) color = "#0ea5e9";
+            
+            ev.put("backgroundColor", color);
+            ev.put("borderColor", color);
+            ev.put("textColor", "#ffffff");
+            
+            ev.put("veterinarioId", c.getVeterinarioId());
+            ev.put("consultorioId", c.getConsultorioId());
+            ev.put("estilistaId", c.getEstilistaId());
+            ev.put("motivo", c.getMotivo());
+            ev.put("servicio", c.getNombreServicio());
+            eventos.add(ev);
+        }
+        return eventos;
+    }
+
+    @PostMapping("/api/citas-reprogramar")
+    @ResponseBody
+    public ResponseEntity<?> apiReprogramarCita(
+            @RequestParam String id,
+            @RequestParam String fechaHora,
+            Authentication auth) {
+        
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body(Map.of("error", "No autorizado"));
+        }
+
+        try {
+            Optional<Cita> citaOpt = citaService.findById(id);
+            if (citaOpt.isEmpty() || !clinica.getId().equals(citaOpt.get().getClinicaId())) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST).body(Map.of("error", "Cita no encontrada."));
+            }
+
+            LocalDateTime nuevaFechaHora = LocalDateTime.parse(fechaHora);
+            citaService.reprogramarCita(id, nuevaFechaHora);
+            return ResponseEntity.ok(Map.of("status", "success", "mensaje", "Cita reprogramada con éxito."));
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/api/citas-asignar")
+    @ResponseBody
+    public ResponseEntity<?> apiAsignarRecursos(
+            @RequestParam String id,
+            @RequestParam(required = false) String veterinarioId,
+            @RequestParam(required = false) String consultorioId,
+            @RequestParam(required = false) String estilistaId,
+            Authentication auth) {
+
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).body(Map.of("error", "No autorizado"));
+        }
+
+        try {
+            Optional<Cita> citaOpt = citaService.findById(id);
+            if (citaOpt.isEmpty() || !clinica.getId().equals(citaOpt.get().getClinicaId())) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.BAD_REQUEST).body(Map.of("error", "Cita no encontrada."));
+            }
+
+            Cita cita = citaOpt.get();
+            if (veterinarioId != null) {
+                cita.setVeterinarioId(veterinarioId.isEmpty() ? null : veterinarioId);
+            }
+            if (consultorioId != null) {
+                cita.setConsultorioId(consultorioId.isEmpty() ? null : consultorioId);
+            }
+            if (estilistaId != null) {
+                cita.setEstilistaId(estilistaId.isEmpty() ? null : estilistaId);
+            }
+
+            citaRepository.save(cita);
+            return ResponseEntity.ok(Map.of("status", "success", "mensaje", "Recursos asignados con éxito."));
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // 16. GESTIÓN DE INVENTARIO (SAAS ENTERPRISE)
+    @GetMapping("/inventario")
+    public String verInventario(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        List<Producto> productos = productoRepository.findByClinicaId(clinica.getId());
+        model.addAttribute("productos", productos);
+        model.addAttribute("clinica", clinica);
+        return "clinica/inventario";
+    }
+
+    @PostMapping("/inventario/guardar")
+    public String guardarProducto(
+            @RequestParam(required = false) String id,
+            @RequestParam String nombre,
+            @RequestParam String descripcion,
+            @RequestParam Double precio,
+            @RequestParam Integer stock,
+            @RequestParam String categoria,
+            @RequestParam(required = false) String lote,
+            @RequestParam(required = false) String fechaVencimiento,
+            @RequestParam Integer stockMinimo,
+            Authentication auth,
+            RedirectAttributes redirectAttributes) {
+
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Producto producto;
+        if (id != null && !id.trim().isEmpty()) {
+            producto = productoRepository.findById(id).orElse(new Producto());
+        } else {
+            producto = new Producto();
+        }
+
+        producto.setNombre(nombre);
+        producto.setDescripcion(descripcion);
+        producto.setPrecio(precio);
+        producto.setStock(stock);
+        producto.setCategoria(categoria);
+        producto.setClinicaId(clinica.getId());
+        producto.setLote(lote);
+        producto.setFechaVencimiento(fechaVencimiento);
+        producto.setStockMinimo(stockMinimo);
+
+        productoRepository.save(producto);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Producto guardado en inventario correctamente.");
+        return "redirect:/clinica/inventario";
+    }
+
+    @PostMapping("/inventario/eliminar/{id}")
+    public String eliminarProducto(@PathVariable String id, Authentication auth, RedirectAttributes redirectAttributes) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Producto> prodOpt = productoRepository.findById(id);
+        if (prodOpt.isEmpty() || !clinica.getId().equals(prodOpt.get().getClinicaId())) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Producto no encontrado.");
+            return "redirect:/clinica/inventario";
+        }
+
+        productoRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Producto eliminado del inventario.");
+        return "redirect:/clinica/inventario";
+    }
+
+    // 17. DESCARGAR FACTURA PDF EXPRESS
+    @GetMapping("/descargar-factura/{visitaId}")
+    public ResponseEntity<InputStreamResource> descargarFactura(@PathVariable String visitaId, Authentication auth) {
+        Optional<Visita> visitaOpt = visitaService.findById(visitaId);
+        Clinica clinica = obtenerClinicaLogueada(auth);
+
+        if (visitaOpt.isEmpty() || clinica == null)
+            return ResponseEntity.notFound().build();
+
+        Visita visita = visitaOpt.get();
+        Mascota mascota = mascotaService.findById(visita.getMascotaId()).orElse(new Mascota());
+        Usuario dueno = usuarioService.findById(mascota.getPropietarioId()).orElse(new Usuario());
+
+        Double subtotal = visita.getCostoTotal() > 0 ? visita.getCostoTotal() : (visita.getPeso() != null ? 35.0 : 25.0);
+        Double igv = subtotal * 0.18;
+        Double total = subtotal + igv;
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("visita", visita);
+        data.put("clinica", clinica);
+        data.put("mascota", mascota);
+        data.put("dueno", dueno);
+        data.put("subtotal", subtotal);
+        data.put("igv", igv);
+        data.put("total", total);
+
+        ByteArrayInputStream bis = pdfService.generatePdfFromTemplate("clinica/pdf_factura", data);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=factura_" + mascota.getNombre() + "_" + visita.getId() + ".pdf");
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
+    }
+
+    // 18. MÓDULO DE LABORATORIO (SAAS ENTERPRISE)
+    @GetMapping("/mascota/{mascotaId}/examenes")
+    public String verExamenes(@PathVariable String mascotaId, Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        Optional<Mascota> mascotaOpt = mascotaRepository.findById(mascotaId);
+        if (mascotaOpt.isEmpty())
+            return "redirect:/clinica/citas";
+
+        Mascota mascota = mascotaOpt.get();
+        List<ExamenLaboratorio> examenes = examenLaboratorioRepository.findByMascotaId(mascotaId);
+
+        model.addAttribute("mascota", mascota);
+        model.addAttribute("examenes", examenes);
+        model.addAttribute("clinica", clinica);
+        return "clinica/examenes";
+    }
+
+    @PostMapping("/mascota/{mascotaId}/examenes/guardar")
+    public String guardarExamen(
+            @PathVariable String mascotaId,
+            @RequestParam String tipoExamen,
+            @RequestParam String conclusiones,
+            @RequestParam List<String> parametro,
+            @RequestParam List<String> valor,
+            @RequestParam List<String> rango,
+            Authentication auth,
+            RedirectAttributes redirectAttributes) {
+
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null)
+            return "redirect:/login";
+
+        ExamenLaboratorio examen = new ExamenLaboratorio();
+        examen.setMascotaId(mascotaId);
+        examen.setClinicaId(clinica.getId());
+        examen.setTipoExamen(tipoExamen);
+        examen.setFechaExamen(LocalDateTime.now());
+        examen.setConclusiones(conclusiones);
+
+        for (int i = 0; i < parametro.size(); i++) {
+            if (i < valor.size() && i < rango.size()) {
+                String p = parametro.get(i).trim();
+                String v = valor.get(i).trim();
+                String r = rango.get(i).trim();
+                if (!p.isEmpty()) {
+                    examen.getResultados().put(p, v);
+                    examen.getRangosReferencia().put(p, r);
+                }
+            }
+        }
+
+        examenLaboratorioRepository.save(examen);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Examen de laboratorio registrado con éxito.");
+        return "redirect:/clinica/mascota/" + mascotaId + "/examenes";
+    }
+
+    @GetMapping("/descargar-examen/{examenId}")
+    public ResponseEntity<InputStreamResource> descargarExamen(@PathVariable String examenId, Authentication auth) {
+        Optional<ExamenLaboratorio> examenOpt = examenLaboratorioRepository.findById(examenId);
+        Clinica clinica = obtenerClinicaLogueada(auth);
+
+        if (examenOpt.isEmpty() || clinica == null)
+            return ResponseEntity.notFound().build();
+
+        ExamenLaboratorio examen = examenOpt.get();
+        Mascota mascota = mascotaService.findById(examen.getMascotaId()).orElse(new Mascota());
+        Usuario dueno = usuarioService.findById(mascota.getPropietarioId()).orElse(new Usuario());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("examen", examen);
+        data.put("clinica", clinica);
+        data.put("mascota", mascota);
+        data.put("dueno", dueno);
+
+        ByteArrayInputStream bis = pdfService.generatePdfFromTemplate("clinica/pdf_examen", data);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=reporte_laboratorio_" + mascota.getNombre() + "_" + examen.getTipoExamen() + ".pdf");
+
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
     }
 }

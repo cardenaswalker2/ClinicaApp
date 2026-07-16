@@ -32,6 +32,14 @@ public class Usuario {
     // Indica si el usuario ya registró su rostro exitosamente
     private boolean facialLoginHabilitado = false;
 
+    // --- NUEVOS CAMPOS SAAS ENTERPRISE ---
+    private String clinicaId; // ID de la clínica a la que pertenece el empleado
+    private java.util.List<String> diasLaborales = java.util.Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES");
+    private String horaInicioTrabajo = "08:00";
+    private String horaFinTrabajo = "17:00";
+    private java.util.List<String> diasLibresVacaciones = new java.util.ArrayList<>();
+
+
     // Constructor vacío
     public Usuario() {
     }
@@ -195,4 +203,51 @@ public class Usuario {
     public void setFotoUrl(String fotoUrl) {
         this.fotoUrl = fotoUrl;
     }
-}
+
+    // --- GETTERS Y SETTERS PARA SAAS ENTERPRISE ---
+    public String getClinicaId() {
+        return clinicaId;
+    }
+
+    public void setClinicaId(String clinicaId) {
+        this.clinicaId = clinicaId;
+    }
+
+    public java.util.List<String> getDiasLaborales() {
+        if (diasLaborales == null) {
+            diasLaborales = java.util.Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES");
+        }
+        return diasLaborales;
+    }
+
+    public void setDiasLaborales(java.util.List<String> diasLaborales) {
+        this.diasLaborales = diasLaborales;
+    }
+
+    public String getHoraInicioTrabajo() {
+        return horaInicioTrabajo != null ? horaInicioTrabajo : "08:00";
+    }
+
+    public void setHoraInicioTrabajo(String horaInicioTrabajo) {
+        this.horaInicioTrabajo = horaInicioTrabajo;
+    }
+
+    public String getHoraFinTrabajo() {
+        return horaFinTrabajo != null ? horaFinTrabajo : "17:00";
+    }
+
+    public void setHoraFinTrabajo(String horaFinTrabajo) {
+        this.horaFinTrabajo = horaFinTrabajo;
+    }
+
+    public java.util.List<String> getDiasLibresVacaciones() {
+        if (diasLibresVacaciones == null) {
+            diasLibresVacaciones = new java.util.ArrayList<>();
+        }
+        return diasLibresVacaciones;
+    }
+
+    public void setDiasLibresVacaciones(java.util.List<String> diasLibresVacaciones) {
+        this.diasLibresVacaciones = diasLibresVacaciones;
+    }
+}

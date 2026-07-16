@@ -394,4 +394,19 @@ private double calcularDistanciaEuclidiana(List<Double> v1, List<Double> v2) {
             return usuarioRepository.findAll(pageable);
         }
     }
-}
+
+    @Override
+    public List<Usuario> findByClinicaId(String clinicaId) {
+        return usuarioRepository.findByClinicaId(clinicaId);
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<Usuario> findByClinicaId(String clinicaId, org.springframework.data.domain.Pageable pageable) {
+        return usuarioRepository.findByClinicaId(clinicaId, pageable);
+    }
+
+    @Override
+    public List<Usuario> findByClinicaIdAndRole(String clinicaId, Role role) {
+        return usuarioRepository.findByClinicaIdAndRole(clinicaId, role);
+    }
+}

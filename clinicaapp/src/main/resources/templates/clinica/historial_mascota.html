@@ -712,6 +712,18 @@
     </nav>
 
     <div class="container mt-4">
+        <!-- Mensajes de Alerta -->
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md); background-color: rgba(16, 185, 129, 0.1); color: var(--success); margin-bottom: 1.5rem;">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensajeExito}">Éxito</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md); background-color: rgba(239, 68, 68, 0.1); color: var(--danger); margin-bottom: 1.5rem;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${mensajeError}">Error</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         <div class="row">
             <!-- Perfil del Paciente (Sidebar) -->
             <div class="col-lg-4 profile-section">
@@ -744,19 +756,92 @@
                     </div>
 
                     <!-- Detalles -->
-                    <div class="profile-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Propietario ID</span>
-                            <span class="detail-value" th:text="${mascota.propietarioId}">--</span>
+                    <div class="profile-details p-3">
+                        <!-- Alertas Médicas Críticas -->
+                        <div th:if="${mascota.alertasMedicas != null and !mascota.alertasMedicas.isEmpty()}" class="mb-3 p-3 bg-danger bg-opacity-10 border-start border-4 border-danger rounded">
+                            <h6 class="fw-bold text-danger mb-1"><i class="bi bi-exclamation-octagon-fill me-1"></i> ALERTA MÉDICA</h6>
+                            <p class="mb-0 small text-danger" th:text="${mascota.alertasMedicas}">Alerta</p>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Nacimiento</span>
-                            <span class="detail-value" th:text="${mascota.fechaNacimiento}">--</span>
+
+                        <!-- Alergias -->
+                        <div class="mb-3">
+                            <span class="detail-label d-block mb-1">Alergias</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:each="al : ${mascota.alergias}" class="badge bg-danger bg-opacity-10 text-danger rounded-pill fw-bold small" th:text="${al}">Alergia</span>
+                                <span th:if="${#lists.isEmpty(mascota.alergias)}" class="text-muted small">Ninguna registrada</span>
+                            </div>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">ID Sistema</span>
-                            <span class="detail-id" th:text="${mascota.id}">--</span>
+
+                        <!-- Vacunas -->
+                        <div class="mb-3">
+                            <span class="detail-label d-block mb-1">Vacunas Aplicadas</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:each="vc : ${mascota.vacunas}" class="badge bg-success bg-opacity-10 text-success rounded-pill fw-bold small" th:text="${vc}">Vacuna</span>
+                                <span th:if="${#lists.isEmpty(mascota.vacunas)}" class="text-muted small">Ninguna registrada</span>
+                            </div>
                         </div>
+
+                        <!-- Desparasitaciones -->
+                        <div class="mb-3">
+                            <span class="detail-label d-block mb-1">Desparasitaciones</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:each="dp : ${mascota.desparasitaciones}" class="badge bg-info bg-opacity-10 text-info rounded-pill fw-bold small" th:text="${dp}">Desparasitación</span>
+                                <span th:if="${#lists.isEmpty(mascota.desparasitaciones)}" class="text-muted small">Ninguna registrada</span>
+                            </div>
+                        </div>
+
+                        <!-- Historial Cirugías -->
+                        <div class="mb-3">
+                            <span class="detail-label d-block mb-1">Cirugías Previas</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span th:each="cr : ${mascota.historialCirugias}" class="badge bg-dark bg-opacity-10 text-dark rounded-pill fw-bold small" th:text="${cr}">Cirugía</span>
+                                <span th:if="${#lists.isEmpty(mascota.historialCirugias)}" class="text-muted small">Ninguna registrada</span>
+                            </div>
+                        </div>
+
+                        <!-- Historial de Peso -->
+                        <div class="mb-3">
+                            <span class="detail-label d-block mb-1">Historial de Peso</span>
+                            <ul class="list-unstyled mb-0 small" style="max-height: 100px; overflow-y: auto;">
+                                <li th:each="entry : ${mascota.pesoHistorico}">
+                                    <i class="bi bi-activity text-muted me-1"></i>
+                                    <span th:text="${entry.key}">Fecha</span>: <strong th:text="${entry.value} + ' kg'">0 kg</strong>
+                                </li>
+                                <li th:if="${#maps.isEmpty(mascota.pesoHistorico)}" class="text-muted">Sin registros</li>
+                            </ul>
+                        </div>
+
+                        <!-- Archivos Adjuntos -->
+                        <div class="mb-3">
+                            <span class="detail-label d-block mb-1">Exámenes & Adjuntos PDF</span>
+                            <ul class="list-unstyled mb-2 small">
+                                <li th:each="adj : ${mascota.adjuntosClinicos}" class="mb-1">
+                                    <a th:href="${adj}" target="_blank" class="text-primary text-decoration-none">
+                                        <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>
+                                        Ver Documento Adjunto
+                                    </a>
+                                </li>
+                                <li th:if="${#lists.isEmpty(mascota.adjuntosClinicos)}" class="text-muted">Ninguno subido</li>
+                            </ul>
+                            <!-- Botón Subir Adjunto -->
+                            <form th:action="@{'/clinica/mascota/' + ${mascota.id} + '/subir-adjunto'}" method="post" enctype="multipart/form-data" class="mt-2">
+                                <div class="input-group input-group-sm">
+                                    <input type="file" name="adjuntoFile" class="form-control" required />
+                                    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-upload"></i></button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <hr class="text-muted" />
+
+                        <!-- Botón Modal para Editar -->
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#editClinicModal">
+                            <i class="bi bi-plus-circle-fill me-1"></i> Actualizar Historia Clínica
+                        </button>
+                        <!-- Botón Exámenes de Laboratorio -->
+                        <a th:href="@{'/clinica/mascota/' + ${mascota.id} + '/examenes'}" class="btn btn-outline-info btn-sm w-100 fw-bold mt-2" style="color: #0ea5e9; border-color: #0ea5e9;">
+                            <i class="bi bi-prescription2 me-1"></i> Análisis y Laboratorio
+                        </a>
                     </div>
                 </div>
             </div>
@@ -862,6 +947,10 @@
                                 <i class="bi bi-file-pdf"></i>
                                 Ver Receta
                             </a>
+                            <a th:href="@{'/clinica/descargar-factura/' + ${v.id}}" class="btn-receta bg-success text-white border-0" target="_blank" style="background-color: var(--success) !important;">
+                                <i class="bi bi-receipt"></i>
+                                Recibo Express
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -871,6 +960,61 @@
                     <i class="bi bi-inbox"></i>
                     <p>Esta mascota no tiene registros médicos previos.</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Actualizar Datos Clínicos -->
+    <div class="modal fade" id="editClinicModal" tabindex="-1" aria-labelledby="editClinicModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-xl);">
+                <div class="modal-header bg-primary text-white" style="border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);">
+                    <h5 class="modal-title fw-bold" id="editClinicModalLabel"><i class="bi bi-heart-pulse-fill me-2"></i> Actualizar Historia Clínica</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{'/clinica/mascota/' + ${mascota.id} + '/actualizar-clinico'}" method="post">
+                    <div class="modal-body">
+                        <!-- Alertas Médicas -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Alertas Médicas Críticas</label>
+                            <textarea class="form-control" name="alertasMedicas" rows="2" th:text="${mascota.alertasMedicas}" placeholder="Ej: Agresivo con otros perros, Insuficiencia cardíaca crónica..."></textarea>
+                        </div>
+                        
+                        <!-- Alergias -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Alergias (Separadas por coma)</label>
+                            <input type="text" class="form-control" name="alergias" th:value="${#strings.listJoin(mascota.alergias, ', ')}" placeholder="Ej: Penicilina, Pollo, Antipulgas" />
+                        </div>
+                        
+                        <!-- Vacunas -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Vacunas Aplicadas (Separadas por coma)</label>
+                            <input type="text" class="form-control" name="vacunas" th:value="${#strings.listJoin(mascota.vacunas, ', ')}" placeholder="Ej: Rabia 2026, Parvovirus, Triple felina" />
+                        </div>
+                        
+                        <!-- Desparasitaciones -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Desparasitaciones (Separadas por coma)</label>
+                            <input type="text" class="form-control" name="desparasitaciones" th:value="${#strings.listJoin(mascota.desparasitaciones, ', ')}" placeholder="Ej: Interna Jun-2026, Externa Jul-2026" />
+                        </div>
+                        
+                        <!-- Cirugías -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Cirugías Previas (Separadas por coma)</label>
+                            <input type="text" class="form-control" name="historialCirugias" th:value="${#strings.listJoin(mascota.historialCirugias, ', ')}" placeholder="Ej: Esterilización, Esplenectomía" />
+                        </div>
+                        
+                        <!-- Nuevo Peso -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Registrar Peso Actual (kg)</label>
+                            <input type="number" step="0.01" class="form-control" name="nuevoPeso" placeholder="Ej: 12.4" />
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid var(--gray-100);">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: var(--radius-md);">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-md); background-color: var(--primary);">Guardar Cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

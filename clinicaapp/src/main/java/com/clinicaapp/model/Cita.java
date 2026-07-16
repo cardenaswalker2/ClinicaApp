@@ -31,6 +31,12 @@ public class Cita {
     private String mascotaId;  // ID de la mascota
     private List<String> serviciosIds = new ArrayList<>(); // Lista de IDs de servicios seleccionados
 
+    // --- NUEVOS CAMPOS DE ASIGNACIÓN DE RECURSOS ---
+    private String veterinarioId;
+    private String consultorioId;
+    private String estilistaId;
+
+
     public Cita() {}
 
     public Cita(String id, LocalDateTime fechaHora, String motivo, String estado, Double costo, String estadoPago, String paymentIntentId, String usuarioId, String clinicaId, String mascotaId, List<String> serviciosIds) {
@@ -134,5 +140,29 @@ public class Cita {
 
     public String getServicioId() {
         return getFirstServicioId();
+    }
+
+    public String getVeterinarioId() {
+        return veterinarioId;
+    }
+
+    public void setVeterinarioId(String veterinarioId) {
+        this.veterinarioId = veterinarioId;
+    }
+
+    public String getConsultorioId() {
+        return consultorioId;
+    }
+
+    public void setConsultorioId(String consultorioId) {
+        this.consultorioId = consultorioId;
+    }
+
+    public String getEstilistaId() {
+        return estilistaId;
+    }
+
+    public void setEstilistaId(String estilistaId) {
+        this.estilistaId = estilistaId;
     }
 }

@@ -15,6 +15,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+    <!-- FullCalendar v6 -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
     <style>
         :root {
@@ -1182,7 +1184,17 @@
         <!-- Toolbar: Search & Filter -->
         <div class="sticky-toolbar">
             <div class="d-flex flex-column gap-3">
-                <div class="search-wrapper">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group w-100" role="group">
+                        <button type="button" class="btn btn-primary active w-50 fw-bold" id="btnViewList" onclick="switchView('list')">
+                            <i class="bi bi-list-ul me-2"></i> Vista Lista
+                        </button>
+                        <button type="button" class="btn btn-outline-primary w-50 fw-bold" id="btnViewCalendar" onclick="switchView('calendar')">
+                            <i class="bi bi-calendar-week me-2"></i> Vista Calendario
+                        </button>
+                    </div>
+                </div>
+                <div class="search-wrapper" id="searchWrapper">
                     <i class="bi bi-search"></i>
                     <input type="text" id="searchInput" class="search-input"
                         placeholder="Buscar por paciente o dueño...">
@@ -1197,7 +1209,9 @@
             </div>
         </div>
 
-        <!-- Header de Sección -->
+        <!-- CONTENEDOR DE VISTA LISTA -->
+        <div id="viewListContent">
+            <!-- Header de Sección -->
         <div class="section-header">
             <h5>
                 <i class="bi bi-list-ul"></i>
@@ -1455,6 +1469,85 @@
                     </tbody>
                 </table>
             </div>
+        </div> <!-- Fin de viewListContent -->
+
+        <!-- CONTENEDOR DE VISTA CALENDARIO -->
+        <div id="viewCalendarContent" style="display: none;">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: var(--radius-xl); background: white;">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-person-badge-fill me-1"></i> Filtrar por Veterinario</label>
+                        <select id="filterVet" class="form-select" style="border-radius: var(--radius-md);">
+                            <option value="all">Todos los Veterinarios</option>
+                            <option th:each="vet : ${veterinarios}" th:value="${vet.id}" th:text="${vet.nombre + ' ' + (vet.apellido != null ? vet.apellido : '')}">Veterinario</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-door-open-fill me-1"></i> Filtrar por Consultorio</label>
+                        <select id="filterRoom" class="form-select" style="border-radius: var(--radius-md);">
+                            <option value="all">Todos los Consultorios</option>
+                            <option value="Consultorio 1">Consultorio 1</option>
+                            <option value="Consultorio 2">Consultorio 2</option>
+                            <option value="Peluquería 1">Peluquería 1</option>
+                            <option value="Peluquería 2">Peluquería 2</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-muted small"><i class="bi bi-scissors me-1"></i> Filtrar por Estilista</label>
+                        <select id="filterStylist" class="form-select" style="border-radius: var(--radius-md);">
+                            <option value="all">Todos los Estilistas</option>
+                            <option th:each="est : ${estilistas}" th:value="${est.id}" th:text="${est.nombre + ' ' + (est.apellido != null ? est.apellido : '')}">Estilista</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="calendar" style="min-height: 600px;"></div>
+            </div>
+        </div>
+
+        <!-- Modal para Asignar Recursos a Cita -->
+        <div class="modal fade" id="assignResourcesModal" tabindex="-1" aria-labelledby="assignResourcesModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-xl);">
+                    <div class="modal-header bg-primary text-white" style="border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);">
+                        <h5 class="modal-title fw-bold" id="assignResourcesModalLabel"><i class="bi bi-sliders me-2"></i> Asignar Recursos</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="assignResourcesForm">
+                        <input type="hidden" id="assignCitaId" name="id" />
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Veterinario Asignado</label>
+                                <select class="form-select" id="assignVetId" name="veterinarioId">
+                                    <option value="">Sin Asignar</option>
+                                    <option th:each="vet : ${veterinarios}" th:value="${vet.id}" th:text="${vet.nombre + ' ' + (vet.apellido != null ? vet.apellido : '')}">Veterinario</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Consultorio / Sala</label>
+                                <select class="form-select" id="assignRoomId" name="consultorioId">
+                                    <option value="">Sin Asignar</option>
+                                    <option value="Consultorio 1">Consultorio 1</option>
+                                    <option value="Consultorio 2">Consultorio 2</option>
+                                    <option value="Peluquería 1">Peluquería 1</option>
+                                    <option value="Peluquería 2">Peluquería 2</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Estilista Asignado</label>
+                                <select class="form-select" id="assignStylistId" name="estilistaId">
+                                    <option value="">Sin Asignar</option>
+                                    <option th:each="est : ${estilistas}" th:value="${est.id}" th:text="${est.nombre + ' ' + (est.apellido != null ? est.apellido : '')}">Estilista</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- Footer -->
@@ -1580,6 +1673,170 @@
                     filterCitas();
                 });
             });
+
+            // View switcher function
+            window.switchView = function(view) {
+                const btnList = document.getElementById('btnViewList');
+                const btnCal = document.getElementById('btnViewCalendar');
+                const listContent = document.getElementById('viewListContent');
+                const calContent = document.getElementById('viewCalendarContent');
+                const searchWrapper = document.getElementById('searchWrapper');
+
+                if (view === 'list') {
+                    btnList.classList.add('active', 'btn-primary');
+                    btnList.classList.remove('btn-outline-primary');
+                    btnCal.classList.remove('active', 'btn-primary');
+                    btnCal.classList.add('btn-outline-primary');
+                    
+                    listContent.style.display = 'block';
+                    calContent.style.display = 'none';
+                    searchWrapper.style.setProperty('display', 'flex', 'important');
+                } else {
+                    btnCal.classList.add('active', 'btn-primary');
+                    btnCal.classList.remove('btn-outline-primary');
+                    btnList.classList.remove('active', 'btn-primary');
+                    btnList.classList.add('btn-outline-primary');
+                    
+                    listContent.style.display = 'none';
+                    calContent.style.display = 'block';
+                    searchWrapper.style.setProperty('display', 'none', 'important');
+                    
+                    // Render calendar
+                    setTimeout(() => {
+                        calendar.render();
+                    }, 100);
+                }
+            };
+
+            // FullCalendar Init
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                locale: 'es',
+                slotMinTime: '06:00:00',
+                slotMaxTime: '21:00:00',
+                editable: true,
+                eventDrop: function(info) {
+                    // Handle reschedule
+                    const id = info.event.id;
+                    const dateStr = info.event.start.toISOString().split('.')[0];
+                    
+                    if (confirm("¿Seguro que deseas reprogramar la cita para: " + info.event.start.toLocaleString() + "?")) {
+                        const params = new URLSearchParams();
+                        params.append('id', id);
+                        params.append('fechaHora', dateStr);
+                        
+                        fetch('/clinica/api/citas-reprogramar', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRF-TOKEN': getCsrfToken()
+                            },
+                            body: params
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                alert('Cita reprogramada con éxito.');
+                                calendar.refetchEvents();
+                            } else {
+                                alert('Error al reprogramar: ' + (data.error || 'Intenta de nuevo'));
+                                info.revert();
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert('Ocurrió un error en la conexión.');
+                            info.revert();
+                        });
+                    } else {
+                        info.revert();
+                    }
+                },
+                eventClick: function(info) {
+                    // Open Assign Resources Modal
+                    document.getElementById('assignCitaId').value = info.event.id;
+                    document.getElementById('assignVetId').value = info.event.extendedProps.veterinarioId || '';
+                    document.getElementById('assignRoomId').value = info.event.extendedProps.consultorioId || '';
+                    document.getElementById('assignStylistId').value = info.event.extendedProps.estilistaId || '';
+                    
+                    const assignModal = new bootstrap.Modal(document.getElementById('assignResourcesModal'));
+                    assignModal.show();
+                },
+                events: '/clinica/api/citas-eventos',
+                eventDidMount: function(info) {
+                    let tooltipText = "Motivo: " + (info.event.extendedProps.motivo || 'N/A') + "\nServicio: " + (info.event.extendedProps.servicio || 'N/A');
+                    info.el.setAttribute('title', tooltipText);
+                }
+            });
+
+            // Filters implementation
+            function applyCalendarFilters() {
+                calendar.removeAllEvents();
+                
+                const vetId = document.getElementById('filterVet').value;
+                const roomId = document.getElementById('filterRoom').value;
+                const stylistId = document.getElementById('filterStylist').value;
+                
+                fetch('/clinica/api/citas-eventos')
+                .then(r => r.json())
+                .then(events => {
+                    const filtered = events.filter(ev => {
+                        let ok = true;
+                        if (vetId !== 'all' && ev.veterinarioId !== vetId) ok = false;
+                        if (roomId !== 'all' && ev.consultorioId !== roomId) ok = false;
+                        if (stylistId !== 'all' && ev.estilistaId !== stylistId) ok = false;
+                        return ok;
+                    });
+                    
+                    filtered.forEach(ev => calendar.addEvent(ev));
+                });
+            }
+
+            document.getElementById('filterVet').addEventListener('change', applyCalendarFilters);
+            document.getElementById('filterRoom').addEventListener('change', applyCalendarFilters);
+            document.getElementById('filterStylist').addEventListener('change', applyCalendarFilters);
+
+            // Assign resources form submit handler
+            document.getElementById('assignResourcesForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const params = new URLSearchParams(new FormData(this));
+                
+                fetch('/clinica/api/citas-asignar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    body: params
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Recursos asignados correctamente.');
+                        bootstrap.Modal.getInstance(document.getElementById('assignResourcesModal')).hide();
+                        calendar.refetchEvents();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error de conexión.');
+                });
+            });
+
+            // Helper to fetch CSRF token if present
+            function getCsrfToken() {
+                const tokenMeta = document.querySelector('meta[name="_csrf"]');
+                return tokenMeta ? tokenMeta.getAttribute('content') : "";
+            }
         });
     </script>
 </body>

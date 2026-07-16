@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Comprobante de Pago Express</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Roboto', 'Arial', sans-serif; 
+            color: #1e293b; 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            padding: 40px;
+            line-height: 1.6;
+        }
+        
+        .header { 
+            text-align: center; 
+            padding-bottom: 25px; 
+            margin-bottom: 35px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #10b981, #6366f1);
+            border-radius: 2px;
+        }
+        
+        .clinic-name { 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: #0f172a;
+            margin: 0 0 10px 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            font-size: 12px; 
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        h2 {
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .info-section { 
+            margin-bottom: 28px; 
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .grid-info {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .grid-row {
+            display: table-row;
+        }
+        
+        .grid-cell {
+            display: table-cell;
+            width: 50%;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .value {
+            color: #0f172a;
+        }
+
+        .table-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .table-items th {
+            background-color: #f1f5f9;
+            color: #475569;
+            text-align: left;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .table-items td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+        .summary-box {
+            margin-top: 30px;
+            text-align: right;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .summary-row {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .total-row {
+            font-size: 18px;
+            font-weight: bold;
+            color: #10b981;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="clinic-name" th:text="${clinica.nombre}">Nombre de la Clínica</h1>
+        <p>Dirección: <span th:text="${clinica.direccion}">Dirección</span> | Teléfono: <span th:text="${clinica.telefono}">Teléfono</span></p>
+    </div>
+
+    <h2>Recibo de Pago Express</h2>
+
+    <div class="info-section">
+        <div class="grid-info">
+            <div class="grid-row">
+                <div class="grid-cell">
+                    <span class="label">Propietario:</span>
+                    <span class="value" th:text="${dueno.nombre + ' ' + (dueno.apellido != null ? dueno.apellido : '')}">Dueño</span>
+                </div>
+                <div class="grid-cell">
+                    <span class="label">Paciente:</span>
+                    <span class="value" th:text="${mascota.nombre + ' (' + mascota.especie + ' - ' + mascota.raza + ')'}">Mascota</span>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="grid-cell">
+                    <span class="label">Fecha Atención:</span>
+                    <span class="value" th:text="${visita.fechaVisita}">Fecha</span>
+                </div>
+                <div class="grid-cell">
+                    <span class="label">Estado de Pago:</span>
+                    <span class="value" style="color: #10b981; font-weight: bold;">PAGADO</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table-items">
+        <thead>
+            <tr>
+                <th>Descripción del Servicio / Concepto</th>
+                <th style="text-align: right;">Precio Unitario</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td th:text="'Atención Médica: ' + ${visita.diagnostico}">Atención Veterinaria</td>
+                <td style="text-align: right;" th:text="${#numbers.formatDecimal(subtotal, 1, 2)} + ' USD'">0.00 USD</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary-box">
+        <div class="summary-row">
+            <span>Subtotal:</span>
+            <strong th:text="${#numbers.formatDecimal(subtotal, 1, 2)} + ' USD'">0.00 USD</strong>
+        </div>
+        <div class="summary-row">
+            <span>Impuestos (IGV 18%):</span>
+            <strong th:text="${#numbers.formatDecimal(igv, 1, 2)} + ' USD'">0.00 USD</strong>
+        </div>
+        <div class="summary-row total-row">
+            <span>Total Cancelado:</span>
+            <span th:text="${#numbers.formatDecimal(total, 1, 2)} + ' USD'">0.00 USD</span>
+        </div>
+    </div>
+</body>
+</html>

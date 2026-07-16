@@ -33,4 +33,9 @@ public interface UsuarioRepository extends MongoRepository<Usuario, String> {
     Usuario findByResetPasswordToken(String token);
 
     List<Usuario> findByFacialLoginHabilitadoTrue();
-}
+
+    // Consultas para multiempresa / personal de clínica
+    List<Usuario> findByClinicaId(String clinicaId);
+    Page<Usuario> findByClinicaId(String clinicaId, Pageable pageable);
+    List<Usuario> findByClinicaIdAndRole(String clinicaId, Role role);
+}

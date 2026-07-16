@@ -27,6 +27,16 @@ public class Mascota {
     private String razaPersonalizada;
     private java.util.List<String> albumFotos = new java.util.ArrayList<>();
 
+    // --- NUEVOS CAMPOS CLÍNICOS ---
+    private java.util.List<String> alergias = new java.util.ArrayList<>();
+    private java.util.Map<String, Double> pesoHistorico = new java.util.LinkedHashMap<>();
+    private java.util.List<String> vacunas = new java.util.ArrayList<>();
+    private java.util.List<String> desparasitaciones = new java.util.ArrayList<>();
+    private java.util.List<String> historialCirugias = new java.util.ArrayList<>();
+    private java.util.List<String> adjuntosClinicos = new java.util.ArrayList<>();
+    private String alertasMedicas;
+
+
     // --- Constructor Vacío (Obligatorio para Spring Data) ---
     public Mascota() {
     }
@@ -170,4 +180,66 @@ public class Mascota {
         }
         return 0; // Si no hay fecha, devuelve 0
     }
-}
+
+    public java.util.List<String> getAlergias() {
+        if (alergias == null) alergias = new java.util.ArrayList<>();
+        return alergias;
+    }
+
+    public void setAlergias(java.util.List<String> alergias) {
+        this.alergias = alergias;
+    }
+
+    public java.util.Map<String, Double> getPesoHistorico() {
+        if (pesoHistorico == null) pesoHistorico = new java.util.LinkedHashMap<>();
+        return pesoHistorico;
+    }
+
+    public void setPesoHistorico(java.util.Map<String, Double> pesoHistorico) {
+        this.pesoHistorico = pesoHistorico;
+    }
+
+    public java.util.List<String> getVacunas() {
+        if (vacunas == null) vacunas = new java.util.ArrayList<>();
+        return vacunas;
+    }
+
+    public void setVacunas(java.util.List<String> vacunas) {
+        this.vacunas = vacunas;
+    }
+
+    public java.util.List<String> getDesparasitaciones() {
+        if (desparasitaciones == null) desparasitaciones = new java.util.ArrayList<>();
+        return desparasitaciones;
+    }
+
+    public void setDesparasitaciones(java.util.List<String> desparasitaciones) {
+        this.desparasitaciones = desparasitaciones;
+    }
+
+    public java.util.List<String> getHistorialCirugias() {
+        if (historialCirugias == null) historialCirugias = new java.util.ArrayList<>();
+        return historialCirugias;
+    }
+
+    public void setHistorialCirugias(java.util.List<String> historialCirugias) {
+        this.historialCirugias = historialCirugias;
+    }
+
+    public java.util.List<String> getAdjuntosClinicos() {
+        if (adjuntosClinicos == null) adjuntosClinicos = new java.util.ArrayList<>();
+        return adjuntosClinicos;
+    }
+
+    public void setAdjuntosClinicos(java.util.List<String> adjuntosClinicos) {
+        this.adjuntosClinicos = adjuntosClinicos;
+    }
+
+    public String getAlertasMedicas() {
+        return alertasMedicas;
+    }
+
+    public void setAlertasMedicas(String alertasMedicas) {
+        this.alertasMedicas = alertasMedicas;
+    }
+}

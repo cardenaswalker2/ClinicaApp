@@ -39,4 +39,9 @@ public interface IUsuarioService extends UserDetailsService {
     void registrarRostro(String usuarioId, List<Double> descriptor);
 
     org.springframework.data.domain.Page<Usuario> findPaginated(String keyword, Role role, org.springframework.data.domain.Pageable pageable);
-}
+
+    // Métodos para personal / empleados de la clínica
+    List<Usuario> findByClinicaId(String clinicaId);
+    org.springframework.data.domain.Page<Usuario> findByClinicaId(String clinicaId, org.springframework.data.domain.Pageable pageable);
+    List<Usuario> findByClinicaIdAndRole(String clinicaId, Role role);
+}
