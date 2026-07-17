@@ -35,6 +35,12 @@ public class Mascota {
     private java.util.List<String> historialCirugias = new java.util.ArrayList<>();
     private java.util.List<String> adjuntosClinicos = new java.util.ArrayList<>();
     private String alertasMedicas;
+    private String estadoHospitalizacion = "De Alta";
+    private Double temperatura = 38.5;
+    private Integer frecuenciaCardiaca = 80;
+    private String observacionesAuxiliar;
+    private String clinicaId; // ID de la clínica para aislar pacientes por tenant
+
 
 
     // --- Constructor Vacío (Obligatorio para Spring Data) ---
@@ -241,5 +247,45 @@ public class Mascota {
 
     public void setAlertasMedicas(String alertasMedicas) {
         this.alertasMedicas = alertasMedicas;
+    }
+
+    public String getEstadoHospitalizacion() {
+        return estadoHospitalizacion;
+    }
+
+    public void setEstadoHospitalizacion(String estadoHospitalizacion) {
+        this.estadoHospitalizacion = estadoHospitalizacion;
+    }
+
+    public Double getTemperatura() {
+        return temperatura;
+    }
+
+    public void setTemperatura(Double temperatura) {
+        this.temperatura = temperatura;
+    }
+
+    public Integer getFrecuenciaCardiaca() {
+        return frecuenciaCardiaca;
+    }
+
+    public void setFrecuenciaCardiaca(Integer frecuenciaCardiaca) {
+        this.frecuenciaCardiaca = frecuenciaCardiaca;
+    }
+
+    public String getObservacionesAuxiliar() {
+        return observacionesAuxiliar;
+    }
+
+    public void setObservacionesAuxiliar(String observacionesAuxiliar) {
+        this.observacionesAuxiliar = observacionesAuxiliar;
+    }
+
+    public String getClinicaId() {
+        return clinicaId;
+    }
+
+    public void setClinicaId(String clinicaId) {
+        this.clinicaId = clinicaId;
     }
 }

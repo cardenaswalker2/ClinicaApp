@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
+import com.clinicaapp.repository.UsuarioRepository;
+import com.clinicaapp.repository.ClinicaRepository;
+
 @Controller
 @RequestMapping("/recepcion")
 public class RecepcionistaController {
@@ -48,14 +52,31 @@ public class RecepcionistaController {
     private INotificacionService notificacionService;
     @Autowired
     private WekaNoShowPredictionService wekaNoShowService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private ClinicaRepository clinicaRepository;
+
+    private Clinica obtenerClinicaLogueada(Authentication auth) {
+        if (auth == null) return null;
+        Usuario usuario = usuarioRepository.findByEmail(auth.getName());
+        if (usuario == null) return null;
+        if (usuario.getClinicaId() != null && !usuario.getClinicaId().isEmpty()) {
+            return clinicaRepository.findById(usuario.getClinicaId()).orElse(null);
+        }
+        return clinicaRepository.findByUsuarioAdminId(usuario.getId());
+    }
 
     // ==========================================================
     // DASHBOARD
     // ==========================================================
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        // Obtenemos todas las citas que tienen significado hoy (no canceladas)
-        List<Cita> todasLasCitas = citaService.findAll();
+    public String dashboard(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return "redirect:/login";
+
+        // Obtenemos todas las citas de la clínica
+        List<Cita> todasLasCitas = citaService.findByClinicaId(clinica.getId());
         LocalDate hoy = LocalDate.now();
 
         List<Cita> citasDeHoy = todasLasCitas.stream()
@@ -90,6 +111,7 @@ public class RecepcionistaController {
         model.addAttribute("totalHoy", dtosHoy.size());
         model.addAttribute("totalEnEdificio", enEspera.size());
         model.addAttribute("totalAtendidos", completadas.size());
+        model.addAttribute("clinica", clinica);
 
         return "recepcion/dashboard_recepcionista";
     }
@@ -100,7 +122,10 @@ public class RecepcionistaController {
     @GetMapping("/citas")
     public String gestionarCitas(
             @RequestParam(name = "estado", required = false) String estado,
+            Authentication auth,
             Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return "redirect:/login";
 
         List<Cita> citasFiltradas;
 
@@ -113,22 +138,39 @@ public class RecepcionistaController {
             } else if ("Completadas".equalsIgnoreCase(estado)) {
                 estadoBusqueda = "Completada";
             }
-            citasFiltradas = citaService.findByEstadoAndEstadoPago(estadoBusqueda, "PAGADO");
+            final String finalEstado = estadoBusqueda;
+            citasFiltradas = citaService.findByClinicaId(clinica.getId()).stream()
+                    .filter(c -> finalEstado.equalsIgnoreCase(c.getEstado()))
+                    .collect(Collectors.toList());
         } else {
-            citasFiltradas = citaService.findAllCitasActivasParaRecepcion();
+            List<String> estadosActivos = List.of("Pendiente", "Confirmada", "En Espera");
+            citasFiltradas = citaService.findByClinicaId(clinica.getId()).stream()
+                    .filter(c -> estadosActivos.contains(c.getEstado()))
+                    .collect(Collectors.toList());
         }
 
         model.addAttribute("citas", convertToDisplayDTO(citasFiltradas));
         model.addAttribute("estadoActual", estado);
+        model.addAttribute("clinica", clinica);
         return "recepcion/gestion_citas";
     }
 
     @GetMapping("/citas/nueva")
-    public String formNuevaCitaRecepcion(Model model) {
-        model.addAttribute("citaDTO", new CitaDTO());
+    public String formNuevaCitaRecepcion(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return "redirect:/login";
+
+        CitaDTO citaDTO = new CitaDTO();
+        citaDTO.setClinicaId(clinica.getId());
+
+        model.addAttribute("citaDTO", citaDTO);
         model.addAttribute("clientes", usuarioService.findByRole(Role.ROLE_USER));
-        model.addAttribute("clinicas", clinicaService.findAll());
+        model.addAttribute("clinicas", List.of(clinica));
         model.addAttribute("mascotas", new ArrayList<Mascota>());
+        
+        List<Usuario> veterinarios = usuarioRepository.findByClinicaIdAndRole(clinica.getId(), Role.ROLE_VETERINARIO);
+        model.addAttribute("veterinarios", veterinarios);
+        
         return "recepcion/form_solicitar_cita_recepcion";
     }
 
@@ -209,31 +251,51 @@ public class RecepcionistaController {
     // GESTIÓN DE CLIENTES
     // ==========================================================
     @GetMapping("/clientes")
-    public String listarClientes(Model model) {
-        model.addAttribute("clientes", usuarioService.findByRole(Role.ROLE_USER));
+    public String listarClientes(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return "redirect:/login";
+
+        List<Usuario> clientesFiltrados = usuarioRepository.findByRole(Role.ROLE_USER).stream()
+                .filter(u -> clinica.getId().equals(u.getClinicaId()))
+                .collect(Collectors.toList());
+
+        model.addAttribute("clientes", clientesFiltrados);
+        model.addAttribute("clinica", clinica);
         return "recepcion/gestion_clientes";
     }
 
     @GetMapping("/clientes/nuevo")
-    public String formNuevoCliente(Model model) {
+    public String formNuevoCliente(Authentication auth, Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return "redirect:/login";
+
         model.addAttribute("usuarioRegistroDTO", new UsuarioRegistroDTO());
+        model.addAttribute("clinica", clinica);
         return "recepcion/form_registro_cliente";
     }
 
     // ✅ CORREGIDO: con validación de email duplicado y manejo de errores
     @PostMapping("/clientes/guardar")
     public String guardarCliente(@ModelAttribute UsuarioRegistroDTO registroDTO,
+            Authentication auth,
             RedirectAttributes redirectAttributes,
             Model model) {
+        Clinica clinica = obtenerClinicaLogueada(auth);
+        if (clinica == null) return "redirect:/login";
+
         try {
             if (usuarioService.findByEmail(registroDTO.getEmail()) != null) {
                 model.addAttribute("mensajeError",
                         "Ya existe un usuario registrado con el correo: " + registroDTO.getEmail());
                 model.addAttribute("usuarioRegistroDTO", registroDTO);
+                model.addAttribute("clinica", clinica);
                 return "recepcion/form_registro_cliente";
             }
 
-            usuarioService.createUsuarioWithRole(registroDTO, Role.ROLE_USER);
+            Usuario cliente = usuarioService.createUsuarioWithRole(registroDTO, Role.ROLE_USER);
+            cliente.setClinicaId(clinica.getId());
+            usuarioRepository.save(cliente);
+
             redirectAttributes.addFlashAttribute("mensajeExito",
                     "Cliente " + registroDTO.getNombre() + " registrado exitosamente.");
             return "redirect:/recepcion/clientes";

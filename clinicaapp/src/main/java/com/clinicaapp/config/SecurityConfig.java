@@ -107,14 +107,17 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
 
                         // Recepción
-                        .requestMatchers("/recepcion/**").hasAuthority("ROLE_RECEPCIONISTA")
+                        .requestMatchers("/recepcion/**").hasAnyAuthority("ROLE_RECEPCIONISTA", "ROLE_CLINICA")
+
+                        // Veterinario
+                        .requestMatchers("/veterinario/**").hasAnyAuthority("ROLE_VETERINARIO", "ROLE_CLINICA")
+
+                        // Auxiliar
+                        .requestMatchers("/auxiliar/**").hasAnyAuthority("ROLE_AUXILIAR", "ROLE_CLINICA")
 
                         // Clínicas
                         .requestMatchers("/clinica/**").hasAnyAuthority(
                                 "ROLE_CLINICA", 
-                                "ROLE_VETERINARIO", 
-                                "ROLE_AUXILIAR", 
-                                "ROLE_ESTILISTA", 
                                 "ROLE_ADMIN_INTERNO"
                         )
 

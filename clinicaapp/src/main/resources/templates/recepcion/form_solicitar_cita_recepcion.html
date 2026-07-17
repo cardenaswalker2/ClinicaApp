@@ -863,12 +863,12 @@
                                         <div class="input-icon-group">
                                             <i class="bi bi-hospital input-icon"></i>
                                             <select id="clinica" class="form-select" th:field="*{clinicaId}" required>
-                                                <!-- Select2 lo poblará dinámicamente -->
+                                                <option th:each="c : ${clinicas}" th:value="${c.id}" th:text="${c.nombre}"></option>
                                             </select>
                                         </div>
                                         <div class="form-text">
-                                            <i class="bi bi-search me-1"></i>
-                                            Escribe para buscar entre las clínicas disponibles.
+                                            <i class="bi bi-hospital me-1"></i>
+                                            Sede actual de agendamiento.
                                         </div>
                                     </div>
                                 </div>
@@ -905,6 +905,22 @@
                                         </div>
                                         <div class="form-text">
                                             Elige el servicio médico a programar.
+                                        </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-4">
+                                        <label for="veterinario" class="form-label required">Veterinario</label>
+                                        <div class="input-icon-group">
+                                            <i class="bi bi-person-badge input-icon"></i>
+                                            <select id="veterinario" class="form-select" th:field="*{veterinarioId}" required>
+                                                <option value="">-- Seleccione Veterinario --</option>
+                                                <option th:each="v : ${veterinarios}" th:value="${v.id}"
+                                                    th:text="${'Dr/a. ' + v.nombre + ' ' + v.apellido + ' (' + (v.especialidad != null ? v.especialidad : 'General') + ')'}"></option>
+                                            </select>
+                                        </div>
+                                        <div class="form-text">
+                                            Elige el médico veterinario asignado para la consulta.
                                         </div>
                                     </div>
                                 </div>
@@ -974,34 +990,6 @@
 
     <script th:inline="javascript">
         $(document).ready(function () {
-            // Inicializar Select2 para búsqueda de clínicas
-            $('#clinica').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Escribe para buscar una clínica...',
-                allowClear: true,
-                ajax: {
-                    url: '/api/clinicas/buscar',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return { term: params.term || '' };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: $.map(data, function (clinica) {
-                                return { id: clinica.id, text: clinica.nombre };
-                            })
-                        };
-                    },
-                    cache: true
-                },
-                language: {
-                    searching: function () { return "Buscando clínica..."; },
-                    noResults: function () { return "No se encontraron clínicas"; },
-                    inputTooShort: function () { return "Escribe para buscar..."; }
-                }
-            });
-
             // Inicializar Select2 para búsqueda de clientes
             $('#cliente').select2({
                 theme: 'bootstrap-5',
@@ -1012,6 +1000,11 @@
                     searching: function () { return "Buscando cliente..."; }
                 }
             });
+
+            // Disparar carga de servicios de la clínica preseleccionada
+            setTimeout(function() {
+                $('#clinica').trigger('change');
+            }, 100);
 
             const mascotaSelect = $('#mascota');
             const servicioSelect = $('#servicio');

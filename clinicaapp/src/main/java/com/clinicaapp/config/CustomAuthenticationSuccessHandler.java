@@ -64,17 +64,27 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             } 
             
             // 2. Redirección para RECEPCIONISTA
-            else if (authorityName.equals(Role.ROLE_RECEPCIONISTA.name())) {
+            else if (grantedAuthority.getAuthority().equals(Role.ROLE_RECEPCIONISTA.name())) {
                 response.sendRedirect("/recepcion/dashboard");
                 return;
             } 
             
-            // 3. NUEVA: Redirección para CLÍNICA y su personal
-            else if (authorityName.equals(Role.ROLE_CLINICA.name()) 
-                    || authorityName.equals(Role.ROLE_VETERINARIO.name())
-                    || authorityName.equals(Role.ROLE_AUXILIAR.name())
-                    || authorityName.equals(Role.ROLE_ESTILISTA.name())
-                    || authorityName.equals(Role.ROLE_ADMIN_INTERNO.name())) {
+            // 3. Redirección para VETERINARIO
+            else if (grantedAuthority.getAuthority().equals(Role.ROLE_VETERINARIO.name())) {
+                response.sendRedirect("/veterinario/dashboard");
+                return;
+            }
+
+            // 4. Redirección para AUXILIAR
+            else if (grantedAuthority.getAuthority().equals(Role.ROLE_AUXILIAR.name())) {
+                response.sendRedirect("/auxiliar/dashboard");
+                return;
+            }
+
+            // 5. Redirección para CLÍNICA (Admin)
+            else if (grantedAuthority.getAuthority().equals(Role.ROLE_CLINICA.name()) 
+                    || grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN_INTERNO.name())
+                    || grantedAuthority.getAuthority().equals(Role.ROLE_ESTILISTA.name())) {
                 response.sendRedirect("/clinica/dashboard");
                 return;
             } 

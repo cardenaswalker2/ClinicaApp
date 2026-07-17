@@ -723,6 +723,7 @@ public class ClinicaController {
             @RequestParam(required = false) Double calificacion,
             @RequestParam(required = false) Integer experiencia,
             Authentication auth,
+            Model model,
             RedirectAttributes redirectAttributes) {
         
         Clinica clinica = obtenerClinicaLogueada(auth);
@@ -740,13 +741,31 @@ public class ClinicaController {
                 empleado = usuarioService.update(empleadoDto.getId(), empleadoDto, empleadoDto.getRole());
             } else {
                 if (usuarioRepository.findByEmail(empleadoDto.getEmail()) != null) {
-                    redirectAttributes.addFlashAttribute("mensajeError", "El correo ingresado ya existe.");
-                    return "redirect:/clinica/personal/nuevo";
+                    model.addAttribute("mensajeError", "El correo ingresado ya existe.");
+                    model.addAttribute("rolesDisponibles", List.of(
+                        Role.ROLE_RECEPCIONISTA,
+                        Role.ROLE_VETERINARIO,
+                        Role.ROLE_AUXILIAR,
+                        Role.ROLE_ESTILISTA,
+                        Role.ROLE_ADMIN_INTERNO
+                    ));
+                    model.addAttribute("diasSemana", List.of("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"));
+                    model.addAttribute("clinica", clinica);
+                    return "clinica/form_empleado";
                 }
                 if (empleadoDto.getTelefono() != null && !empleadoDto.getTelefono().isEmpty()) {
                     if (usuarioRepository.findByTelefono(empleadoDto.getTelefono()) != null) {
-                        redirectAttributes.addFlashAttribute("mensajeError", "El teléfono ingresado ya existe.");
-                        return "redirect:/clinica/personal/nuevo";
+                        model.addAttribute("mensajeError", "El teléfono ingresado ya existe.");
+                        model.addAttribute("rolesDisponibles", List.of(
+                            Role.ROLE_RECEPCIONISTA,
+                            Role.ROLE_VETERINARIO,
+                            Role.ROLE_AUXILIAR,
+                            Role.ROLE_ESTILISTA,
+                            Role.ROLE_ADMIN_INTERNO
+                        ));
+                        model.addAttribute("diasSemana", List.of("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"));
+                        model.addAttribute("clinica", clinica);
+                        return "clinica/form_empleado";
                     }
                 }
                 empleado = usuarioService.createUsuarioWithRole(empleadoDto, empleadoDto.getRole());
