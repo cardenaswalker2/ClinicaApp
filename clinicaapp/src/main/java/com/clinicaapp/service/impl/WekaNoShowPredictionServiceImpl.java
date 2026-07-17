@@ -27,34 +27,36 @@ public class WekaNoShowPredictionServiceImpl implements WekaNoShowPredictionServ
 
     @PostConstruct
     public void init() {
-        try {
-            File modelFile = new File(MODEL_PATH);
-            if (modelFile.exists()) {
-                System.out.println("🤖 Weka No-Show: Modelo encontrado. Cargando...");
-                Object[] data = (Object[]) SerializationHelper.readAll(MODEL_PATH);
-                classifier = (J48) data[0];
-                structure = (Instances) data[1];
-            } else {
-                System.out.println("🤖 Weka No-Show: Generando dataset (1000 instancias)...");
-                Instances dataset = dataGenerator.generarDatosEntrenamiento(1000);
-                
-                System.out.println("🤖 Weka No-Show: Guardando dataset_no_show.arff...");
-                ArffSaver saver = new ArffSaver();
-                saver.setInstances(dataset);
-                saver.setFile(new File("dataset_no_show.arff"));
-                saver.writeBatch();
-                
-                System.out.println("🤖 Weka No-Show: Entrenando árbol de decisión J48...");
-                classifier = new J48();
-                classifier.buildClassifier(dataset);
-                
-                structure = new Instances(dataset, 0); 
-                SerializationHelper.writeAll(MODEL_PATH, new Object[]{classifier, structure});
-                System.out.println("✅ Weka No-Show: Modelo entrenado y guardado.");
+        new Thread(() -> {
+            try {
+                File modelFile = new File(MODEL_PATH);
+                if (modelFile.exists()) {
+                    System.out.println("🤖 Weka No-Show: Modelo encontrado. Cargando...");
+                    Object[] data = (Object[]) SerializationHelper.readAll(MODEL_PATH);
+                    classifier = (J48) data[0];
+                    structure = (Instances) data[1];
+                } else {
+                    System.out.println("🤖 Weka No-Show: Generando dataset (1000 instancias)...");
+                    Instances dataset = dataGenerator.generarDatosEntrenamiento(1000);
+                    
+                    System.out.println("🤖 Weka No-Show: Guardando dataset_no_show.arff...");
+                    ArffSaver saver = new ArffSaver();
+                    saver.setInstances(dataset);
+                    saver.setFile(new File("dataset_no_show.arff"));
+                    saver.writeBatch();
+                    
+                    System.out.println("🤖 Weka No-Show: Entrenando árbol de decisión J48...");
+                    classifier = new J48();
+                    classifier.buildClassifier(dataset);
+                    
+                    structure = new Instances(dataset, 0); 
+                    SerializationHelper.writeAll(MODEL_PATH, new Object[]{classifier, structure});
+                    System.out.println("✅ Weka No-Show: Modelo entrenado y guardado.");
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Error Weka No-Show: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("❌ Error Weka No-Show: " + e.getMessage());
-        }
+        }).start();
     }
 
     @Override

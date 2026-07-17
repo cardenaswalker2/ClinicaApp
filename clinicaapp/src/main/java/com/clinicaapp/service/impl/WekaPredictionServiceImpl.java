@@ -27,38 +27,40 @@ public class WekaPredictionServiceImpl implements WekaPredictionService {
 
     @PostConstruct
     public void init() {
-        try {
-            File modelFile = new File(MODEL_PATH);
-            if (modelFile.exists()) {
-                System.out.println("🤖 Weka: Modelo encontrado. Cargando desde " + MODEL_PATH);
-                Object[] data = (Object[]) SerializationHelper.readAll(MODEL_PATH);
-                classifier = (J48) data[0];
-                structure = (Instances) data[1];
-            } else {
-                System.out.println("🤖 Weka: Modelo no encontrado. Generando datos aleatorios (1000 instancias)...");
-                Instances dataset = dataGenerator.generarDatosEntrenamiento(1000);
-                
-                // GUARDAR EL DATASET EN FORMATO ARFF PARA ABRIRLO EN WEKA GUI
-                System.out.println("🤖 Weka: Guardando dataset en archivo ARFF para visualización...");
-                ArffSaver saver = new ArffSaver();
-                saver.setInstances(dataset);
-                saver.setFile(new File("dataset_riesgo_articular.arff"));
-                saver.writeBatch();
-                
-                System.out.println("🤖 Weka: Entrenando modelo J48 (Árbol de decisión)...");
-                classifier = new J48();
-                classifier.buildClassifier(dataset);
-                
-                System.out.println("🤖 Weka: Guardando modelo en disco...");
-                structure = new Instances(dataset, 0); // Estructura vacía
-                SerializationHelper.writeAll(MODEL_PATH, new Object[]{classifier, structure});
-                
-                System.out.println("✅ Weka: Modelo entrenado y guardado correctamente.");
+        new Thread(() -> {
+            try {
+                File modelFile = new File(MODEL_PATH);
+                if (modelFile.exists()) {
+                    System.out.println("🤖 Weka: Modelo encontrado. Cargando desde " + MODEL_PATH);
+                    Object[] data = (Object[]) SerializationHelper.readAll(MODEL_PATH);
+                    classifier = (J48) data[0];
+                    structure = (Instances) data[1];
+                } else {
+                    System.out.println("🤖 Weka: Modelo no encontrado. Generando datos aleatorios (1000 instancias)...");
+                    Instances dataset = dataGenerator.generarDatosEntrenamiento(1000);
+                    
+                    // GUARDAR EL DATASET EN FORMATO ARFF PARA ABRIRLO EN WEKA GUI
+                    System.out.println("🤖 Weka: Guardando dataset en archivo ARFF para visualización...");
+                    ArffSaver saver = new ArffSaver();
+                    saver.setInstances(dataset);
+                    saver.setFile(new File("dataset_riesgo_articular.arff"));
+                    saver.writeBatch();
+                    
+                    System.out.println("🤖 Weka: Entrenando modelo J48 (Árbol de decisión)...");
+                    classifier = new J48();
+                    classifier.buildClassifier(dataset);
+                    
+                    System.out.println("🤖 Weka: Guardando modelo en disco...");
+                    structure = new Instances(dataset, 0); // Estructura vacía
+                    SerializationHelper.writeAll(MODEL_PATH, new Object[]{classifier, structure});
+                    
+                    System.out.println("✅ Weka: Modelo entrenado y guardado correctamente.");
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Error al inicializar Weka: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.err.println("❌ Error al inicializar Weka: " + e.getMessage());
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     @Override
