@@ -15,6 +15,9 @@ import com.clinicaapp.model.enums.Role;
 import com.clinicaapp.service.*; // Importar IVisitaService
 import com.clinicaapp.repository.UsuarioRepository;
 import com.clinicaapp.repository.CitaRepository;
+import com.clinicaapp.repository.ResenaRepository;
+import com.clinicaapp.repository.VisitaRepository;
+
 
 // lombok.AllArgsConstructor removed (unused)
 import lombok.Data;
@@ -64,6 +67,11 @@ public class UsuarioController {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private CitaRepository citaRepository;
+    @Autowired
+    private ResenaRepository resenaRepository;
+    @Autowired
+    private VisitaRepository visitaRepository;
+
     @Autowired
     private IMascotaService mascotaService;
     @Autowired
@@ -1203,6 +1211,152 @@ public Map<String, Object> getContextoIA(Principal principal) {
         }
         return res;
     }
+
+    @GetMapping("/api/veterinarios/{id}/detalle")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getVeterinarioDetalle(@PathVariable String id) {
+        Optional<Usuario> vetOpt = usuarioRepository.findById(id);
+        if (vetOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario v = vetOpt.get();
+        Map<String, Object> res = new HashMap<>();
+        res.put("id", v.getId());
+        res.put("nombreCompleto", v.getNombreCompleto());
+        res.put("especialidad", v.getEspecialidad() != null ? v.getEspecialidad() : "Medicina General");
+        res.put("cargo", v.getCargo() != null ? v.getCargo() : "Médico Veterinario");
+        res.put("experiencia", v.getExperiencia());
+        res.put("biografia", v.getBiografia() != null ? v.getBiografia() : "Médico veterinario dedicado al cuidado integral de la salud animal.");
+        res.put("fotoPerfilUrl", v.getFotoPerfilUrl() != null ? v.getFotoPerfilUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
+        res.put("horaInicioTrabajo", v.getHoraInicioTrabajo());
+        res.put("horaFinTrabajo", v.getHoraFinTrabajo());
+        res.put("diasLaborales", v.getDiasLaborales() != null ? String.join(", ", v.getDiasLaborales()) : "No especificado");
+
+        // Calcular dinámicamente el estado
+        String estadoCalculado = "Disponible";
+        try {
+            if ("Vacaciones".equalsIgnoreCase(v.getEstadoEmpleado())) {
+                estadoCalculado = "Vacaciones";
+            } else if ("Inactivo".equalsIgnoreCase(v.getEstadoEmpleado()) || "Suspendido".equalsIgnoreCase(v.getEstadoEmpleado())) {
+                estadoCalculado = v.getEstadoEmpleado();
+            } else {
+                java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+                java.time.LocalDate hoy = ahora.toLocalDate();
+                java.time.LocalTime horaActual = ahora.toLocalTime();
+                String diaSemana = hoy.getDayOfWeek().name();
+
+                Map<String, String> mapDias = new HashMap<>();
+                mapDias.put("MONDAY", "LUNES");
+                mapDias.put("TUESDAY", "MARTES");
+                mapDias.put("WEDNESDAY", "MIERCOLES");
+                mapDias.put("THURSDAY", "JUEVES");
+                mapDias.put("FRIDAY", "VIERNES");
+                mapDias.put("SATURDAY", "SABADO");
+                mapDias.put("SUNDAY", "DOMINGO");
+
+                String diaTraducido = mapDias.get(diaSemana);
+
+                if (v.getDiasLaborales() == null || !v.getDiasLaborales().contains(diaTraducido)) {
+                    estadoCalculado = "Fuera de horario";
+                } else if (v.getHoraInicioTrabajo() != null && v.getHoraFinTrabajo() != null) {
+                    java.time.LocalTime timeStart = java.time.LocalTime.parse(v.getHoraInicioTrabajo());
+                    java.time.LocalTime timeEnd = java.time.LocalTime.parse(v.getHoraFinTrabajo());
+
+                    if (horaActual.isBefore(timeStart) || horaActual.isAfter(timeEnd)) {
+                        estadoCalculado = "Fuera de horario";
+                    } else if (v.getHoraInicioDescanso() != null && v.getHoraFinDescanso() != null) {
+                        java.time.LocalTime breakStart = java.time.LocalTime.parse(v.getHoraInicioDescanso());
+                        java.time.LocalTime breakEnd = java.time.LocalTime.parse(v.getHoraFinDescanso());
+
+                        if (!horaActual.isBefore(breakStart) && horaActual.isBefore(breakEnd)) {
+                            estadoCalculado = "Descanso";
+                        } else {
+                            // Validar si tiene una cita activa en este bloque
+                            List<Cita> citas = citaRepository.findByClinicaId(v.getClinicaId()).stream()
+                                    .filter(c -> v.getId().equals(c.getVeterinarioId()))
+                                    .filter(c -> c.getFechaHora().toLocalDate().equals(hoy))
+                                    .filter(c -> !"Cancelada".equalsIgnoreCase(c.getEstado()))
+                                    .collect(Collectors.toList());
+
+                            for (Cita c : citas) {
+                                java.time.LocalTime citaHora = c.getFechaHora().toLocalTime();
+                                if (!horaActual.isBefore(citaHora) && horaActual.isBefore(citaHora.plusMinutes(30))) {
+                                    estadoCalculado = "En consulta";
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            estadoCalculado = "Disponible";
+        }
+        res.put("estadoActual", estadoCalculado);
+
+        // Reseñas y calificaciones
+        List<Cita> citasVet = citaRepository.findByClinicaId(v.getClinicaId()).stream()
+                .filter(c -> v.getId().equals(c.getVeterinarioId()))
+                .collect(Collectors.toList());
+
+        List<String> citaIds = citasVet.stream().map(Cita::getId).collect(Collectors.toList());
+        List<Resena> resenas = resenaRepository.findAll().stream()
+                .filter(r -> citaIds.contains(r.getCitaId()))
+                .collect(Collectors.toList());
+
+        res.put("cantidadResenas", resenas.size());
+        if (!resenas.isEmpty()) {
+            double prom = resenas.stream().mapToInt(Resena::getCalificacion).average().orElse(0.0);
+            res.put("calificacionPromedio", Math.round(prom * 10.0) / 10.0);
+        } else {
+            res.put("calificacionPromedio", v.getCalificacion());
+        }
+
+        // Pacientes atendidos únicos
+        long totalPacientes = 0;
+        try {
+            totalPacientes = visitaRepository.findByVeterinarioId(v.getId()).stream()
+                    .map(Visita::getMascotaId)
+                    .distinct()
+                    .count();
+        } catch (Exception ex) {
+            // fallback
+        }
+        res.put("cantidadPacientes", totalPacientes);
+
+        // Próximo horario disponible
+        res.put("proximoHorario", calcularProximoHorarioDisponible(v.getId()));
+
+        return ResponseEntity.ok(res);
+    }
+
+    private String calcularProximoHorarioDisponible(String vetId) {
+        try {
+            java.time.LocalDate date = java.time.LocalDate.now();
+            for (int i = 0; i < 7; i++) {
+                List<String> slots = getHorariosDisponibles(vetId, date.toString());
+                if (!slots.isEmpty()) {
+                    if (i == 0) {
+                        java.time.LocalTime nowTime = java.time.LocalTime.now();
+                        for (String slot : slots) {
+                            java.time.LocalTime st = java.time.LocalTime.parse(slot);
+                            if (st.isAfter(nowTime)) {
+                                return date.toString() + " a las " + slot;
+                            }
+                        }
+                    } else {
+                        return date.toString() + " a las " + slots.get(0);
+                    }
+                }
+                date = date.plusDays(1);
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+        return "No hay turnos disponibles esta semana";
+    }
+
 
     @GetMapping("/api/horarios-disponibles")
     @ResponseBody
