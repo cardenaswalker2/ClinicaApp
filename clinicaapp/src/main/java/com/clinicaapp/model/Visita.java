@@ -150,4 +150,54 @@ public class Visita {
 
     public LocalDateTime getFechaProximaCita() { return fechaProximaCita; }
     public void setFechaProximaCita(LocalDateTime fechaProximaCita) { this.fechaProximaCita = fechaProximaCita; }
+
+    // --- NUEVOS CAMPOS CLÍNICOS AVANZADOS ---
+    private String anamnesis;
+    private String sintomas;
+    private String tiempoEvolucion;
+    private String diagnosticoPrincipal;
+    private String diagnosticosSecundarios;
+    private String gravedad;
+    private String procedimientosRealizados;
+    private String recomendacionesPropietario;
+    private String vacunasAplicadas;
+    private String proximaVacunacion;
+    private List<String> adjuntosUrls;
+    private boolean bloqueada;
+
+    public String getAnamnesis() { return anamnesis; }
+    public void setAnamnesis(String anamnesis) { this.anamnesis = anamnesis; }
+
+    public String getSintomas() { return sintomas; }
+    public void setSintomas(String sintomas) { this.sintomas = sintomas; }
+
+    public String getTiempoEvolucion() { return tiempoEvolucion; }
+    public void setTiempoEvolucion(String tiempoEvolucion) { this.tiempoEvolucion = tiempoEvolucion; }
+
+    public String getDiagnosticoPrincipal() { return diagnosticoPrincipal; }
+    public void setDiagnosticoPrincipal(String diagnosticoPrincipal) { this.diagnosticoPrincipal = diagnosticoPrincipal; }
+
+    public String getDiagnosticosSecundarios() { return diagnosticosSecundarios; }
+    public void setDiagnosticosSecundarios(String diagnosticosSecundarios) { this.diagnosticosSecundarios = diagnosticosSecundarios; }
+
+    public String getGravedad() { return gravedad; }
+    public void setGravedad(String gravedad) { this.gravedad = gravedad; }
+
+    public String getProcedimientosRealizados() { return procedimientosRealizados; }
+    public void setProcedimientosRealizados(String procedimientosRealizados) { this.procedimientosRealizados = procedimientosRealizados; }
+
+    public String getRecomendacionesPropietario() { return recomendacionesPropietario; }
+    public void setRecomendacionesPropietario(String recomendacionesPropietario) { this.recomendacionesPropietario = recomendacionesPropietario; }
+
+    public String getVacunasAplicadas() { return vacunasAplicadas; }
+    public void setVacunasAplicadas(String vacunasAplicadas) { this.vacunasAplicadas = vacunasAplicadas; }
+
+    public String getProximaVacunacion() { return proximaVacunacion; }
+    public void setProximaVacunacion(String proximaVacunacion) { this.proximaVacunacion = proximaVacunacion; }
+
+    public List<String> getAdjuntosUrls() { return adjuntosUrls; }
+    public void setAdjuntosUrls(List<String> adjuntosUrls) { this.adjuntosUrls = adjuntosUrls; }
+
+    public boolean isBloqueada() { return bloqueada; }
+    public void setBloqueada(boolean bloqueada) { this.bloqueada = bloqueada; }
 }

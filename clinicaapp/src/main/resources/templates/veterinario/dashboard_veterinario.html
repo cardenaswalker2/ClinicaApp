@@ -345,7 +345,7 @@
                         <div class="owner-name" th:text="${'Propietario: ' + (c.nombreUsuario != null ? c.nombreUsuario : 'Cliente')}">Propietario</div>
                         <div class="mt-1">
                             <span class="status-badge" 
-                                  th:classappend="${c.estado == 'En Espera' ? 'status-espera' : (c.estado == 'Confirmada' ? 'status-confirmada' : (c.estado == 'En Consulta' ? 'status-consulta' : (c.estado == 'Consulta Finalizada' ? 'status-finalizada' : 'status-pendiente')))}" 
+                                  th:classappend="${#strings.equalsIgnoreCase(c.estado, 'En Espera') ? 'status-espera' : (#strings.equalsIgnoreCase(c.estado, 'Confirmada') ? 'status-confirmada' : (#strings.equalsIgnoreCase(c.estado, 'En Consulta') ? 'status-consulta' : (#strings.equalsIgnoreCase(c.estado, 'Consulta Finalizada') ? 'status-finalizada' : 'status-pendiente')))}" 
                                   th:text="${c.estado}">Estado</span>
                         </div>
                     </div>
@@ -355,19 +355,19 @@
                         <i class="bi bi-clock"></i>
                         <span th:text="${#temporals.format(c.fechaHora, 'HH:mm')}">14:30</span>
                     </div>
-                    <th:block th:if="${c.estado == 'En Espera'}">
+                    <th:block th:if="${#strings.equalsIgnoreCase(c.estado, 'En Espera')}">
                         <a th:href="@{/veterinario/citas/{id}/atender(id=${c.id})}" class="btn-attend" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);">
                             <i class="bi bi-door-open-fill"></i>
                             Llamar a Consultorio
                         </a>
                     </th:block>
-                    <th:block th:if="${c.estado == 'En Consulta'}">
+                    <th:block th:if="${#strings.equalsIgnoreCase(c.estado, 'En Consulta')}">
                         <a th:href="@{/veterinario/citas/{id}/atender(id=${c.id})}" class="btn-attend">
                             <i class="bi bi-heart-pulse"></i>
                             Continuar Consulta
                         </a>
                     </th:block>
-                    <th:block th:if="${c.estado != 'En Espera' and c.estado != 'En Consulta'}">
+                    <th:block th:if="${!#strings.equalsIgnoreCase(c.estado, 'En Espera') and !#strings.equalsIgnoreCase(c.estado, 'En Consulta')}">
                         <span class="text-muted small fw-bold"><i class="bi bi-hourglass-split"></i> Esperando Llegada</span>
                     </th:block>
                 </div>

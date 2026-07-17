@@ -307,25 +307,46 @@
         </div>
     </div>
 
+    <div class="info-section" th:if="${visita.anamnesis != null and !visita.anamnesis.isEmpty()}">
+        <div class="section-title">Anamnesis / Historia Previa</div>
+        <div class="content-box" th:text="${visita.anamnesis}"></div>
+    </div>
+
     <div class="info-section">
         <div class="section-title">Diagnóstico Clínico</div>
-        <div class="content-box" th:text="${visita.diagnostico}"></div>
+        <div class="content-box">
+            <p><strong>Diagnóstico Principal:</strong> <span th:text="${visita.diagnosticoPrincipal ?: visita.diagnostico}"></span></p>
+            <p th:if="${visita.diagnosticosSecundarios != null and !visita.diagnosticosSecundarios.isEmpty()}"><strong>Diagnósticos Secundarios:</strong> <span th:text="${visita.diagnosticosSecundarios}"></span></p>
+            <p th:if="${visita.gravedad != null}"><strong>Nivel de Gravedad:</strong> <span th:text="${visita.gravedad}"></span></p>
+        </div>
     </div>
 
     <div class="info-section">
         <div class="section-title">Tratamiento y Procedimientos</div>
-        <div class="content-box" th:text="${visita.tratamiento}"></div>
-    </div>
-
-    <div class="info-section">
-        <div class="section-title">Medicamentos Recetados</div>
-        <div class="content-box" style="border-left: 3px solid #e74c3c;">
-            <p th:text="${visita.medicamentosRecetados != null ? visita.medicamentosRecetados : 'Sin prescripción de fármacos.'}"></p>
+        <div class="content-box">
+            <p th:text="${visita.tratamiento}"></p>
+            <p th:if="${visita.procedimientosRealizados != null and !visita.procedimientosRealizados.isEmpty()}" style="margin-top: 8px;"><strong>Procedimientos Realizados:</strong> <span th:text="${visita.procedimientosRealizados}"></span></p>
+            <p th:if="${visita.recomendacionesPropietario != null and !visita.recomendacionesPropietario.isEmpty()}" style="margin-top: 8px;"><strong>Recomendaciones para el Propietario:</strong> <span th:text="${visita.recomendacionesPropietario}"></span></p>
         </div>
     </div>
 
-    <div class="info-section" th:if="${visita.notasAdicionales != null}">
-        <div class="section-title">Indicaciones Especiales</div>
+    <div class="info-section" th:if="${visita.medicamentosRecetados != null and !visita.medicamentosRecetados.isEmpty()}">
+        <div class="section-title">Medicamentos Recetados (Receta)</div>
+        <div class="content-box" style="border-left: 3px solid #e74c3c; background: #fff5f5;">
+            <p th:text="${#strings.listJoin(visita.medicamentosRecetados, ', ')}"></p>
+        </div>
+    </div>
+
+    <div class="info-section" th:if="${visita.vacunasAplicadas != null and !visita.vacunasAplicadas.isEmpty()}">
+        <div class="section-title">Vacunas Aplicadas</div>
+        <div class="content-box">
+            <p><strong>Vacunas en esta sesión:</strong> <span th:text="${visita.vacunasAplicadas}"></span></p>
+            <p th:if="${visita.proximaVacunacion != null and !visita.proximaVacunacion.isEmpty()}"><strong>Próxima Vacunación:</strong> <span th:text="${visita.proximaVacunacion}"></span></p>
+        </div>
+    </div>
+
+    <div class="info-section" th:if="${visita.notasAdicionales != null and !visita.notasAdicionales.isEmpty()}">
+        <div class="section-title">Indicaciones Especiales / Observaciones</div>
         <div class="content-box" th:text="${visita.notasAdicionales}"></div>
     </div>
 

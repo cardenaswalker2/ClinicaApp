@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atención Médica | ClínicaApp</title>
+    <title>Historia Clínica & Consulta | ClínicaApp</title>
     <link th:replace="~{fragments/header :: favIcon}">
 
     <!-- Bootstrap & Icons -->
@@ -44,7 +44,7 @@
             backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border);
             padding: 1rem 0;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .navbar-brand-custom {
@@ -131,6 +131,28 @@
             color: white;
         }
 
+        .nav-tabs-custom {
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 2rem;
+            gap: 0.5rem;
+        }
+
+        .nav-tabs-custom .nav-link {
+            color: var(--text-secondary);
+            font-weight: 700;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            transition: var(--transition);
+            background: transparent;
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            color: white;
+            background: rgba(99, 102, 241, 0.1);
+            border-bottom: 3px solid var(--primary);
+        }
+
         .history-item {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
@@ -144,6 +166,21 @@
             color: var(--text-secondary);
             font-weight: 600;
             margin-bottom: 0.5rem;
+        }
+
+        .btn-draft {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid var(--border);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .btn-draft:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
         }
 
         .btn-submit {
@@ -162,10 +199,10 @@
         }
 
         .btn-cancel {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border: 1.5px solid var(--border);
-            color: var(--text);
-            padding: 0.8rem 2rem;
+            color: var(--text-secondary);
+            padding: 0.8rem 1.5rem;
             border-radius: var(--radius-md);
             font-weight: 700;
             transition: var(--transition);
@@ -173,8 +210,8 @@
         }
 
         .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
         }
     </style>
 </head>
@@ -184,12 +221,13 @@
     <!-- Navbar -->
     <nav class="navbar navbar-custom navbar-dark">
         <div class="container">
-            <a class="navbar-brand-custom" href="#">
+            <a class="navbar-brand-custom" th:href="@{/veterinario/dashboard}">
                 <i class="bi bi-shield-plus"></i>
                 ClínicaApp <span>Atención Médica</span>
             </a>
             <div class="d-flex align-items-center gap-3">
                 <span class="text-secondary fw-semibold" th:text="${'Sede: ' + clinica.nombre}">Clínica</span>
+                <span class="badge bg-success" th:if="${visitaDTO.id != null}">Modo Edición (Borrador)</span>
             </div>
         </div>
     </nav>
@@ -197,7 +235,7 @@
     <div class="container pb-5">
         <div class="row">
             <!-- Columna Ficha Paciente e Historial -->
-            <div class="col-lg-5 mb-4">
+            <div class="col-lg-4 mb-4">
                 <div class="form-card h-100">
                     <div class="section-title">
                         <i class="bi bi-journal-medical"></i> Ficha del Paciente
@@ -224,6 +262,12 @@
                         </div>
                         <div class="col-6">
                             <div class="info-pill">
+                                <div class="info-pill-title">Edad</div>
+                                <div class="info-pill-value" th:text="${mascota != null ? mascota.edad + ' años' : 'N/A'}">Edad</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-pill">
                                 <div class="info-pill-title">Propietario</div>
                                 <div class="info-pill-value" th:text="${cliente != null ? cliente.nombre + ' ' + cliente.apellido : 'Cliente'}">Propietario</div>
                             </div>
@@ -236,74 +280,222 @@
 
                     <div th:if="${#lists.isEmpty(historial)}" class="text-muted text-center py-4">
                         <i class="bi bi-folder-x fs-2 d-block mb-2"></i>
-                        No hay consultas previas registradas para este paciente.
+                        No hay consultas previas registradas.
                     </div>
 
-                    <div th:unless="${#lists.isEmpty(historial)}" style="max-height: 350px; overflow-y: auto; padding-right: 0.5rem;">
+                    <div th:unless="${#lists.isEmpty(historial)}" style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
                         <div class="history-item" th:each="h : ${historial}">
-                            <div class="history-date" th:text="${#temporals.format(h.fechaVisita, 'dd/MM/yyyy HH:mm')}">Fecha</div>
-                            <div class="fw-bold mb-1">Diagnóstico:</div>
-                            <p class="text-secondary small mb-2" th:text="${h.diagnostico}">Diagnóstico</p>
-                            <div class="fw-bold mb-1">Tratamiento:</div>
-                            <p class="text-secondary small mb-0" th:text="${h.tratamiento}">Tratamiento</p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="history-date text-primary" th:text="${#temporals.format(h.fechaVisita, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                <span class="badge bg-secondary" th:if="${h.bloqueada}">Cerrado</span>
+                                <span class="badge bg-warning text-dark" th:if="${!h.bloqueada}">Borrador</span>
+                            </div>
+                            <div class="small mb-1"><strong>Diagnóstico Principal:</strong> <span th:text="${h.diagnosticoPrincipal ?: h.diagnostico}">Diagnóstico</span></div>
+                            <div class="small mb-1" th:if="${h.sintomas != null}"><strong>Síntomas:</strong> <span th:text="${h.sintomas}">Síntomas</span></div>
+                            <div class="small mb-1"><strong>Tratamiento:</strong> <span th:text="${h.tratamiento}">Tratamiento</span></div>
+                            <div class="small" th:if="${h.peso != null}"><strong>Peso:</strong> <span th:text="${h.peso + ' kg'}">Peso</span> | <strong>Temp:</strong> <span th:text="${h.temperatura + ' °C'}">Temp</span></div>
+                            <div class="mt-2" th:if="${!h.bloqueada}">
+                                <a th:href="@{/veterinario/citas/{citaId}/editar-consulta/{visitaId}(citaId=${cita.id}, visitaId=${h.id})}" class="btn btn-sm btn-outline-warning w-100 fw-bold">
+                                    <i class="bi bi-pencil-square"></i> Editar Borrador
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Columna Registro de Consulta -->
-            <div class="col-lg-7">
+            <div class="col-lg-8">
                 <div class="form-card">
                     <div class="section-title">
-                        <i class="bi bi-heart-pulse-fill"></i> Registro de Atención
+                        <i class="bi bi-heart-pulse-fill"></i> Historia Clínica & Consulta Médica
                     </div>
 
-                    <form th:action="@{/veterinario/citas/guardar-consulta}" th:object="${visitaDTO}" method="post">
+                    <form th:action="@{/veterinario/citas/guardar-consulta}" th:object="${visitaDTO}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
                         <input type="hidden" th:field="*{citaId}">
                         <input type="hidden" th:field="*{mascotaId}">
                         <input type="hidden" th:field="*{clinicaId}">
                         <input type="hidden" th:field="*{veterinarioId}">
+                        <input type="hidden" id="finalizar" name="finalizar" value="false">
 
-                        <!-- Diagnóstico -->
-                        <div class="mb-4">
-                            <label for="diagnostico" class="form-label">Diagnóstico Clínico *</label>
-                            <textarea id="diagnostico" class="form-control" th:field="*{diagnostico}" rows="4" required placeholder="Describe detalladamente el diagnóstico o síntomas observados..."></textarea>
-                        </div>
+                        <!-- Pestañas de Navegación -->
+                        <nav>
+                            <div class="nav nav-tabs nav-tabs-custom" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general" type="button" role="tab">1. Info General & Examen</button>
+                                <button class="nav-link" id="nav-diagnostico-tab" data-bs-toggle="tab" data-bs-target="#nav-diagnostico" type="button" role="tab">2. Diagnóstico & Plan</button>
+                                <button class="nav-link" id="nav-tratamiento-tab" data-bs-toggle="tab" data-bs-target="#nav-tratamiento" type="button" role="tab">3. Tratamiento & Vacunas</button>
+                                <button class="nav-link" id="nav-archivos-tab" data-bs-toggle="tab" data-bs-target="#nav-archivos" type="button" role="tab">4. Documentación & Adjuntos</button>
+                            </div>
+                        </nav>
 
-                        <!-- Tratamiento -->
-                        <div class="mb-4">
-                            <label for="tratamiento" class="form-label">Tratamiento y Plan de Acción *</label>
-                            <textarea id="tratamiento" class="form-control" th:field="*{tratamiento}" rows="3" required placeholder="Medicamentos administrados, reposo, cuidados o procedimientos a realizar..."></textarea>
-                        </div>
+                        <div class="tab-content" id="nav-tabContent">
+                            <!-- Pestaña 1: Info General y Constantes -->
+                            <div class="tab-pane fade show active" id="nav-general" role="tabpanel">
+                                <div class="mb-4">
+                                    <label class="form-label">Motivo de la Consulta *</label>
+                                    <input type="text" class="form-control" th:field="*{diagnostico}" required placeholder="Ej: Vómitos recurrentes y decaimiento general">
+                                    <div class="form-text text-secondary">Breve motivo por el cual asiste a consulta.</div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Anamnesis</label>
+                                    <textarea class="form-control" th:field="*{anamnesis}" rows="3" placeholder="Historial previo, comportamiento, alimentación, antecedentes relevantes..."></textarea>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Síntomas Reportados</label>
+                                        <input type="text" class="form-control" th:field="*{sintomas}" placeholder="Ej: Diarrea, letargo, falta de apetito">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tiempo de Evolución</label>
+                                        <input type="text" class="form-control" th:field="*{tiempoEvolucion}" placeholder="Ej: 3 días">
+                                    </div>
+                                </div>
 
-                        <!-- Receta Médica -->
-                        <div class="mb-4">
-                            <label for="medicamentos" class="form-label">Medicamentos Recetados (Opcional)</label>
-                            <input type="text" id="medicamentos" class="form-control" name="medicamentosRecetados" placeholder="Ej: Amoxicilina 250mg, Meloxicam 1ml (Separados por coma)">
-                            <div class="form-text text-secondary">Si se recetan medicamentos para el hogar, lístalos aquí.</div>
-                        </div>
+                                <div class="section-title mt-5">
+                                    <i class="bi bi-activity"></i> Examen Físico & Constantes
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label">Peso (kg) *</label>
+                                        <input type="number" step="0.01" class="form-control" th:field="*{peso}" required placeholder="Ej: 12.5">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label">Temperatura (°C)</label>
+                                        <input type="number" step="0.1" class="form-control" th:field="*{temperatura}" placeholder="Ej: 38.5">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label">Frec. Cardíaca (ppm)</label>
+                                        <input type="number" class="form-control" th:field="*{frecuenciaCardiaca}" placeholder="Ej: 110">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label">Frec. Respiratoria (rpm)</label>
+                                        <input type="number" class="form-control" th:field="*{frecuenciaRespiratoria}" placeholder="Ej: 24">
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Condición Corporal</label>
+                                        <select class="form-select" th:field="*{condicionCorporal}">
+                                            <option value="Muy Delgado">1 - Muy Delgado</option>
+                                            <option value="Delgado">2 - Delgado</option>
+                                            <option value="Ideal">3 - Ideal (Recomendado)</option>
+                                            <option value="Sobrepeso">4 - Sobrepeso</option>
+                                            <option value="Obeso">5 - Obeso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Estado de Conciencia</label>
+                                        <select class="form-select" th:field="*{estadoConciencia}">
+                                            <option value="Alerta">Alerta</option>
+                                            <option value="Deprimido">Deprimido</option>
+                                            <option value="Estuporoso">Estuporoso</option>
+                                            <option value="Comatoso">Comatoso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Observaciones del Examen Físico</label>
+                                        <textarea class="form-control" th:field="*{notasAdicionales}" rows="2" placeholder="Mucosas, tiempo de llenado capilar, palpación abdominal, auscultación..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Costo Total -->
-                        <div class="mb-4">
-                            <label for="costoTotal" class="form-label">Costo Total de la Consulta ($ COP) *</label>
-                            <input type="number" step="0.01" id="costoTotal" class="form-control" th:field="*{costoTotal}" required placeholder="Ej: 50000.00">
-                        </div>
+                            <!-- Pestaña 2: Diagnóstico -->
+                            <div class="tab-pane fade" id="nav-diagnostico" role="tabpanel">
+                                <div class="mb-4">
+                                    <label class="form-label">Diagnóstico Principal (Diferencial) *</label>
+                                    <textarea class="form-control" th:field="*{diagnosticoPrincipal}" rows="3" required placeholder="Describe el diagnóstico principal o presuntivo de la consulta..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Diagnósticos Secundarios / Hallazgos</label>
+                                    <textarea class="form-control" th:field="*{diagnosticosSecundarios}" rows="2" placeholder="Otras observaciones clínicas o enfermedades encontradas..."></textarea>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nivel de Gravedad</label>
+                                        <select class="form-select" th:field="*{gravedad}">
+                                            <option value="Leve">Leve</option>
+                                            <option value="Moderado">Moderado</option>
+                                            <option value="Grave">Grave / Crítico</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Costo de la Consulta (COP) *</label>
+                                        <input type="number" step="0.01" class="form-control" th:field="*{costoTotal}" required placeholder="Monto total a cobrar">
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Notas Adicionales -->
-                        <div class="mb-4">
-                            <label for="notasAdicionales" class="form-label">Notas Adicionales (Privadas)</label>
-                            <textarea id="notasAdicionales" class="form-control" th:field="*{notasAdicionales}" rows="2" placeholder="Observaciones de seguimiento o indicaciones internas..."></textarea>
+                            <!-- Pestaña 3: Tratamiento -->
+                            <div class="tab-pane fade" id="nav-tratamiento" role="tabpanel">
+                                <div class="mb-4">
+                                    <label class="form-label">Tratamiento y Plan de Acción *</label>
+                                    <textarea class="form-control" th:field="*{tratamiento}" rows="4" required placeholder="Describe las acciones tomadas en la clínica y el plan de manejo domiciliario..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Medicamentos Formulados (Receta)</label>
+                                    <input type="text" class="form-control" name="medicamentosRecetados" placeholder="Ej: Amoxicilina 250mg, Meloxicam 1ml (Separados por coma)">
+                                    <div class="form-text text-secondary">Lístele los fármacos, dosis y duración para que aparezcan impresos en la receta médica digital.</div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Procedimientos Realizados</label>
+                                    <textarea class="form-control" th:field="*{procedimientosRealizados}" rows="2" placeholder="Ej: Canalización, administración de suero endovenoso, limpieza de heridas..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Recomendaciones para el Propietario</label>
+                                    <textarea class="form-control" th:field="*{recomendacionesPropietario}" rows="2" placeholder="Dieta, reposo, signos de alerta por los cuales volver de urgencia..."></textarea>
+                                </div>
+
+                                <div class="section-title mt-5">
+                                    <i class="bi bi-eyedropper"></i> Control de Vacunación
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Vacunas Aplicadas en esta Sesión</label>
+                                        <input type="text" class="form-control" th:field="*{vacunasAplicadas}" placeholder="Ej: Rabia, Triple Felina, Polivalente">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Próxima Fecha de Vacunación</label>
+                                        <input type="date" class="form-control" th:field="*{proximaVacunacion}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña 4: Documentación y Adjuntos -->
+                            <div class="tab-pane fade" id="nav-archivos" role="tabpanel">
+                                <div class="mb-4">
+                                    <label class="form-label">Adjuntar Imágenes, Radiografías, Exámenes (Formatos permitidos: JPG, PNG, PDF, DOCX)</label>
+                                    <input type="file" class="form-control" name="adjuntos" multiple>
+                                    <div class="form-text text-secondary">Selecciona uno o más archivos para subirlos a la historia clínica.</div>
+                                </div>
+
+                                <div th:if="${visitaDTO.adjuntosUrls != null and !#lists.isEmpty(visitaDTO.adjuntosUrls)}" class="mt-4">
+                                    <h6 class="fw-bold mb-3"><i class="bi bi-paperclip"></i> Archivos Adjuntos a esta Consulta:</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-4 col-sm-6" th:each="url : ${visitaDTO.adjuntosUrls}">
+                                            <div class="p-2 border border-secondary rounded d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02);">
+                                                <a th:href="${url}" target="_blank" class="text-info text-decoration-none small text-truncate" th:text="${url.substring(url.lastIndexOf('_') + 1)}">Archivo</a>
+                                                <i class="bi bi-file-earmark-arrow-down-fill text-info"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Botones de Acción -->
-                        <div class="d-flex justify-content-end gap-3 mt-5">
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top border-secondary">
                             <a th:href="@{/veterinario/dashboard}" class="btn-cancel">
-                                Cancelar
+                                <i class="bi bi-arrow-left"></i> Volver al Portal
                             </a>
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-check2-circle me-1"></i>
-                                Guardar Consulta y Finalizar Cita
-                            </button>
+                            <div class="d-flex gap-3">
+                                <button type="button" onclick="enviarFormulario(false)" class="btn-draft">
+                                    <i class="bi bi-journal-check me-1"></i> Guardar Borrador
+                                </button>
+                                <button type="button" onclick="enviarFormulario(true)" class="btn-submit">
+                                    <i class="bi bi-check2-all me-1"></i> Finalizar y Cerrar Consulta
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -311,7 +503,22 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function enviarFormulario(finalizar) {
+            document.getElementById('finalizar').value = finalizar ? 'true' : 'false';
+            
+            // Si finaliza, confirmamos
+            if (finalizar) {
+                if (confirm('¿Estás seguro de finalizar la consulta? Una vez cerrada definitivamente, el registro clínico se bloqueará para mantener la integridad de los datos.')) {
+                    document.querySelector('form').submit();
+                }
+            } else {
+                document.querySelector('form').submit();
+            }
+        }
+    </script>
 </body>
 
 </html>
