@@ -11,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.clinicaapp.service.IUsuarioService;
+import com.clinicaapp.dto.UsuarioRegistroDTO;
+import com.clinicaapp.model.enums.Role;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
@@ -47,6 +50,21 @@ public class CliController {
 
     @Autowired
     private LogActividadService logActividadService;
+
+    @Autowired
+    private IUsuarioService usuarioService;
+
+    @Autowired
+    private MascotaRepository mascotaRepo;
+
+    @Autowired
+    private VisitaRepository visitaRepo;
+
+    @Autowired
+    private ProductoRepository productoRepo;
+
+    @Autowired
+    private ExamenLaboratorioRepository examenRepo;
 
     @GetMapping("/consola-cli")
     public String verTerminal(Model model) {
@@ -344,6 +362,32 @@ public class CliController {
                     output.add("  • Empaquetando a flujo binario ZIP...");
                     output.add("<span class='text-success'>[SUCCESS] Respaldo compilado de forma inmutable.</span>");
                     output.add("  🚀 <a href='/admin/respaldos/generar?coleccion=TODOS' target='_blank' class='text-info fw-bold'>DESCARGAR COPIA DE SEGURIDAD</a>");
+                    break;
+
+                case "db purge":
+                case "db reset":
+                    output.add("<span class='text-danger fw-bold'>[ADVERTENCIA] INICIANDO PURGA TOTAL DE BASE DE DATOS...</span>");
+                    try {
+                        usuarioRepo.deleteAll();
+                        clinicaRepo.deleteAll();
+                        citaRepo.deleteAll();
+                        logRepo.deleteAll();
+                        if (logNotificacionRepo != null) logNotificacionRepo.deleteAll();
+                        if (mascotaRepo != null) mascotaRepo.deleteAll();
+                        if (visitaRepo != null) visitaRepo.deleteAll();
+                        if (productoRepo != null) productoRepo.deleteAll();
+                        if (examenRepo != null) examenRepo.deleteAll();
+
+                        // Crear superusuario de nuevo para no perder acceso
+                        UsuarioRegistroDTO adminDTO = new UsuarioRegistroDTO("Admin", "Principal", "admin@clinica.app", "admin123", "999999999");
+                        usuarioService.createUsuarioWithRole(adminDTO, Role.ROLE_ADMIN);
+
+                        output.add("<span class='text-success'>[SUCCESS] Base de datos purgada por completo.</span>");
+                        output.add("<span class='text-success'>[SUCCESS] Re-creado superusuario: admin@clinica.app / admin123</span>");
+                        output.add("<span class='text-warning'>[INFO] Para volver a cargar los datos de demostración de clínicas y servicios por defecto, por favor reinicia la aplicación.</span>");
+                    } catch (Exception ex) {
+                        output.add("<span class='text-danger'>[FAIL] Error al purgar la base de datos: " + ex.getMessage() + "</span>");
+                    }
                     break;
 
                 // ==========================================
