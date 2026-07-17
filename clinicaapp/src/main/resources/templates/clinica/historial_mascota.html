@@ -986,11 +986,11 @@
                                 <i class="bi bi-person-badge-fill"></i>
                                 <span th:text="${v.veterinarioId != null and vetsMap != null and vetsMap.containsKey(v.veterinarioId) ? 'Dr. ' + vetsMap.get(v.veterinarioId) : 'Atendido por Clínica'}">Atendido por Clínica</span>
                             </div>
-                            <a th:href="@{'/clinica/descargar-receta/' + ${v.id}}" class="btn-receta" target="_blank">
+                            <a th:href="@{/clinica/descargar-receta/{visitaId}(visitaId=${v.id})}" class="btn-receta" target="_blank">
                                 <i class="bi bi-file-pdf"></i>
                                 Ver Receta
                             </a>
-                            <a th:href="@{'/clinica/descargar-factura/' + ${v.id}}" class="btn-receta bg-success text-white border-0" target="_blank" style="background-color: var(--success) !important;">
+                            <a th:href="@{/clinica/descargar-factura/{visitaId}(visitaId=${v.id})}" class="btn-receta bg-success text-white border-0" target="_blank" style="background-color: var(--success) !important;">
                                 <i class="bi bi-receipt"></i>
                                 Recibo Express
                             </a>
