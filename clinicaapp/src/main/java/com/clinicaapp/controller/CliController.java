@@ -93,7 +93,7 @@ public class CliController {
         // Comandos compuestos de 2 palabras (ej: "base64 encode", "cpu info")
         String doubleCmd = parts.length > 1 ? baseCmd + " " + parts[1].toLowerCase() : baseCmd;
 
-        if (doubleCmd.equals("db stats") || doubleCmd.equals("logs tail") || 
+        if (doubleCmd.equals("db stats") || doubleCmd.equals("db reset") || doubleCmd.equals("db purge") || doubleCmd.equals("logs tail") || 
             doubleCmd.equals("users list") || doubleCmd.equals("clinics list") || 
             doubleCmd.equals("appointments list") || doubleCmd.equals("cpu info") || 
             doubleCmd.equals("disk usage") || doubleCmd.equals("ram sweep") ||
