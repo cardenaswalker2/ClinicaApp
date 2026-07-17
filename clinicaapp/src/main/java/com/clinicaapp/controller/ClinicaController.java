@@ -640,6 +640,13 @@ public class ClinicaController {
             return "redirect:/login";
         
         List<Usuario> personal = usuarioService.findByClinicaId(clinica.getId());
+        if (personal != null) {
+            log.info("DEBUG: Listando personal para clinica {}: total={} empleados.", clinica.getId(), personal.size());
+            for (Usuario u : personal) {
+                log.info("DEBUG: Empleado ID: '{}', Nombre: '{}', Email: '{}', Activo: '{}'", 
+                         u.getId(), u.getNombreCompleto(), u.getEmail(), u.isActivo());
+            }
+        }
         model.addAttribute("personal", personal);
         model.addAttribute("clinica", clinica);
         return "clinica/empleados";
