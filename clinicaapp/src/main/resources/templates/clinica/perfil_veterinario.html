@@ -223,7 +223,7 @@
                     </div>
                 </div>
                 <div class="col-md-auto text-center text-md-end mt-3 mt-md-0">
-                    <a th:href="@{'/clinica/personal/editar/' + ${empleado.id}}" class="btn btn-outline-primary fw-bold" style="border-radius: var(--radius-md);">
+                    <a th:href="@{/clinica/personal/editar/{id}(id=${empleado.id})}" class="btn btn-outline-primary fw-bold" style="border-radius: var(--radius-md);">
                         <i class="bi bi-pencil-square me-1"></i> Editar Perfil
                     </a>
                 </div>

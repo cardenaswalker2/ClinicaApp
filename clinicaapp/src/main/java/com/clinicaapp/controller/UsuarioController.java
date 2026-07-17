@@ -1202,10 +1202,12 @@ public Map<String, Object> getContextoIA(Principal principal) {
                 map.put("nombreCompleto", v.getNombreCompleto());
                 map.put("especialidad", v.getEspecialidad() != null ? v.getEspecialidad() : "Medicina General");
                 map.put("cargo", v.getCargo() != null ? v.getCargo() : "Médico Veterinario");
-                map.put("calificacion", v.getCalificacion());
-                map.put("experiencia", v.getExperiencia());
-                map.put("fotoPerfilUrl", v.getFotoPerfilUrl() != null ? v.getFotoPerfilUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
-                map.put("estadoEmpleado", v.getEstadoEmpleado());
+                map.put("calificacion", v.getCalificacion() != null ? v.getCalificacion() : 5.0);
+                map.put("experiencia", v.getExperiencia() != null ? v.getExperiencia() : 0);
+                
+                String foto = v.getFotoPerfilUrl() != null && !v.getFotoPerfilUrl().isEmpty() ? v.getFotoPerfilUrl() : (v.getFotoUrl() != null && !v.getFotoUrl().isEmpty() ? v.getFotoUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
+                map.put("fotoPerfilUrl", foto);
+                map.put("estadoEmpleado", v.getEstadoEmpleado() != null ? v.getEstadoEmpleado() : "Activo");
                 res.add(map);
             }
         }
@@ -1228,7 +1230,9 @@ public Map<String, Object> getContextoIA(Principal principal) {
         res.put("cargo", v.getCargo() != null ? v.getCargo() : "Médico Veterinario");
         res.put("experiencia", v.getExperiencia() != null ? v.getExperiencia() : 0);
         res.put("biografia", v.getBiografia() != null ? v.getBiografia() : "Médico veterinario dedicado al cuidado integral de la salud animal.");
-        res.put("fotoPerfilUrl", v.getFotoPerfilUrl() != null ? v.getFotoPerfilUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
+        
+        String foto = v.getFotoPerfilUrl() != null && !v.getFotoPerfilUrl().isEmpty() ? v.getFotoPerfilUrl() : (v.getFotoUrl() != null && !v.getFotoUrl().isEmpty() ? v.getFotoUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
+        res.put("fotoPerfilUrl", foto);
         
         String hInicio = v.getHoraInicioTrabajo() != null ? v.getHoraInicioTrabajo() : "08:00";
         String hFin = v.getHoraFinTrabajo() != null ? v.getHoraFinTrabajo() : "17:00";

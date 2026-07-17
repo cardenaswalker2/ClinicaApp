@@ -287,14 +287,14 @@
 
                     <!-- Botones de Acción -->
                     <div class="action-row">
-                        <a th:href="@{/clinica/personal/perfil/{id}(id=${emp.getId()})}" class="btn-card-action btn-outline-info border text-info bg-light">
+                        <a th:href="@{/clinica/personal/perfil/{id}(id=${emp.id})}" class="btn-card-action btn-outline-info border text-info bg-light">
                             <i class="bi bi-eye"></i> Perfil
                         </a>
-                        <a th:href="@{/clinica/personal/editar/{id}(id=${emp.getId()})}" class="btn-card-action btn-outline-primary border text-primary bg-light">
+                        <a th:href="@{/clinica/personal/editar/{id}(id=${emp.id})}" class="btn-card-action btn-outline-primary border text-primary bg-light">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
                         
-                        <form th:action="@{/clinica/personal/toggle-activo/{id}(id=${emp.getId()})}" method="post" style="flex: 1; display: inline;">
+                        <form th:action="@{/clinica/personal/toggle-activo/{id}(id=${emp.id})}" method="post" style="flex: 1; display: inline;">
                             <button type="submit" 
                                     th:class="'btn-card-action w-100 border-0 ' + ${emp.activo ? 'btn-danger text-white bg-danger' : 'btn-success text-white bg-success'}"
                                     th:text="${emp.activo ? 'Desactivar' : 'Activar'}">
@@ -302,7 +302,7 @@
                             </button>
                         </form>
 
-                        <form th:action="@{/clinica/personal/eliminar/{id}(id=${emp.getId()})}" method="post" style="width: 100%; display: block;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar permanentemente a este colaborador? Esta acción no se puede deshacer.');">
+                        <form th:action="@{/clinica/personal/eliminar/{id}(id=${emp.id})}" method="post" style="width: 100%; display: block;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar permanentemente a este colaborador? Esta acción no se puede deshacer.');">
                             <button type="submit" class="btn-card-action w-100 border-0 btn-danger text-white bg-danger mt-2">
                                 <i class="bi bi-trash"></i> Eliminar Colaborador
                             </button>
