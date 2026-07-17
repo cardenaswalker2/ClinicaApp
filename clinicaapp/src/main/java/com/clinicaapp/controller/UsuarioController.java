@@ -1226,12 +1226,15 @@ public Map<String, Object> getContextoIA(Principal principal) {
         res.put("nombreCompleto", v.getNombreCompleto());
         res.put("especialidad", v.getEspecialidad() != null ? v.getEspecialidad() : "Medicina General");
         res.put("cargo", v.getCargo() != null ? v.getCargo() : "Médico Veterinario");
-        res.put("experiencia", v.getExperiencia());
+        res.put("experiencia", v.getExperiencia() != null ? v.getExperiencia() : 0);
         res.put("biografia", v.getBiografia() != null ? v.getBiografia() : "Médico veterinario dedicado al cuidado integral de la salud animal.");
         res.put("fotoPerfilUrl", v.getFotoPerfilUrl() != null ? v.getFotoPerfilUrl() : "https://cdn-icons-png.flaticon.com/512/387/387561.png");
-        res.put("horaInicioTrabajo", v.getHoraInicioTrabajo());
-        res.put("horaFinTrabajo", v.getHoraFinTrabajo());
-        res.put("diasLaborales", v.getDiasLaborales() != null ? String.join(", ", v.getDiasLaborales()) : "No especificado");
+        
+        String hInicio = v.getHoraInicioTrabajo() != null ? v.getHoraInicioTrabajo() : "08:00";
+        String hFin = v.getHoraFinTrabajo() != null ? v.getHoraFinTrabajo() : "17:00";
+        res.put("horaInicioTrabajo", hInicio);
+        res.put("horaFinTrabajo", hFin);
+        res.put("diasLaborales", v.getDiasLaborales() != null && !v.getDiasLaborales().isEmpty() ? String.join(", ", v.getDiasLaborales()) : "LUNES, MARTES, MIERCOLES, JUEVES, VIERNES");
 
         // Calcular dinámicamente el estado
         String estadoCalculado = "Disponible";
@@ -1256,18 +1259,21 @@ public Map<String, Object> getContextoIA(Principal principal) {
                 mapDias.put("SUNDAY", "DOMINGO");
 
                 String diaTraducido = mapDias.get(diaSemana);
+                List<String> diasLaborales = v.getDiasLaborales() != null ? v.getDiasLaborales() : List.of("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES");
 
-                if (v.getDiasLaborales() == null || !v.getDiasLaborales().contains(diaTraducido)) {
+                if (!diasLaborales.contains(diaTraducido)) {
                     estadoCalculado = "Fuera de horario";
-                } else if (v.getHoraInicioTrabajo() != null && v.getHoraFinTrabajo() != null) {
-                    java.time.LocalTime timeStart = java.time.LocalTime.parse(v.getHoraInicioTrabajo());
-                    java.time.LocalTime timeEnd = java.time.LocalTime.parse(v.getHoraFinTrabajo());
+                } else {
+                    java.time.LocalTime timeStart = java.time.LocalTime.parse(hInicio);
+                    java.time.LocalTime timeEnd = java.time.LocalTime.parse(hFin);
 
                     if (horaActual.isBefore(timeStart) || horaActual.isAfter(timeEnd)) {
                         estadoCalculado = "Fuera de horario";
-                    } else if (v.getHoraInicioDescanso() != null && v.getHoraFinDescanso() != null) {
-                        java.time.LocalTime breakStart = java.time.LocalTime.parse(v.getHoraInicioDescanso());
-                        java.time.LocalTime breakEnd = java.time.LocalTime.parse(v.getHoraFinDescanso());
+                    } else {
+                        String dInicio = v.getHoraInicioDescanso() != null ? v.getHoraInicioDescanso() : "13:00";
+                        String dFin = v.getHoraFinDescanso() != null ? v.getHoraFinDescanso() : "14:00";
+                        java.time.LocalTime breakStart = java.time.LocalTime.parse(dInicio);
+                        java.time.LocalTime breakEnd = java.time.LocalTime.parse(dFin);
 
                         if (!horaActual.isBefore(breakStart) && horaActual.isBefore(breakEnd)) {
                             estadoCalculado = "Descanso";
@@ -1394,10 +1400,10 @@ public Map<String, Object> getContextoIA(Principal principal) {
                 .filter(c -> !"Cancelada".equalsIgnoreCase(c.getEstado()))
                 .collect(Collectors.toList());
 
-        String hInicio = vet.getHoraInicioTrabajo();
-        String hFin = vet.getHoraFinTrabajo();
-        String dInicio = vet.getHoraInicioDescanso();
-        String dFin = vet.getHoraFinDescanso();
+        String hInicio = vet.getHoraInicioTrabajo() != null && !vet.getHoraInicioTrabajo().isEmpty() ? vet.getHoraInicioTrabajo() : "08:00";
+        String hFin = vet.getHoraFinTrabajo() != null && !vet.getHoraFinTrabajo().isEmpty() ? vet.getHoraFinTrabajo() : "17:00";
+        String dInicio = vet.getHoraInicioDescanso() != null && !vet.getHoraInicioDescanso().isEmpty() ? vet.getHoraInicioDescanso() : "13:00";
+        String dFin = vet.getHoraFinDescanso() != null && !vet.getHoraFinDescanso().isEmpty() ? vet.getHoraFinDescanso() : "14:00";
 
         java.time.LocalTime timeStart = java.time.LocalTime.parse(hInicio);
         java.time.LocalTime timeEnd = java.time.LocalTime.parse(hFin);

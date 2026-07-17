@@ -67,11 +67,18 @@ public class VeterinarioController {
         if (veterinario == null) return "redirect:/login";
 
         Clinica clinica = obtenerClinicaLogueada(veterinario);
+        if (clinica == null) {
+            clinica = new Clinica();
+            clinica.setNombre("Clínica Veterinaria Mascotas");
+        }
         
         // Obtener citas asignadas a este veterinario
-        List<Cita> todasMisCitas = citaRepository.findByClinicaId(veterinario.getClinicaId()).stream()
-                .filter(c -> veterinario.getId().equals(c.getVeterinarioId()))
-                .collect(Collectors.toList());
+        List<Cita> todasMisCitas = new ArrayList<>();
+        if (veterinario.getClinicaId() != null) {
+            todasMisCitas = citaRepository.findByClinicaId(veterinario.getClinicaId()).stream()
+                    .filter(c -> veterinario.getId().equals(c.getVeterinarioId()))
+                    .collect(Collectors.toList());
+        }
 
         LocalDate hoy = LocalDate.now();
 
@@ -87,6 +94,9 @@ public class VeterinarioController {
         List<Cita> citasCompletadas = todasMisCitas.stream()
                 .filter(c -> "Completada".equalsIgnoreCase(c.getEstado()))
                 .collect(Collectors.toList());
+
+        String fechaHoy = java.time.format.DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", new java.util.Locale("es", "ES")).format(java.time.LocalDate.now());
+        model.addAttribute("fechaHoy", fechaHoy);
 
         model.addAttribute("citasActivas", dtosHoy);
         model.addAttribute("totalHoy", dtosHoy.size());
