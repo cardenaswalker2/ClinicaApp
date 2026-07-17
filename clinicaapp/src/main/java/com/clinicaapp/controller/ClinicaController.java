@@ -121,7 +121,9 @@ public class ClinicaController {
 
         List<CitaDisplayDTO> todas = citaService.getCitasByClinicaEmail(clinica.getEmail());
         List<CitaDisplayDTO> salaDeEspera = todas.stream()
-                .filter(c -> "En Espera".equalsIgnoreCase(c.getEstado()))
+                .filter(c -> "En Espera".equalsIgnoreCase(c.getEstado()) 
+                          || "En Consulta".equalsIgnoreCase(c.getEstado()) 
+                          || "Consulta Finalizada".equalsIgnoreCase(c.getEstado()))
                 .collect(Collectors.toList());
 
         double ingresosTotales = todas.stream()
@@ -255,158 +257,18 @@ public class ClinicaController {
         return "clinica/citas";
     }
 
-    // 3. REGISTRAR ATENCIÓN MÉDICA (FORMULARIO)
+    // 3. REGISTRAR ATENCIÓN MÉDICA (DESHABILITADO PARA EL ADMINISTRADOR)
     @GetMapping("/atender/{citaId}")
-    public String formAtenderPaciente(@PathVariable String citaId, Model model, Authentication auth) {
-        Clinica clinica = obtenerClinicaLogueada(auth);
-        Optional<Cita> citaOpt = citaService.findById(citaId);
-
-        if (citaOpt.isEmpty() || clinica == null)
-            return "redirect:/clinica/citas";
-
-        Cita cita = citaOpt.get();
-        VisitaDTO visitaDTO = new VisitaDTO();
-        visitaDTO.setCitaId(cita.getId());
-        visitaDTO.setMascotaId(cita.getMascotaId());
-        visitaDTO.setClinicaId(clinica.getId());
-        visitaDTO.setFechaVisita(LocalDateTime.now());
-        visitaDTO.setCostoTotal(0.0);
-
-        model.addAttribute("nombreMascota", mascotaService.findById(cita.getMascotaId())
-                .map(Mascota::getNombre).orElse("Paciente"));
-
-        List<String> nombresServicios = new ArrayList<>();
-        if (cita.getServiciosIds() != null) {
-            for (String sId : cita.getServiciosIds()) {
-                servicioService.findById(sId).ifPresent(s -> nombresServicios.add(s.getNombre()));
-            }
-        }
-        model.addAttribute("serviciosSolicitados", String.join(", ", nombresServicios));
-
-        model.addAttribute("visitaDTO", visitaDTO);
-        model.addAttribute("clinica", clinica);
-        return "clinica/form_visita";
+    public String formAtenderPaciente(@PathVariable String citaId, Model model, Authentication auth, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("mensajeError", "El Administrador de la clínica no puede realizar consultas médicas. Esta acción le corresponde al Veterinario.");
+        return "redirect:/clinica/dashboard";
     }
 
-    // 4. GUARDAR ATENCIÓN Y ENVIAR RECETA
+    // 4. GUARDAR ATENCIÓN Y ENVIAR RECETA (DESHABILITADO PARA EL ADMINISTRADOR)
     @PostMapping("/visitas/guardar")
-    public String guardarAtencion(@ModelAttribute VisitaDTO visitaDTO, Authentication auth) {
-        // 1. Guardamos la visita en la BD
-        Visita visitaSaved = visitaService.save(visitaDTO);
-        // 2. Cerramos la cita
-        citaService.completarCita(visitaDTO.getCitaId());
-
-        try {
-            Clinica clinica = obtenerClinicaLogueada(auth);
-            Mascota mascota = mascotaService.findById(visitaDTO.getMascotaId()).orElseThrow();
-            Usuario dueno = usuarioService.findById(mascota.getPropietarioId()).orElseThrow();
-
-            // 2.1 Generar Notificación Interna
-            String msgNotif = "Se ha completado la atención de " + mascota.getNombre() + ".";
-            if (visitaSaved.getFechaProximaCita() != null) {
-                msgNotif += " Tu próxima cita es el " + visitaSaved.getFechaProximaCita().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + ".";
-            }
-            notificacionService.crearNotificacion(
-                dueno.getId(), 
-                "¡Consulta Médica Finalizada!", 
-                msgNotif, 
-                "/usuario/historial/" + mascota.getId()
-            );
-
-            // 3. Generamos el PDF para adjuntarlo
-            Map<String, Object> data = new HashMap<>();
-            data.put("visita", visitaSaved);
-            data.put("clinica", clinica);
-            data.put("mascota", mascota);
-            data.put("dueno", dueno);
-
-            ByteArrayInputStream bis = pdfService.generatePdfFromTemplate("clinica/pdf_receta", data);
-            byte[] pdfBytes = bis.readAllBytes();
-
-            // --- DISEÑO DE EMAIL MÉDICO PREMIUM ---
-            String subject = "📄 Receta Médica: " + mascota.getNombre() + " - " + clinica.getNombre();
-
-            String htmlBody = String.format(
-                    """
-                            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9; padding: 40px 0;">
-                                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-
-                                    <!-- Encabezado con Gradiente Azul Médico -->
-                                    <div style="background: linear-gradient(135deg, #0284c7 0%%, #0369a1 100%%); padding: 35px 20px; text-align: center; color: white;">
-                                        <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                                            <span style="font-size: 30px;">🩺</span>
-                                        </div>
-                                        <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Resumen de Consulta Médica</h1>
-                                        <p style="margin: 5px 0 0; opacity: 0.8; font-size: 14px;">%s</p>
-                                    </div>
-
-                                    <div style="padding: 40px; color: #334155;">
-                                        <p style="font-size: 16px;">Hola <strong>%s</strong>,</p>
-                                        <p style="line-height: 1.6; font-size: 15px; color: #475569;">
-                                            Esperamos que <strong>%s</strong> se encuentre mucho mejor. Te enviamos los detalles de la atención recibida el día de hoy y la receta médica digital adjunta a este correo.
-                                        </p>
-
-                                        <!-- Caja de Resumen de la Mascota -->
-                                        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 25px 0;">
-                                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                                <span style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Paciente:</span>
-                                                <strong style="color: #0f172a;">%s</strong>
-                                            </div>
-                                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                                <span style="color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Servicio:</span>
-                                                <strong style="color: #0f172a;">Consulta Veterinaria</strong>
-                                            </div>
-                                            <div style="border-top: 1px solid #e2e8f0; margin-top: 15px; padding-top: 15px;">
-                                                <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">DIAGNÓSTICO:</p>
-                                                <p style="margin: 5px 0 0; color: #334155; font-style: italic;">"%s"</p>
-                                            </div>
-                                        </div>
-
-                                        <div style="text-align: center; margin: 35px 0;">
-                                            <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">Para ver las instrucciones detalladas y dosis, abre el PDF adjunto.</p>
-                                            <div style="background: #f0f9ff; color: #0369a1; display: inline-block; padding: 10px 20px; border-radius: 8px; font-weight: 700; border: 1px dashed #0369a1;">
-                                                📎 Archivo adjunto: Receta_%s.pdf
-                                            </div>
-                                        </div>
-
-                                        <p style="font-size: 14px; line-height: 1.6; color: #64748b; text-align: center;">
-                                            Si tienes dudas sobre el tratamiento, comunícate con nosotros al <br>
-                                            <strong style="color: #0f172a;">%s</strong>
-                                        </p>
-                                    </div>
-
-                                    <!-- Footer -->
-                                    <div style="background-color: #f8fafc; padding: 25px; text-align: center; border-top: 1px solid #e2e8f0;">
-                                        <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                                            Este es un documento médico oficial generado por ClínicaApp.<br>
-                                            Consérvalo para el historial de tu mascota.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            """,
-                    clinica.getNombre(),
-                    dueno.getNombre(),
-                    mascota.getNombre(),
-                    mascota.getNombre(),
-                    visitaSaved.getDiagnostico(), // Asegúrate que tu modelo Visita tenga getDiagnostico()
-                    mascota.getNombre(),
-                    clinica.getTelefono());
-
-            // 4. Enviamos el correo con el diseño y el adjunto
-            emailService.sendMessageWithAttachment(
-                    dueno.getEmail(),
-                    subject,
-                    htmlBody,
-                    "Receta_" + mascota.getNombre() + ".pdf",
-                    pdfBytes);
-
-            log.info("✅ Receta Premium enviada con éxito a: {}", dueno.getEmail());
-
-        } catch (Exception e) {
-            log.error("❌ Error al procesar envío de receta: {}", e.getMessage());
-        }
-        return "redirect:/clinica/citas?success=atendida";
+    public String guardarAtencion(@ModelAttribute VisitaDTO visitaDTO, Authentication auth, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("mensajeError", "Acción no permitida para el rol de Administrador.");
+        return "redirect:/clinica/dashboard";
     }
 
     // 5. ACCIONES DE CITAS

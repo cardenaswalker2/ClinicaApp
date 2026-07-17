@@ -119,6 +119,10 @@ public class VeterinarioController {
         }
 
         Cita cita = citaOpt.get();
+        if ("En Espera".equalsIgnoreCase(cita.getEstado()) || "Confirmada".equalsIgnoreCase(cita.getEstado()) || "Pendiente".equalsIgnoreCase(cita.getEstado())) {
+            cita.setEstado("En Consulta");
+            citaRepository.save(cita);
+        }
         Mascota mascota = mascotaService.findById(cita.getMascotaId()).orElse(null);
         Usuario cliente = usuarioRepository.findById(cita.getUsuarioId()).orElse(null);
 
@@ -153,6 +157,12 @@ public class VeterinarioController {
         try {
             visitaDTO.setVeterinarioId(veterinario.getId());
             visitaService.save(visitaDTO);
+            Optional<Cita> citaOpt = citaRepository.findById(visitaDTO.getCitaId());
+            if (citaOpt.isPresent()) {
+                Cita cita = citaOpt.get();
+                cita.setEstado("Consulta Finalizada");
+                citaRepository.save(cita);
+            }
             redirectAttributes.addFlashAttribute("mensajeExito", "¡Consulta guardada e historial actualizado exitosamente!");
         } catch (Exception e) {
             log.error("Error al registrar consulta: {}", e.getMessage());

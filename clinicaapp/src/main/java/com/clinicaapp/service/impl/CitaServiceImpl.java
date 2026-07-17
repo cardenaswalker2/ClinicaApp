@@ -289,7 +289,13 @@ public class CitaServiceImpl implements ICitaService {
             }
         }
 
-        return new CitaDisplayDTO(cita, usuario, clinica, mascota, servicios);
+        CitaDisplayDTO dto = new CitaDisplayDTO(cita, usuario, clinica, mascota, servicios);
+        if (cita.getVeterinarioId() != null) {
+            usuarioRepository.findById(cita.getVeterinarioId()).ifPresent(vet -> {
+                dto.setNombreDoctor(vet.getNombreCompleto());
+            });
+        }
+        return dto;
     }
 
     private void enviarEmailConfirmacionCita(Cita cita) {
