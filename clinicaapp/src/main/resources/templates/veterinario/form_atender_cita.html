@@ -10,25 +10,46 @@
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
-            --bg: #090d16;
-            --surface: #111827;
-            --surface-card: #1f2937;
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-dark: #3730a3;
             --success: #10b981;
+            --success-light: #d1fae5;
             --warning: #f59e0b;
+            --warning-light: #fef3c7;
             --danger: #ef4444;
-            --text: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --border: rgba(255, 255, 255, 0.08);
-            --radius-xl: 24px;
-            --radius-lg: 16px;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
             --radius-md: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -37,181 +58,589 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
+        /* ===== NAVBAR ===== */
         .navbar-custom {
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(15px);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            margin-bottom: 2rem;
+            padding: 0.875rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-brand-custom {
             font-weight: 800;
             font-size: 1.25rem;
-            color: white;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .navbar-brand-custom:hover {
+            color: var(--primary);
         }
 
         .navbar-brand-custom i {
             color: var(--primary);
+            font-size: 1.5rem;
         }
 
-        .form-card {
+        .navbar-brand-custom span {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .clinic-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.875rem;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(79, 70, 229, 0.15);
+        }
+
+        .edit-mode-badge {
+            background: var(--warning-light);
+            color: #92400e;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.875rem;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== CARD BASE ===== */
+        .card-custom {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-xl);
-            padding: 2.5rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-            margin-bottom: 3rem;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
         }
 
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
+        .card-header-custom {
+            padding: 1.5rem 1.75rem;
             border-bottom: 1px solid var(--border);
-            color: white;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
-        .section-title i {
+        .card-header-custom i {
             color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .card-header-custom h5 {
+            font-weight: 800;
+            font-size: 1rem;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .card-body-custom {
+            padding: 1.75rem;
+        }
+
+        /* ===== PATIENT INFO PILLS ===== */
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
         }
 
         .info-pill {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--surface-hover);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 1rem;
-            height: 100%;
+            padding: 0.875rem 1rem;
+            transition: var(--transition);
+        }
+
+        .info-pill:hover {
+            border-color: #c7d2fe;
+            background: #eef2ff;
         }
 
         .info-pill-title {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            font-weight: 800;
-            color: var(--text-secondary);
-            margin-bottom: 0.35rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.08em;
         }
 
         .info-pill-value {
-            font-size: 1rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .form-label {
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
         }
 
-        .form-control, .form-select {
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1.5px solid var(--border);
-            color: white;
-            padding: 0.8rem 1rem;
-            border-radius: var(--radius-md);
-            transition: var(--transition);
+        .info-pill-full {
+            grid-column: 1 / -1;
         }
 
-        .form-control:focus, .form-select:focus {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-            color: white;
+        /* ===== HISTORIAL ===== */
+        .history-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
         }
 
-        .nav-tabs-custom {
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 2rem;
-            gap: 0.5rem;
+        .history-scroll::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .nav-tabs-custom .nav-link {
-            color: var(--text-secondary);
-            font-weight: 700;
-            border: none;
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--radius-md) var(--radius-md) 0 0;
-            transition: var(--transition);
+        .history-scroll::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        .nav-tabs-custom .nav-link.active {
-            color: white;
-            background: rgba(99, 102, 241, 0.1);
-            border-bottom: 3px solid var(--primary);
+        .history-scroll::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-full);
         }
 
         .history-item {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             padding: 1.25rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            border-color: #c7d2fe;
+            box-shadow: var(--shadow-md);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .history-date {
             font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        .btn-draft {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1.5px solid var(--border);
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: var(--radius-md);
+        .history-date i {
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
             font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-closed {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .badge-draft {
+            background: var(--warning-light);
+            color: #92400e;
+        }
+
+        .history-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            line-height: 1.5;
+        }
+
+        .history-detail strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .btn-edit-draft {
+            background: var(--warning-light);
+            color: #92400e;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            width: 100%;
+            justify-content: center;
+            margin-top: 0.75rem;
+        }
+
+        .btn-edit-draft:hover {
+            background: #fef3c7;
+            color: #78350f;
+            transform: translateY(-1px);
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-history-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .empty-history-icon i {
+            font-size: 1.75rem;
+            color: var(--text-muted);
+        }
+
+        .empty-history h6 {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .empty-history p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* ===== TABS ===== */
+        .tabs-wrapper {
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs-custom {
+            border-bottom: 2px solid var(--border);
+            gap: 0.25rem;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-tabs-custom::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tabs-custom .nav-link {
+            color: var(--text-muted);
+            font-weight: 600;
+            border: none;
+            padding: 0.875rem 1.25rem;
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            transition: var(--transition);
+            background: transparent;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .nav-tabs-custom .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 1rem;
+            right: 1rem;
+            height: 3px;
+            background: var(--primary);
+            border-radius: var(--radius-full);
+            transform: scaleX(0);
             transition: var(--transition);
         }
 
+        .nav-tabs-custom .nav-link:hover {
+            color: var(--text);
+            background: var(--surface-hover);
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-tabs-custom .nav-link.active::after {
+            transform: scaleX(1);
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .form-label .required {
+            color: var(--danger);
+            margin-left: 0.15rem;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            color: var(--text);
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        .form-text {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 0.375rem;
+        }
+
+        .form-section-title {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-section-title i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        /* ===== ATTACHMENTS ===== */
+        .attachment-card {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .attachment-card:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .attachment-card a {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .attachment-card i {
+            color: var(--primary);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-cancel:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: var(--danger-light);
+        }
+
+        .btn-draft {
+            background: var(--surface);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+            padding: 0.75rem 1.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
         .btn-draft:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+            background: var(--surface-hover);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-submit {
             background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
+            padding: 0.75rem 1.75rem;
             border-radius: var(--radius-md);
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 0.875rem;
             transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
         }
 
-        .btn-cancel {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1.5px solid var(--border);
-            color: var(--text-secondary);
-            padding: 0.8rem 1.5rem;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            transition: var(--transition);
-            text-decoration: none;
+        .btn-group-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
-        .btn-cancel:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991px) {
+            .main-container {
+                padding: 1.25rem 1rem;
+            }
+
+            .patient-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-tabs-custom .nav-link {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-group-actions {
+                justify-content: stretch;
+            }
+
+            .btn-group-actions button,
+            .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .patient-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header-custom {
+                padding: 1.25rem;
+            }
+
+            .card-body-custom {
+                padding: 1.25rem;
+            }
+
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .navbar-brand-custom span {
+                display: none;
+            }
+
+            .clinic-badge {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -219,285 +648,422 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-custom navbar-dark">
-        <div class="container">
+    <nav class="navbar navbar-custom navbar-expand">
+        <div class="container main-container" style="padding-top: 0; padding-bottom: 0;">
             <a class="navbar-brand-custom" th:href="@{/veterinario/dashboard}">
                 <i class="bi bi-shield-plus"></i>
                 ClínicaApp <span>Atención Médica</span>
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-secondary fw-semibold" th:text="${'Sede: ' + clinica.nombre}">Clínica</span>
-                <span class="badge bg-success" th:if="${visitaDTO.id != null}">Modo Edición (Borrador)</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="clinic-badge d-none d-md-inline" th:text="${'Sede: ' + clinica.nombre}">Clínica</span>
+                <span class="edit-mode-badge" th:if="${visitaDTO.id != null}">
+                    <i class="bi bi-pencil-square"></i>
+                    <span class="d-none d-sm-inline">Modo Edición</span>
+                </span>
             </div>
         </div>
     </nav>
 
-    <div class="container pb-5">
-        <div class="row">
-            <!-- Columna Ficha Paciente e Historial -->
-            <div class="col-lg-4 mb-4">
-                <div class="form-card h-100">
-                    <div class="section-title">
-                        <i class="bi bi-journal-medical"></i> Ficha del Paciente
+    <div class="main-container">
+        <div class="row g-4">
+            <!-- Columna Izquierda: Ficha Paciente e Historial -->
+            <div class="col-lg-4">
+                <!-- Ficha del Paciente -->
+                <div class="card-custom mb-4">
+                    <div class="card-header-custom">
+                        <i class="bi bi-journal-medical"></i>
+                        <h5>Ficha del Paciente</h5>
                     </div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
+                    <div class="card-body-custom">
+                        <div class="patient-grid">
                             <div class="info-pill">
                                 <div class="info-pill-title">Mascota</div>
-                                <div class="info-pill-value" th:text="${mascota != null ? mascota.nombre : 'Paciente'}">Nombre</div>
+                                <div class="info-pill-value" th:text="${mascota != null ? mascota.nombre : 'Paciente'}">
+                                    Nombre</div>
                             </div>
-                        </div>
-                        <div class="col-6">
                             <div class="info-pill">
                                 <div class="info-pill-title">Especie</div>
-                                <div class="info-pill-value" th:text="${mascota != null ? mascota.especie : 'Especie'}">Especie</div>
+                                <div class="info-pill-value" th:text="${mascota != null ? mascota.especie : 'Especie'}">
+                                    Especie</div>
                             </div>
-                        </div>
-                        <div class="col-6">
                             <div class="info-pill">
                                 <div class="info-pill-title">Raza</div>
-                                <div class="info-pill-value" th:text="${mascota != null ? mascota.raza : 'Raza'}">Raza</div>
+                                <div class="info-pill-value" th:text="${mascota != null ? mascota.raza : 'Raza'}">Raza
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-6">
                             <div class="info-pill">
                                 <div class="info-pill-title">Edad</div>
-                                <div class="info-pill-value" th:text="${mascota != null ? mascota.edad + ' años' : 'N/A'}">Edad</div>
+                                <div class="info-pill-value"
+                                    th:text="${mascota != null ? mascota.edad + ' años' : 'N/A'}">Edad</div>
                             </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="info-pill">
+                            <div class="info-pill info-pill-full">
                                 <div class="info-pill-title">Propietario</div>
-                                <div class="info-pill-value" th:text="${cliente != null ? cliente.nombre + ' ' + cliente.apellido : 'Cliente'}">Propietario</div>
+                                <div class="info-pill-value"
+                                    th:text="${cliente != null ? cliente.nombre + ' ' + cliente.apellido : 'Cliente'}">
+                                    Propietario</div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="section-title mt-4">
-                        <i class="bi bi-clock-history"></i> Historial Clínico
+                <!-- Historial Clínico -->
+                <div class="card-custom">
+                    <div class="card-header-custom">
+                        <i class="bi bi-clock-history"></i>
+                        <h5>Historial Clínico</h5>
                     </div>
-
-                    <div th:if="${#lists.isEmpty(historial)}" class="text-muted text-center py-4">
-                        <i class="bi bi-folder-x fs-2 d-block mb-2"></i>
-                        No hay consultas previas registradas.
-                    </div>
-
-                    <div th:unless="${#lists.isEmpty(historial)}" style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
-                        <div class="history-item" th:each="h : ${historial}">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="history-date text-primary" th:text="${#temporals.format(h.fechaVisita, 'dd/MM/yyyy HH:mm')}">Fecha</span>
-                                <span class="badge bg-secondary" th:if="${h.bloqueada}">Cerrado</span>
-                                <span class="badge bg-warning text-dark" th:if="${!h.bloqueada}">Borrador</span>
+                    <div class="card-body-custom" style="padding-top: 1rem;">
+                        <div th:if="${#lists.isEmpty(historial)}" class="empty-history">
+                            <div class="empty-history-icon">
+                                <i class="bi bi-folder-x"></i>
                             </div>
-                            <div class="small mb-1"><strong>Diagnóstico Principal:</strong> <span th:text="${h.diagnosticoPrincipal ?: h.diagnostico}">Diagnóstico</span></div>
-                            <div class="small mb-1" th:if="${h.sintomas != null}"><strong>Síntomas:</strong> <span th:text="${h.sintomas}">Síntomas</span></div>
-                            <div class="small mb-1"><strong>Tratamiento:</strong> <span th:text="${h.tratamiento}">Tratamiento</span></div>
-                            <div class="small" th:if="${h.peso != null}"><strong>Peso:</strong> <span th:text="${h.peso + ' kg'}">Peso</span> | <strong>Temp:</strong> <span th:text="${h.temperatura + ' °C'}">Temp</span></div>
-                            <div class="mt-2" th:if="${!h.bloqueada}">
-                                <a th:href="@{/veterinario/citas/{citaId}/editar-consulta/{visitaId}(citaId=${cita.id}, visitaId=${h.id})}" class="btn btn-sm btn-outline-warning w-100 fw-bold">
-                                    <i class="bi bi-pencil-square"></i> Editar Borrador
-                                </a>
+                            <h6>Sin registros previos</h6>
+                            <p>No hay consultas anteriores registradas para este paciente.</p>
+                        </div>
+
+                        <div th:unless="${#lists.isEmpty(historial)}" class="history-scroll">
+                            <div class="history-item" th:each="h : ${historial}">
+                                <div class="history-header">
+                                    <span class="history-date">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span
+                                            th:text="${#temporals.format(h.fechaVisita, 'dd/MM/yyyy HH:mm')}">Fecha</span>
+                                    </span>
+                                    <span class="status-badge badge-closed" th:if="${h.bloqueada}">Cerrado</span>
+                                    <span class="status-badge badge-draft" th:if="${!h.bloqueada}">Borrador</span>
+                                </div>
+                                <div class="history-detail">
+                                    <strong>Diagnóstico:</strong>
+                                    <span th:text="${h.diagnosticoPrincipal ?: h.diagnostico}">Diagnóstico</span>
+                                </div>
+                                <div class="history-detail" th:if="${h.sintomas != null}">
+                                    <strong>Síntomas:</strong>
+                                    <span th:text="${h.sintomas}">Síntomas</span>
+                                </div>
+                                <div class="history-detail">
+                                    <strong>Tratamiento:</strong>
+                                    <span th:text="${h.tratamiento}">Tratamiento</span>
+                                </div>
+                                <div class="history-detail" th:if="${h.peso != null}">
+                                    <strong>Peso:</strong> <span th:text="${h.peso + ' kg'}">Peso</span>
+                                    <span class="mx-1">|</span>
+                                    <strong>Temp:</strong> <span th:text="${h.temperatura + ' °C'}">Temp</span>
+                                </div>
+                                <div th:if="${!h.bloqueada}">
+                                    <a th:href="@{/veterinario/citas/{citaId}/editar-consulta/{visitaId}(citaId=${cita.id}, visitaId=${h.id})}"
+                                        class="btn-edit-draft">
+                                        <i class="bi bi-pencil-square"></i> Editar Borrador
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Columna Registro de Consulta -->
+            <!-- Columna Derecha: Formulario de Consulta -->
             <div class="col-lg-8">
-                <div class="form-card">
-                    <div class="section-title">
-                        <i class="bi bi-heart-pulse-fill"></i> Historia Clínica & Consulta Médica
+                <div class="card-custom">
+                    <div class="card-header-custom">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        <h5>Historia Clínica & Consulta Médica</h5>
                     </div>
+                    <div class="card-body-custom">
+                        <form th:action="@{/veterinario/citas/guardar-consulta}" th:object="${visitaDTO}" method="post"
+                            enctype="multipart/form-data">
+                            <input type="hidden" th:field="*{id}">
+                            <input type="hidden" th:field="*{citaId}">
+                            <input type="hidden" th:field="*{mascotaId}">
+                            <input type="hidden" th:field="*{clinicaId}">
+                            <input type="hidden" th:field="*{veterinarioId}">
+                            <input type="hidden" id="finalizar" name="finalizar" value="false">
 
-                    <form th:action="@{/veterinario/citas/guardar-consulta}" th:object="${visitaDTO}" method="post" enctype="multipart/form-data">
-                        <input type="hidden" th:field="*{id}">
-                        <input type="hidden" th:field="*{citaId}">
-                        <input type="hidden" th:field="*{mascotaId}">
-                        <input type="hidden" th:field="*{clinicaId}">
-                        <input type="hidden" th:field="*{veterinarioId}">
-                        <input type="hidden" id="finalizar" name="finalizar" value="false">
+                            <!-- Pestañas -->
+                            <div class="tabs-wrapper">
+                                <nav>
+                                    <div class="nav nav-tabs nav-tabs-custom" id="nav-tab" role="tablist">
+                                        <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-general" type="button" role="tab">
+                                            <i class="bi bi-clipboard-pulse d-md-none"></i>
+                                            <span class="d-none d-md-inline">1. Info General & Examen</span>
+                                            <span class="d-md-none">General</span>
+                                        </button>
+                                        <button class="nav-link" id="nav-diagnostico-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-diagnostico" type="button" role="tab">
+                                            <i class="bi bi-activity d-md-none"></i>
+                                            <span class="d-none d-md-inline">2. Diagnóstico & Plan</span>
+                                            <span class="d-md-none">Diagnóstico</span>
+                                        </button>
+                                        <button class="nav-link" id="nav-tratamiento-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-tratamiento" type="button" role="tab">
+                                            <i class="bi bi-capsule d-md-none"></i>
+                                            <span class="d-none d-md-inline">3. Tratamiento & Vacunas</span>
+                                            <span class="d-md-none">Tratamiento</span>
+                                        </button>
+                                        <button class="nav-link" id="nav-archivos-tab" data-bs-toggle="tab"
+                                            data-bs-target="#nav-archivos" type="button" role="tab">
+                                            <i class="bi bi-paperclip d-md-none"></i>
+                                            <span class="d-none d-md-inline">4. Documentación</span>
+                                            <span class="d-md-none">Adjuntos</span>
+                                        </button>
+                                    </div>
+                                </nav>
 
-                        <!-- Pestañas de Navegación -->
-                        <nav>
-                            <div class="nav nav-tabs nav-tabs-custom" id="nav-tab" role="tablist">
-                                <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general" type="button" role="tab">1. Info General & Examen</button>
-                                <button class="nav-link" id="nav-diagnostico-tab" data-bs-toggle="tab" data-bs-target="#nav-diagnostico" type="button" role="tab">2. Diagnóstico & Plan</button>
-                                <button class="nav-link" id="nav-tratamiento-tab" data-bs-toggle="tab" data-bs-target="#nav-tratamiento" type="button" role="tab">3. Tratamiento & Vacunas</button>
-                                <button class="nav-link" id="nav-archivos-tab" data-bs-toggle="tab" data-bs-target="#nav-archivos" type="button" role="tab">4. Documentación & Adjuntos</button>
-                            </div>
-                        </nav>
+                                <div class="tab-content" id="nav-tabContent">
+                                    <!-- Pestaña 1: Info General y Constantes -->
+                                    <div class="tab-pane fade show active" id="nav-general" role="tabpanel">
+                                        <div class="form-group">
+                                            <label class="form-label">Motivo de la Consulta <span
+                                                    class="required">*</span></label>
+                                            <input type="text" class="form-control" th:field="*{diagnostico}" required
+                                                placeholder="Ej: Vómitos recurrentes y decaimiento general">
+                                            <div class="form-text">Breve motivo por el cual asiste a consulta.</div>
+                                        </div>
 
-                        <div class="tab-content" id="nav-tabContent">
-                            <!-- Pestaña 1: Info General y Constantes -->
-                            <div class="tab-pane fade show active" id="nav-general" role="tabpanel">
-                                <div class="mb-4">
-                                    <label class="form-label">Motivo de la Consulta *</label>
-                                    <input type="text" class="form-control" th:field="*{diagnostico}" required placeholder="Ej: Vómitos recurrentes y decaimiento general">
-                                    <div class="form-text text-secondary">Breve motivo por el cual asiste a consulta.</div>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Anamnesis</label>
-                                    <textarea class="form-control" th:field="*{anamnesis}" rows="3" placeholder="Historial previo, comportamiento, alimentación, antecedentes relevantes..."></textarea>
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Síntomas Reportados</label>
-                                        <input type="text" class="form-control" th:field="*{sintomas}" placeholder="Ej: Diarrea, letargo, falta de apetito">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Tiempo de Evolución</label>
-                                        <input type="text" class="form-control" th:field="*{tiempoEvolucion}" placeholder="Ej: 3 días">
-                                    </div>
-                                </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Anamnesis</label>
+                                            <textarea class="form-control" th:field="*{anamnesis}" rows="3"
+                                                placeholder="Historial previo, comportamiento, alimentación, antecedentes relevantes..."></textarea>
+                                        </div>
 
-                                <div class="section-title mt-5">
-                                    <i class="bi bi-activity"></i> Examen Físico & Constantes
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-3 col-6">
-                                        <label class="form-label">Peso (kg) *</label>
-                                        <input type="number" step="0.01" class="form-control" th:field="*{peso}" required placeholder="Ej: 12.5">
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <label class="form-label">Temperatura (°C)</label>
-                                        <input type="number" step="0.1" class="form-control" th:field="*{temperatura}" placeholder="Ej: 38.5">
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <label class="form-label">Frec. Cardíaca (ppm)</label>
-                                        <input type="number" class="form-control" th:field="*{frecuenciaCardiaca}" placeholder="Ej: 110">
-                                    </div>
-                                    <div class="col-md-3 col-6">
-                                        <label class="form-label">Frec. Respiratoria (rpm)</label>
-                                        <input type="number" class="form-control" th:field="*{frecuenciaRespiratoria}" placeholder="Ej: 24">
-                                    </div>
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Condición Corporal</label>
-                                        <select class="form-select" th:field="*{condicionCorporal}">
-                                            <option value="Muy Delgado">1 - Muy Delgado</option>
-                                            <option value="Delgado">2 - Delgado</option>
-                                            <option value="Ideal">3 - Ideal (Recomendado)</option>
-                                            <option value="Sobrepeso">4 - Sobrepeso</option>
-                                            <option value="Obeso">5 - Obeso</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Estado de Conciencia</label>
-                                        <select class="form-select" th:field="*{estadoConciencia}">
-                                            <option value="Alerta">Alerta</option>
-                                            <option value="Deprimido">Deprimido</option>
-                                            <option value="Estuporoso">Estuporoso</option>
-                                            <option value="Comatoso">Comatoso</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Observaciones del Examen Físico</label>
-                                        <textarea class="form-control" th:field="*{notasAdicionales}" rows="2" placeholder="Mucosas, tiempo de llenado capilar, palpación abdominal, auscultación..."></textarea>
-                                    </div>
-                                </div>
-                            </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Síntomas Reportados</label>
+                                                    <input type="text" class="form-control" th:field="*{sintomas}"
+                                                        placeholder="Ej: Diarrea, letargo, falta de apetito">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Tiempo de Evolución</label>
+                                                    <input type="text" class="form-control"
+                                                        th:field="*{tiempoEvolucion}" placeholder="Ej: 3 días">
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            <!-- Pestaña 2: Diagnóstico -->
-                            <div class="tab-pane fade" id="nav-diagnostico" role="tabpanel">
-                                <div class="mb-4">
-                                    <label class="form-label">Diagnóstico Principal (Diferencial) *</label>
-                                    <textarea class="form-control" th:field="*{diagnosticoPrincipal}" rows="3" required placeholder="Describe el diagnóstico principal o presuntivo de la consulta..."></textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Diagnósticos Secundarios / Hallazgos</label>
-                                    <textarea class="form-control" th:field="*{diagnosticosSecundarios}" rows="2" placeholder="Otras observaciones clínicas o enfermedades encontradas..."></textarea>
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Nivel de Gravedad</label>
-                                        <select class="form-select" th:field="*{gravedad}">
-                                            <option value="Leve">Leve</option>
-                                            <option value="Moderado">Moderado</option>
-                                            <option value="Grave">Grave / Crítico</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Costo de la Consulta (COP) *</label>
-                                        <input type="number" step="0.01" class="form-control" th:field="*{costoTotal}" required placeholder="Monto total a cobrar">
-                                    </div>
-                                </div>
-                            </div>
+                                        <div class="form-section-title">
+                                            <i class="bi bi-activity"></i>
+                                            Examen Físico & Constantes Vitales
+                                        </div>
 
-                            <!-- Pestaña 3: Tratamiento -->
-                            <div class="tab-pane fade" id="nav-tratamiento" role="tabpanel">
-                                <div class="mb-4">
-                                    <label class="form-label">Tratamiento y Plan de Acción *</label>
-                                    <textarea class="form-control" th:field="*{tratamiento}" rows="4" required placeholder="Describe las acciones tomadas en la clínica y el plan de manejo domiciliario..."></textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Medicamentos Formulados (Receta)</label>
-                                    <input type="text" class="form-control" name="medicamentosRecetados" placeholder="Ej: Amoxicilina 250mg, Meloxicam 1ml (Separados por coma)">
-                                    <div class="form-text text-secondary">Lístele los fármacos, dosis y duración para que aparezcan impresos en la receta médica digital.</div>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Procedimientos Realizados</label>
-                                    <textarea class="form-control" th:field="*{procedimientosRealizados}" rows="2" placeholder="Ej: Canalización, administración de suero endovenoso, limpieza de heridas..."></textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Recomendaciones para el Propietario</label>
-                                    <textarea class="form-control" th:field="*{recomendacionesPropietario}" rows="2" placeholder="Dieta, reposo, signos de alerta por los cuales volver de urgencia..."></textarea>
-                                </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-3 col-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Peso (kg) <span
+                                                            class="required">*</span></label>
+                                                    <input type="number" step="0.01" class="form-control"
+                                                        th:field="*{peso}" required placeholder="Ej: 12.5">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Temperatura (°C)</label>
+                                                    <input type="number" step="0.1" class="form-control"
+                                                        th:field="*{temperatura}" placeholder="Ej: 38.5">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Frec. Cardíaca (ppm)</label>
+                                                    <input type="number" class="form-control"
+                                                        th:field="*{frecuenciaCardiaca}" placeholder="Ej: 110">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Frec. Respiratoria (rpm)</label>
+                                                    <input type="number" class="form-control"
+                                                        th:field="*{frecuenciaRespiratoria}" placeholder="Ej: 24">
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                <div class="section-title mt-5">
-                                    <i class="bi bi-eyedropper"></i> Control de Vacunación
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Vacunas Aplicadas en esta Sesión</label>
-                                        <input type="text" class="form-control" th:field="*{vacunasAplicadas}" placeholder="Ej: Rabia, Triple Felina, Polivalente">
+                                        <div class="row g-3 mt-1">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Condición Corporal</label>
+                                                    <select class="form-select" th:field="*{condicionCorporal}">
+                                                        <option value="Muy Delgado">1 - Muy Delgado</option>
+                                                        <option value="Delgado">2 - Delgado</option>
+                                                        <option value="Ideal">3 - Ideal (Recomendado)</option>
+                                                        <option value="Sobrepeso">4 - Sobrepeso</option>
+                                                        <option value="Obeso">5 - Obeso</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Estado de Conciencia</label>
+                                                    <select class="form-select" th:field="*{estadoConciencia}">
+                                                        <option value="Alerta">Alerta</option>
+                                                        <option value="Deprimido">Deprimido</option>
+                                                        <option value="Estuporoso">Estuporoso</option>
+                                                        <option value="Comatoso">Comatoso</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Observaciones del Examen Físico</label>
+                                                    <textarea class="form-control" th:field="*{notasAdicionales}"
+                                                        rows="2"
+                                                        placeholder="Mucosas, tiempo de llenado capilar, palpación abdominal, auscultación..."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Próxima Fecha de Vacunación</label>
-                                        <input type="date" class="form-control" th:field="*{proximaVacunacion}">
+
+                                    <!-- Pestaña 2: Diagnóstico -->
+                                    <div class="tab-pane fade" id="nav-diagnostico" role="tabpanel">
+                                        <div class="form-group">
+                                            <label class="form-label">Diagnóstico Principal (Diferencial) <span
+                                                    class="required">*</span></label>
+                                            <textarea class="form-control" th:field="*{diagnosticoPrincipal}" rows="3"
+                                                required
+                                                placeholder="Describe el diagnóstico principal o presuntivo de la consulta..."></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Diagnósticos Secundarios / Hallazgos</label>
+                                            <textarea class="form-control" th:field="*{diagnosticosSecundarios}"
+                                                rows="2"
+                                                placeholder="Otras observaciones clínicas o enfermedades encontradas..."></textarea>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Nivel de Gravedad</label>
+                                                    <select class="form-select" th:field="*{gravedad}">
+                                                        <option value="Leve">Leve</option>
+                                                        <option value="Moderado">Moderado</option>
+                                                        <option value="Grave">Grave / Crítico</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Costo de la Consulta (COP) <span
+                                                            class="required">*</span></label>
+                                                    <input type="number" step="0.01" class="form-control"
+                                                        th:field="*{costoTotal}" required
+                                                        placeholder="Monto total a cobrar">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Pestaña 4: Documentación y Adjuntos -->
-                            <div class="tab-pane fade" id="nav-archivos" role="tabpanel">
-                                <div class="mb-4">
-                                    <label class="form-label">Adjuntar Imágenes, Radiografías, Exámenes (Formatos permitidos: JPG, PNG, PDF, DOCX)</label>
-                                    <input type="file" class="form-control" name="adjuntos" multiple>
-                                    <div class="form-text text-secondary">Selecciona uno o más archivos para subirlos a la historia clínica.</div>
-                                </div>
+                                    <!-- Pestaña 3: Tratamiento -->
+                                    <div class="tab-pane fade" id="nav-tratamiento" role="tabpanel">
+                                        <div class="form-group">
+                                            <label class="form-label">Tratamiento y Plan de Acción <span
+                                                    class="required">*</span></label>
+                                            <textarea class="form-control" th:field="*{tratamiento}" rows="4" required
+                                                placeholder="Describe las acciones tomadas en la clínica y el plan de manejo domiciliario..."></textarea>
+                                        </div>
 
-                                <div th:if="${visitaDTO.adjuntosUrls != null and !#lists.isEmpty(visitaDTO.adjuntosUrls)}" class="mt-4">
-                                    <h6 class="fw-bold mb-3"><i class="bi bi-paperclip"></i> Archivos Adjuntos a esta Consulta:</h6>
-                                    <div class="row g-3">
-                                        <div class="col-md-4 col-sm-6" th:each="url : ${visitaDTO.adjuntosUrls}">
-                                            <div class="p-2 border border-secondary rounded d-flex justify-content-between align-items-center" style="background: rgba(255,255,255,0.02);">
-                                                <a th:href="${url}" target="_blank" class="text-info text-decoration-none small text-truncate" th:text="${url.substring(url.lastIndexOf('_') + 1)}">Archivo</a>
-                                                <i class="bi bi-file-earmark-arrow-down-fill text-info"></i>
+                                        <div class="form-group">
+                                            <label class="form-label">Medicamentos Formulados (Receta)</label>
+                                            <input type="text" class="form-control" name="medicamentosRecetados"
+                                                placeholder="Ej: Amoxicilina 250mg, Meloxicam 1ml (Separados por coma)">
+                                            <div class="form-text">Lístele los fármacos, dosis y duración para que
+                                                aparezcan impresos en la receta médica digital.</div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Procedimientos Realizados</label>
+                                            <textarea class="form-control" th:field="*{procedimientosRealizados}"
+                                                rows="2"
+                                                placeholder="Ej: Canalización, administración de suero endovenoso, limpieza de heridas..."></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Recomendaciones para el Propietario</label>
+                                            <textarea class="form-control" th:field="*{recomendacionesPropietario}"
+                                                rows="2"
+                                                placeholder="Dieta, reposo, signos de alerta por los cuales volver de urgencia..."></textarea>
+                                        </div>
+
+                                        <div class="form-section-title">
+                                            <i class="bi bi-eyedropper"></i>
+                                            Control de Vacunación
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Vacunas Aplicadas en esta Sesión</label>
+                                                    <input type="text" class="form-control"
+                                                        th:field="*{vacunasAplicadas}"
+                                                        placeholder="Ej: Rabia, Triple Felina, Polivalente">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label">Próxima Fecha de Vacunación</label>
+                                                    <input type="date" class="form-control"
+                                                        th:form="*{proximaVacunacion}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pestaña 4: Documentación y Adjuntos -->
+                                    <div class="tab-pane fade" id="nav-archivos" role="tabpanel">
+                                        <div class="form-group">
+                                            <label class="form-label">Adjuntar Archivos</label>
+                                            <input type="file" class="form-control" name="adjuntos" multiple>
+                                            <div class="form-text">Formatos permitidos: JPG, PNG, PDF, DOCX. Selecciona
+                                                uno o más archivos para subirlos a la historia clínica.</div>
+                                        </div>
+
+                                        <div th:if="${visitaDTO.adjuntosUrls != null and !#lists.isEmpty(visitaDTO.adjuntosUrls)}"
+                                            class="mt-4">
+                                            <div class="form-section-title" style="margin-top: 0;">
+                                                <i class="bi bi-paperclip"></i>
+                                                Archivos Adjuntos a esta Consulta
+                                            </div>
+                                            <div class="row g-2">
+                                                <div class="col-md-4 col-sm-6"
+                                                    th:each="url : ${visitaDTO.adjuntosUrls}">
+                                                    <div class="attachment-card">
+                                                        <i class="bi bi-file-earmark-text"></i>
+                                                        <a th:href="${url}" target="_blank"
+                                                            th:text="${url.substring(url.lastIndexOf('_') + 1)}">Archivo</a>
+                                                        <i class="bi bi-box-arrow-up-right"
+                                                            style="font-size: 0.75rem;"></i>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Botones de Acción -->
-                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top border-secondary">
-                            <a th:href="@{/veterinario/dashboard}" class="btn-cancel">
-                                <i class="bi bi-arrow-left"></i> Volver al Portal
-                            </a>
-                            <div class="d-flex gap-3">
-                                <button type="button" onclick="enviarFormulario(false)" class="btn-draft">
-                                    <i class="bi bi-journal-check me-1"></i> Guardar Borrador
-                                </button>
-                                <button type="button" onclick="enviarFormulario(true)" class="btn-submit">
-                                    <i class="bi bi-check2-all me-1"></i> Finalizar y Cerrar Consulta
-                                </button>
+                            <!-- Botones de Acción -->
+                            <div class="actions-bar">
+                                <a th:href="@{/veterinario/dashboard}" class="btn-cancel">
+                                    <i class="bi bi-arrow-left"></i>
+                                    <span class="d-none d-sm-inline">Volver al Portal</span>
+                                    <span class="d-sm-none">Volver</span>
+                                </a>
+                                <div class="btn-group-actions">
+                                    <button type="button" onclick="enviarFormulario(false)" class="btn-draft">
+                                        <i class="bi bi-journal-check"></i>
+                                        <span class="d-none d-sm-inline">Guardar Borrador</span>
+                                        <span class="d-sm-none">Borrador</span>
+                                    </button>
+                                    <button type="button" onclick="enviarFormulario(true)" class="btn-submit">
+                                        <i class="bi bi-check2-all"></i>
+                                        <span class="d-none d-sm-inline">Finalizar y Cerrar</span>
+                                        <span class="d-sm-none">Finalizar</span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -508,8 +1074,7 @@
     <script>
         function enviarFormulario(finalizar) {
             document.getElementById('finalizar').value = finalizar ? 'true' : 'false';
-            
-            // Si finaliza, confirmamos
+
             if (finalizar) {
                 if (confirm('¿Estás seguro de finalizar la consulta? Una vez cerrada definitivamente, el registro clínico se bloqueará para mantener la integridad de los datos.')) {
                     document.querySelector('form').submit();
