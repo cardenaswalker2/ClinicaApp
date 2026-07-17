@@ -47,6 +47,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
         Usuario usuario = new Usuario();
         BeanUtils.copyProperties(registroDTO, usuario);
+        if (usuario.getId() != null && usuario.getId().trim().isEmpty()) {
+            usuario.setId(null);
+        }
         usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
         usuario.setRole(Role.ROLE_USER);
         usuario.setFechaCreacion(LocalDateTime.now());
@@ -66,6 +69,9 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
         Usuario usuario = new Usuario();
         BeanUtils.copyProperties(registroDTO, usuario);
+        if (usuario.getId() != null && usuario.getId().trim().isEmpty()) {
+            usuario.setId(null);
+        }
         usuario.setPassword(passwordEncoder.encode(registroDTO.getPassword()));
         usuario.setRole(role);
         usuario.setFechaCreacion(LocalDateTime.now());

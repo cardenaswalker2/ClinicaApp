@@ -640,6 +640,28 @@ public class ClinicaController {
             return "redirect:/login";
         
         List<Usuario> personal = usuarioService.findByClinicaId(clinica.getId());
+        
+        // AUTO-HEALING: Detect and fix any users with empty/blank ID
+        boolean healed = false;
+        if (personal != null) {
+            List<Usuario> toHeal = new ArrayList<>();
+            for (Usuario u : personal) {
+                if (u.getId() == null || u.getId().trim().isEmpty()) {
+                    toHeal.add(u);
+                }
+            }
+            for (Usuario u : toHeal) {
+                log.info("AUTO-HEALING: Eliminando y recreando empleado con ID vacío (Email: {})", u.getEmail());
+                usuarioRepository.delete(u); // elimina el documento con _id = ""
+                u.setId(null); // fuerza a generar un nuevo ObjectId
+                usuarioRepository.save(u);
+                healed = true;
+            }
+            if (healed) {
+                personal = usuarioService.findByClinicaId(clinica.getId()); // recarga la lista
+            }
+        }
+        
         if (personal != null) {
             log.info("DEBUG: Listando personal para clinica {}: total={} empleados.", clinica.getId(), personal.size());
             for (Usuario u : personal) {
