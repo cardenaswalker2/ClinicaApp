@@ -2,6 +2,7 @@ package com.clinicaapp.model;
 
 import com.clinicaapp.model.enums.Role;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -59,6 +60,7 @@ public class Usuario {
 
 
     // Constructor vacío
+    @PersistenceCreator
     public Usuario() {
     }
 
