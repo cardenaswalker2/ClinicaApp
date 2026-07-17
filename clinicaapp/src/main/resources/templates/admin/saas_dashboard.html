@@ -26,7 +26,7 @@
             --hex-success-dim: rgba(16, 185, 129, 0.1);
             --hex-text: #f1f5f9;
             --hex-text-secondary: #94a3b8;
-            --hex-border: rgba(148, 163, 184, 0.1);
+            --hex-border: rgba(255, 255, 255, 0.08);
             --hex-glow: rgba(0, 212, 255, 0.35);
         }
 
@@ -183,6 +183,8 @@
             font-size: 0.7rem;
             font-family: 'JetBrains Mono', monospace;
             color: var(--hex-primary);
+            display: block;
+            margin-top: -2px;
         }
 
         .nav-link-hex {
@@ -257,12 +259,13 @@
         }
 
         .metric-card {
-            background: rgba(30, 41, 59, 0.45);
+            background: rgba(15, 23, 42, 0.6);
             border: 1px solid var(--hex-border);
             border-radius: 16px;
-            padding: 20px;
+            padding: 24px 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
 
         .metric-label {
@@ -270,15 +273,15 @@
             font-size: 0.75rem;
             color: var(--hex-text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
         .metric-value {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: var(--hex-text);
             margin-top: 10px;
-            background: linear-gradient(135deg, #ffffff, var(--hex-text-secondary));
+            background: linear-gradient(135deg, #ffffff 0%, var(--hex-primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -332,9 +335,9 @@
             box-shadow: 0 0 10px var(--hex-primary);
         }
 
-        /* ===== FUTURISTIC TABLES ===== */
+        /* ===== FUTURISTIC TABLES (FIXED COLOR CLASHES) ===== */
         .table-hex {
-            color: var(--hex-text);
+            color: var(--hex-text) !important;
             width: 100%;
             border-collapse: collapse;
         }
@@ -342,40 +345,62 @@
         .table-hex th {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
-            color: var(--hex-text-secondary);
+            color: var(--hex-text-secondary) !important;
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 14px 16px;
-            border-bottom: 1px solid var(--hex-border);
+            border-bottom: 1px solid var(--hex-border) !important;
+            background-color: transparent !important;
             text-align: left;
         }
 
         .table-hex td {
             padding: 16px;
-            border-bottom: 1px solid var(--hex-border);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            background-color: transparent !important;
+            color: var(--hex-text) !important;
             font-size: 0.85rem;
         }
 
+        .table-hex tr {
+            background-color: transparent !important;
+        }
+
         .table-hex tr:hover td {
-            background: rgba(0, 212, 255, 0.02);
-            color: var(--hex-primary);
+            background: rgba(0, 212, 255, 0.04) !important;
+            color: var(--hex-primary) !important;
+        }
+
+        /* Form styling */
+        .form-control-hex {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid var(--hex-border) !important;
+            color: white !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+        }
+
+        .form-control-hex:focus {
+            border-color: var(--hex-primary) !important;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.25) !important;
         }
 
         .badge-hex {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
-            padding: 4px 12px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-weight: 600;
+            display: inline-block;
         }
 
-        .badge-hex-starter { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .badge-hex-professional { background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.2); }
-        .badge-hex-enterprise { background: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2); }
+        .badge-hex-starter { background: rgba(16, 185, 129, 0.1) !important; color: #10b981 !important; border: 1px solid rgba(16, 185, 129, 0.2) !important; }
+        .badge-hex-professional { background: rgba(2, 132, 199, 0.1) !important; color: #0284c7 !important; border: 1px solid rgba(2, 132, 199, 0.2) !important; }
+        .badge-hex-enterprise { background: rgba(168, 85, 247, 0.1) !important; color: #a855f7 !important; border: 1px solid rgba(168, 85, 247, 0.2) !important; }
 
-        .badge-hex-activo { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-        .badge-hex-suspendido { background: rgba(244, 63, 94, 0.15); color: #f43f5e; }
-        .badge-hex-prueba { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-hex-activo { background: rgba(16, 185, 129, 0.15) !important; color: #10b981 !important; }
+        .badge-hex-suspendido { background: rgba(244, 63, 94, 0.15) !important; color: #f43f5e !important; }
+        .badge-hex-prueba { background: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; }
 
         /* ===== HEALTH ITEMS ===== */
         .health-item {
@@ -421,11 +446,11 @@
             </div>
         </a>
 
-        <nav class="d-flex gap-2">
+        <nav class="d-flex gap-2 align-items-center">
             <a th:href="@{/admin/dashboard}" class="nav-link-hex">Dashboard</a>
             <a th:href="@{/admin/clinicas}" class="nav-link-hex">Clínicas</a>
             <a th:href="@{/admin/usuarios}" class="nav-link-hex">Usuarios</a>
-            <a th:href="@{/admin/centro-control}" class="nav-link-hex active"><i class="bi bi-cpu-fill"></i> Control Core</a>
+            <a th:href="@{/admin/centro-control}" class="btn btn-sm btn-outline-info rounded-pill px-3"><i class="bi bi-cpu-fill"></i> Control Core</a>
         </nav>
     </header>
 
@@ -524,11 +549,11 @@
                                 <form th:action="@{/admin/anuncios/enviar}" method="post">
                                     <div class="mb-3">
                                         <label class="form-label small text-muted text-uppercase">Título del Mensaje</label>
-                                        <input type="text" name="titulo" class="form-control bg-dark text-white border-secondary" placeholder="Ej: Mantenimiento Planificado" required>
+                                        <input type="text" name="titulo" class="form-control form-control-hex" placeholder="Ej: Mantenimiento Planificado" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label small text-muted text-uppercase">Contenido del Anuncio</label>
-                                        <textarea name="contenido" rows="5" class="form-control bg-dark text-white border-secondary" placeholder="Especifica detalles que verán todos los usuarios..." required></textarea>
+                                        <textarea name="contenido" rows="5" class="form-control form-control-hex" placeholder="Especifica detalles que verán todos los usuarios..." required></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100 fw-bold py-2"><i class="bi bi-broadcast"></i> Publicar en Plataforma</button>
                                 </form>
@@ -543,7 +568,7 @@
                         <div class="card-header">
                             <div class="card-title-group">
                                 <h3>Suscripciones y Licencias de Clínicas</h3>
-                                  <p>Acciones de actualización de planes, suspensiones y regalo de días de prueba</p>
+                                <p>Acciones de actualización de planes, suspensiones y regalo de días de prueba</p>
                             </div>
                         </div>
                         <div class="table-responsive">
