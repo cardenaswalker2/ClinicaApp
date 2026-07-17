@@ -972,7 +972,7 @@
                                         Ver todas
                                     </a>
                                 </div>
-                                <input type="hidden" id="clinicaIdHidden" th:field="*{clinicaId}" required />
+                                <input type="hidden" id="clinicaId" th:field="*{clinicaId}" required />
                             </div>
 
                             <div class="mb-0">
@@ -993,7 +993,7 @@
                                     <i class="bi bi-person-badge-fill me-2 text-primary"></i>
                                     Selecciona tu Veterinario
                                 </label>
-                                <input type="hidden" id="veterinarioIdHidden" th:field="*{veterinarioId}" required />
+                                <input type="hidden" id="veterinarioId" th:field="*{veterinarioId}" required />
                                 <div id="vetsContainer" class="row g-3 p-2">
                                     <p class="text-muted small mb-0 w-100 text-center py-3">
                                         <i class="bi bi-info-circle me-1"></i>
@@ -1139,13 +1139,13 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             const clinicaInput = document.getElementById('clinicaInput');
-            const clinicaHidden = document.getElementById('clinicaId');
+            const clinicaHidden = document.querySelector('input[name="clinicaId"]');
             const suggestions = document.getElementById('clinicaSuggestions');
             const servicioContainer = document.getElementById('serviciosContainer');
             const mascotaSelect = document.getElementById('mascota');
             const fechaPicker = document.getElementById('fechaPicker');
             const contenedorHoras = document.getElementById('contenedorHoras');
-            const fechaHoraFinal = document.getElementById('fechaHora');
+            const fechaHoraFinal = document.querySelector('input[name="fechaHora"]');
             const citaForm = document.getElementById('citaForm');
 
             const submitButton = document.getElementById('submitButton');
@@ -1155,7 +1155,7 @@
             const resumenMascota = document.getElementById('resumenMascota');
 
             const vetsContainer = document.getElementById('vetsContainer');
-            const veterinarioHidden = document.getElementById('veterinarioId');
+            const veterinarioHidden = document.querySelector('input[name="veterinarioId"]');
             const resumenVeterinario = document.getElementById('resumenVeterinario');
 
             // 1. AUTOCOMPLETE DE CLÍNICAS
