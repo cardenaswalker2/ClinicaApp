@@ -604,7 +604,7 @@ public class AdminController {
     }
 
     // ==========================================================
-    // SECCIÓN SAAS SUPER ADMIN PREMIUM
+    // SECCIÓN SAAS SUPER ADMIN PREMIUM UNIFICADA
     // ==========================================================
     @GetMapping("/saas")
     public String saasDashboard(Model model) {
@@ -650,6 +650,17 @@ public class AdminController {
           .limit(10)
           .collect(Collectors.toList());
 
+        // Salud del sistema JVM
+        Runtime runtime = Runtime.getRuntime();
+        double totalMemoryGb = runtime.totalMemory() / (1024.0 * 1024.0 * 1024.0);
+        double freeMemoryGb = runtime.freeMemory() / (1024.0 * 1024.0 * 1024.0);
+        double usedMemoryGb = totalMemoryGb - freeMemoryGb;
+
+        model.addAttribute("totalMemory", String.format("%.2f GB", totalMemoryGb));
+        model.addAttribute("usedMemory", String.format("%.2f GB", usedMemoryGb));
+        model.addAttribute("freeMemory", String.format("%.2f GB", freeMemoryGb));
+        model.addAttribute("cpuUsage", "14.2%");
+
         model.addAttribute("clinicas", clinicas);
         model.addAttribute("totalClinicas", clinicas.size());
         model.addAttribute("totalCitas", citas.size());
@@ -664,12 +675,6 @@ public class AdminController {
         return "admin/saas_dashboard";
     }
 
-    @GetMapping("/suscripciones")
-    public String suscripciones(Model model) {
-        model.addAttribute("clinicas", clinicaService.findAll());
-        return "admin/suscripciones";
-    }
-
     @PostMapping("/suscripciones/editar-plan")
     public String editarPlanSaaS(@RequestParam String clinicaId, @RequestParam String plan, RedirectAttributes attributes) {
         Optional<Clinica> clinicaOpt = clinicaRepository.findById(clinicaId);
@@ -681,7 +686,7 @@ public class AdminController {
         } else {
             attributes.addFlashAttribute("mensajeError", "Clínica no encontrada");
         }
-        return "redirect:/admin/suscripciones";
+        return "redirect:/admin/saas";
     }
 
     @PostMapping("/suscripciones/estado")
@@ -695,7 +700,7 @@ public class AdminController {
         } else {
             attributes.addFlashAttribute("mensajeError", "Clínica no encontrada");
         }
-        return "redirect:/admin/suscripciones";
+        return "redirect:/admin/saas";
     }
 
     @PostMapping("/suscripciones/dias-gratis")
@@ -710,22 +715,7 @@ public class AdminController {
         } else {
             attributes.addFlashAttribute("mensajeError", "Clínica no encontrada");
         }
-        return "redirect:/admin/suscripciones";
-    }
-
-    @GetMapping("/salud")
-    public String saludSistema(Model model) {
-        Runtime runtime = Runtime.getRuntime();
-        double totalMemoryGb = runtime.totalMemory() / (1024.0 * 1024.0 * 1024.0);
-        double freeMemoryGb = runtime.freeMemory() / (1024.0 * 1024.0 * 1024.0);
-        double usedMemoryGb = totalMemoryGb - freeMemoryGb;
-
-        model.addAttribute("totalMemory", String.format("%.2f GB", totalMemoryGb));
-        model.addAttribute("usedMemory", String.format("%.2f GB", usedMemoryGb));
-        model.addAttribute("freeMemory", String.format("%.2f GB", freeMemoryGb));
-        model.addAttribute("cpuUsage", "14.2%");
-
-        return "admin/salud_sistema";
+        return "redirect:/admin/saas";
     }
 
     @PostMapping("/anuncios/enviar")
@@ -741,4 +731,4 @@ public class AdminController {
         attributes.addFlashAttribute("mensajeExito", "Anuncio global enviado con éxito a todas las sedes.");
         return "redirect:/admin/saas";
     }
-}
+}
