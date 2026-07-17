@@ -353,7 +353,7 @@
                 <div class="d-flex align-items-center gap-4">
                     <div class="time-badge">
                         <i class="bi bi-clock"></i>
-                        <span th:text="${#temporals.format(c.fechaHora, 'HH:mm')}">14:30</span>
+                        <span th:text="${c.fechaHoraIso != null and c.fechaHoraIso.length() >= 16 ? c.fechaHoraIso.substring(11, 16) : '14:30'}">14:30</span>
                     </div>
                     <th:block th:if="${#strings.equalsIgnoreCase(c.estado, 'En Espera')}">
                         <a th:href="@{/veterinario/citas/{id}/atender(id=${c.id})}" class="btn-attend" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);">
