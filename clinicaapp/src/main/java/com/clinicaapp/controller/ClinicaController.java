@@ -315,6 +315,12 @@ public class ClinicaController {
         if (mascotaOpt.isEmpty() || clinica == null)
             return "redirect:/clinica/citas?error";
 
+        Map<String, String> vetsMap = new HashMap<>();
+        usuarioRepository.findAll().forEach(u -> {
+            vetsMap.put(u.getId(), u.getNombre() + " " + (u.getApellido() != null ? u.getApellido() : ""));
+        });
+        model.addAttribute("vetsMap", vetsMap);
+
         model.addAttribute("mascota", mascotaOpt.get());
         model.addAttribute("historial", visitaService.getHistorialByMascota(mascotaId));
         model.addAttribute("clinica", clinica);

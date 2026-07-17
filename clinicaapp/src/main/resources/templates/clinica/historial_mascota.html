@@ -863,6 +863,8 @@
                                 <span th:text="${#temporals.format(v.fechaVisita, 'dd/MM/yyyy HH:mm')}">Fecha</span>
                             </div>
                             <div class="visit-badges">
+                                <span th:if="${v.bloqueada}" class="badge bg-danger text-white px-2 py-1"><i class="bi bi-lock-fill"></i> Registro Cerrado</span>
+                                <span th:if="${!v.bloqueada}" class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-pencil"></i> Borrador</span>
                                 <span th:if="${v.estadoConciencia != null}" class="badge-custom badge-conciencia"
                                     th:text="${v.estadoConciencia}">Conciencia</span>
                                 <span th:if="${v.condicionCorporal != null}" class="badge-custom badge-condicion"
@@ -906,16 +908,47 @@
                             </div>
                         </div>
 
+                        <!-- Anamnesis / Historia Previa -->
+                        <div class="visit-section" th:if="${v.anamnesis != null and !v.anamnesis.isEmpty()}">
+                            <div class="section-label">Anamnesis / Historia Previa</div>
+                            <p class="section-text" th:text="${v.anamnesis}">--</p>
+                        </div>
+
                         <!-- Diagnóstico -->
                         <div class="visit-section">
                             <div class="section-label">Diagnóstico Clínico</div>
-                            <p class="section-text diagnostico" th:text="${v.diagnostico}">--</p>
+                            <p class="section-text diagnostico">
+                                <strong>Principal:</strong> <span th:text="${v.diagnosticoPrincipal ?: v.diagnostico}">--</span>
+                            </p>
+                            <p class="section-text small text-secondary mt-1" th:if="${v.diagnosticosSecundarios != null and !v.diagnosticosSecundarios.isEmpty()}">
+                                <strong>Secundarios:</strong> <span th:text="${v.diagnosticosSecundarios}">--</span>
+                            </p>
+                            <p class="section-text small text-secondary mt-1" th:if="${v.gravedad != null}">
+                                <strong>Gravedad:</strong> <span th:text="${v.gravedad}">--</span>
+                            </p>
                         </div>
 
                         <!-- Tratamiento -->
                         <div class="visit-section">
-                            <div class="section-label">Tratamiento y Hallazgos</div>
+                            <div class="section-label">Tratamiento y Plan de Acción</div>
                             <p class="section-text" th:text="${v.tratamiento}">--</p>
+                            <p class="section-text small text-secondary mt-1" th:if="${v.procedimientosRealizados != null and !v.procedimientosRealizados.isEmpty()}">
+                                <strong>Procedimientos:</strong> <span th:text="${v.procedimientosRealizados}">--</span>
+                            </p>
+                            <p class="section-text small text-secondary mt-1" th:if="${v.recomendacionesPropietario != null and !v.recomendacionesPropietario.isEmpty()}">
+                                <strong>Recomendaciones:</strong> <span th:text="${v.recomendacionesPropietario}">--</span>
+                            </p>
+                        </div>
+
+                        <!-- Vacunación -->
+                        <div class="visit-section" th:if="${v.vacunasAplicadas != null and !v.vacunasAplicadas.isEmpty()}">
+                            <div class="section-label">Inmunizaciones / Vacunas</div>
+                            <p class="section-text">
+                                <strong>Aplicadas:</strong> <span th:text="${v.vacunasAplicadas}">--</span>
+                            </p>
+                            <p class="section-text small text-secondary mt-1" th:if="${v.proximaVacunacion != null and !v.proximaVacunacion.isEmpty()}">
+                                <strong>Próximo control:</strong> <span th:text="${v.proximaVacunacion}">--</span>
+                            </p>
                         </div>
 
                         <!-- Receta -->
@@ -925,7 +958,17 @@
                                 <i class="bi bi-capsule-pill"></i>
                                 Receta Médica
                             </div>
-                            <p class="receta-text" th:text="${v.medicamentosRecetados}">--</p>
+                            <p class="receta-text" th:text="${#strings.listJoin(v.medicamentosRecetados, ', ')}">--</p>
+                        </div>
+
+                        <!-- Adjuntos de la Consulta -->
+                        <div class="visit-section" th:if="${v.adjuntosUrls != null and !v.adjuntosUrls.isEmpty()}">
+                            <div class="section-label">Documentación Adjunta</div>
+                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                <a th:each="url : ${v.adjuntosUrls}" th:href="${url}" target="_blank" class="badge bg-secondary text-decoration-none">
+                                    <i class="bi bi-paperclip"></i> <span th:text="${url.substring(url.lastIndexOf('_') + 1)}">Adjunto</span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Próxima Cita -->
@@ -939,9 +982,9 @@
 
                         <!-- Footer de Visita -->
                         <div class="visit-footer">
-                            <div class="visit-attribution">
-                                <i class="bi bi-person-badge"></i>
-                                Atendido por Clínica
+                            <div class="visit-attribution text-primary fw-bold">
+                                <i class="bi bi-person-badge-fill"></i>
+                                <span th:text="${v.veterinarioId != null and vetsMap != null and vetsMap.containsKey(v.veterinarioId) ? 'Dr. ' + vetsMap.get(v.veterinarioId) : 'Atendido por Clínica'}">Atendido por Clínica</span>
                             </div>
                             <a th:href="@{'/clinica/descargar-receta/' + ${v.id}}" class="btn-receta" target="_blank">
                                 <i class="bi bi-file-pdf"></i>

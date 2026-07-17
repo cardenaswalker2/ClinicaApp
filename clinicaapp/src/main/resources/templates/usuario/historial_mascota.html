@@ -1636,14 +1636,55 @@
                             </div>
 
                             <div class="visit-body">
+                                <!-- Constantes Clínicas -->
+                                <div class="row g-2 mb-3" th:if="${dto.visita.peso != null or dto.visita.temperatura != null}">
+                                    <div class="col-6 col-md-3" th:if="${dto.visita.peso != null}">
+                                        <div class="p-2 border rounded text-center bg-light bg-opacity-50">
+                                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;"><i class="bi bi-speedometer2 text-primary"></i> Peso</small>
+                                            <strong th:text="${dto.visita.peso} + ' kg'">--</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3" th:if="${dto.visita.temperatura != null}">
+                                        <div class="p-2 border rounded text-center bg-light bg-opacity-50">
+                                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;"><i class="bi bi-thermometer-half text-danger"></i> Temp</small>
+                                            <strong th:text="${dto.visita.temperatura} + ' °C'">--</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3" th:if="${dto.visita.frecuenciaCardiaca != null}">
+                                        <div class="p-2 border rounded text-center bg-light bg-opacity-50">
+                                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;"><i class="bi bi-heart-pulse text-success"></i> F. Cardíaca</small>
+                                            <strong th:text="${dto.visita.frecuenciaCardiaca} + ' bpm'">--</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3" th:if="${dto.visita.frecuenciaRespiratoria != null}">
+                                        <div class="p-2 border rounded text-center bg-light bg-opacity-50">
+                                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;"><i class="bi bi-wind text-info"></i> F. Resp</small>
+                                            <strong th:text="${dto.visita.frecuenciaRespiratoria} + ' rpm'">--</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Anamnesis -->
+                                <div class="visit-field" th:if="${dto.visita.anamnesis != null and !dto.visita.anamnesis.isEmpty()}">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-chat-left-text-fill text-muted"></i> Anamnesis / Motivo
+                                    </span>
+                                    <span class="visit-field-value text-muted" th:text="${dto.visita.anamnesis}">--</span>
+                                </div>
+
                                 <!-- Diagnóstico -->
                                 <div class="visit-field">
                                     <span class="visit-field-label">
                                         <i class="bi bi-stethoscope"></i> Diagnóstico
                                     </span>
                                     <div class="diagnosis-box">
-                                        <span class="visit-field-value" th:text="${dto.visita.diagnostico}">Chequeo
-                                            general</span>
+                                        <div><strong>Principal:</strong> <span class="visit-field-value" th:text="${dto.visita.diagnosticoPrincipal ?: dto.visita.diagnostico}">Chequeo general</span></div>
+                                        <div th:if="${dto.visita.diagnosticosSecundarios != null and !dto.visita.diagnosticosSecundarios.isEmpty()}" class="mt-1 small">
+                                            <strong>Secundarios:</strong> <span th:text="${dto.visita.diagnosticosSecundarios}">--</span>
+                                        </div>
+                                        <div th:if="${dto.visita.gravedad != null}" class="mt-1 small">
+                                            <strong>Gravedad:</strong> <span th:text="${dto.visita.gravedad}">--</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1653,8 +1694,26 @@
                                         <i class="bi bi-bandaid-fill"></i> Tratamiento
                                     </span>
                                     <div class="treatment-box">
-                                        <span class="visit-field-value" th:text="${dto.visita.tratamiento}">Vacunación
-                                            anual</span>
+                                        <span class="visit-field-value" th:text="${dto.visita.tratamiento}">Vacunación anual</span>
+                                        <div th:if="${dto.visita.procedimientosRealizados != null and !dto.visita.procedimientosRealizados.isEmpty()}" class="mt-2 small text-secondary">
+                                            <strong>Procedimientos:</strong> <span th:text="${dto.visita.procedimientosRealizados}">--</span>
+                                        </div>
+                                        <div th:if="${dto.visita.recomendacionesPropietario != null and !dto.visita.recomendacionesPropietario.isEmpty()}" class="mt-1 small text-secondary">
+                                            <strong>Recomendaciones:</strong> <span th:text="${dto.visita.recomendacionesPropietario}">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vacunación -->
+                                <div class="visit-field" th:if="${dto.visita.vacunasAplicadas != null and !dto.visita.vacunasAplicadas.isEmpty()}">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-shield-check text-success"></i> Vacunas Aplicadas
+                                    </span>
+                                    <div class="treatment-box">
+                                        <strong>Vacuna:</strong> <span th:text="${dto.visita.vacunasAplicadas}">--</span>
+                                        <div th:if="${dto.visita.proximaVacunacion != null and !dto.visita.proximaVacunacion.isEmpty()}" class="mt-1 small">
+                                            <strong>Próximo Control Vacunas:</strong> <span th:text="${dto.visita.proximaVacunacion}">--</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1673,6 +1732,18 @@
                                     </div>
                                 </div>
 
+                                <!-- Adjuntos -->
+                                <div class="visit-field" th:if="${dto.visita.adjuntosUrls != null and !dto.visita.adjuntosUrls.isEmpty()}">
+                                    <span class="visit-field-label">
+                                        <i class="bi bi-paperclip"></i> Archivos y Radiografías Adjuntas
+                                    </span>
+                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                        <a th:each="url : ${dto.visita.adjuntosUrls}" th:href="${url}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill py-1 px-3">
+                                            <i class="bi bi-file-earmark-arrow-down"></i> <span th:text="${url.substring(url.lastIndexOf('_') + 1)}">Adjunto</span>
+                                        </a>
+                                    </div>
+                                </div>
+
                                 <!-- Notas -->
                                 <div class="visit-field" th:if="${!#strings.isEmpty(dto.visita.notasAdicionales)}">
                                     <span class="visit-field-label">
@@ -1680,6 +1751,13 @@
                                     </span>
                                     <span class="visit-field-value text-muted"
                                         th:text="${dto.visita.notasAdicionales}">Notas del veterinario</span>
+                                </div>
+
+                                <!-- Atendido Por -->
+                                <div class="visit-field border-top pt-2 mt-2">
+                                    <span class="small text-primary fw-bold">
+                                        <i class="bi bi-person-badge-fill"></i> Atendido por: <span th:text="${dto.veterinarioNombre != null and dto.veterinarioNombre != 'N/A' ? 'Dr/a. ' + dto.veterinarioNombre : 'Clínica Veterinaria'}">Veterinario</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
