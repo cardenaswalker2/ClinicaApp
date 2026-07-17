@@ -71,6 +71,8 @@ public class UsuarioController {
     private ResenaRepository resenaRepository;
     @Autowired
     private VisitaRepository visitaRepository;
+    @Autowired
+    private com.clinicaapp.repository.AnuncioGlobalRepository anuncioGlobalRepository;
 
     @Autowired
     private IMascotaService mascotaService;
@@ -197,6 +199,7 @@ public class UsuarioController {
         // 3. Mascotas para el panel lateral
         List<Mascota> misMascotas = mascotaService.findByPropietarioId(usuario.getId());
         model.addAttribute("mascotas", misMascotas);
+        model.addAttribute("anunciosGlobales", anuncioGlobalRepository.findByActivoTrue());
 
         return "usuario/dashboard_usuario_privado";
     }

@@ -1499,6 +1499,20 @@
                 </div>
             </div>
 
+            <!-- ANUNCIOS GLOBALES DEL SISTEMA (SAAS) -->
+            <div class="row mb-4" th:if="${anunciosGlobales != null and not #lists.isEmpty(anunciosGlobales)}">
+                <div class="col-12 animate-fade-in">
+                    <div th:each="anuncio : ${anunciosGlobales}" class="card border border-primary p-3 mb-2" style="border-radius: var(--radius-md); background-color: rgba(99, 102, 241, 0.08); border-left: 5px solid var(--primary) !important;">
+                        <div class="d-flex align-items-center gap-2 text-primary mb-2">
+                            <i class="bi bi-broadcast fs-5"></i>
+                            <h6 class="fw-bold mb-0" th:text="${anuncio.titulo}">Comunicado de Plataforma</h6>
+                            <span class="badge bg-primary text-white ms-auto">ANUNCIO GLOBAL</span>
+                        </div>
+                        <p class="mb-0 text-secondary" style="font-size: 0.9rem;" th:text="${anuncio.contenido}">Contenido del comunicado...</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4">
                 <!-- ===== COLUMNA PRINCIPAL ===== -->
                 <div class="col-lg-8">

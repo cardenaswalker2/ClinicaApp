@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suscripciones SaaS | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hex-bg: #090d16;
+            --hex-surface: #111827;
+            --hex-elevated: #1f2937;
+            --hex-primary: #10b981;
+            --hex-accent: #0284c7;
+            --hex-text: #f9fafb;
+            --hex-text-secondary: #9ca3af;
+            --hex-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--hex-surface);
+            border-bottom: 1px solid var(--hex-border);
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--hex-primary) !important;
+        }
+
+        .card-custom {
+            background-color: var(--hex-surface);
+            border: 1px solid var(--hex-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .table-custom {
+            color: var(--hex-text);
+        }
+
+        .table-custom th {
+            border-bottom: 2px solid var(--hex-border);
+            color: var(--hex-text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .table-custom td {
+            border-bottom: 1px solid var(--hex-border);
+            padding: 14px 8px;
+        }
+
+        .badge-starter { background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-professional { background-color: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.2); }
+        .badge-enterprise { background-color: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2); }
+
+        .badge-status-activo { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .badge-status-suspendido { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .badge-status-prueba { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .badge-status-vencido { background-color: rgba(107, 114, 128, 0.1); color: #9ca3af; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/admin/dashboard">
+                <i class="bi bi-shield-lock-fill"></i>
+                ClínicaApp SaaS Admin
+            </a>
+            <div class="d-flex gap-2">
+                <a href="/admin/saas" class="btn btn-sm btn-outline-light">SaaS Dash</a>
+                <a href="/admin/suscripciones" class="btn btn-sm btn-outline-light active">Suscripciones</a>
+                <a href="/admin/salud" class="btn btn-sm btn-outline-light">Salud Sistema</a>
+                <a href="/admin/dashboard" class="btn btn-sm btn-danger">Cerrar Consola</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div th:if="${mensajeExito}" class="alert alert-success border-0 bg-success bg-opacity-10 text-success mb-4" th:text="${mensajeExito}"></div>
+        <div th:if="${mensajeError}" class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger mb-4" th:text="${mensajeError}"></div>
+
+        <div class="card-custom">
+            <h4 class="fw-bold mb-4 font-monospace"><i class="bi bi-credit-card-2-front"></i> Listado de Clínicas y Suscripciones</h4>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Sede / Clínica</th>
+                            <th>Plan</th>
+                            <th>Estado</th>
+                            <th>Vencimiento</th>
+                            <th>Método Pago</th>
+                            <th>Acciones Comerciales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${clinicas}">
+                            <td>
+                                <strong class="d-block" th:text="${c.nombre}">Sede Central</strong>
+                                <small class="text-muted" th:text="${c.email}">email@email.com</small>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${#strings.equalsIgnoreCase(c.planSaaS, 'Enterprise') ? 'badge-enterprise' : (#strings.equalsIgnoreCase(c.planSaaS, 'Professional') ? 'badge-professional' : 'badge-starter')}" th:text="${c.planSaaS != null ? c.planSaaS : 'Starter'}">Starter</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill" th:classappend="${#strings.equalsIgnoreCase(c.estadoSuscripcion, 'Activo') ? 'badge-status-activo' : (#strings.equalsIgnoreCase(c.estadoSuscripcion, 'Suspendido') ? 'badge-status-suspendido' : (#strings.equalsIgnoreCase(c.estadoSuscripcion, 'Prueba') ? 'badge-status-prueba' : 'badge-status-vencido'))}" th:text="${c.estadoSuscripcion != null ? c.estadoSuscripcion : 'Activo'}">Activo</span>
+                            </td>
+                            <td th:text="${c.fechaVencimientoPlan}">30-08-2026</td>
+                            <td class="text-muted small" th:text="${c.metodoPago != null ? c.metodoPago : 'Stripe'}">Stripe</td>
+                            <td>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <!-- Editar Plan -->
+                                    <form th:action="@{/admin/suscripciones/editar-plan}" method="post" class="d-inline">
+                                        <input type="hidden" name="clinicaId" th:value="${c.id}">
+                                        <select name="plan" class="form-select form-select-sm bg-dark text-white border-secondary d-inline-block w-auto" onchange="this.form.submit()">
+                                            <option value="" disabled selected>Cambiar Plan</option>
+                                            <option value="Starter">Starter</option>
+                                            <option value="Professional">Professional</option>
+                                            <option value="Enterprise">Enterprise</option>
+                                        </select>
+                                    </form>
+
+                                    <!-- Cambiar Estado -->
+                                    <form th:action="@{/admin/suscripciones/estado}" method="post" class="d-inline">
+                                        <input type="hidden" name="clinicaId" th:value="${c.id}">
+                                        <select name="estado" class="form-select form-select-sm bg-dark text-white border-secondary d-inline-block w-auto" onchange="this.form.submit()">
+                                            <option value="" disabled selected>Cambiar Estado</option>
+                                            <option value="Activo">Activo</option>
+                                            <option value="Suspendido">Suspendido</option>
+                                            <option value="Prueba">Prueba</option>
+                                            <option value="Vencido">Vencido</option>
+                                        </select>
+                                    </form>
+
+                                    <!-- Regalar días -->
+                                    <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" th:attr="data-bs-target='#diasModal-' + ${c.id}">
+                                        <i class="bi bi-gift"></i> Regalar Días
+                                    </button>
+
+                                    <!-- Modal regalar días -->
+                                    <div class="modal fade" th:id="'diasModal-' + ${c.id}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content bg-dark text-white border-secondary">
+                                                <form th:action="@{/admin/suscripciones/dias-gratis}" method="post">
+                                                    <input type="hidden" name="clinicaId" th:value="${c.id}">
+                                                    <div class="modal-header border-secondary">
+                                                        <h5 class="modal-title font-monospace">Otorgar Período de Cortesía</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="small text-muted">Añade días de prueba o cortesía al vencimiento de la suscripción de <strong th:text="${c.nombre}">Clínica</strong>.</p>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Número de Días</label>
+                                                            <input type="number" name="dias" min="1" max="365" class="form-control bg-secondary text-white border-secondary" placeholder="Ej: 15" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-secondary">
+                                                        <button type="button" class="btn btn-sm btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-sm btn-warning fw-bold text-dark">Confirmar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

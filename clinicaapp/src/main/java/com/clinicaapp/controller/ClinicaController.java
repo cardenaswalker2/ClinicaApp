@@ -94,6 +94,8 @@ public class ClinicaController {
     private IEmailService emailService;
     @Autowired
     private INotificacionService notificacionService;
+    @Autowired
+    private com.clinicaapp.repository.AnuncioGlobalRepository anuncioGlobalRepository;
 
     // --- MÉTODO AUXILIAR PARA OBTENER LA CLÍNICA CORRECTA ---
     private Clinica obtenerClinicaLogueada(Authentication auth) {
@@ -228,6 +230,7 @@ public class ClinicaController {
         model.addAttribute("bajoStock", bajoStock);
         model.addAttribute("citasHoy", citasHoy);
         model.addAttribute("ingresosHoy", ingresosHoy);
+        model.addAttribute("anunciosGlobales", anuncioGlobalRepository.findByActivoTrue());
 
         return "clinica/dashboard";
     }

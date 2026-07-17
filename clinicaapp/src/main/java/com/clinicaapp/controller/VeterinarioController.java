@@ -55,6 +55,8 @@ public class VeterinarioController {
     @Autowired
     private IServicioService servicioService;
     @Autowired
+    private com.clinicaapp.repository.AnuncioGlobalRepository anuncioGlobalRepository;
+    @Autowired
     private IPdfService pdfService;
     @Autowired
     private IEmailService emailService;
@@ -113,6 +115,7 @@ public class VeterinarioController {
         model.addAttribute("totalCompletadas", citasCompletadas.size());
         model.addAttribute("veterinario", veterinario);
         model.addAttribute("clinica", clinica);
+        model.addAttribute("anunciosGlobales", anuncioGlobalRepository.findByActivoTrue());
 
         return "veterinario/dashboard_veterinario";
     }

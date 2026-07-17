@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salud del Sistema | ClínicaApp</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hex-bg: #090d16;
+            --hex-surface: #111827;
+            --hex-elevated: #1f2937;
+            --hex-primary: #10b981;
+            --hex-accent: #0284c7;
+            --hex-text: #f9fafb;
+            --hex-text-secondary: #9ca3af;
+            --hex-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--hex-surface);
+            border-bottom: 1px solid var(--hex-border);
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--hex-primary) !important;
+        }
+
+        .card-custom {
+            background-color: var(--hex-surface);
+            border: 1px solid var(--hex-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .health-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: var(--hex-elevated);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .text-success-custom { color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/admin/dashboard">
+                <i class="bi bi-shield-lock-fill"></i>
+                ClínicaApp SaaS Admin
+            </a>
+            <div class="d-flex gap-2">
+                <a href="/admin/saas" class="btn btn-sm btn-outline-light">SaaS Dash</a>
+                <a href="/admin/suscripciones" class="btn btn-sm btn-outline-light">Suscripciones</a>
+                <a href="/admin/salud" class="btn btn-sm btn-outline-light active">Salud Sistema</a>
+                <a href="/admin/dashboard" class="btn btn-sm btn-danger">Cerrar Consola</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row">
+            <!-- APIs & Integraciones -->
+            <div class="col-lg-6">
+                <div class="card-custom">
+                    <h5 class="fw-bold mb-4 font-monospace"><i class="bi bi-check-all text-success-custom"></i> Integraciones & APIs</h5>
+                    
+                    <div class="health-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-database text-success-custom fs-4"></i>
+                            <div>
+                                <strong class="d-block">MongoDB Database</strong>
+                                <small class="text-muted">Conectado y responsivo</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2"><i class="bi bi-check-circle-fill"></i> Operativo</span>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-credit-card text-success-custom fs-4"></i>
+                            <div>
+                                <strong class="d-block">Stripe Gateway</strong>
+                                <small class="text-muted">Pasarela de cobros SaaS</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2"><i class="bi bi-check-circle-fill"></i> Operativo</span>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-envelope-at text-success-custom fs-4"></i>
+                            <div>
+                                <strong class="d-block">Gmail SMTP Mailer</strong>
+                                <small class="text-muted">Despacho de notificaciones</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2"><i class="bi bi-check-circle-fill"></i> Operativo</span>
+                    </div>
+
+                    <div class="health-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-chat-left-text text-success-custom fs-4"></i>
+                            <div>
+                                <strong class="d-block">Twilio SMS</strong>
+                                <small class="text-muted">Recordatorios móviles</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2"><i class="bi bi-check-circle-fill"></i> Operativo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servidor e Infraestructura -->
+            <div class="col-lg-6">
+                <div class="card-custom">
+                    <h5 class="fw-bold mb-4 font-monospace"><i class="bi bi-cpu text-info"></i> Estado del Servidor JVM</h5>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Uso de CPU</label>
+                        <div class="d-flex justify-content-between mb-1">
+                            <strong th:text="${cpuUsage}">14.2%</strong>
+                            <small class="text-muted">Carga del núcleo</small>
+                        </div>
+                        <div class="progress bg-dark" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 14.2%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted text-uppercase fw-bold">Memoria RAM Utilizada</label>
+                        <div class="d-flex justify-content-between mb-1">
+                            <strong th:text="${usedMemory}">0.50 GB</strong>
+                            <small class="text-muted" th:text="'De ' + ${totalMemory}">De 1.00 GB</small>
+                        </div>
+                        <div class="progress bg-dark" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="border border-secondary border-opacity-50 rounded p-3 bg-dark bg-opacity-50">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Tiempo de Actividad (Uptime)</span>
+                            <span class="fw-bold text-success-custom">99.98%</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Última Caída</span>
+                            <span>Hace 18 días</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Región de Despliegue</span>
+                            <span>Render (US East)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

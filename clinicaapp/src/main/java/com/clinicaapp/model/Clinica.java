@@ -132,4 +132,30 @@ public class Clinica {
     public void setGaleriaFotos(List<String> galeriaFotos) {
         this.galeriaFotos = galeriaFotos;
     }
+
+    // --- NUEVOS CAMPOS SAAS ---
+    private String planSaaS = "Starter";
+    private String estadoSuscripcion = "Activo";
+    private java.time.LocalDate fechaInicioPlan = java.time.LocalDate.now();
+    private java.time.LocalDate fechaVencimientoPlan = java.time.LocalDate.now().plusMonths(1);
+    private boolean renovacionAutomatica = true;
+    private String metodoPago = "Tarjeta (Stripe)";
+
+    public String getPlanSaaS() { return planSaaS; }
+    public void setPlanSaaS(String planSaaS) { this.planSaaS = planSaaS; }
+
+    public String getEstadoSuscripcion() { return estadoSuscripcion; }
+    public void setEstadoSuscripcion(String estadoSuscripcion) { this.estadoSuscripcion = estadoSuscripcion; }
+
+    public java.time.LocalDate getFechaInicioPlan() { return fechaInicioPlan; }
+    public void setFechaInicioPlan(java.time.LocalDate fechaInicioPlan) { this.fechaInicioPlan = fechaInicioPlan; }
+
+    public java.time.LocalDate getFechaVencimientoPlan() { return fechaVencimientoPlan; }
+    public void setFechaVencimientoPlan(java.time.LocalDate fechaVencimientoPlan) { this.fechaVencimientoPlan = fechaVencimientoPlan; }
+
+    public boolean isRenovacionAutomatica() { return renovacionAutomatica; }
+    public void setRenovacionAutomatica(boolean renovacionAutomatica) { this.renovacionAutomatica = renovacionAutomatica; }
+
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
 }
