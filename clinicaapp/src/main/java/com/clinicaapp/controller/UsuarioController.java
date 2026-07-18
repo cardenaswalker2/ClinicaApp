@@ -1678,8 +1678,8 @@ public Map<String, Object> getContextoIA(Principal principal) {
         PublicacionAdopcion pub = optPub.get();
         model.addAttribute("pub", pub);
 
-        // Security check: user must be either publisher or other participant
-        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(otroUsuarioId)) {
+        // Security check: the owner of the publication must be one of the two participants
+        if (!pub.getPropietarioId().equals(usuario.getId()) && !pub.getPropietarioId().equals(otroUsuarioId)) {
             return "redirect:/usuario/comunidad/chats?error=noauth";
         }
 
@@ -1727,8 +1727,8 @@ public Map<String, Object> getContextoIA(Principal principal) {
         if (!optPub.isPresent()) return "redirect:/usuario/comunidad/chats?error=notfound";
         PublicacionAdopcion pub = optPub.get();
 
-        // Security check: sender must be owner or receiver
-        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(receptorId)) {
+        // Security check: the owner of the publication must be one of the two participants
+        if (!pub.getPropietarioId().equals(usuario.getId()) && !pub.getPropietarioId().equals(receptorId)) {
             return "redirect:/usuario/comunidad/chats?error=noauth";
         }
 
@@ -1750,8 +1750,8 @@ public Map<String, Object> getContextoIA(Principal principal) {
         if (!optPub.isPresent()) return new ArrayList<>();
         PublicacionAdopcion pub = optPub.get();
 
-        // Security check
-        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(otroUsuarioId)) {
+        // Security check: the owner of the publication must be one of the two participants
+        if (!pub.getPropietarioId().equals(usuario.getId()) && !pub.getPropietarioId().equals(otroUsuarioId)) {
             return new ArrayList<>();
         }
 
@@ -1772,8 +1772,8 @@ public Map<String, Object> getContextoIA(Principal principal) {
         if (!optPub.isPresent()) throw new RuntimeException("Adoption not found");
         PublicacionAdopcion pub = optPub.get();
 
-        // Security check
-        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(receptorId)) {
+        // Security check: the owner of the publication must be one of the two participants
+        if (!pub.getPropietarioId().equals(usuario.getId()) && !pub.getPropietarioId().equals(receptorId)) {
             throw new RuntimeException("Unauthorized");
         }
 
