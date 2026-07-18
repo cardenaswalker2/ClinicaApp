@@ -1382,9 +1382,7 @@
             </div>
             <div class="kpi-tile fade-in stagger-2">
                 <div class="kpi-info">
-                    <h3
-                        th:text="${ingresosHoy != null ? '$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT') : '$0'}">
-                        $0</h3>
+                    <h3 th:text="${ingresosHoy != null ? '$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT') : '$0'}">$0</h3>
                     <small>Ingresos Hoy</small>
                 </div>
                 <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-currency-dollar"></i></div>
@@ -1398,24 +1396,24 @@
             </div>
             <div class="kpi-tile fade-in stagger-4">
                 <div class="kpi-info">
+                    <h3 th:text="${receptionists ?: 0}">0</h3>
+                    <small>Recepcionistas</small>
+                </div>
+                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-people"></i></div>
+            </div>
+            <div class="kpi-tile fade-in stagger-5">
+                <div class="kpi-info">
                     <h3 th:text="${totalMascotasSede ?: 0}">0</h3>
                     <small>Mascotas Sede</small>
                 </div>
                 <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-heart-pulse"></i></div>
             </div>
-            <div class="kpi-tile fade-in stagger-5">
-                <div class="kpi-info">
-                    <h3>12 min</h3>
-                    <small>Espera Promedio</small>
-                </div>
-                <div class="kpi-icon-wrap kpi-icon-amber"><i class="bi bi-hourglass-split"></i></div>
-            </div>
             <div class="kpi-tile fade-in stagger-6">
                 <div class="kpi-info">
-                    <h3>2%</h3>
-                    <small>Cancelaciones</small>
+                    <h3 th:text="${totalClientesSede ?: 0}">0</h3>
+                    <small>Clientes Sede</small>
                 </div>
-                <div class="kpi-icon-wrap kpi-icon-rose"><i class="bi bi-calendar-x"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-people-fill"></i></div>
             </div>
             <div class="kpi-tile fade-in stagger-1">
                 <div class="kpi-info">
@@ -1426,38 +1424,17 @@
             </div>
             <div class="kpi-tile fade-in stagger-2">
                 <div class="kpi-info">
-                    <h3>98%</h3>
-                    <small>Satisfacción</small>
+                    <h3 th:text="${totalCitas ?: 0}">0</h3>
+                    <small>Citas Totales</small>
                 </div>
-                <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-emoji-smile"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-folder-check"></i></div>
             </div>
             <div class="kpi-tile fade-in stagger-3">
                 <div class="kpi-info">
-                    <h3 th:text="${totalClientesSede ?: 0}">0</h3>
-                    <small>Clientes Sede</small>
+                    <h3 th:text="${totalIngresos != null ? '$' + #numbers.formatDecimal(totalIngresos, 0, 'POINT', 0, 'POINT') : '$0'}">$0</h3>
+                    <small>Ingresos Totales</small>
                 </div>
-                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-people-fill"></i></div>
-            </div>
-            <div class="kpi-tile fade-in stagger-4">
-                <div class="kpi-info">
-                    <h3>142</h3>
-                    <small>Med. Vendidos</small>
-                </div>
-                <div class="kpi-icon-wrap kpi-icon-cyan"><i class="bi bi-capsule"></i></div>
-            </div>
-            <div class="kpi-tile fade-in stagger-5">
-                <div class="kpi-info">
-                    <h3>5</h3>
-                    <small>Fac. Pendientes</small>
-                </div>
-                <div class="kpi-icon-wrap kpi-icon-amber"><i class="bi bi-receipt-cutoff"></i></div>
-            </div>
-            <div class="kpi-tile fade-in stagger-6">
-                <div class="kpi-info">
-                    <h3>83%</h3>
-                    <small>Ocupación</small>
-                </div>
-                <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-hospital"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-cash-stack"></i></div>
             </div>
         </div>
 
@@ -1475,11 +1452,11 @@
             </div>
         </div>
 
-        <!-- ===== 5. THREE COLUMN LAYOUT ===== -->
+        <!-- ===== 5. TWO COLUMN LAYOUT (100% REAL DATA) ===== -->
         <div class="row g-4">
 
-            <!-- LEFT COLUMN -->
-            <div class="col-lg-4">
+            <!-- LEFT COLUMN (MAIN FLOW & ANALYTICS) -->
+            <div class="col-lg-8">
 
                 <!-- Waiting Room -->
                 <div class="hex-card" th:if="${salaDeEspera != null and not #lists.isEmpty(salaDeEspera)}">
@@ -1507,92 +1484,6 @@
                     </div>
                 </div>
 
-                <!-- Alerts Panel -->
-                <div class="hex-card">
-                    <div class="card-header-hex">
-                        <h5><i class="bi bi-exclamation-triangle-fill"></i> Alertas de Sede</h5>
-                    </div>
-                    <div class="card-body-hex">
-                        <div th:if="${bajoStock != null and not #lists.isEmpty(bajoStock)}">
-                            <div th:each="p : ${bajoStock}" class="alert-item-hex danger">
-                                <i class="bi bi-exclamation-octagon-fill"></i>
-                                <div class="alert-content-hex">
-                                    <h6 style="color: var(--accent-rose);">Stock Crítico</h6>
-                                    <p>El medicamento <strong th:text="${p.nombre}">Fármaco</strong> está en nivel
-                                        mínimo (<span th:text="${p.stock}">0</span> uds).</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="alert-item-hex warning">
-                            <i class="bi bi-clock-history"></i>
-                            <div class="alert-content-hex">
-                                <h6 style="color: var(--accent-amber);">Consulta Retrasada</h6>
-                                <p>El paciente Lucas tiene un retraso de 15 minutos en consulta.</p>
-                            </div>
-                        </div>
-                        <div class="alert-item-hex info">
-                            <i class="bi bi-credit-card-2-front"></i>
-                            <div class="alert-content-hex">
-                                <h6 style="color: var(--accent-indigo);">Factura Pendiente</h6>
-                                <p>Sede tiene 2 facturas de proveedores por vencer mañana.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Staff Status -->
-                <div class="hex-card">
-                    <div class="card-header-hex">
-                        <h5><i class="bi bi-person-badge-fill"></i> Estado del Personal</h5>
-                    </div>
-                    <div class="card-body-hex">
-                        <div class="vet-item-hex">
-                            <div class="vet-info-hex">
-                                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100"
-                                    alt="Vet" class="vet-avatar-hex">
-                                <div>
-                                    <h6 class="vet-name-hex">Dr. Carlos Mendoza</h6>
-                                    <span class="vet-role-hex">Veterinario Principal</span>
-                                </div>
-                            </div>
-                            <span class="vet-status-hex status-active">
-                                <span class="room-dot dot-free" style="width: 5px; height: 5px;"></span> En consulta
-                            </span>
-                        </div>
-                        <div class="vet-item-hex">
-                            <div class="vet-info-hex">
-                                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100"
-                                    alt="Vet" class="vet-avatar-hex">
-                                <div>
-                                    <h6 class="vet-name-hex">Dra. Laura Restrepo</h6>
-                                    <span class="vet-role-hex">Cirujana</span>
-                                </div>
-                            </div>
-                            <span class="vet-status-hex status-available">
-                                <span class="room-dot dot-free" style="width: 5px; height: 5px;"></span> Disponible
-                            </span>
-                        </div>
-                        <div class="vet-item-hex">
-                            <div class="vet-info-hex">
-                                <img src="https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=100"
-                                    alt="Vet" class="vet-avatar-hex">
-                                <div>
-                                    <h6 class="vet-name-hex">Dr. Andrés Castro</h6>
-                                    <span class="vet-role-hex">General</span>
-                                </div>
-                            </div>
-                            <span class="vet-status-hex status-break">
-                                <span class="room-dot dot-cleaning" style="width: 5px; height: 5px;"></span> Descanso
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- CENTER COLUMN -->
-            <div class="col-lg-5">
-
                 <!-- Revenue Chart -->
                 <div class="hex-card">
                     <div class="card-header-hex">
@@ -1610,7 +1501,7 @@
                         <!-- Status Chart -->
                         <div class="hex-card h-100">
                             <div class="card-header-hex">
-                                <h5><i class="bi bi-pie-chart-fill"></i> Citas</h5>
+                                <h5><i class="bi bi-pie-chart-fill"></i> Distribución de Citas</h5>
                             </div>
                             <div class="card-body-hex">
                                 <div class="chart-container-sm-hex">
@@ -1623,7 +1514,7 @@
                         <!-- Services Chart -->
                         <div class="hex-card h-100">
                             <div class="card-header-hex">
-                                <h5><i class="bi bi-bar-chart-fill"></i> Servicios</h5>
+                                <h5><i class="bi bi-bar-chart-fill"></i> Servicios Más Solicitados</h5>
                             </div>
                             <div class="card-body-hex">
                                 <div class="chart-container-sm-hex">
@@ -1634,39 +1525,33 @@
                     </div>
                 </div>
 
-                <!-- Room Occupancy -->
-                <div class="hex-card mt-3">
+            </div>
+
+            <!-- RIGHT COLUMN (SIDEBAR: REAL ALERTS, REAL INSIGHTS, REAL AGENDA) -->
+            <div class="col-lg-4">
+
+                <!-- Alerts Panel -->
+                <div class="hex-card">
                     <div class="card-header-hex">
-                        <h5><i class="bi bi-hospital"></i> Ocupación de Consultorios</h5>
+                        <h5><i class="bi bi-exclamation-triangle-fill"></i> Alertas de Sede</h5>
                     </div>
                     <div class="card-body-hex">
-                        <div class="rooms-grid-hex">
-                            <div class="room-tile-hex occupied">
-                                <div class="room-title-hex">Consultorio 1</div>
-                                <div class="room-status-hex" style="color: var(--accent-rose);">
-                                    <span class="room-dot dot-occupied"></span> OCUPADO
-                                </div>
-                            </div>
-                            <div class="room-tile-hex free">
-                                <div class="room-title-hex">Consultorio 2</div>
-                                <div class="room-status-hex" style="color: var(--accent-emerald);">
-                                    <span class="room-dot dot-free"></span> LIBRE
-                                </div>
-                            </div>
-                            <div class="room-tile-hex cleaning">
-                                <div class="room-title-hex">Consultorio 3</div>
-                                <div class="room-status-hex" style="color: var(--accent-amber);">
-                                    <span class="room-dot dot-cleaning"></span> LIMPIEZA
+                        <div th:if="${bajoStock != null and not #lists.isEmpty(bajoStock)}">
+                            <div th:each="p : ${bajoStock}" class="alert-item-hex danger">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                                <div class="alert-content-hex">
+                                    <h6 style="color: var(--accent-rose);">Stock Crítico</h6>
+                                    <p>El medicamento <strong th:text="${p.nombre}">Fármaco</strong> está en nivel
+                                        mínimo (<span th:text="${p.stock}">0</span> uds).</p>
                                 </div>
                             </div>
                         </div>
+                        <div th:if="${bajoStock == null or #lists.isEmpty(bajoStock)}" class="text-center py-3">
+                            <i class="bi bi-shield-check text-success fs-3 mb-2 d-block"></i>
+                            <p class="text-muted small mb-0">No hay alertas críticas en esta sede.</p>
+                        </div>
                     </div>
                 </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div class="col-lg-3">
 
                 <!-- IA Insights -->
                 <div class="hex-card ia-card-hex">
@@ -1674,18 +1559,21 @@
                         <h5><i class="bi bi-stars"></i> IA Mira Insights</h5>
                     </div>
                     <div class="card-body-hex pt-0">
-                        <div class="ia-bullet-hex">
+                        <div class="ia-bullet-hex" th:if="${citasHoy > 0}">
                             <i class="bi bi-arrow-up-right-circle-fill"></i>
-                            <p>Las consultas aumentaron un <strong>18%</strong> en comparación con la semana anterior.
-                            </p>
+                            <p>Hoy se han registrado <strong th:text="${citasHoy}">0</strong> citas en la sede.</p>
                         </div>
-                        <div class="ia-bullet-hex">
+                        <div class="ia-bullet-hex" th:if="${ingresosHoy > 0}">
+                            <i class="bi bi-arrow-up-right-circle-fill"></i>
+                            <p>Los ingresos procesados hoy suman <strong th:text="${'$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT')}">$0</strong>.</p>
+                        </div>
+                        <div class="ia-bullet-hex" th:if="${bajoStock != null and bajoStock.size() > 0}">
                             <i class="bi bi-exclamation-triangle-fill"></i>
-                            <p>El stock de <strong>Amoxicilina</strong> se agotará en las próximas 24 horas.</p>
+                            <p>Alerta: Hay <strong th:text="${bajoStock.size()}">0</strong> medicamentos con inventario bajo.</p>
                         </div>
-                        <div class="ia-bullet-hex">
+                        <div class="ia-bullet-hex" th:if="${citasHoy == 0 and (bajoStock == null or bajoStock.size() == 0)}">
                             <i class="bi bi-check-circle-fill"></i>
-                            <p>La agenda del Dr. Carlos tiene <strong>100% de ocupación</strong> para el día de hoy.</p>
+                            <p>Operación estable. No se registran alertas ni eventos críticos el día de hoy.</p>
                         </div>
                     </div>
                 </div>
@@ -1696,87 +1584,15 @@
                         <h5><i class="bi bi-calendar3"></i> Agenda de Citas</h5>
                     </div>
                     <div class="card-body-hex">
-                        <div class="calendar-event-hex">
-                            <h6>Chequeo general - Firulais</h6>
-                            <span>08:00 AM - Dr. Andrés</span>
-                        </div>
-                        <div class="calendar-event-hex" style="border-color: #d946ef;">
-                            <h6>Cirugía Dental - Luna</h6>
-                            <span>10:30 AM - Dra. Laura</span>
-                        </div>
-                        <div class="calendar-event-hex" style="border-color: #34d399;">
-                            <h6>Vacunación - Max</h6>
-                            <span>02:00 PM - Dr. Carlos</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Activity Timeline -->
-                <div class="hex-card">
-                    <div class="card-header-hex">
-                        <h5><i class="bi bi-activity"></i> Actividad Reciente</h5>
-                    </div>
-                    <div class="card-body-hex">
-                        <div class="timeline-hex">
-                            <div class="timeline-item-hex">
-                                <div class="timeline-dot-hex"></div>
-                                <small>Hace 2 min</small>
-                                <p><strong>Juan Pérez</strong> registró a la mascota <em>Rocky</em></p>
-                            </div>
-                            <div class="timeline-item-hex">
-                                <div class="timeline-dot-hex"
-                                    style="background: var(--accent-emerald); box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);">
-                                </div>
-                                <small>Hace 4 min</small>
-                                <p>El <strong>Dr. Andrés</strong> inició la consulta de general</p>
-                            </div>
-                            <div class="timeline-item-hex">
-                                <div class="timeline-dot-hex"
-                                    style="background: var(--accent-amber); box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);">
-                                </div>
-                                <small>Hace 8 min</small>
-                                <p>Se procesó el pago de la factura <strong>#FC-2041</strong></p>
+                        <div th:if="${salaDeEspera != null and not #lists.isEmpty(salaDeEspera)}">
+                            <div th:each="c : ${salaDeEspera}" class="calendar-event-hex">
+                                <h6 th:text="${c.nombreMascota + ' (' + c.nombreServicio + ')'}">Mascota (Servicio)</h6>
+                                <span th:text="${(c.nombreDoctor != null ? 'Dr/a. ' + c.nombreDoctor : 'Sin asignar') + ' | ' + c.estado}">Dr. Carlos | En Espera</span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Daily Goals -->
-                <div class="hex-card">
-                    <div class="card-header-hex">
-                        <h5><i class="bi bi-trophy"></i> Metas del Día</h5>
-                    </div>
-                    <div class="card-body-hex">
-                        <div class="goal-wrapper-hex">
-                            <div class="goal-meta-hex">
-                                <span>Meta Ingresos</span>
-                                <span style="color: var(--accent-indigo);">82%</span>
-                            </div>
-                            <div class="goal-progress-hex">
-                                <div class="goal-bar-hex goal-bar-indigo" style="width: 82%;"></div>
-                            </div>
+                        <div th:if="${salaDeEspera == null or #lists.isEmpty(salaDeEspera)}" class="text-center py-3">
+                            <p class="text-muted small mb-0">No hay citas registradas para hoy.</p>
                         </div>
-                        <div class="goal-wrapper-hex">
-                            <div class="goal-meta-hex">
-                                <span>Meta Consultas</span>
-                                <span style="color: var(--accent-emerald);">74%</span>
-                            </div>
-                            <div class="goal-progress-hex">
-                                <div class="goal-bar-hex goal-bar-emerald" style="width: 74%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Weather -->
-                <div class="weather-hex">
-                    <div class="weather-info-hex">
-                        <h6>Domicilios de Sede</h6>
-                        <p>Clima óptimo para visitas</p>
-                    </div>
-                    <div class="weather-temp-hex">
-                        <i class="bi bi-sun-fill"></i>
-                        <span>24°C</span>
                     </div>
                 </div>
 
