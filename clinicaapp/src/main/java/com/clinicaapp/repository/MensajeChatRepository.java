@@ -16,4 +16,6 @@ public interface MensajeChatRepository extends MongoRepository<MensajeChat, Stri
     List<MensajeChat> findByAdopcionIdAndEmisorIdAndReceptorId(String adopcionId, String emisorId, String receptorId);
     
     List<MensajeChat> findByAdopcionIdAndReceptorIdAndEmisorId(String adopcionId, String receptorId, String emisorId);
+    
+    long countByReceptorIdAndLeido(String receptorId, boolean leido);
 }

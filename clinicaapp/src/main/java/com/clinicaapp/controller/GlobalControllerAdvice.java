@@ -22,17 +22,22 @@ public class GlobalControllerAdvice {
     @Autowired
     private IUsuarioService usuarioService;
 
+    @Autowired
+    private com.clinicaapp.service.ComunidadPetService comunidadPetService;
+
     @ModelAttribute
     public void addNotificationsToModel(Model model, Principal principal) {
         // Inicializamos valores por defecto para evitar errores en Thymeleaf
         model.addAttribute("notificacionesUnreadCount", 0L);
         model.addAttribute("listaNotificaciones", new java.util.ArrayList<>());
+        model.addAttribute("unreadChatCount", 0L);
 
         if (principal != null) {
             Usuario usuario = getLoggedUser(principal);
             if (usuario != null) {
                 model.addAttribute("notificacionesUnreadCount", notificacionService.getConteoNoLeidas(usuario.getId()));
                 model.addAttribute("listaNotificaciones", notificacionService.getUltimasNotificaciones(usuario.getId(), 5));
+                model.addAttribute("unreadChatCount", comunidadPetService.getUnreadChatMessagesCount(usuario.getId()));
             }
         }
     }

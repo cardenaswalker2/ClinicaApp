@@ -1652,6 +1652,20 @@ public Map<String, Object> getContextoIA(Principal principal) {
         return "usuario/comunidad/comunidad_chat";
     }
 
+    @GetMapping("/comunidad/chat/unread-count")
+    @ResponseBody
+    public Map<String, Object> getChatUnreadCount(Principal principal) {
+        Map<String, Object> response = new HashMap<>();
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) {
+            response.put("count", 0);
+            return response;
+        }
+        long count = comunidadPetService.getUnreadChatMessagesCount(usuario.getId());
+        response.put("count", count);
+        return response;
+    }
+
     @GetMapping("/comunidad/chat/{adopcionId}/{otroUsuarioId}")
     public String chatConversacionDetail(@PathVariable String adopcionId, @PathVariable String otroUsuarioId, Model model, Principal principal) {
         Usuario usuario = getLoggedUser(principal);
@@ -1664,12 +1678,31 @@ public Map<String, Object> getContextoIA(Principal principal) {
         PublicacionAdopcion pub = optPub.get();
         model.addAttribute("pub", pub);
 
+        // Security check: user must be either publisher or other participant
+        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(otroUsuarioId)) {
+            return "redirect:/usuario/comunidad/chats?error=noauth";
+        }
+
         // Fetch other user name
         Usuario otroUsuario = usuarioService.findById(otroUsuarioId).orElse(null);
         if (otroUsuario == null) return "redirect:/usuario/comunidad/chats?error=notfound";
         model.addAttribute("otroUsuario", otroUsuario);
 
         List<MensajeChat> mensajes = comunidadPetService.getMessages(adopcionId, usuario.getId(), otroUsuarioId);
+        
+        // Auto-initialize conversation if it does not exist and current user is the interested B party
+        if (mensajes.isEmpty() && !usuario.getId().equals(pub.getPropietarioId())) {
+            comunidadPetService.enviarMensaje(
+                adopcionId, 
+                usuario.getId(), 
+                usuario.getNombre(), 
+                otroUsuarioId, 
+                otroUsuario.getNombre(), 
+                "¡Hola! Estoy interesado en la adopción de " + pub.getNombre() + "."
+            );
+            mensajes = comunidadPetService.getMessages(adopcionId, usuario.getId(), otroUsuarioId);
+        }
+        
         model.addAttribute("mensajes", mensajes);
 
         // Mark as read
@@ -1690,6 +1723,15 @@ public Map<String, Object> getContextoIA(Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         if (usuario == null) return "redirect:/login?error=noauth";
 
+        Optional<PublicacionAdopcion> optPub = comunidadPetService.getById(adopcionId);
+        if (!optPub.isPresent()) return "redirect:/usuario/comunidad/chats?error=notfound";
+        PublicacionAdopcion pub = optPub.get();
+
+        // Security check: sender must be owner or receiver
+        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(receptorId)) {
+            return "redirect:/usuario/comunidad/chats?error=noauth";
+        }
+
         Usuario receptor = usuarioService.findById(receptorId).orElse(null);
         if (receptor != null && contenido != null && !contenido.trim().isEmpty()) {
             comunidadPetService.enviarMensaje(adopcionId, usuario.getId(), usuario.getNombre(), receptorId, receptor.getNombre(), contenido);
@@ -1704,7 +1746,41 @@ public Map<String, Object> getContextoIA(Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         if (usuario == null) return new ArrayList<>();
 
+        Optional<PublicacionAdopcion> optPub = comunidadPetService.getById(adopcionId);
+        if (!optPub.isPresent()) return new ArrayList<>();
+        PublicacionAdopcion pub = optPub.get();
+
+        // Security check
+        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(otroUsuarioId)) {
+            return new ArrayList<>();
+        }
+
         comunidadPetService.marcarConversacionComoLeida(adopcionId, otroUsuarioId, usuario.getId());
         return comunidadPetService.getMessages(adopcionId, usuario.getId(), otroUsuarioId);
+    }
+
+    @PostMapping("/comunidad/chat/enviar-ajax")
+    @ResponseBody
+    public MensajeChat enviarMensajeAjax(@RequestParam String adopcionId,
+                                         @RequestParam String receptorId,
+                                         @RequestParam String contenido,
+                                         Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) throw new RuntimeException("Unauthorized");
+
+        Optional<PublicacionAdopcion> optPub = comunidadPetService.getById(adopcionId);
+        if (!optPub.isPresent()) throw new RuntimeException("Adoption not found");
+        PublicacionAdopcion pub = optPub.get();
+
+        // Security check
+        if (!usuario.getId().equals(pub.getPropietarioId()) && !usuario.getId().equals(receptorId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        Usuario receptor = usuarioService.findById(receptorId).orElse(null);
+        if (receptor != null && contenido != null && !contenido.trim().isEmpty()) {
+            return comunidadPetService.enviarMensaje(adopcionId, usuario.getId(), usuario.getNombre(), receptorId, receptor.getNombre(), contenido);
+        }
+        throw new RuntimeException("Invalid request");
     }
 }

@@ -211,7 +211,12 @@
                         </li>
                         <li class="nav-item"><a class="nav-link" th:href="@{/usuario/mis-mascotas}">Mis Mascotas</a></li>
                         <li class="nav-item"><a class="nav-link" th:href="@{/usuario/mis-citas}">Mis Citas</a></li>
-                        <li class="nav-item"><a class="nav-link" th:href="@{/usuario/comunidad}"><i class="bi bi-heart-fill text-danger"></i> Comunidad Pet</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-1" th:href="@{/usuario/comunidad}">
+                                <i class="bi bi-heart-fill text-danger"></i> Comunidad Pet
+                                <span id="navChatBadge" class="badge bg-danger rounded-pill ms-1" style="font-size: 0.7rem; font-weight: 800; padding: 0.25em 0.6em;" th:if="${unreadChatCount != null && unreadChatCount > 0}" th:text="${unreadChatCount}"></span>
+                            </a>
+                        </li>
                         <li class="nav-item"><a class="nav-link" th:href="@{/usuario/pagos}">Mis Pagos</a></li>
                     </ul>
                     <div class="navbar-nav ms-auto align-items-center gap-3">
@@ -633,6 +638,67 @@
                         updatePinDots();
                     }, 500);
                 }
+            }
+
+            // --- Polling global para notificaciones de chat sin leer ---
+            function checkUnreadChats() {
+                fetch('/usuario/comunidad/chat/unread-count')
+                    .then(response => {
+                        if (response.ok) return response.json();
+                        throw new Error('Network error');
+                    })
+                    .then(data => {
+                        const count = data.count;
+                        const badge = document.getElementById('navChatBadge');
+                        const bell = document.getElementById('bellDropdown');
+                        
+                        // Actualizar badge del menú "Comunidad Pet"
+                        if (count > 0) {
+                            if (badge) {
+                                badge.textContent = count;
+                                badge.style.display = 'inline-block';
+                            } else {
+                                const link = document.querySelector('a[href="/usuario/comunidad"]');
+                                if (link) {
+                                    const span = document.createElement('span');
+                                    span.id = 'navChatBadge';
+                                    span.className = 'badge bg-danger rounded-pill ms-1';
+                                    span.style.fontSize = '0.7rem';
+                                    span.style.fontWeight = '800';
+                                    span.style.padding = '0.25em 0.6em';
+                                    span.textContent = count;
+                                    link.appendChild(span);
+                                }
+                            }
+                            
+                            // Punto rojo en la campana
+                            if (bell) {
+                                let dot = document.getElementById('bellChatDot');
+                                if (!dot) {
+                                    dot = document.createElement('span');
+                                    dot.id = 'bellChatDot';
+                                    dot.className = 'position-absolute top-0 start-100 translate-middle p-1.5 bg-danger border border-light rounded-circle';
+                                    dot.style.width = '10px';
+                                    dot.style.height = '10px';
+                                    dot.style.padding = '0';
+                                    bell.appendChild(dot);
+                                }
+                            }
+                        } else {
+                            if (badge) {
+                                badge.style.display = 'none';
+                            }
+                            const dot = document.getElementById('bellChatDot');
+                            if (dot) dot.remove();
+                        }
+                    })
+                    .catch(err => console.debug('Chat poll skipped:', err));
+            }
+            
+            // Check once on load and then every 8 seconds
+            if (window.location.pathname.startsWith('/usuario/')) {
+                setTimeout(checkUnreadChats, 1000);
+                setInterval(checkUnreadChats, 8000);
             }
         });
 

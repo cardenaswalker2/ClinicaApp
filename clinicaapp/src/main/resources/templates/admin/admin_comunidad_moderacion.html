@@ -12,7 +12,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,12 +23,18 @@
             --text-secondary: #475569;
             --text-muted: #64748b;
             --accent-indigo: #4f46e5;
+            --accent-indigo-glow: rgba(79, 70, 229, 0.15);
             --accent-emerald: #10b981;
             --accent-rose: #e11d48;
+            --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.05);
+            --shadow-hover: 0 20px 40px rgba(79, 70, 229, 0.1);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             color: var(--text-secondary);
             min-height: 100vh;
@@ -40,6 +46,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.01);
         }
 
         .navbar-brand-admin {
@@ -49,23 +56,198 @@
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            font-size: 1.25rem;
+        }
+
+        .navbar-brand-admin span {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 1rem;
         }
 
         .moderation-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            box-shadow: var(--shadow-soft);
             margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .moderation-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent-indigo-glow);
         }
 
         .pet-thumbnail {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            transition: var(--transition);
+        }
+
+        .moderation-card:hover .pet-thumbnail {
+            transform: scale(1.03);
+            border-color: var(--accent-indigo);
+        }
+
+        /* Modal custom styles */
+        .modal-content-premium {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header-premium {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            border: none;
+            padding: 1.75rem;
+        }
+
+        .modal-body-premium {
+            padding: 2.25rem;
+            background-color: #ffffff;
+        }
+
+        .modal-footer-premium {
+            border-top: 1px solid #f1f5f9;
+            background-color: #f8fafc;
+            padding: 1.5rem 2.25rem;
+        }
+
+        .badge-pill-custom {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.4rem 0.85rem;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            height: 100%;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .spec-value {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .health-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .health-true {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .health-false {
+            background-color: rgba(244, 63, 94, 0.08);
+            color: #dc2626;
+            border: 1px solid rgba(244, 63, 94, 0.15);
+        }
+
+        .gallery-main {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+        }
+
+        .gallery-thumb {
+            width: 64px;
+            height: 64px;
             object-fit: cover;
             border-radius: 8px;
-            border: 1px solid var(--border);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .gallery-thumb:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-indigo);
+        }
+
+        .btn-premium-approve {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: var(--transition);
+        }
+
+        .btn-premium-approve:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        .btn-premium-reject {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+            transition: var(--transition);
+        }
+
+        .btn-premium-reject:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
+            color: white;
         }
     </style>
 </head>
@@ -73,74 +255,221 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="main-navbar py-2 mb-4">
+    <nav class="main-navbar py-3 mb-4">
         <div class="container d-flex align-items-center">
-            <a class="navbar-brand-admin h5 mb-0" th:href="@{/admin/dashboard}">
-                <i class="bi bi-shield-lock-fill text-indigo" style="color: var(--accent-indigo);"></i>
-                ClínicaApp <span>Admin Moderación</span>
+            <a class="navbar-brand-admin mb-0" th:href="@{/admin/dashboard}">
+                <i class="bi bi-shield-lock-fill text-primary" style="color: var(--accent-indigo) !important;"></i>
+                HEX Moderación <span>• Comunidad Pet</span>
             </a>
-            <div class="ms-auto">
-                <a th:href="@{/admin/dashboard}" class="btn btn-sm btn-outline-secondary rounded-3">Volver al Dashboard</a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a th:href="@{/admin/dashboard}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 fw-semibold">
+                    <i class="bi bi-arrow-left"></i> Dashboard
+                </a>
             </div>
         </div>
     </nav>
 
-    <div class="container mb-5">
+    <div class="container mb-5" style="max-width: 1000px;">
         
-        <div class="mb-4">
-            <h2 class="text-dark fw-bold h3"><i class="bi bi-shield-check text-indigo" style="color: var(--accent-indigo);"></i> Moderación de Mascotas en Adopción</h2>
-            <p class="text-muted small">Aprueba o rechaza publicaciones de la Comunidad Pet de forma segura para evitar spams o ventas no autorizadas.</p>
+        <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="text-dark fw-bold h3 mb-1"><i class="bi bi-shield-check text-primary" style="color: var(--accent-indigo) !important;"></i> Panel de Moderación de Adopciones</h2>
+                <p class="text-muted small mb-0">Revisa la ficha técnica, historia y condiciones de cada mascota antes de aprobar su publicación.</p>
+            </div>
+            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-bold" th:if="${not #lists.isEmpty(publicaciones)}" th:text="${#lists.size(publicaciones)} + ' Pendientes'">0 Pendientes</span>
         </div>
 
-        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-            <i class="bi bi-check-circle-fill"></i> <span th:text="${mensajeExito}">Éxito</span>
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-4 mb-4 border-0 shadow-sm py-3" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                <span class="fw-semibold" th:text="${mensajeExito}">Operación completada con éxito.</span>
+            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <div th:if="${#lists.isEmpty(publicaciones)}" class="text-center py-5 bg-white border rounded-3">
-            <i class="bi bi-emoji-smile text-success fs-1 mb-3 d-block"></i>
-            <h5 class="text-dark">No hay publicaciones pendientes de revisión</h5>
-            <p class="text-muted small">Todo está al día por el momento.</p>
+        <div th:if="${#lists.isEmpty(publicaciones)}" class="text-center py-5 bg-white border border-secondary-subtle rounded-4 shadow-sm">
+            <i class="bi bi-emoji-smile text-success fs-1 mb-3 d-block" style="color: var(--accent-emerald) !important;"></i>
+            <h5 class="text-dark fw-bold">No hay publicaciones pendientes de revisión</h5>
+            <p class="text-muted small mb-0">La comunidad de adopción de ClínicaApp está completamente moderada y al día.</p>
         </div>
 
         <!-- Pending publications list -->
         <div class="moderation-card" th:each="pub : ${publicaciones}">
-            <div class="row align-items-center g-3">
+            <div class="row align-items-center g-4">
                 
-                <!-- Image -->
-                <div class="col-md-2 text-center text-md-start">
+                <!-- Thumbnail -->
+                <div class="col-sm-3 col-md-2 text-center text-sm-start">
                     <img th:src="${pub.fotoPrincipalUrl}" alt="Foto Mascota" class="pet-thumbnail">
                 </div>
 
                 <!-- Info -->
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="col-sm-9 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-2">
                         <h4 class="text-dark fw-bold h5 mb-0" th:text="${pub.nombre}">Nombre</h4>
-                        <span class="badge bg-secondary-subtle text-secondary small" th:text="${pub.sexo}">Sexo</span>
+                        <span class="badge bg-info-subtle text-info badge-pill-custom" th:text="${pub.sexo}">Macho</span>
+                        <span class="badge bg-secondary-subtle text-secondary badge-pill-custom" th:text="${pub.especie}">Perro</span>
                     </div>
-                    <div class="small text-muted mb-2" th:text="${pub.especie + ' - ' + pub.raza + ' - ' + pub.edad}">Raza</div>
-                    <p class="text-secondary small mb-2" th:text="${pub.historia}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"></p>
+                    <div class="small text-muted mb-2 fw-semibold">
+                        <i class="bi bi-tags"></i> <span th:text="${pub.raza}">Cruza</span> • <i class="bi bi-egg-fried"></i> <span th:text="${pub.edad}">1 año</span>
+                    </div>
+                    <p class="text-secondary small mb-3" th:text="${pub.historia}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;"></p>
                     
-                    <div class="small">
-                        <strong>Publicador:</strong> <span th:text="${pub.nombrePublicador + ' (' + pub.tipoPublicador + ')'}">Usuario</span> 
-                        | <strong>Ubicación:</strong> <span th:text="${pub.ciudad + (pub.barrio != null ? ' - ' + pub.barrio : '')}">Cartagena</span>
+                    <div class="d-flex align-items-center gap-3 text-muted small flex-wrap">
+                        <span><i class="bi bi-person-fill text-primary"></i> <strong class="text-dark" th:text="${pub.nombrePublicador}">Publicador</strong></span>
+                        <span><i class="bi bi-geo-alt-fill text-danger"></i> <span th:text="${pub.ciudad + (pub.barrio != null ? ', ' + pub.barrio : '')}">Medellín</span></span>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="col-md-4 text-center text-md-end">
-                    <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn btn-success px-4 rounded-3 me-2">
-                        <i class="bi bi-check-lg"></i> Aprobar
-                    </a>
-                    <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn btn-danger px-4 rounded-3">
-                        <i class="bi bi-x-lg"></i> Rechazar
-                    </a>
+                <div class="col-md-4 text-center text-md-end d-flex flex-md-column flex-row gap-2 justify-content-center align-items-stretch">
+                    <button class="btn btn-outline-primary rounded-pill fw-bold btn-sm py-2" data-bs-toggle="modal" th:data-bs-target="'#detailModal-' + ${pub.id}">
+                        <i class="bi bi-eye-fill"></i> Ver Ficha Completa
+                    </button>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn btn-success rounded-pill fw-bold btn-sm py-2 flex-grow-1">
+                            <i class="bi bi-check-lg"></i> Aprobar
+                        </a>
+                        <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn btn-danger rounded-pill fw-bold btn-sm py-2 flex-grow-1">
+                            <i class="bi bi-x-lg"></i> Rechazar
+                        </a>
+                    </div>
                 </div>
 
             </div>
+
+            <!-- Redesigned Premium Detail Modal -->
+            <div class="modal fade" th:id="'detailModal-' + ${pub.id}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content modal-content-premium">
+                        
+                        <!-- Header -->
+                        <div class="modal-header modal-header-premium text-white d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="modal-title fw-bold h4 mb-1" th:text="'Detalle de ' + ${pub.nombre}">Ficha Mascota</h5>
+                                <div class="small opacity-75">
+                                    <i class="bi bi-shield-exclamation"></i> Pendiente de validación • Publicado por <span th:text="${pub.nombrePublicador + ' (' + pub.tipoPublicador + ')'}">Admin</span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        
+                        <!-- Body -->
+                        <div class="modal-body modal-body-premium">
+                            <div class="row g-4">
+                                
+                                <!-- Left side (Gallery & Specifications) -->
+                                <div class="col-md-5">
+                                    <div class="mb-3">
+                                        <img th:src="${pub.fotoPrincipalUrl}" alt="Foto Principal" class="gallery-main">
+                                        
+                                        <!-- Album list if exists -->
+                                        <div class="d-flex gap-2 flex-wrap mb-2" th:if="${pub.albumFotos != null && !#lists.isEmpty(pub.albumFotos)}">
+                                            <div th:each="img : ${pub.albumFotos}">
+                                                <img th:src="${img}" alt="Album Img" class="gallery-thumb" onclick="window.open(this.src)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Specifications box -->
+                                    <div class="detail-box">
+                                        <h6 class="detail-title"><i class="bi bi-info-circle-fill text-primary"></i> Especificaciones</h6>
+                                        <div class="spec-item">
+                                            <span class="spec-label">Tamaño:</span>
+                                            <span class="spec-value" th:text="${pub.tamano ?: 'No especificado'}">Mediano</span>
+                                        </div>
+                                        <div class="spec-item">
+                                            <span class="spec-label">Nivel de Energía:</span>
+                                            <span class="spec-value" th:text="${pub.nivelEnergia ?: 'Medio'}">Medio</span>
+                                        </div>
+                                        <div class="spec-item">
+                                            <span class="spec-label">Vivienda recomendada:</span>
+                                            <span class="spec-value" th:text="${pub.tipoViviendaRecomendada ?: 'Indiferente'}">Casa con patio</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right side (Detailed info & health) -->
+                                <div class="col-md-7">
+                                    
+                                    <!-- Quick Badges -->
+                                    <div class="mb-4">
+                                        <span class="badge bg-primary-subtle text-primary badge-pill-custom me-1" th:text="${pub.especie}">Perro</span>
+                                        <span class="badge bg-info-subtle text-info badge-pill-custom me-1" th:text="${pub.raza}">Cruza</span>
+                                        <span class="badge bg-success-subtle text-success badge-pill-custom me-1" th:text="${pub.edad}">1 año</span>
+                                        <span class="badge bg-warning-subtle text-warning badge-pill-custom me-1" th:text="${pub.sexo}">Macho</span>
+                                        <span class="badge bg-danger-subtle text-danger badge-pill-custom" th:text="${'Salud: ' + (pub.estadoSalud ?: 'Estable')}">Sano</span>
+                                    </div>
+
+                                    <!-- Health Checklist -->
+                                    <div class="mb-4">
+                                        <h6 class="detail-title"><i class="bi bi-shield-check text-success"></i> Salud y Convivencia</h6>
+                                        <div class="d-flex flex-wrap">
+                                            <span class="health-badge" th:classappend="${pub.vacunada} ? 'health-true' : 'health-false'">
+                                                <i class="bi" th:classappend="${pub.vacunada} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Vacunada
+                                            </span>
+                                            <span class="health-badge" th:classappend="${pub.esterilizada} ? 'health-true' : 'health-false'">
+                                                <i class="bi" th:classappend="${pub.esterilizada} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Esterilizada
+                                            </span>
+                                            <span class="health-badge" th:classappend="${pub.aceptaNinos} ? 'health-true' : 'health-false'">
+                                                <i class="bi" th:classappend="${pub.aceptaNinos} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Apta para niños
+                                            </span>
+                                            <span class="health-badge" th:classappend="${pub.aceptaOtrasMascotas} ? 'health-true' : 'health-false'">
+                                                <i class="bi" th:classappend="${pub.aceptaOtrasMascotas} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Acepta mascotas
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Story -->
+                                    <div class="mb-4">
+                                        <h6 class="detail-title"><i class="bi bi-book-half text-primary"></i> Su Historia</h6>
+                                        <p class="text-secondary small mb-0" th:text="${pub.historia}" style="line-height: 1.6; text-align: justify;"></p>
+                                    </div>
+
+                                    <!-- Motivo de adopcion -->
+                                    <div class="mb-4" th:if="${pub.motivoAdopcion != null && !#strings.isEmpty(pub.motivoAdopcion)}">
+                                        <h6 class="detail-title"><i class="bi bi-question-circle-fill text-primary"></i> Motivo de Adopción</h6>
+                                        <p class="text-secondary small mb-0" th:text="${pub.motivoAdopcion}" style="line-height: 1.6;"></p>
+                                    </div>
+
+                                    <!-- Requisitos de adopcion -->
+                                    <div class="mb-4" th:if="${pub.requisitosAdopcion != null && !#strings.isEmpty(pub.requisitosAdopcion)}">
+                                        <h6 class="detail-title"><i class="bi bi-card-checklist text-primary"></i> Requisitos de Adopción</h6>
+                                        <p class="text-secondary small mb-0" th:text="${pub.requisitosAdopcion}" style="line-height: 1.6;"></p>
+                                    </div>
+
+                                    <!-- Info adicional -->
+                                    <div class="mb-2" th:if="${pub.informacionAdicional != null && !#strings.isEmpty(pub.informacionAdicional)}">
+                                        <h6 class="detail-title"><i class="bi bi-plus-circle-fill text-primary"></i> Información Adicional</h6>
+                                        <p class="text-secondary small mb-0" th:text="${pub.informacionAdicional}" style="line-height: 1.6;"></p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="modal-footer modal-footer-premium d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn btn-premium-reject rounded-pill px-4" onclick="return confirm('¿Seguro que deseas rechazar esta publicación?')">
+                                    <i class="bi bi-x-lg"></i> Rechazar
+                                </a>
+                                <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn btn-premium-approve rounded-pill px-4">
+                                    <i class="bi bi-check-lg"></i> Aprobar y Publicar
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

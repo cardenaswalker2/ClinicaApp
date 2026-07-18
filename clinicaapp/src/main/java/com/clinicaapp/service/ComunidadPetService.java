@@ -193,7 +193,13 @@ public class ComunidadPetService {
                 map.put("otroParticipanteNombre", otroNombre);
                 map.put("ultimoMensaje", ultimo.getContenido());
                 map.put("fechaHora", ultimo.getFechaHora());
-                map.put("noLeido", !ultimo.isLeido() && ultimo.getReceptorId().equals(userId));
+                
+                long unreadCount = msgs.stream()
+                        .filter(m -> !m.isLeido() && m.getReceptorId().equals(userId))
+                        .count();
+                map.put("noLeido", unreadCount > 0);
+                map.put("cantidadNoLeidos", unreadCount);
+                
                 result.add(map);
             }
         }
@@ -202,6 +208,10 @@ public class ComunidadPetService {
         result.sort((c1, c2) -> ((LocalDateTime) c2.get("fechaHora")).compareTo((LocalDateTime) c1.get("fechaHora")));
 
         return result;
+    }
+
+    public long getUnreadChatMessagesCount(String userId) {
+        return chatRepository.countByReceptorIdAndLeido(userId, false);
     }
 
     public void marcarConversacionComoLeida(String adopcionId, String emisorId, String receptorId) {
