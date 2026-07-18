@@ -86,9 +86,10 @@
         .main-container {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
+            justify-content: flex-start;
+            padding: 4rem 1rem 6rem 1rem;
         }
 
         /* Success Ticket Aesthetic */
@@ -365,7 +366,7 @@
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
-    <canvas id="global-particles"></canvas>
+    <!-- El script de confeti no requiere un canvas estático -->
 
     <!-- Header -->
     <div th:replace="~{fragments/header :: header-publico}"></div>

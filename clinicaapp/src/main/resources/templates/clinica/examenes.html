@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,181 +12,659 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
             --primary: #4f46e5;
-            --primary-light: #818cf8;
+            --primary-light: #e0e7ff;
             --primary-dark: #3730a3;
             --success: #10b981;
+            --success-light: #d1fae5;
             --warning: #f59e0b;
+            --warning-light: #fef3c7;
             --danger: #ef4444;
-            --dark: #0f172a;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-500: #64748b;
-            --gray-700: #334155;
-            --gray-900: #0f172a;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
             --radius-xl: 20px;
-            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --radius-full: 9999px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--gray-50);
-            color: var(--gray-700);
+            background-color: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            line-height: 1.6;
         }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 0.75rem 1rem;
+        /* ===== NAVBAR ===== */
+        .navbar-custom {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.875rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: var(--shadow-sm);
         }
 
-        .navbar-brand {
+        .navbar-brand-custom {
             font-weight: 800;
-            color: white;
+            font-size: 1.25rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .navbar-brand-custom:hover {
+            color: var(--primary);
+        }
+
+        .navbar-brand-custom i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .pet-name {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-back:hover {
+            background: var(--surface-hover);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-custom {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .alert-success-custom {
+            background: var(--success-light);
+            color: #065f46;
+            border-left: 4px solid var(--success);
+        }
+
+        .btn-close-custom {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .navbar-brand i {
-            background: linear-gradient(135deg, #0ea5e9, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .page-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: var(--radius-full);
         }
 
-        .btn-back {
-            border: 1.5px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.85);
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
             font-weight: 600;
-            background: rgba(255, 255, 255, 0.05);
-            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-md);
+            border: none;
+            transition: var(--transition);
             display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+            white-space: nowrap;
+        }
+
+        .btn-add:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        /* ===== EXAM CARD ===== */
+        .exam-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .exam-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #c7d2fe;
+        }
+
+        .exam-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .exam-title {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--text);
+            margin-bottom: 0.375rem;
+        }
+
+        .exam-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .exam-date i {
+            color: var(--primary);
+        }
+
+        .btn-pdf {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1.5px solid rgba(239, 68, 68, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-pdf:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .exam-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* ===== TABLE ===== */
+        .table-custom {
+            margin-bottom: 0;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .table-custom thead th {
+            background: var(--surface-hover);
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .table-custom tbody td {
+            padding: 0.875rem 1rem;
+            color: var(--text);
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr {
+            transition: var(--transition);
+        }
+
+        .table-custom tbody tr:hover {
+            background: var(--surface-hover);
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .result-value {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* ===== CONCLUSIONS ===== */
+        .conclusions-box {
+            background: var(--info-light);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .conclusions-box strong {
+            font-size: 0.8rem;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .conclusions-box p {
+            color: #0369a1;
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-xl);
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+
+        .empty-state-icon i {
+            font-size: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h6 {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-content-custom {
+            border: none;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border: none;
+        }
+
+        .modal-header-custom h5 {
+            font-weight: 700;
+            margin: 0;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .btn-back:hover {
-            background: rgba(255, 255, 255, 0.12);
+        .modal-body-custom {
+            padding: 1.5rem;
+        }
+
+        .modal-footer-custom {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--surface-hover);
+        }
+
+        .form-label-modal {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .form-control-modal {
+            background-color: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            padding: 0.625rem 0.875rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .form-control-modal:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-cancel-modal {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .btn-cancel-modal:hover {
+            background: var(--surface-hover);
+        }
+
+        .btn-submit-modal {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+        }
+
+        .btn-submit-modal:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        .btn-add-row {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1.5px solid rgba(79, 70, 229, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
+        .btn-add-row:hover {
+            background: var(--primary);
             color: white;
         }
 
-        .card-exam {
-            background: white;
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--gray-200);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            margin-bottom: 1.5rem;
+        .btn-delete-row {
+            background: transparent;
+            color: var(--danger);
+            border: none;
+            padding: 0.25rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .btn-delete-row:hover {
+            color: #991b1b;
+            transform: scale(1.1);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.25rem 1rem;
+            }
+
+            .exam-header {
+                flex-direction: column;
+            }
+
+            .btn-pdf {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-add {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .table-custom thead th,
+            .table-custom tbody td {
+                padding: 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .conclusions-box {
+                padding: 0.875rem 1rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-dark">
-        <div class="container">
-            <span class="navbar-brand">
+    <nav class="navbar navbar-custom navbar-expand">
+        <div class="container main-container" style="padding-top: 0; padding-bottom: 0;">
+            <a class="navbar-brand-custom" href="#">
                 <i class="bi bi-prescription2"></i>
-                Laboratorio Clínico - Paciente: <span th:text="${mascota.nombre}">Firulais</span>
-            </span>
+                Laboratorio — <span class="pet-name" th:text="${mascota.nombre}">Firulais</span>
+            </a>
             <button onclick="window.history.back()" class="btn-back border-0">
                 <i class="bi bi-arrow-left"></i>
-                <span>Volver</span>
+                <span class="d-none d-sm-inline">Volver</span>
             </button>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="main-container">
         <!-- Alertas -->
-        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: var(--radius-md); background-color: rgba(16, 185, 129, 0.1); color: var(--success); margin-bottom: 1.5rem;">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <span th:text="${mensajeExito}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="bi bi-folder2-open me-1"></i> Historial de Exámenes</h5>
-            <button type="button" class="btn btn-primary fw-bold" style="border-radius: var(--radius-md);" data-bs-toggle="modal" data-bs-target="#examenModal">
-                <i class="bi bi-plus-circle me-1"></i> Registrar Examen
+        <div th:if="${mensajeExito}" class="alert-custom alert-success-custom" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${mensajeExito}">Mensaje de éxito</span>
+            <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
             </button>
         </div>
 
-        <!-- Lista de exámenes -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div th:each="ex : ${examenes}" class="card-exam">
-                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
-                        <div>
-                            <h5 class="fw-bold text-dark mb-1" th:text="${ex.tipoExamen}">Examen</h5>
-                            <span class="text-muted small">
-                                <i class="bi bi-calendar3 me-1"></i>
-                                <span th:text="${#temporals.format(ex.fechaExamen, 'dd/MM/yyyy HH:mm')}">Fecha</span>
-                            </span>
-                        </div>
-                        <a th:href="@{'/clinica/descargar-examen/' + ${ex.id}}" class="btn btn-outline-danger fw-bold btn-sm" style="border-radius: var(--radius-md);" target="_blank">
-                            <i class="bi bi-file-earmark-pdf me-1"></i> Descargar Reporte PDF
-                        </a>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Parámetro</th>
-                                    <th>Resultado</th>
-                                    <th>Rango Referencia</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="entry : ${ex.resultados}">
-                                    <td class="fw-bold" th:text="${entry.key}">Hematocrito</td>
-                                    <td class="text-primary fw-bold" th:text="${entry.value}">42%</td>
-                                    <td th:text="${ex.rangosReferencia.get(entry.key)}">37% - 55%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-2 bg-light p-3 rounded" th:if="${ex.conclusiones != null and !ex.conclusiones.isEmpty()}">
-                        <strong class="text-dark small d-block mb-1">Observaciones / Conclusiones:</strong>
-                        <p class="mb-0 text-muted small" th:text="${ex.conclusiones}"></p>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h4 class="page-title">Historial de Exámenes</h4>
+            <button type="button" class="btn-add" data-bs-toggle="modal" data-bs-target="#examenModal">
+                <i class="bi bi-plus-circle"></i>
+                Registrar Examen
+            </button>
+        </div>
+
+        <!-- Lista de Exámenes -->
+        <div th:each="ex : ${examenes}" class="exam-card">
+            <div class="exam-header">
+                <div>
+                    <div class="exam-title" th:text="${ex.tipoExamen}">Hemograma Completo</div>
+                    <div class="exam-date">
+                        <i class="bi bi-calendar3"></i>
+                        <span th:text="${#temporals.format(ex.fechaExamen, 'dd/MM/yyyy HH:mm')}">12/07/2026 14:30</span>
                     </div>
                 </div>
-
-                <div th:if="${#lists.isEmpty(examenes)}" class="text-center py-5 text-muted bg-white border rounded shadow-sm">
-                    <i class="bi bi-journal-medical fs-1 mb-2 d-block text-muted"></i>
-                    <span>No hay exámenes de laboratorio registrados para esta mascota.</span>
+                <a th:href="@{'/clinica/descargar-examen/' + ${ex.id}}" class="btn-pdf" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    Descargar PDF
+                </a>
+            </div>
+            <div class="exam-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Parámetro</th>
+                                <th>Resultado</th>
+                                <th>Rango Referencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="entry : ${ex.resultados}">
+                                <td class="fw-bold" th:text="${entry.key}">Hematocrito</td>
+                                <td class="result-value" th:text="${entry.value}">42%</td>
+                                <td th:text="${ex.rangosReferencia.get(entry.key)}">37% - 55%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="conclusions-box" th:if="${ex.conclusiones != null and !ex.conclusiones.isEmpty()}">
+                    <strong><i class="bi bi-chat-left-text me-1"></i> Observaciones / Conclusiones</strong>
+                    <p th:text="${ex.conclusiones}">Conclusiones del examen...</p>
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(examenes)}" class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-journal-medical"></i>
+            </div>
+            <h6>Sin exámenes registrados</h6>
+            <p>No hay exámenes de laboratorio registrados para esta mascota. Registra el primer examen para comenzar.
+            </p>
+        </div>
+    </div>
     <!-- Modal para Nuevo Examen -->
     <div class="modal fade" id="examenModal" tabindex="-1" aria-labelledby="examenModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-lg);">
-                <div class="modal-header bg-primary text-white" style="border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);">
-                    <h5 class="modal-title fw-bold" id="examenModalLabel"><i class="bi bi-prescription2 me-2"></i> Registrar Examen de Laboratorio</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-content-custom">
+                <div class="modal-header modal-header-custom">
+                    <h5 class="modal-title" id="examenModalLabel">
+                        <i class="bi bi-prescription2"></i>
+                        Registrar Examen de Laboratorio
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <form th:action="@{'/clinica/mascota/' + ${mascota.id} + '/examenes/guardar'}" method="post">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">Tipo de Examen *</label>
-                            <select class="form-select" name="tipoExamen" required onchange="presetParams(this.value)">
+                    <div class="modal-body modal-body-custom">
+                        <div class="form-group mb-3">
+                            <label class="form-label-modal">Tipo de Examen <span
+                                    style="color: var(--danger);">*</span></label>
+                            <select class="form-control-modal form-select" name="tipoExamen" required
+                                onchange="presetParams(this.value)">
                                 <option value="Hemograma Completo">Hemograma Completo</option>
                                 <option value="Perfil Bioquímico">Perfil Bioquímico</option>
                                 <option value="Uroanálisis">Uroanálisis</option>
@@ -194,23 +673,27 @@
                             </select>
                         </div>
 
-                        <label class="form-label fw-bold small text-muted">Resultados del Examen</label>
-                        <div id="paramsWrapper">
-                            <!-- Inyectado dinámicamente -->
+                        <div class="form-group mb-3">
+                            <label class="form-label-modal">Resultados del Examen</label>
+                            <div id="paramsWrapper">
+                                <!-- Inyectado dinámicamente -->
+                            </div>
                         </div>
 
-                        <button type="button" class="btn btn-outline-primary btn-sm mb-3 fw-bold" onclick="addParamRow('', '', '')">
-                            <i class="bi bi-plus-circle me-1"></i> Agregar Fila
+                        <button type="button" class="btn-add-row mb-3" onclick="addParamRow('', '', '')">
+                            <i class="bi bi-plus-circle"></i>
+                            Agregar Fila
                         </button>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">Observaciones / Conclusiones</label>
-                            <textarea class="form-control" name="conclusiones" rows="3" placeholder="Diagnóstico de laboratorio e interpretación médica..."></textarea>
+                        <div class="form-group mb-0">
+                            <label class="form-label-modal">Observaciones / Conclusiones</label>
+                            <textarea class="form-control-modal" name="conclusiones" rows="3"
+                                placeholder="Diagnóstico de laboratorio e interpretación médica..."></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer" style="border-top: 1px solid var(--gray-100);">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Registrar Examen</button>
+                    <div class="modal-footer modal-footer-custom">
+                        <button type="button" class="btn-cancel-modal" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn-submit-modal">Registrar Examen</button>
                     </div>
                 </form>
             </div>
@@ -223,25 +706,25 @@
     <script>
         const presets = {
             "Hemograma Completo": [
-                {p: "Hematocrito (HCT)", r: "37 - 55 %"},
-                {p: "Hemoglobina (HB)", r: "12 - 18 g/dL"},
-                {p: "Eritrocitos (RBC)", r: "5.5 - 8.5 M/µL"},
-                {p: "Leucocitos (WBC)", r: "6.0 - 17.0 K/µL"},
-                {p: "Plaquetas (PLT)", r: "200 - 500 K/µL"}
+                { p: "Hematocrito (HCT)", r: "37 - 55 %" },
+                { p: "Hemoglobina (HB)", r: "12 - 18 g/dL" },
+                { p: "Eritrocitos (RBC)", r: "5.5 - 8.5 M/µL" },
+                { p: "Leucocitos (WBC)", r: "6.0 - 17.0 K/µL" },
+                { p: "Plaquetas (PLT)", r: "200 - 500 K/µL" }
             ],
             "Perfil Bioquímico": [
-                {p: "Glucosa", r: "70 - 120 mg/dL"},
-                {p: "Urea", r: "10 - 30 mg/dL"},
-                {p: "Creatinina", r: "0.5 - 1.5 mg/dL"},
-                {p: "ALT / GPT", r: "10 - 80 U/L"},
-                {p: "AST / GOT", r: "10 - 50 U/L"}
+                { p: "Glucosa", r: "70 - 120 mg/dL" },
+                { p: "Urea", r: "10 - 30 mg/dL" },
+                { p: "Creatinina", r: "0.5 - 1.5 mg/dL" },
+                { p: "ALT / GPT", r: "10 - 80 U/L" },
+                { p: "AST / GOT", r: "10 - 50 U/L" }
             ],
             "Uroanálisis": [
-                {p: "Densidad Urinaria", r: "1.015 - 1.045"},
-                {p: "pH", r: "5.5 - 7.0"},
-                {p: "Proteínas", r: "Negativo"},
-                {p: "Glucosa en orina", r: "Negativo"},
-                {p: "Cuerpos Cetónicos", r: "Negativo"}
+                { p: "Densidad Urinaria", r: "1.015 - 1.045" },
+                { p: "pH", r: "5.5 - 7.0" },
+                { p: "Proteínas", r: "Negativo" },
+                { p: "Glucosa en orina", r: "Negativo" },
+                { p: "Cuerpos Cetónicos", r: "Negativo" }
             ]
         };
 
@@ -249,7 +732,7 @@
             const wrapper = document.getElementById('paramsWrapper');
             wrapper.innerHTML = '';
             const items = presets[type] || [];
-            
+
             if (items.length > 0) {
                 items.forEach(it => addParamRow(it.p, '', it.r));
             } else {
@@ -262,17 +745,19 @@
             const row = document.createElement('div');
             row.className = "row g-2 mb-2 align-items-center param-row";
             row.innerHTML = `
-                <div class="col-4">
-                    <input type="text" class="form-control form-control-sm" name="parametro" required value="${param}" placeholder="Parámetro">
+                <div class="col-md-4 col-12">
+                    <input type="text" class="form-control-modal" name="parametro" required value="${param}" placeholder="Parámetro (ej: Glucosa)">
                 </div>
-                <div class="col-4">
-                    <input type="text" class="form-control form-control-sm" name="valor" required value="${val}" placeholder="Resultado">
+                <div class="col-md-4 col-8">
+                    <input type="text" class="form-control-modal" name="valor" required value="${val}" placeholder="Resultado">
                 </div>
-                <div class="col-3">
-                    <input type="text" class="form-control form-control-sm" name="rango" value="${rango}" placeholder="Referencia">
+                <div class="col-md-3 col-3">
+                    <input type="text" class="form-control-modal" name="rango" value="${rango}" placeholder="Referencia">
                 </div>
                 <div class="col-1 text-center">
-                    <button type="button" class="btn btn-link text-danger p-0" onclick="this.closest('.param-row').remove()"><i class="bi bi-trash"></i></button>
+                    <button type="button" class="btn-delete-row" onclick="this.closest('.param-row').remove()">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             `;
             wrapper.appendChild(row);
@@ -284,4 +769,5 @@
         });
     </script>
 </body>
+
 </html>

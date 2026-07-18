@@ -12,98 +12,145 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
             --primary: #4f46e5;
-            --primary-light: #818cf8;
+            --primary-light: #e0e7ff;
             --primary-dark: #3730a3;
             --success: #10b981;
+            --success-light: #d1fae5;
             --warning: #f59e0b;
+            --warning-light: #fef3c7;
             --danger: #ef4444;
-            --dark: #0f172a;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-500: #64748b;
-            --gray-700: #334155;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
             --radius-md: 12px;
+            --radius-lg: 16px;
             --radius-xl: 20px;
-            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.05);
-            --transition: 0.3s ease;
+            --radius-full: 9999px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background: var(--gray-50);
+            background: var(--bg);
             min-height: 100vh;
-            color: var(--gray-700);
+            color: var(--text);
             font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.6;
         }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--gray-900) 0%, #1e1b4b 100%) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        /* ===== NAVBAR ===== */
+        .navbar-custom {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
             padding: 0.875rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
         }
 
-        .navbar-brand {
+        .navbar-brand-custom {
             font-weight: 800;
-            font-size: 1.2rem;
-            color: white;
+            font-size: 1.25rem;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            transition: var(--transition);
         }
 
-        .navbar-brand i {
-            background: linear-gradient(135deg, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .navbar-brand-custom:hover {
+            color: var(--primary);
+        }
+
+        .navbar-brand-custom i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand-custom span {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
         }
 
         .btn-back {
-            border: 1.5px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.85);
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-md);
             padding: 0.5rem 1rem;
             font-weight: 600;
             font-size: 0.85rem;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .btn-back:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: white;
-            transform: translateY(-1px);
+            background: var(--surface-hover);
+            color: var(--primary);
+            border-color: var(--primary-light);
         }
 
-        .profile-header-card {
-            background: white;
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== PROFILE HEADER ===== */
+        .profile-header {
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: var(--radius-xl);
-            border: 1px solid var(--gray-200);
-            padding: 2.5rem;
-            box-shadow: var(--shadow-md);
-            margin-top: 2rem;
-            position: relative;
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
+            margin-bottom: 1.5rem;
         }
 
-        .profile-header-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, #6366f1, #818cf8, #c084fc);
+        .profile-header-top {
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: relative;
+        }
+
+        .profile-header-body {
+            padding: 0 2rem 2rem;
+            position: relative;
+        }
+
+        .avatar-wrapper {
+            margin-top: -60px;
+            margin-bottom: 1rem;
         }
 
         .avatar-img {
@@ -111,71 +158,459 @@
             height: 120px;
             object-fit: cover;
             border-radius: 50%;
-            border: 4px solid var(--gray-100);
-            box-shadow: var(--shadow-md);
+            border: 4px solid var(--surface);
+            box-shadow: var(--shadow-lg);
+            background: var(--surface);
+        }
+
+        .profile-info h2 {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-role {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .profile-role strong {
+            color: var(--primary);
+        }
+
+        .profile-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .profile-meta-item i {
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         .status-badge {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 700;
-            padding: 0.35rem 0.85rem;
-            border-radius: 50px;
+            padding: 0.3rem 0.75rem;
+            border-radius: var(--radius-full);
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .status-activo { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .status-inactivo { background-color: rgba(100, 116, 139, 0.1); color: var(--gray-500); }
-        .status-vacaciones { background-color: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .status-suspendido { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .status-activo {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .status-inactivo {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        .status-vacaciones {
+            background: var(--warning-light);
+            color: #92400e;
+        }
+
+        .status-suspendido {
+            background: var(--danger-light);
+            color: #991b1b;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+            white-space: nowrap;
+        }
+
+        .btn-edit:hover {
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
 
         .stat-card {
-            background: white;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-md);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             padding: 1.25rem;
             text-align: center;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
             transition: var(--transition);
         }
 
         .stat-card:hover {
             transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon-blue {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .stat-icon-yellow {
+            background: var(--warning-light);
+            color: #92400e;
+        }
+
+        .stat-icon-green {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .stat-icon-info {
+            background: var(--info-light);
+            color: #0369a1;
         }
 
         .stat-value {
             font-size: 1.5rem;
             font-weight: 800;
-            color: var(--dark);
+            color: var(--text);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
         }
 
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
-            color: var(--gray-500);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.25rem;
+            letter-spacing: 0.05em;
         }
 
-        .card-details {
-            background: white;
-            border: 1px solid var(--gray-200);
+        /* ===== CONTENT CARDS ===== */
+        .content-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: var(--radius-xl);
-            padding: 2rem;
-            box-shadow: var(--shadow-md);
-            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
         }
 
-        .card-details-title {
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: var(--dark);
-            border-bottom: 1.5px dashed var(--gray-200);
-            padding-bottom: 0.75rem;
-            margin-bottom: 1.25rem;
+        .card-header-custom {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .card-header-custom i {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .card-header-custom h5 {
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        /* ===== BIOGRAPHY ===== */
+        .bio-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            white-space: pre-line;
+            margin: 0;
+        }
+
+        .bio-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .bio-empty i {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        /* ===== TABLE ===== */
+        .table-custom {
+            margin-bottom: 0;
+            font-size: 0.875rem;
+        }
+
+        .table-custom thead th {
+            background: var(--surface-hover);
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .table-custom tbody td {
+            padding: 0.875rem 1rem;
+            color: var(--text);
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr {
+            transition: var(--transition);
+        }
+
+        .table-custom tbody tr:hover {
+            background: var(--surface-hover);
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-status {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-confirmada {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .badge-pendiente {
+            background: var(--warning-light);
+            color: #92400e;
+        }
+
+        .badge-default {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        /* ===== SCHEDULE LIST ===== */
+        .schedule-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .schedule-value {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .schedule-badge {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .schedule-badge-secondary {
+            background: var(--surface-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===== TAGS ===== */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            background: var(--surface-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .tag-primary {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-color: rgba(79, 70, 229, 0.2);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .empty-state-icon i {
+            font-size: 1.75rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* ===== INTERNAL NOTES ===== */
+        .notes-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            font-size: 0.9rem;
+            color: #92400e;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .notes-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.25rem 1rem;
+            }
+
+            .profile-header-body {
+                padding: 0 1.25rem 1.5rem;
+            }
+
+            .avatar-img {
+                width: 96px;
+                height: 96px;
+            }
+
+            .profile-info h2 {
+                font-size: 1.25rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .navbar-brand-custom span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .profile-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -183,176 +618,230 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/clinica/dashboard}">
+    <nav class="navbar navbar-custom navbar-expand">
+        <div class="container main-container" style="padding-top: 0; padding-bottom: 0;">
+            <a class="navbar-brand-custom" th:href="@{/clinica/dashboard}">
                 <i class="bi bi-shield-plus"></i>
                 ClínicaApp <span>Admin Sede</span>
             </a>
-            <div class="ms-auto">
-                <a class="btn-back" th:href="@{/clinica/personal}">
-                    <i class="bi bi-arrow-left"></i>
-                    Volver al Listado
-                </a>
-            </div>
+            <a class="btn-back" th:href="@{/clinica/personal}">
+                <i class="bi bi-arrow-left"></i>
+                <span class="d-none d-sm-inline">Volver al Listado</span>
+                <span class="d-sm-none">Volver</span>
+            </a>
         </div>
     </nav>
 
-    <div class="container">
-        <!-- Header del Perfil -->
-        <div class="profile-header-card">
-            <div class="row align-items-center">
-                <div class="col-md-auto text-center mb-3 mb-md-0">
-                    <img th:src="${empleado.fotoPerfilUrl != null ? empleado.fotoPerfilUrl : 'https://cdn-icons-png.flaticon.com/512/387/387561.png'}" 
-                         class="avatar-img" alt="Foto Perfil" />
-                </div>
-                <div class="col text-center text-md-start">
-                    <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center mb-2">
-                        <h2 class="fw-bold text-dark mb-0" th:text="${empleado.nombreCompleto}">Juan Pérez</h2>
-                        <span th:class="'status-badge status-' + ${#strings.toLowerCase(empleado.estadoEmpleado)}"
-                              th:text="${empleado.estadoEmpleado}">Activo</span>
+    <div class="main-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-header-top"></div>
+            <div class="profile-header-body">
+                <div class="row align-items-end">
+                    <div class="col-md-auto text-center text-md-start">
+                        <div class="avatar-wrapper">
+                            <img th:src="${empleado.fotoPerfilUrl != null ? empleado.fotoPerfilUrl : 'https://cdn-icons-png.flaticon.com/512/387/387561.png'}"
+                                class="avatar-img" alt="Foto Perfil" />
+                        </div>
                     </div>
-                    <p class="text-muted mb-2">
-                        <strong th:text="${empleado.cargo != null ? empleado.cargo : 'Colaborador'}">Cargo</strong>
-                        <span th:if="${empleado.especialidad != null}" th:text="' - Especialidad en ' + ${empleado.especialidad}"> - Especialidad</span>
-                    </p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start text-muted small">
-                        <span><i class="bi bi-envelope me-1"></i> <span th:text="${empleado.email}">correo@correo.com</span></span>
-                        <span><i class="bi bi-telephone me-1"></i> <span th:text="${empleado.telefono}">+123456789</span></span>
-                        <span th:if="${empleado.documento != null}"><i class="bi bi-card-text me-1"></i> DNI: <span th:text="${empleado.documento}">12345</span></span>
+                    <div class="col text-center text-md-start mb-3 mb-md-0">
+                        <div
+                            class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start align-items-center mb-2">
+                            <h2 th:text="${empleado.nombreCompleto}">Juan Pérez</h2>
+                            <span th:class="'status-badge status-' + ${#strings.toLowerCase(empleado.estadoEmpleado)}"
+                                th:text="${empleado.estadoEmpleado}">Activo</span>
+                        </div>
+                        <div class="profile-role">
+                            <strong th:text="${empleado.cargo != null ? empleado.cargo : 'Colaborador'}">Cargo</strong>
+                            <span th:if="${empleado.especialidad != null}"
+                                th:text="' — Especialidad en ' + ${empleado.especialidad}"> — Especialidad</span>
+                        </div>
+                        <div class="profile-meta">
+                            <span class="profile-meta-item">
+                                <i class="bi bi-envelope"></i>
+                                <span th:text="${empleado.email}">correo@correo.com</span>
+                            </span>
+                            <span class="profile-meta-item">
+                                <i class="bi bi-telephone"></i>
+                                <span th:text="${empleado.telefono}">+123456789</span>
+                            </span>
+                            <span class="profile-meta-item" th:if="${empleado.documento != null}">
+                                <i class="bi bi-card-text"></i>
+                                <span th:text="'DNI: ' + ${empleado.documento}">DNI: 12345</span>
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-auto text-center text-md-end mt-3 mt-md-0">
-                    <a th:href="@{/clinica/personal/editar/{id}(id=${empleado.id})}" class="btn btn-outline-primary fw-bold" style="border-radius: var(--radius-md);">
-                        <i class="bi bi-pencil-square me-1"></i> Editar Perfil
-                    </a>
+                    <div class="col-md-auto text-center text-md-end">
+                        <a th:href="@{/clinica/personal/editar/{id}(id=${empleado.id})}" class="btn-edit">
+                            <i class="bi bi-pencil-square"></i>
+                            <span class="d-none d-sm-inline">Editar Perfil</span>
+                            <span class="d-sm-none">Editar</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Indicadores -->
-        <div class="row g-3 mt-3 mb-4">
-            <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value text-primary" th:text="${empleado.experiencia != null ? empleado.experiencia + ' Años' : '0 Años'}">5 Años</div>
-                    <div class="stat-label">Experiencia</div>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="bi bi-briefcase"></i>
                 </div>
+                <div class="stat-value"
+                    th:text="${empleado.experiencia != null ? empleado.experiencia + ' Años' : '0 Años'}">5 Años</div>
+                <div class="stat-label">Experiencia</div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value text-warning">
-                        <i class="bi bi-star-fill text-warning me-1"></i>
-                        <span th:text="${empleado.calificacion != null ? empleado.calificacion : '5.0'}">5.0</span>
-                    </div>
-                    <div class="stat-label">Calificación</div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-yellow">
+                    <i class="bi bi-star-fill"></i>
                 </div>
+                <div class="stat-value" th:text="${empleado.calificacion != null ? empleado.calificacion : '5.0'}">5.0
+                </div>
+                <div class="stat-label">Calificación</div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value text-success" th:text="${#lists.size(citas)}">12</div>
-                    <div class="stat-label">Citas Asignadas</div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <i class="bi bi-calendar-check"></i>
                 </div>
+                <div class="stat-value" th:text="${#lists.size(citas)}">12</div>
+                <div class="stat-label">Citas Asignadas</div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value text-info" th:text="${empleado.nLicencia != null and !empleado.nLicencia.isEmpty() ? 'Licencia OK' : 'Sin Reg.'}">Licencia</div>
-                    <div class="stat-label">Registro Médico</div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-info">
+                    <i class="bi bi-shield-check"></i>
                 </div>
+                <div class="stat-value" style="font-size: 0.95rem;"
+                    th:text="${empleado.nLicencia != null and !empleado.nLicencia.isEmpty() ? 'Licencia OK' : 'Sin Reg.'}">
+                    Licencia</div>
+                <div class="stat-label">Registro Médico</div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Columna Izquierda: Información Detallada -->
+        <div class="row g-4">
+            <!-- Columna Izquierda -->
             <div class="col-lg-7">
                 <!-- Biografía -->
-                <div class="card-details">
-                    <div class="card-details-title">
-                        <i class="bi bi-chat-quote text-primary"></i>
-                        Biografía Profesional
+                <div class="content-card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-chat-quote"></i>
+                        <h5>Biografía Profesional</h5>
                     </div>
-                    <p class="mb-0 text-muted" style="white-space: pre-line;" 
-                       th:text="${empleado.biografia != null and !empleado.biografia.isEmpty() ? empleado.biografia : 'Este colaborador no ha redactado una biografía profesional todavía.'}">
-                        Biografía...
-                    </p>
+                    <div class="card-body-custom">
+                        <p class="bio-text" th:if="${empleado.biografia != null and !empleado.biografia.isEmpty()}"
+                            th:text="${empleado.biografia}">
+                            Biografía del colaborador...
+                        </p>
+                        <div class="bio-empty" th:if="${empleado.biografia == null or empleado.biografia.isEmpty()}">
+                            <i class="bi bi-chat-square-text"></i>
+                            <p>Este colaborador no ha redactado una biografía profesional todavía.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Citas Agendadas -->
-                <div class="card-details">
-                    <div class="card-details-title">
-                        <i class="bi bi-calendar-event text-primary"></i>
-                        Próximas Citas y Turnos
+                <div class="content-card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-calendar-event"></i>
+                        <h5>Próximas Citas y Turnos</h5>
                     </div>
-                    <div class="table-responsive" th:if="${!#lists.isEmpty(citas)}">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fecha / Hora</th>
-                                    <th>Motivo</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="c : ${citas}">
-                                    <td class="fw-bold" th:text="${#temporals.format(c.fechaHora, 'dd/MM/yyyy HH:mm')}">12/12/2026</td>
-                                    <td th:text="${c.motivo}">Consulta general</td>
-                                    <td>
-                                        <span class="badge" 
-                                              th:classappend="${c.estado == 'Confirmada' ? 'bg-success' : (c.estado == 'Pendiente' ? 'bg-warning' : 'bg-secondary')}"
-                                              th:text="${c.estado}">Confirmada</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-center py-4 text-muted" th:if="${#lists.isEmpty(citas)}">
-                        <i class="bi bi-calendar-check fs-2 mb-2 d-block text-muted"></i>
-                        <span>No hay citas programadas para este colaborador.</span>
+                    <div class="card-body-custom" style="padding: 0;">
+                        <div class="table-responsive" th:if="${!#lists.isEmpty(citas)}">
+                            <table class="table table-custom mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha / Hora</th>
+                                        <th>Motivo</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="c : ${citas}">
+                                        <td class="fw-bold"
+                                            th:text="${#temporals.format(c.fechaHora, 'dd/MM/yyyy HH:mm')}">12/12/2026
+                                        </td>
+                                        <td th:text="${c.motivo}">Consulta general</td>
+                                        <td>
+                                            <span class="badge-status"
+                                                th:classappend="${c.estado == 'Confirmada' ? 'badge-confirmada' : (c.estado == 'Pendiente' ? 'badge-pendiente' : 'badge-default')}"
+                                                th:text="${c.estado}">Confirmada</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-state" th:if="${#lists.isEmpty(citas)}">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <p>No hay citas programadas para este colaborador.</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Columna Derecha: Configuración de Turnos y Notas -->
+            <!-- Columna Derecha -->
             <div class="col-lg-5">
                 <!-- Horario de Trabajo -->
-                <div class="card-details">
-                    <div class="card-details-title">
-                        <i class="bi bi-clock-history text-primary"></i>
-                        Horario Laboral Configurado
+                <div class="content-card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-clock-history"></i>
+                        <h5>Horario Laboral</h5>
                     </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted fw-bold">Turno de Trabajo:</span>
-                            <span class="badge bg-primary fs-7" th:text="${empleado.horaInicioTrabajo + ' - ' + empleado.horaFinTrabajo}">08:00 - 17:00</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted fw-bold">Horas de Descanso:</span>
-                            <span class="badge bg-secondary fs-7" th:text="${empleado.horaInicioDescanso + ' - ' + empleado.horaFinDescanso}">13:00 - 14:00</span>
-                        </li>
-                        <li class="list-group-item px-0">
-                            <div class="text-muted fw-bold mb-2">Días Laborales:</div>
-                            <div class="d-flex flex-wrap gap-1">
-                                <span class="badge bg-light text-dark border" th:each="dia : ${empleado.diasLaborales}" th:text="${dia}">Lunes</span>
-                            </div>
-                        </li>
-                        <li class="list-group-item px-0" th:if="${!#lists.isEmpty(empleado.consultoriosDisponibles)}">
-                            <div class="text-muted fw-bold mb-2">Consultorios / Salas Asignadas:</div>
-                            <div class="d-flex flex-wrap gap-1">
-                                <span class="badge bg-light text-primary border border-primary" th:each="cons : ${empleado.consultoriosDisponibles}" th:text="${cons}">Consultorio A</span>
-                            </div>
-                        </li>
-                    </ul>
+                    <div class="card-body-custom">
+                        <ul class="schedule-list">
+                            <li class="schedule-item">
+                                <span class="schedule-label">Turno de Trabajo</span>
+                                <span class="schedule-badge"
+                                    th:text="${empleado.horaInicioTrabajo + ' - ' + empleado.horaFinTrabajo}">08:00 -
+                                    17:00</span>
+                            </li>
+                            <li class="schedule-item">
+                                <span class="schedule-label">Horas de Descanso</span>
+                                <span class="schedule-badge schedule-badge-secondary"
+                                    th:text="${empleado.horaInicioDescanso + ' - ' + empleado.horaFinDescanso}">13:00 -
+                                    14:00</span>
+                            </li>
+                            <li class="schedule-item"
+                                style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+                                <span class="schedule-label">Días Laborales</span>
+                                <div class="tags-container">
+                                    <span class="tag" th:each="dia : ${empleado.diasLaborales}"
+                                        th:text="${dia}">Lunes</span>
+                                </div>
+                            </li>
+                            <li class="schedule-item"
+                                style="flex-direction: column; align-items: flex-start; gap: 0.75rem;"
+                                th:if="${!#lists.isEmpty(empleado.consultoriosDisponibles)}">
+                                <span class="schedule-label">Consultorios Asignados</span>
+                                <div class="tags-container">
+                                    <span class="tag tag-primary" th:each="cons : ${empleado.consultoriosDisponibles}"
+                                        th:text="${cons}">Consultorio A</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Observaciones Internas -->
-                <div class="card-details">
-                    <div class="card-details-title">
-                        <i class="bi bi-lock-fill text-danger"></i>
-                        Observaciones Internas (Privadas)
+                <div class="content-card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-lock-fill" style="color: var(--danger);"></i>
+                        <h5>Observaciones Internas</h5>
+                        <span class="badge-status badge-pendiente ms-auto" style="font-size: 0.6rem;">Privado</span>
                     </div>
-                    <p class="mb-0 text-muted small" style="white-space: pre-line;"
-                       th:text="${empleado.observacionesInternas != null and !empleado.observacionesInternas.isEmpty() ? empleado.observacionesInternas : 'Sin notas u observaciones internas registradas para este empleado.'}">
-                        Notas de contrato...
-                    </p>
+                    <div class="card-body-custom">
+                        <div class="notes-box"
+                            th:if="${empleado.observacionesInternas != null and !empleado.observacionesInternas.isEmpty()}">
+                            <p class="mb-0" th:text="${empleado.observacionesInternas}">Notas internas...</p>
+                        </div>
+                        <div class="notes-empty"
+                            th:if="${empleado.observacionesInternas == null or empleado.observacionesInternas.isEmpty()}">
+                            <i class="bi bi-journal-x"
+                                style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem; color: var(--text-muted);"></i>
+                            Sin notas u observaciones internas registradas.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

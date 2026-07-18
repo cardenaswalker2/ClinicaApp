@@ -10,26 +10,46 @@
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
-            --bg: #0b0f19;
-            --surface: #121824;
-            --surface-card: #1f2a3c;
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --primary-dark: #3730a3;
             --success: #10b981;
+            --success-light: #d1fae5;
             --warning: #f59e0b;
+            --warning-light: #fef3c7;
             --danger: #ef4444;
-            --info: #06b6d4;
-            --text: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --border: rgba(255, 255, 255, 0.08);
-            --radius-xl: 24px;
-            --radius-lg: 16px;
+            --danger-light: #fee2e2;
+            --info: #0ea5e9;
+            --info-light: #e0f2fe;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
             --radius-md: 12px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -38,89 +58,298 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
+        /* ===== NAVBAR ===== */
         .navbar-custom {
-            background: rgba(18, 24, 36, 0.85);
-            backdrop-filter: blur(15px);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
+            padding: 0.875rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-brand-custom {
             font-weight: 800;
             font-size: 1.25rem;
-            color: white;
+            color: var(--text);
             display: flex;
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .navbar-brand-custom:hover {
+            color: var(--primary);
         }
 
         .navbar-brand-custom i {
             color: var(--primary);
+            font-size: 1.5rem;
         }
 
-        .welcome-card {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.05) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: var(--radius-xl);
-            padding: 2.5rem;
-            margin-bottom: 2.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        }
-
-        .welcome-text h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff, #ddd6fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .welcome-text p {
-            color: var(--text-secondary);
-            margin: 0;
+        .navbar-brand-custom span {
+            color: var(--text-muted);
             font-weight: 500;
+            font-size: 0.95rem;
         }
 
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 800;
+        .clinic-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.875rem;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(79, 70, 229, 0.15);
+        }
+
+        .btn-logout {
+            background: transparent;
+            color: var(--danger);
+            border: 1.5px solid var(--danger-light);
+            padding: 0.4rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-custom {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: white;
+            gap: 0.75rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            animation: slideDown 0.4s ease-out;
         }
 
-        .section-title i {
+        .alert-success-custom {
+            background: var(--success-light);
+            color: #065f46;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger-custom {
+            background: var(--danger-light);
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+
+        .btn-close-custom {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== WELCOME CARD ===== */
+        .welcome-section {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-content h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.375rem;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .welcome-content p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .date-badge {
+            background: var(--surface);
             color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
         }
 
-        .patient-card {
+        .date-badge i {
+            font-size: 1rem;
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-mini {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-mini-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .stat-mini-icon.red {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .stat-mini-icon.blue {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .stat-mini-icon.green {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .stat-mini-info h4 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .stat-mini-info p {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            margin: 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            margin-top: 2.5rem;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-header::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: var(--radius-full);
+        }
+
+        .section-header h4 {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .section-count {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            margin-left: auto;
+        }
+
+        /* ===== PATIENT CARD ===== */
+        .patient-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
             padding: 1.5rem;
             transition: var(--transition);
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            box-shadow: var(--shadow-sm);
         }
 
         .patient-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
+            border-color: #c7d2fe;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .patient-header {
@@ -131,92 +360,227 @@
         }
 
         .patient-avatar {
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.04);
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ff 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            border: 1.5px solid var(--border);
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+            transition: var(--transition);
         }
 
-        .patient-name {
-            font-weight: 800;
-            color: white;
-            font-size: 1.15rem;
+        .patient-card:hover .patient-avatar {
+            border-color: var(--primary-light);
+            transform: scale(1.05);
+        }
+
+        .patient-info h5 {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
         }
 
         .patient-meta {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        .vital-sign-pill {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 0.75rem 1rem;
-            text-align: center;
-        }
-
-        .vital-sign-val {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: white;
-        }
-
-        .vital-sign-lbl {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .status-badge {
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 0.25rem 0.65rem;
-            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--radius-full);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04em;
+            margin-left: auto;
         }
 
-        .status-hosp { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-        .status-alta { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-hosp {
+            background: var(--danger-light);
+            color: #991b1b;
+        }
 
-        .btn-update {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--primary);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            padding: 0.5rem 1rem;
+        .status-alta {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        /* ===== VITAL SIGNS ===== */
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .vital-pill {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
+            padding: 0.75rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .vital-pill:hover {
+            border-color: var(--primary-light);
+            background: var(--primary-light);
+        }
+
+        .vital-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .vital-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
             font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+
+        /* ===== OBSERVATIONS ===== */
+        .obs-box {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .obs-box strong {
+            color: var(--text);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== ACTION BUTTON ===== */
+        .btn-action {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.625rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
             font-size: 0.85rem;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
-            gap: 0.35rem;
+            justify-content: center;
+            gap: 0.4rem;
             text-decoration: none;
             width: 100%;
-            justify-content: center;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
         }
 
-        .btn-update:hover {
-            background: var(--primary);
+        .btn-action:hover {
             color: white;
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
         }
 
-        .empty-box {
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
             text-align: center;
-            padding: 3rem 2rem;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1.5px dashed var(--border);
-            border-radius: var(--radius-lg);
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-xl);
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+
+        .empty-state-icon i {
+            font-size: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h6 {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
             color: var(--text-secondary);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.25rem 1rem;
+            }
+
+            .welcome-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .welcome-content h1 {
+                font-size: 1.4rem;
+            }
+
+            .date-badge {
+                justify-self: center;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .stat-mini {
+                padding: 0.875rem;
+            }
+
+            .section-header {
+                margin-top: 2rem;
+            }
+
+            .patient-card {
+                padding: 1.25rem;
+            }
+
+            .vitals-grid {
+                gap: 0.5rem;
+            }
+
+            .navbar-brand-custom span {
+                display: none;
+            }
+
+            .clinic-badge {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -224,53 +588,98 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-custom navbar-dark">
-        <div class="container">
+    <nav class="navbar navbar-custom navbar-expand">
+        <div class="container main-container" style="padding-top: 0; padding-bottom: 0;">
             <a class="navbar-brand-custom" href="#">
                 <i class="bi bi-shield-plus"></i>
                 ClínicaApp <span>Auxiliar Portal</span>
             </a>
-            <div class="d-flex align-items-center gap-3">
-                <span class="text-secondary fw-semibold" th:text="${'Sede: ' + clinica.nombre}">Clínica</span>
-                <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm fw-bold">
-                    <i class="bi bi-box-arrow-right me-1"></i> Salir
+            <div class="d-flex align-items-center gap-2">
+                <span class="clinic-badge d-none d-md-inline" th:text="${'Sede: ' + clinica.nombre}">Clínica</span>
+                <a th:href="@{/logout}" class="btn-logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span class="d-none d-sm-inline">Salir</span>
                 </a>
             </div>
         </div>
     </nav>
 
-    <div class="container my-5">
+    <div class="main-container">
         <!-- Notificaciones -->
-        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show border-0 shadow" role="alert" style="background: rgba(16, 185, 129, 0.15); color: var(--success); border-radius: var(--radius-md);">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <span th:text="${mensajeExito}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show border-0 shadow" role="alert" style="background: rgba(239, 68, 68, 0.15); color: var(--danger); border-radius: var(--radius-md);">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <span th:text="${mensajeError}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div th:if="${mensajeExito}" class="alert-custom alert-success-custom" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${mensajeExito}">Mensaje de éxito</span>
+            <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
 
-        <!-- Welcome Card -->
-        <div class="welcome-card">
-            <div class="welcome-text">
+        <div th:if="${mensajeError}" class="alert-custom alert-danger-custom" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${mensajeError}">Mensaje de error</span>
+            <button type="button" class="btn-close-custom" data-bs-dismiss="alert" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-content">
                 <h1 th:text="${'¡Hola, ' + auxiliar.nombre + '!'}">¡Hola, Auxiliar!</h1>
                 <p>Monitorea y registra los signos vitales de los pacientes hospitalizados o en consulta hoy.</p>
             </div>
             <div>
-                <span class="badge bg-primary px-3 py-2 rounded-3 fw-bold" th:text="${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy', 'es')}">Fecha</span>
+                <span class="date-badge">
+                    <i class="bi bi-calendar3"></i>
+                    <span th:text="${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy', 'es')}">Fecha</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-mini">
+                <div class="stat-mini-icon red">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 th:text="${#lists.size(hospitalizados)}">0</h4>
+                    <p>Hospitalizados</p>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon blue">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 th:text="${#lists.size(consultaGeneral)}">0</h4>
+                    <p>En Consulta</p>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 th:text="${#lists.size(hospitalizados) + #lists.size(consultaGeneral)}">0</h4>
+                    <p>Total Pacientes</p>
+                </div>
             </div>
         </div>
 
         <!-- Pacientes Hospitalizados -->
-        <div class="section-title">
-            <i class="bi bi-hospital"></i> Pacientes Hospitalizados
+        <div class="section-header">
+            <h4><i class="bi bi-hospital me-2 text-danger"></i>Pacientes Hospitalizados</h4>
+            <span class="section-count" th:if="${hospitalizados != null}"
+                th:text="${#lists.size(hospitalizados) + ' pacientes'}">0 pacientes</span>
         </div>
 
-        <div th:if="${#lists.isEmpty(hospitalizados)}" class="empty-box mb-5">
-            <i class="bi bi-heart-fill fs-2 mb-2 d-block text-secondary"></i>
-            No hay pacientes hospitalizados en este momento.
+        <div th:if="${#lists.isEmpty(hospitalizados)}" class="empty-state mb-4">
+            <div class="empty-state-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+            <h6>No hay pacientes hospitalizados</h6>
+            <p>En este momento no hay mascotas en estado de hospitalización.</p>
         </div>
 
         <div th:unless="${#lists.isEmpty(hospitalizados)}" class="row g-4 mb-5">
@@ -279,46 +688,60 @@
                     <div>
                         <div class="patient-header">
                             <div class="patient-avatar">🐾</div>
-                            <div>
-                                <div class="patient-name" th:text="${p.nombre}">Nombre</div>
-                                <div class="patient-meta" th:text="${p.especie.name() + ' • ' + p.getRaza()}">Meta</div>
+                            <div class="patient-info">
+                                <h5 th:text="${p.nombre}">Firulais</h5>
+                                <div class="patient-meta" th:text="${p.especie.name() + ' • ' + p.getRaza()}">Perro •
+                                    Labrador</div>
+                            </div>
+                            <span class="status-badge status-hosp">Hospitalizado</span>
+                        </div>
+
+                        <div class="vitals-grid">
+                            <div class="vital-pill">
+                                <div class="vital-value"
+                                    th:text="${p.temperatura != null ? p.temperatura + '°C' : '--'}">38.5°C</div>
+                                <div class="vital-label">Temperatura</div>
+                            </div>
+                            <div class="vital-pill">
+                                <div class="vital-value"
+                                    th:text="${p.frecuenciaCardiaca != null ? p.frecuenciaCardiaca + ' lpm' : '--'}">80
+                                    lpm</div>
+                                <div class="vital-label">Frec. Cardíaca</div>
                             </div>
                         </div>
 
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <div class="vital-sign-pill">
-                                    <div class="vital-sign-val" th:text="${p.temperatura + '°C'}">38.5</div>
-                                    <div class="vital-sign-lbl">Temp</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="vital-sign-pill">
-                                    <div class="vital-sign-val" th:text="${p.frecuenciaCardiaca + ' lpm'}">80</div>
-                                    <div class="vital-sign-lbl">FC</div>
-                                </div>
-                            </div>
+                        <div class="obs-box"
+                            th:if="${p.observacionesAuxiliar != null and !p.observacionesAuxiliar.isEmpty()}">
+                            <strong>Última Observación</strong>
+                            <span th:text="${p.observacionesAuxiliar}">Observaciones...</span>
                         </div>
-
-                        <p class="text-secondary small mb-3" th:text="${p.observacionesAuxiliar != null ? p.observacionesAuxiliar : 'Sin observaciones recientes'}">Observaciones...</p>
+                        <div class="obs-box"
+                            th:if="${p.observacionesAuxiliar == null or p.observacionesAuxiliar.isEmpty()}">
+                            <strong>Última Observación</strong>
+                            Sin observaciones recientes registradas.
+                        </div>
                     </div>
 
-                    <div>
-                        <a th:href="@{/auxiliar/mascotas/{id}/signos-vitales(id=${p.id})}" class="btn-update">
-                            <i class="bi bi-pencil-square"></i> Actualizar Signos
-                        </a>
-                    </div>
+                    <a th:href="@{/auxiliar/mascotas/{id}/signos-vitales(id=${p.id})}" class="btn-action">
+                        <i class="bi bi-pencil-square"></i>
+                        Actualizar Signos Vitales
+                    </a>
                 </div>
             </div>
         </div>
-
-        <!-- Consulta General / Pacientes de la Sede -->
-        <div class="section-title">
-            <i class="bi bi-search"></i> Catálogo de Pacientes (Sede)
+        <!-- Catálogo de Pacientes (Sede) -->
+        <div class="section-header">
+            <h4><i class="bi bi-search me-2 text-primary"></i>Catálogo de Pacientes</h4>
+            <span class="section-count" th:if="${consultaGeneral != null}"
+                th:text="${#lists.size(consultaGeneral) + ' pacientes'}">0 pacientes</span>
         </div>
 
-        <div th:if="${#lists.isEmpty(consultaGeneral)}" class="empty-box">
-            No se han registrado pacientes para esta sede.
+        <div th:if="${#lists.isEmpty(consultaGeneral)}" class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <h6>Sin pacientes registrados</h6>
+            <p>No se han registrado pacientes para esta sede en el sistema.</p>
         </div>
 
         <div th:unless="${#lists.isEmpty(consultaGeneral)}" class="row g-4">
@@ -327,33 +750,44 @@
                     <div>
                         <div class="patient-header">
                             <div class="patient-avatar">🐾</div>
-                            <div>
-                                <div class="patient-name" th:text="${p.nombre}">Nombre</div>
-                                <div class="patient-meta" th:text="${p.especie.name() + ' • ' + p.getRaza()}">Meta</div>
+                            <div class="patient-info">
+                                <h5 th:text="${p.nombre}">Firulais</h5>
+                                <div class="patient-meta" th:text="${p.especie.name() + ' • ' + p.getRaza()}">Perro •
+                                    Labrador</div>
+                            </div>
+                            <span class="status-badge status-alta">En Consulta</span>
+                        </div>
+
+                        <div class="vitals-grid">
+                            <div class="vital-pill">
+                                <div class="vital-value"
+                                    th:text="${p.temperatura != null ? p.temperatura + '°C' : '--'}">38.5°C</div>
+                                <div class="vital-label">Temperatura</div>
+                            </div>
+                            <div class="vital-pill">
+                                <div class="vital-value"
+                                    th:text="${p.frecuenciaCardiaca != null ? p.frecuenciaCardiaca + ' lpm' : '--'}">80
+                                    lpm</div>
+                                <div class="vital-label">Frec. Cardíaca</div>
                             </div>
                         </div>
 
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <div class="vital-sign-pill">
-                                    <div class="vital-sign-val" th:text="${p.temperatura + '°C'}">38.5</div>
-                                    <div class="vital-sign-lbl">Temp</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="vital-sign-pill">
-                                    <div class="vital-sign-val" th:text="${p.frecuenciaCardiaca + ' lpm'}">80</div>
-                                    <div class="vital-sign-lbl">FC</div>
-                                </div>
-                            </div>
+                        <div class="obs-box"
+                            th:if="${p.observacionesAuxiliar != null and !p.observacionesAuxiliar.isEmpty()}">
+                            <strong>Última Observación</strong>
+                            <span th:text="${p.observacionesAuxiliar}">Observaciones...</span>
+                        </div>
+                        <div class="obs-box"
+                            th:if="${p.observacionesAuxiliar == null or p.observacionesAuxiliar.isEmpty()}">
+                            <strong>Última Observación</strong>
+                            Sin observaciones recientes registradas.
                         </div>
                     </div>
 
-                    <div>
-                        <a th:href="@{/auxiliar/mascotas/{id}/signos-vitales(id=${p.id})}" class="btn-update">
-                            <i class="bi bi-activity"></i> Registrar Signos / Hospitalizar
-                        </a>
-                    </div>
+                    <a th:href="@{/auxiliar/mascotas/{id}/signos-vitales(id=${p.id})}" class="btn-action">
+                        <i class="bi bi-activity"></i>
+                        Registrar Signos / Hospitalizar
+                    </a>
                 </div>
             </div>
         </div>

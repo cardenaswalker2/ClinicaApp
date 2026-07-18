@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <title>Reporte de Laboratorio Clínico</title>
     <style>
         * {
@@ -9,177 +10,502 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
-        body { 
-            font-family: 'Roboto', 'Arial', sans-serif; 
-            color: #1e293b; 
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+        body {
+            font-family: 'Roboto', 'Arial', sans-serif;
+            color: #0f172a;
+            background: #ffffff;
             min-height: 100vh;
-            padding: 40px;
+            padding: 0;
             line-height: 1.6;
         }
-        
-        .header { 
-            text-align: center; 
-            padding-bottom: 25px; 
-            margin-bottom: 35px;
-            position: relative;
-        }
-        
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 4px;
-            background: linear-gradient(90deg, #0ea5e9, #6366f1, #0ea5e9);
-            border-radius: 2px;
-        }
-        
-        .clinic-name { 
-            font-size: 32px; 
-            font-weight: 700; 
-            color: #0f172a;
-            margin: 0 0 10px 0;
-            letter-spacing: -0.5px;
-        }
-        
-        .header p {
-            font-size: 12px; 
-            color: #64748b;
-        }
-        
-        h2 {
-            text-align: center; 
-            font-size: 22px; 
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        
-        .info-section { 
-            margin-bottom: 28px; 
+
+        /* ===== PAGE CONTAINER ===== */
+        .page {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 40px 50px;
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
-        
-        .grid-info {
+
+        /* ===== HEADER ===== */
+        .header {
             display: table;
             width: 100%;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #4f46e5;
         }
-        
-        .grid-row {
-            display: table-row;
-        }
-        
-        .grid-cell {
+
+        .header-icon-cell {
             display: table-cell;
-            width: 50%;
-            padding: 5px;
+            width: 64px;
+            vertical-align: middle;
         }
 
-        .label {
-            font-weight: bold;
-            color: #475569;
+        .header-icon {
+            width: 64px;
+            height: 64px;
+            background-color: #4f46e5;
+            border-radius: 16px;
+            text-align: center;
+            line-height: 64px;
+            color: white;
+            font-size: 32px;
         }
 
-        .value {
+        .header-info-cell {
+            display: table-cell;
+            padding-left: 1.5rem;
+            vertical-align: middle;
+        }
+
+        .header-info h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
             color: #0f172a;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-info p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .header-badge-cell {
+            display: table-cell;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .badge-lab {
+            background-color: #4f46e5;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: inline-block;
+        }
+
+        .badge-date {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* ===== REPORT TITLE ===== */
+        .report-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .report-title h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .report-title p {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ===== INFO CARDS ===== */
+        .info-grid {
+            display: table;
+            width: 100%;
+            border-spacing: 15px 0;
+            margin-bottom: 2rem;
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+
+        .info-card {
+            display: table-cell;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid #4f46e5;
+            vertical-align: top;
+        }
+
+        .info-card.patient {
+            border-left-color: #10b981;
+        }
+
+        .info-card-header {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-row {
+            padding: 0.375rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            clear: both;
+            overflow: hidden;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            float: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.85rem;
+        }
+
+        .info-value {
+            float: right;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-align: right;
+        }
+
+        /* ===== TABLE ===== */
+        .table-section {
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            margin-bottom: 1rem;
+        }
+
+        .table-header-icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 32px;
+            height: 32px;
+            background: #e0e7ff;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 32px;
+            color: #4f46e5;
+            font-size: 1rem;
+        }
+
+        .table-header h3 {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 0 0.5rem;
         }
 
         .table-results {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
         }
 
-        .table-results th {
-            background-color: #f1f5f9;
+        .table-results thead th {
+            background: #f1f5f9;
             color: #475569;
             text-align: left;
-            padding: 12px;
-            font-weight: bold;
+            padding: 1rem 1.25rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        .table-results td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
+        .table-results tbody td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #0f172a;
+            font-size: 0.9rem;
+        }
+
+        .table-results tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .param-name {
+            font-weight: 700;
             color: #0f172a;
         }
 
-        .conclusiones-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: white;
+        .param-value {
+            color: #4f46e5;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .param-range {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        /* ===== CONCLUSIONS ===== */
+        .conclusions-section {
+            background: #f8fafc;
+            border: 1px solid #e0e7ff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border-left: 4px solid #6366f1;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .conclusions-header {
+            margin-bottom: 0.75rem;
+        }
+
+        .conclusions-header-icon {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 1.25rem;
+        }
+
+        .conclusions-header h4 {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #4f46e5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 0 0.5rem;
+        }
+
+        .conclusions-text {
+            color: #334155;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            padding-left: 0.5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .report-footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: table;
+            width: 100%;
+        }
+
+        .footer-signature {
+            display: table-cell;
+            width: 50%;
+            text-align: left;
+        }
+
+        .signature-line {
+            width: 200px;
+            border-bottom: 1px solid #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-signature p {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .footer-signature strong {
+            color: #0f172a;
+            font-size: 0.85rem;
+        }
+
+        .footer-qr {
+            display: table-cell;
+            width: 50%;
+            text-align: right;
+            vertical-align: bottom;
+        }
+
+        .footer-qr p {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin: 0;
         }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <h1 class="clinic-name" th:text="${clinica.nombre}">Nombre de la Clínica</h1>
-        <p>Dirección: <span th:text="${clinica.direccion}">Dirección</span> | Teléfono: <span th:text="${clinica.telefono}">Teléfono</span></p>
-    </div>
-
-    <h2 th:text="'Reporte: ' + ${examen.tipoExamen}">Análisis de Laboratorio</h2>
-
-    <div class="info-section">
-        <div class="grid-info">
-            <div class="grid-row">
-                <div class="grid-cell">
-                    <span class="label">Propietario:</span>
-                    <span class="value" th:text="${dueno.nombre + ' ' + (dueno.apellido != null ? dueno.apellido : '')}">Dueño</span>
-                </div>
-                <div class="grid-cell">
-                    <span class="label">Paciente:</span>
-                    <span class="value" th:text="${mascota.nombre + ' (' + mascota.especie + ' - ' + mascota.raza + ')'}">Mascota</span>
+    <div class="page">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon-cell">
+                <div class="header-icon">🧬</div>
+            </div>
+            <div class="header-info-cell">
+                <div class="header-info">
+                    <h1 th:text="${clinica.nombre}">Nombre de la Clínica</h1>
+                    <p>
+                        <span th:text="${clinica.direccion}">Dirección</span> |
+                        Tel: <span th:text="${clinica.telefono}">Teléfono</span>
+                    </p>
                 </div>
             </div>
-            <div class="grid-row">
-                <div class="grid-cell">
-                    <span class="label">Fecha Informe:</span>
-                    <span class="value" th:text="${examen.fechaExamen}">Fecha</span>
-                </div>
-                <div class="grid-cell">
-                    <span class="label">ID Examen:</span>
-                    <span class="value" th:text="${examen.id}">ID</span>
+            <div class="header-badge-cell">
+                <div class="header-badge">
+                    <span class="badge-lab">Laboratorio</span>
+                    <div class="badge-date" th:text="${examen.fechaExamen}">2026-07-17</div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <table class="table-results">
-        <thead>
-            <tr>
-                <th>Parámetro Analizado</th>
-                <th>Valor Encontrado</th>
-                <th>Rango de Referencia</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="entry : ${examen.resultados}">
-                <td class="fw-bold" th:text="${entry.key}">Hemoglobina</td>
-                <td style="color: #6366f1; font-weight: bold;" th:text="${entry.value}">12.5</td>
-                <td th:text="${examen.rangosReferencia.get(entry.key)}">11.0 - 15.0</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Report Title -->
+        <div class="report-title">
+            <h2 th:text="'Reporte: ' + ${examen.tipoExamen}">Análisis de Laboratorio</h2>
+            <p>Resultados de análisis clínico veterinario</p>
+        </div>
 
-    <div class="conclusiones-box" th:if="${examen.conclusiones != null and !examen.conclusiones.isEmpty()}">
-        <h4 style="margin-bottom: 8px; color: #4f46e5; font-weight: 800;">Conclusiones y Observaciones</h4>
-        <p th:text="${examen.conclusiones}">Observaciones generales.</p>
+        <!-- Info Grid -->
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-card-header">Información del Propietario</div>
+                <div class="info-row">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value"
+                        th:text="${dueno.nombre + ' ' + (dueno.apellido != null ? dueno.apellido : '')}">Juan
+                        Pérez</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Teléfono</span>
+                    <span class="info-value" th:text="${dueno.telefono != null ? dueno.telefono : 'N/A'}">+57 300 123
+                        4567</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value"
+                        th:text="${dueno.email != null ? dueno.email : 'N/A'}">juan@email.com</span>
+                </div>
+            </div>
+            <div class="info-card patient">
+                <div class="info-card-header">Información del Paciente</div>
+                <div class="info-row">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value" th:text="${mascota.nombre}">Firulais</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Especie / Raza</span>
+                    <span class="info-value" th:text="${mascota.especie + ' - ' + mascota.raza}">Perro - Labrador</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Edad</span>
+                    <span class="info-value" th:text="${mascota.edad != null ? mascota.edad + ' años' : 'N/A'}">3
+                        años</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exam Info -->
+        <div class="info-grid">
+            <div class="info-card" style="border-left-color: #0ea5e9;">
+                <div class="info-card-header">Detalles del Examen</div>
+                <div class="info-row">
+                    <span class="info-label">ID Examen</span>
+                    <span class="info-value" th:text="${examen.id}">#12345</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Fecha</span>
+                    <span class="info-value" th:text="${examen.fechaExamen}">2026-07-17</span>
+                </div>
+            </div>
+            <div class="info-card" style="border-left-color: #f59e0b;">
+                <div class="info-card-header">Veterinario</div>
+                <div class="info-row">
+                    <span class="info-label">Nombre</span>
+                    <span class="info-value"
+                        th:text="${veterinario != null ? veterinario.nombre : 'No especificado'}">Dr. García</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Licencia</span>
+                    <span class="info-value"
+                        th:text="${veterinario != null and veterinario.nLicencia != null ? veterinario.nLicencia : 'N/A'}">REG-12345</span>
+                </div>
+            </div>
+            <div class="info-card" style="border-left-color: #10b981;">
+                <div class="info-card-header">Clínica</div>
+                <div class="info-row">
+                    <span class="info-label">Sede</span>
+                    <span class="info-value" th:text="${clinica.nombre}">Clínica Central</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contacto</span>
+                    <span class="info-value" th:text="${clinica.telefono}">+57 300 123 4567</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <span class="table-header-icon">📊</span>
+                <h3>Resultados del Análisis</h3>
+            </div>
+            <table class="table-results">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Parámetro Analizado</th>
+                        <th style="width: 30%;">Valor Encontrado</th>
+                        <th style="width: 30%;">Rango de Referencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="entry : ${examen.resultados}">
+                        <td class="param-name" th:text="${entry.key}">Hemoglobina</td>
+                        <td class="param-value" th:text="${entry.value}">12.5</td>
+                        <td class="param-range" th:text="${examen.rangosReferencia.get(entry.key)}">11.0 - 15.0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Conclusiones -->
+        <div class="conclusions-section" th:if="${examen.conclusiones != null and !examen.conclusiones.isEmpty()}">
+            <div class="conclusions-header">
+                <span class="conclusions-header-icon">📝</span>
+                <h4>Conclusiones y Observaciones</h4>
+            </div>
+            <p class="conclusions-text" th:text="${examen.conclusiones}">
+                Observaciones generales del análisis de laboratorio...
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            <div class="footer-signature">
+                <div class="signature-line"></div>
+                <p><strong th:text="${veterinario != null ? veterinario.nombre : 'Veterinario Responsable'}">Dr.
+                        García</strong></p>
+                <p>Médico Veterinario</p>
+                <p th:if="${veterinario != null and veterinario.nLicencia != null}"
+                    th:text="'Licencia: ' + ${veterinario.nLicencia}">Licencia: REG-12345</p>
+            </div>
+            <div class="footer-qr">
+                <p>Documento generado electrónicamente por ClínicaApp</p>
+                <p style="margin-top: 0.25rem;">ID: <span th:text="${examen.id}">12345</span> | Fecha: <span
+                        th:text="${examen.fechaExamen}">2026-07-17</span></p>
+            </div>
+        </div>
     </div>
 </body>
+
 </html>

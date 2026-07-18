@@ -376,9 +376,15 @@
 
         /* ===== BUTTONS ===== */
         .actions-grid {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 1rem;
+        }
+
+        @media (min-width: 576px) {
+            .actions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         .btn-primary-custom {
@@ -563,6 +569,10 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            .welcome-main {
+                padding: 2.5rem 0;
+            }
+
             .welcome-title {
                 font-size: 2.2rem;
             }
@@ -583,6 +593,7 @@
 
             .features-mini {
                 gap: 1rem;
+                margin-top: 2.5rem;
             }
 
             .feature-item {
@@ -601,7 +612,7 @@
             }
 
             .welcome-main {
-                padding: 2rem 0;
+                padding: 1.5rem 0;
             }
 
             .brand-logo {
@@ -613,13 +624,22 @@
             }
 
             .card-title {
-                font-size: 1.4rem;
+                font-size: 1.3rem;
             }
 
             .btn-primary-custom,
             .btn-secondary-custom {
-                padding: 1rem 1.5rem;
-                font-size: 0.95rem;
+                padding: 0.9rem 1.25rem;
+                font-size: 0.9rem;
+            }
+
+            .hint-text {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+                padding: 1rem;
+                font-size: 0.88rem;
+                margin-bottom: 1.75rem;
             }
         }
 
