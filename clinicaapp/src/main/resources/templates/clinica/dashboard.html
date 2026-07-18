@@ -12,7 +12,9 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -21,715 +23,1280 @@
 
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --primary-glow: rgba(99, 102, 241, 0.15);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #0ea5e9;
-            --dark-bg: #090d16;
-            --card-bg: rgba(17, 24, 39, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-secondary: #94a3b8;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --bg-elevated: #e2e8f0;
+            --bg-card: #ffffff;
+            --border-subtle: rgba(15, 23, 42, 0.06);
+            --border-hover: rgba(15, 23, 42, 0.12);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
             --text-muted: #64748b;
+            --accent-indigo: #4f46e5;
+            --accent-indigo-dim: rgba(79, 70, 229, 0.06);
+            --accent-indigo-glow: rgba(79, 70, 229, 0.15);
+            --accent-emerald: #10b981;
+            --accent-emerald-dim: rgba(16, 185, 129, 0.06);
+            --accent-amber: #d97706;
+            --accent-amber-dim: rgba(217, 119, 6, 0.06);
+            --accent-rose: #e11d48;
+            --accent-rose-dim: rgba(225, 29, 72, 0.06);
+            --accent-cyan: #0891b2;
+            --accent-cyan-dim: rgba(8, 145, 178, 0.06);
+            --radius-sm: 8px;
             --radius-md: 12px;
-            --radius-lg: 18px;
-            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            background-color: var(--dark-bg);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(217, 70, 239, 0.08) 0px, transparent 50%);
-            background-attachment: fixed;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== AMBIENT BACKGROUND ===== */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .ambient-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+        }
+
+        .orb-indigo {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+            top: -180px;
+            right: -120px;
+            animation: orbFloat 16s ease-in-out infinite;
+        }
+
+        .orb-purple {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(217, 70, 239, 0.06) 0%, transparent 70%);
+            bottom: -120px;
+            left: -120px;
+            animation: orbFloat 20s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(12px, -20px) scale(1.02);
+            }
+
+            66% {
+                transform: translate(-8px, 12px) scale(0.98);
+            }
         }
 
         /* ===== NAVBAR ===== */
-        .navbar {
-            background: rgba(9, 13, 22, 0.8) !important;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--card-border);
+        .main-navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px) saturate(1.2);
+            border-bottom: 1px solid var(--border-subtle);
             position: sticky;
             top: 0;
             z-index: 1000;
-            padding: 0.75rem 0;
+            padding: 0.65rem 0;
         }
 
-        .navbar-brand {
+        .navbar-brand-hex {
             font-weight: 800;
-            font-size: 1.25rem;
-            color: white !important;
+            font-size: 1.15rem;
+            color: var(--text-primary) !important;
             display: flex;
             align-items: center;
             gap: 0.6rem;
             letter-spacing: -0.02em;
+            text-decoration: none;
+            transition: opacity 0.2s;
         }
 
-        .navbar-brand i {
+        .navbar-brand-hex:hover {
+            opacity: 0.85;
+        }
+
+        .navbar-brand-hex i {
+            width: 34px;
+            height: 34px;
             background: linear-gradient(135deg, #6366f1, #d946ef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.4rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
         }
 
-        .navbar-brand span {
+        .navbar-brand-hex span {
             font-weight: 400;
             opacity: 0.5;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        .btn-logout {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5 !important;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: var(--radius-md);
-            padding: 0.5rem 1.25rem;
-            font-weight: 700;
+        .user-email-nav {
+            color: var(--text-muted);
             font-size: 0.8rem;
-            transition: all 0.3s ease;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-logout-hex {
+            background: rgba(251, 113, 133, 0.08);
+            color: var(--accent-rose) !important;
+            border: 1px solid rgba(251, 113, 133, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.78rem;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
         }
 
-        .btn-logout:hover {
-            background: #ef4444;
-            color: white !important;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+        .btn-logout-hex:hover {
+            background: rgba(251, 113, 133, 0.15);
+            border-color: rgba(251, 113, 133, 0.35);
+            color: var(--accent-rose) !important;
+            transform: translateY(-1px);
         }
 
-        /* ===== HEADER INTELIGENTE ===== */
-        .smart-header {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
+        /* ===== SMART HEADER ===== */
+        .smart-header-hex {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
             padding: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-md);
+            transition: border-color 0.3s ease;
         }
 
-        .smart-header::after {
+        .smart-header-hex:hover {
+            border-color: var(--border-hover);
+        }
+
+        .smart-header-hex::before {
             content: '';
             position: absolute;
             top: 0;
             right: 0;
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
             pointer-events: none;
         }
 
-        .smart-header h1 {
-            font-size: 2.25rem;
+        .smart-header-hex h1 {
+            font-size: 1.9rem;
             font-weight: 800;
             letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-primary);
         }
 
-        .smart-header h1 span {
+        .smart-header-hex h1 span {
             background: linear-gradient(135deg, #a5b4fc, #f472b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .header-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            margin-top: 1.5rem;
+        .smart-header-hex p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            margin: 0;
         }
 
-        .header-stat-item {
+        .header-stats-hex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
+        }
+
+        .header-stat-hex {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .header-stat-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 50px;
-            background: rgba(255, 255, 255, 0.05);
+        .header-stat-icon-hex {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            color: var(--primary-light);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.1rem;
+            color: var(--accent-indigo);
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s ease;
         }
 
-        .header-stat-info small {
+        .header-stat-hex:hover .header-stat-icon-hex {
+            background: var(--accent-indigo-dim);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .header-stat-info-hex small {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 700;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
         }
 
-        .header-stat-info span {
-            font-size: 1.1rem;
+        .header-stat-info-hex span {
+            font-size: 1.05rem;
             font-weight: 800;
-            color: white;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* ===== BARRA ACCIONES RÁPIDAS ===== */
-        .quick-actions-bar {
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions-hex {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
         }
 
-        .quick-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+        .quick-btn-hex {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
-            padding: 1rem;
-            color: var(--text-main);
+            padding: 1rem 0.75rem;
+            color: var(--text-secondary);
             text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-sm);
         }
 
-        .quick-btn:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
+        .quick-btn-hex:hover {
+            background: var(--accent-indigo-dim);
+            border-color: rgba(99, 102, 241, 0.25);
             transform: translateY(-3px);
-            color: white;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md), 0 0 20px rgba(99, 102, 241, 0.08);
         }
 
-        .quick-btn i {
-            font-size: 1.5rem;
-            color: var(--primary-light);
-            transition: transform 0.3s ease;
+        .quick-btn-hex i {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--accent-indigo);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-subtle);
         }
 
-        .quick-btn:hover i {
-            transform: scale(1.15) rotate(5deg);
+        .quick-btn-hex:hover i {
+            background: var(--accent-indigo-dim);
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: scale(1.1) rotate(4deg);
         }
 
-        .quick-btn span {
-            font-size: 0.85rem;
-            font-weight: 700;
+        .quick-btn-hex span {
+            font-size: 0.78rem;
+            font-weight: 600;
         }
 
-        /* ===== CARDS COMPACTAS ===== */
-        .compact-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            margin-bottom: 1.5rem;
+        /* ===== CARDS ===== */
+        .hex-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.25rem;
             overflow: hidden;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
         }
 
-        .compact-card:hover {
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
+        .hex-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-1px);
         }
 
-        .card-header-premium {
+        .card-header-hex {
             padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: rgba(255, 255, 255, 0.01);
         }
 
-        .card-header-premium h5 {
-            font-size: 1rem;
-            font-weight: 800;
+        .card-header-hex h5 {
+            font-size: 0.92rem;
+            font-weight: 700;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            color: white;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
         }
 
-        .card-header-premium h5 i {
-            color: var(--primary-light);
+        .card-header-hex h5 i {
+            color: var(--accent-indigo);
+            font-size: 1rem;
         }
 
-        .card-body-premium {
-            padding: 1.5rem;
+        .card-body-hex {
+            padding: 1.25rem 1.5rem;
         }
 
-        /* ===== GRID KPIs (12 TARJETAS) ===== */
-        .kpis-grid {
+        /* ===== KPIs GRID ===== */
+        .kpis-grid-hex {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
         }
 
-        .kpi-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
+        @media (max-width: 1400px) {
+            .kpis-grid-hex {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .kpis-grid-hex {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .kpis-grid-hex {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .kpi-tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             position: relative;
             overflow: hidden;
+            cursor: default;
         }
 
-        .kpi-card:hover {
+        .kpi-tile:hover {
             transform: translateY(-2px);
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-indigo), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .kpi-tile:hover::before {
+            opacity: 0.4;
         }
 
         .kpi-info h3 {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: white;
-            margin: 0 0 0.25rem 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 0.15rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.5px;
         }
 
         .kpi-info small {
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.8px;
         }
 
-        .kpi-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius-md);
-            background: rgba(255,255,255,0.03);
+        .kpi-icon-wrap {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            color: var(--primary-light);
-            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 1rem;
+            border: 1px solid var(--border-subtle);
         }
 
-        /* ===== SATELLITE LISTS (SALA DE ESPERA / CITAS) ===== */
-        .flujo-item {
+        .kpi-icon-indigo {
+            background: var(--accent-indigo-dim);
+            color: var(--accent-indigo);
+        }
+
+        .kpi-icon-emerald {
+            background: var(--accent-emerald-dim);
+            color: var(--accent-emerald);
+        }
+
+        .kpi-icon-amber {
+            background: var(--accent-amber-dim);
+            color: var(--accent-amber);
+        }
+
+        .kpi-icon-rose {
+            background: var(--accent-rose-dim);
+            color: var(--accent-rose);
+        }
+
+        .kpi-icon-cyan {
+            background: var(--accent-cyan-dim);
+            color: var(--accent-cyan);
+        }
+
+        /* ===== FLUJO ITEMS ===== */
+        .flujo-item-hex {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--card-border);
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.15s ease;
         }
 
-        .flujo-item:last-child {
+        .flujo-item-hex:last-child {
             border-bottom: none;
         }
 
-        .flujo-meta {
+        .flujo-item-hex:hover {
+            background: rgba(255, 255, 255, 0.01);
+            margin: 0 -1.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .flujo-meta-hex {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .flujo-avatar {
-            width: 40px;
-            height: 40px;
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--primary-light);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: var(--radius-md);
+        .flujo-avatar-hex {
+            width: 38px;
+            height: 38px;
+            background: var(--accent-indigo-dim);
+            color: var(--accent-indigo);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            flex-shrink: 0;
         }
 
-        .flujo-details h6 {
-            margin: 0 0 0.15rem 0;
+        .flujo-details-hex h6 {
+            margin: 0 0 0.1rem 0;
             font-weight: 700;
-            color: white;
-            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-size: 0.85rem;
         }
 
-        .flujo-details p {
+        .flujo-details-hex p {
             margin: 0;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            font-size: 0.72rem;
+            color: var(--text-muted);
         }
 
-        /* ===== ALERTAS PANEL ===== */
-        .alert-item-sede {
+        /* ===== BADGES ===== */
+        .badge-hex {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.35rem 0.7rem;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            border: 1px solid;
+        }
+
+        .badge-waiting {
+            background: var(--accent-amber-dim);
+            color: var(--accent-amber);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+
+        .badge-consulting {
+            background: var(--accent-cyan-dim);
+            color: var(--accent-cyan);
+            border-color: rgba(34, 211, 238, 0.2);
+        }
+
+        .badge-done {
+            background: var(--accent-emerald-dim);
+            color: var(--accent-emerald);
+            border-color: rgba(52, 211, 153, 0.2);
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-item-hex {
             display: flex;
             align-items: flex-start;
             gap: 0.75rem;
             padding: 0.85rem;
-            background: rgba(239, 68, 68, 0.05);
-            border: 1px solid rgba(239, 68, 68, 0.15);
             border-radius: var(--radius-md);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid;
+            transition: all 0.2s ease;
         }
 
-        .alert-item-sede:last-child {
+        .alert-item-hex:last-child {
             margin-bottom: 0;
         }
 
-        .alert-item-sede.warning {
-            background: rgba(245, 158, 11, 0.05);
-            border-color: rgba(245, 158, 11, 0.15);
+        .alert-item-hex:hover {
+            transform: translateX(2px);
         }
 
-        .alert-item-sede i {
-            font-size: 1.1rem;
-            margin-top: 0.1rem;
+        .alert-item-hex.danger {
+            background: var(--accent-rose-dim);
+            border-color: rgba(251, 113, 133, 0.15);
         }
 
-        .alert-item-content h6 {
-            margin: 0 0 0.2rem 0;
-            font-size: 0.85rem;
-            font-weight: 800;
+        .alert-item-hex.warning {
+            background: var(--accent-amber-dim);
+            border-color: rgba(251, 191, 36, 0.15);
         }
 
-        .alert-item-content p {
+        .alert-item-hex.info {
+            background: var(--accent-indigo-dim);
+            border-color: rgba(99, 102, 241, 0.15);
+        }
+
+        .alert-item-hex i {
+            font-size: 1rem;
+            margin-top: 0.15rem;
+            flex-shrink: 0;
+        }
+
+        .alert-item-hex.danger i {
+            color: var(--accent-rose);
+        }
+
+        .alert-item-hex.warning i {
+            color: var(--accent-amber);
+        }
+
+        .alert-item-hex.info i {
+            color: var(--accent-indigo);
+        }
+
+        .alert-content-hex h6 {
+            margin: 0 0 0.15rem 0;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .alert-content-hex p {
             margin: 0;
             font-size: 0.75rem;
             color: var(--text-secondary);
+            line-height: 1.5;
         }
 
-        /* ===== VET STATUS CARD ===== */
-        .vet-status-item {
+        .alert-content-hex strong {
+            color: var(--text-primary);
+        }
+
+        /* ===== VET STATUS ===== */
+        .vet-item-hex {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.15s ease;
         }
 
-        .vet-status-item:last-child {
+        .vet-item-hex:last-child {
             border-bottom: none;
         }
 
-        .vet-avatar-status {
+        .vet-item-hex:hover {
+            background: rgba(255, 255, 255, 0.01);
+            margin: 0 -1.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .vet-info-hex {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .vet-avatar-status img {
+        .vet-avatar-hex {
             width: 36px;
             height: 36px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1.5px solid rgba(255,255,255,0.1);
+            border: 2px solid var(--border-subtle);
+            transition: border-color 0.2s ease;
         }
 
-        .vet-status-indicator {
+        .vet-item-hex:hover .vet-avatar-hex {
+            border-color: var(--border-hover);
+        }
+
+        .vet-name-hex {
+            margin: 0 0 0.05rem 0;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .vet-role-hex {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .vet-status-hex {
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            font-size: 0.72rem;
+            gap: 0.35rem;
+            font-size: 0.68rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.25rem 0.65rem;
-            border-radius: 50px;
+            letter-spacing: 0.5px;
+            padding: 0.3rem 0.65rem;
+            border-radius: 20px;
+            border: 1px solid;
         }
 
-        /* ===== TIMELINE EN VIVO ===== */
-        .timeline-stream {
+        .status-active {
+            background: var(--accent-emerald-dim);
+            color: var(--accent-emerald);
+            border-color: rgba(52, 211, 153, 0.2);
+        }
+
+        .status-available {
+            background: var(--accent-cyan-dim);
+            color: var(--accent-cyan);
+            border-color: rgba(34, 211, 238, 0.2);
+        }
+
+        .status-break {
+            background: var(--accent-amber-dim);
+            color: var(--accent-amber);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-hex {
             position: relative;
             padding-left: 1.5rem;
         }
 
-        .timeline-stream::before {
+        .timeline-hex::before {
             content: '';
             position: absolute;
             left: 5px;
-            top: 0;
+            top: 4px;
             bottom: 0;
             width: 1px;
-            background: var(--card-border);
+            background: var(--border-subtle);
         }
 
-        .stream-item {
+        .timeline-item-hex {
             position: relative;
-            padding-bottom: 1.25rem;
+            padding-bottom: 1.1rem;
         }
 
-        .stream-item:last-child {
+        .timeline-item-hex:last-child {
             padding-bottom: 0;
         }
 
-        .stream-dot {
+        .timeline-dot-hex {
             position: absolute;
             left: -19px;
-            top: 4px;
-            width: 9px;
-            height: 9px;
+            top: 3px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: var(--primary-light);
-            box-shadow: 0 0 10px var(--primary);
+            background: var(--accent-indigo);
+            box-shadow: 0 0 8px var(--accent-indigo-glow);
         }
 
-        .stream-item small {
+        .timeline-item-hex small {
             display: block;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             color: var(--text-muted);
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.1rem;
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .stream-item p {
+        .timeline-item-hex p {
             margin: 0;
             font-size: 0.8rem;
             color: var(--text-secondary);
+            line-height: 1.5;
         }
 
-        .stream-item p strong {
-            color: white;
+        .timeline-item-hex strong {
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
-        /* ===== IA WIDGET (MIRA INSIGHTS) ===== */
-        .ia-insight-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(217, 70, 239, 0.04) 100%);
-            border: 1px dashed rgba(99, 102, 241, 0.3) !important;
+        /* ===== IA INSIGHTS ===== */
+        .ia-card-hex {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(217, 70, 239, 0.03) 100%);
+            border: 1px dashed rgba(99, 102, 241, 0.25) !important;
         }
 
-        .ia-bullet {
+        .ia-bullet-hex {
             display: flex;
             align-items: flex-start;
             gap: 0.6rem;
             margin-bottom: 0.75rem;
         }
 
-        .ia-bullet:last-child {
+        .ia-bullet-hex:last-child {
             margin-bottom: 0;
         }
 
-        .ia-bullet i {
+        .ia-bullet-hex i {
             color: #d946ef;
-            font-size: 1rem;
-            margin-top: 0.1rem;
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
         }
 
-        .ia-bullet p {
+        .ia-bullet-hex p {
+            margin: 0;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .ia-bullet-hex strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* ===== ROOMS ===== */
+        .rooms-grid-hex {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .room-tile-hex {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.85rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .room-tile-hex:hover {
+            transform: translateY(-2px);
+        }
+
+        .room-tile-hex.occupied {
+            border-color: rgba(251, 113, 133, 0.2);
+            background: var(--accent-rose-dim);
+        }
+
+        .room-tile-hex.cleaning {
+            border-color: rgba(251, 191, 36, 0.2);
+            background: var(--accent-amber-dim);
+        }
+
+        .room-tile-hex.free {
+            border-color: rgba(52, 211, 153, 0.2);
+            background: var(--accent-emerald-dim);
+        }
+
+        .room-title-hex {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .room-status-hex {
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .room-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-occupied {
+            background: var(--accent-rose);
+            box-shadow: 0 0 6px var(--accent-rose);
+        }
+
+        .dot-cleaning {
+            background: var(--accent-amber);
+            box-shadow: 0 0 6px var(--accent-amber);
+        }
+
+        .dot-free {
+            background: var(--accent-emerald);
+            box-shadow: 0 0 6px var(--accent-emerald);
+        }
+
+        /* ===== CALENDAR EVENTS ===== */
+        .calendar-event-hex {
+            padding: 0.7rem 0.85rem;
+            background: rgba(255, 255, 255, 0.015);
+            border-left: 2px solid var(--accent-indigo);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-event-hex:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateX(2px);
+        }
+
+        .calendar-event-hex:last-child {
+            margin-bottom: 0;
+        }
+
+        .calendar-event-hex h6 {
+            margin: 0 0 0.1rem 0;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .calendar-event-hex span {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== GOALS ===== */
+        .goal-wrapper-hex {
+            margin-bottom: 1rem;
+        }
+
+        .goal-wrapper-hex:last-child {
+            margin-bottom: 0;
+        }
+
+        .goal-meta-hex {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .goal-progress-hex {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .goal-bar-hex {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        .goal-bar-indigo {
+            background: linear-gradient(90deg, #6366f1, #a78bfa);
+        }
+
+        .goal-bar-emerald {
+            background: linear-gradient(90deg, #34d399, #0ea5e9);
+        }
+
+        /* ===== CHARTS ===== */
+        .chart-container-hex {
+            position: relative;
+            height: 240px;
+            width: 100%;
+        }
+
+        .chart-container-sm-hex {
+            position: relative;
+            height: 170px;
+            width: 100%;
+        }
+
+        /* ===== ANNOUNCEMENTS ===== */
+        .announcement-card-hex {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(99, 102, 241, 0.01) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .announcement-card-hex:hover {
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateX(2px);
+        }
+
+        .announcement-card-hex:last-child {
+            margin-bottom: 0;
+        }
+
+        .announcement-header-hex {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .announcement-header-hex i {
+            color: var(--accent-indigo);
+            font-size: 1rem;
+        }
+
+        .announcement-header-hex h6 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .announcement-badge-hex {
+            margin-left: auto;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: var(--accent-indigo-dim);
+            color: var(--accent-indigo);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .announcement-card-hex p {
             margin: 0;
             font-size: 0.82rem;
             color: var(--text-secondary);
             line-height: 1.5;
         }
 
-        /* ===== ROOMS STATUS ===== */
-        .room-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        /* ===== FOOTER INFO ===== */
+        .sede-info-hex {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .sede-info-item-hex {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
             gap: 0.75rem;
         }
 
-        .room-box {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            padding: 0.85rem;
-            text-align: center;
-        }
-
-        .room-box.occupied {
-            border-color: rgba(239, 68, 68, 0.2);
-            background: rgba(239, 68, 68, 0.02);
-        }
-
-        .room-box.cleaning {
-            border-color: rgba(245, 158, 11, 0.2);
-            background: rgba(245, 158, 11, 0.02);
-        }
-
-        .room-box.free {
-            border-color: rgba(16, 185, 129, 0.2);
-            background: rgba(16, 185, 129, 0.02);
-        }
-
-        .room-title {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 0.35rem;
-        }
-
-        .room-indicator {
-            font-size: 0.78rem;
-            font-weight: 800;
-        }
-
-        /* ===== CHARTS ===== */
-        .chart-container-premium {
-            position: relative;
-            height: 260px;
-            width: 100%;
-        }
-
-        .chart-container-sm-premium {
-            position: relative;
-            height: 180px;
-            width: 100%;
-        }
-
-        /* ===== WEATHER & CALENDAR WIDGETS ===== */
-        .weather-widget {
+        .sede-info-icon-hex {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(99, 102, 241, 0.05) 100%);
-            border: 1px solid rgba(14, 165, 233, 0.15);
-            border-radius: var(--radius-md);
+            justify-content: center;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-subtle);
+            flex-shrink: 0;
         }
 
-        .weather-info h6 {
-            margin: 0;
-            font-weight: 800;
-            color: white;
-            font-size: 0.95rem;
-        }
-
-        .weather-info p {
-            margin: 0;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .weather-temp {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: 900;
-            color: white;
-        }
-
-        .weather-temp i {
-            color: var(--warning);
-            font-size: 1.75rem;
-        }
-
-        .calendar-widget-event {
-            padding: 0.65rem 0.85rem;
-            background: rgba(255,255,255,0.02);
-            border-left: 3px solid var(--primary);
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            margin-bottom: 0.6rem;
-        }
-
-        .calendar-widget-event:last-child {
-            margin-bottom: 0;
-        }
-
-        .calendar-widget-event h6 {
-            margin: 0 0 0.15rem 0;
-            font-size: 0.82rem;
+        .sede-info-label-hex {
+            font-size: 0.65rem;
             font-weight: 700;
-            color: white;
-        }
-
-        .calendar-widget-event span {
-            font-size: 0.72rem;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: block;
+            margin-bottom: 1px;
         }
 
-        /* ===== GOALS WIDGET ===== */
-        .goal-bar-wrapper {
-            margin-bottom: 1rem;
-        }
-
-        .goal-bar-wrapper:last-child {
-            margin-bottom: 0;
-        }
-
-        .goal-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-bottom: 0.35rem;
-        }
-
-        .goal-progress {
-            height: 6px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .goal-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), #d946ef);
-            border-radius: 10px;
+        .sede-info-value-hex {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         /* ===== FOOTER ===== */
-        .app-footer {
+        .app-footer-hex {
             text-align: center;
-            padding: 3rem 0;
+            padding: 2.5rem 0;
             color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--card-border);
-            margin-top: 3rem;
+            font-size: 0.78rem;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 2rem;
         }
 
-        /* Scrollbar custom */
+        /* ===== WEATHER WIDGET ===== */
+        .weather-hex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.06) 0%, rgba(99, 102, 241, 0.03) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.12);
+            border-radius: var(--radius-lg);
+        }
+
+        .weather-info-hex h6 {
+            margin: 0 0 0.15rem 0;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .weather-info-hex p {
+            margin: 0;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .weather-temp-hex {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .weather-temp-hex i {
+            color: var(--accent-amber);
+            font-size: 1.5rem;
+        }
+
+        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--card-border);
-            border-radius: 4px;
+            background: var(--border-subtle);
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--border-hover);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.05s;
+            opacity: 0;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.15s;
+            opacity: 0;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .stagger-5 {
+            animation-delay: 0.25s;
+            opacity: 0;
+        }
+
+        .stagger-6 {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .smart-header-hex {
+                padding: 1.25rem;
+            }
+
+            .smart-header-hex h1 {
+                font-size: 1.4rem;
+            }
+
+            .header-stats-hex {
+                gap: 1rem;
+            }
+
+            .quick-actions-hex {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .kpis-grid-hex {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .rooms-grid-hex {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header-hex {
+                padding: 1rem 1.25rem;
+            }
+
+            .card-body-hex {
+                padding: 1rem 1.25rem;
+            }
+
+            .user-email-nav {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .kpis-grid-hex {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-grid"></div>
+        <div class="ambient-orb orb-indigo"></div>
+        <div class="ambient-orb orb-purple"></div>
+    </div>
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="main-navbar">
         <div class="container">
-            <a class="navbar-brand" th:href="@{/clinica/dashboard}">
+            <a class="navbar-brand-hex" th:href="@{/clinica/dashboard}">
                 <i class="bi bi-shield-plus"></i>
-                ClínicaApp <span>Admin</span>
+                <div>
+                    ClínicaApp <span>Admin</span>
+                </div>
             </a>
             <div class="ms-auto d-flex align-items-center gap-3">
-                <span class="user-email d-none d-md-block" th:text="${clinica?.email}">admin@clinica.com</span>
-                <a class="btn-logout" th:href="@{/logout}">
+                <span class="user-email-nav d-none d-md-block" th:text="${clinica?.email}">admin@clinica.com</span>
+                <a class="btn-logout-hex" th:href="@{/logout}">
                     <i class="bi bi-box-arrow-right"></i>
                     Salir
                 </a>
@@ -737,36 +1304,38 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4 position-relative" style="z-index: 1;">
 
-        <!-- ===== 1. CABECERA INTELIGENTE ===== -->
-        <div class="smart-header">
+        <!-- ===== 1. SMART HEADER ===== -->
+        <div class="smart-header-hex fade-in">
             <div class="row align-items-center">
                 <div class="col-md-7 mb-3 mb-md-0">
                     <h1>Buenos días, <span th:text="${clinica?.nombre}">Clínica Animal Care</span> 👋</h1>
-                    <p class="text-secondary mb-0">Bienvenido al Centro de Control de tu Sede. Aquí está el flujo operacional de hoy.</p>
+                    <p>Bienvenido al Centro de Control de tu Sede. Aquí está el flujo operacional de hoy en tiempo real.
+                    </p>
                 </div>
                 <div class="col-md-5">
                     <div class="d-flex justify-content-md-end gap-3 flex-wrap">
-                        <div class="header-stat-item">
-                            <div class="header-stat-icon"><i class="bi bi-calendar-day"></i></div>
-                            <div class="header-stat-info">
+                        <div class="header-stat-hex">
+                            <div class="header-stat-icon-hex"><i class="bi bi-calendar-day"></i></div>
+                            <div class="header-stat-info-hex">
                                 <small>Citas Hoy</small>
                                 <span th:text="${citasHoy ?: 0}">42</span>
                             </div>
                         </div>
-                        <div class="header-stat-item">
-                            <div class="header-stat-icon"><i class="bi bi-people"></i></div>
-                            <div class="header-stat-info">
+                        <div class="header-stat-hex">
+                            <div class="header-stat-icon-hex"><i class="bi bi-people"></i></div>
+                            <div class="header-stat-info-hex">
                                 <small>En Espera</small>
                                 <span th:text="${salaDeEspera != null ? salaDeEspera.size() : 0}">8</span>
                             </div>
                         </div>
-                        <div class="header-stat-item">
-                            <div class="header-stat-icon"><i class="bi bi-cash-coin"></i></div>
-                            <div class="header-stat-info">
-                                <small>Hoy</small>
-                                <span th:text="${ingresosHoy != null ? '$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT') : '$0'}">$2,350</span>
+                        <div class="header-stat-hex">
+                            <div class="header-stat-icon-hex"><i class="bi bi-cash-coin"></i></div>
+                            <div class="header-stat-info-hex">
+                                <small>Ingresos</small>
+                                <span
+                                    th:text="${ingresosHoy != null ? '$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT') : '$0'}">$2,350</span>
                             </div>
                         </div>
                     </div>
@@ -774,249 +1343,263 @@
             </div>
         </div>
 
-        <!-- ===== 2. BARRA DE ACCIONES RÁPIDAS ===== -->
-        <div class="quick-actions-bar">
-            <a th:href="@{/clinica/citas}" class="quick-btn">
+        <!-- ===== 2. QUICK ACTIONS ===== -->
+        <div class="quick-actions-hex">
+            <a th:href="@{/clinica/citas}" class="quick-btn-hex fade-in stagger-1">
                 <i class="bi bi-plus-circle-fill"></i>
                 <span>Gestionar Citas</span>
             </a>
-            <a th:href="@{/clinica/personal}" class="quick-btn">
+            <a th:href="@{/clinica/personal}" class="quick-btn-hex fade-in stagger-2">
                 <i class="bi bi-person-plus-fill"></i>
                 <span>Personal</span>
             </a>
-            <a th:href="@{/clinica/inventario}" class="quick-btn">
+            <a th:href="@{/clinica/inventario}" class="quick-btn-hex fade-in stagger-3">
                 <i class="bi bi-box-seam-fill"></i>
                 <span>Inventario</span>
             </a>
-            <a th:href="@{/clinica/mis-servicios}" class="quick-btn">
+            <a th:href="@{/clinica/mis-servicios}" class="quick-btn-hex fade-in stagger-4">
                 <i class="bi bi-tags-fill"></i>
                 <span>Catálogo Precios</span>
             </a>
-            <a th:href="@{/clinica/horario}" class="quick-btn">
+            <a th:href="@{/clinica/horario}" class="quick-btn-hex fade-in stagger-5">
                 <i class="bi bi-clock-history"></i>
                 <span>Definir Horarios</span>
             </a>
-            <a th:href="@{/clinica/reporte-ventas}" class="quick-btn">
+            <a th:href="@{/clinica/reporte-ventas}" class="quick-btn-hex fade-in stagger-6">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>Ventas</span>
             </a>
         </div>
 
-        <!-- ===== 3. KPIs GRID (12 TARJETAS COMPACTAS) ===== -->
-        <div class="kpis-grid">
-            <div class="kpi-card">
+        <!-- ===== 3. KPIs GRID ===== -->
+        <div class="kpis-grid-hex">
+            <div class="kpi-tile fade-in stagger-1">
                 <div class="kpi-info">
                     <h3 th:text="${citasHoy ?: 0}">0</h3>
                     <small>Citas Hoy</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-calendar-check"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-2">
                 <div class="kpi-info">
-                    <h3 th:text="${ingresosHoy != null ? '$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT') : '$0'}">$0</h3>
+                    <h3
+                        th:text="${ingresosHoy != null ? '$' + #numbers.formatDecimal(ingresosHoy, 0, 'POINT', 0, 'POINT') : '$0'}">
+                        $0</h3>
                     <small>Ingresos Hoy</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-currency-dollar"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-currency-dollar"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-3">
                 <div class="kpi-info">
                     <h3 th:text="${vetsActivos ?: 0}">0</h3>
                     <small>Vets Activos</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-person-workspace"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-cyan"><i class="bi bi-person-workspace"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-4">
                 <div class="kpi-info">
                     <h3 th:text="${totalMascotasSede ?: 0}">0</h3>
                     <small>Mascotas Sede</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-heart-pulse"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-heart-pulse"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-5">
                 <div class="kpi-info">
                     <h3>12 min</h3>
                     <small>Espera Promedio</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-amber"><i class="bi bi-hourglass-split"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-6">
                 <div class="kpi-info">
                     <h3>2%</h3>
                     <small>Cancelaciones</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-calendar-x"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-rose"><i class="bi bi-calendar-x"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-1">
                 <div class="kpi-info">
                     <h3 th:text="${bajoStock != null ? bajoStock.size() : 0}">0</h3>
                     <small>Stock Crítico</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-rose"><i class="bi bi-exclamation-triangle"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-2">
                 <div class="kpi-info">
                     <h3>98%</h3>
                     <small>Satisfacción</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-emoji-smile"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-emoji-smile"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-3">
                 <div class="kpi-info">
                     <h3 th:text="${totalClientesSede ?: 0}">0</h3>
                     <small>Clientes Sede</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-indigo"><i class="bi bi-people-fill"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-4">
                 <div class="kpi-info">
                     <h3>142</h3>
                     <small>Med. Vendidos</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-capsule"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-cyan"><i class="bi bi-capsule"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-5">
                 <div class="kpi-info">
                     <h3>5</h3>
                     <small>Fac. Pendientes</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-receipt-cutoff"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-amber"><i class="bi bi-receipt-cutoff"></i></div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-tile fade-in stagger-6">
                 <div class="kpi-info">
                     <h3>83%</h3>
                     <small>Ocupación</small>
                 </div>
-                <div class="kpi-icon"><i class="bi bi-hospital"></i></div>
+                <div class="kpi-icon-wrap kpi-icon-emerald"><i class="bi bi-hospital"></i></div>
             </div>
         </div>
 
-        <!-- ===== 4. COMUNICADOS Y ANUNCIOS GLOBALES ===== -->
+        <!-- ===== 4. ANNOUNCEMENTS ===== -->
         <div class="row mb-4" th:if="${anunciosGlobales != null and not #lists.isEmpty(anunciosGlobales)}">
             <div class="col-12">
-                <div th:each="anuncio : ${anunciosGlobales}" class="card border border-primary p-3 mb-2" style="border-radius: var(--radius-md); background-color: rgba(99, 102, 241, 0.05); border-left: 5px solid var(--primary) !important;">
-                    <div class="d-flex align-items-center gap-2 text-primary mb-2">
-                        <i class="bi bi-broadcast fs-5"></i>
-                        <h6 class="fw-bold mb-0" th:text="${anuncio.titulo}">Comunicado de Plataforma</h6>
-                        <span class="badge bg-primary text-white ms-auto">ANUNCIO GLOBAL</span>
+                <div th:each="anuncio : ${anunciosGlobales}" class="announcement-card-hex">
+                    <div class="announcement-header-hex">
+                        <i class="bi bi-broadcast"></i>
+                        <h6 th:text="${anuncio.titulo}">Comunicado de Plataforma</h6>
+                        <span class="announcement-badge-hex">ANUNCIO GLOBAL</span>
                     </div>
-                    <p class="mb-0 text-secondary" style="font-size: 0.9rem;" th:text="${anuncio.contenido}">Contenido del comunicado...</p>
+                    <p th:text="${anuncio.contenido}">Contenido del comunicado...</p>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 5. LAYOUT DE TRES COLUMNAS ===== -->
+        <!-- ===== 5. THREE COLUMN LAYOUT ===== -->
         <div class="row g-4">
-            
-            <!-- COLUMNA IZQUIERDA: FLUJO & PLAN DE ALERTAS -->
+
+            <!-- LEFT COLUMN -->
             <div class="col-lg-4">
-                
-                <!-- Sala de Espera Activa -->
-                <div class="compact-card" th:if="${salaDeEspera != null and not #lists.isEmpty(salaDeEspera)}">
-                    <div class="card-header-premium">
+
+                <!-- Waiting Room -->
+                <div class="hex-card" th:if="${salaDeEspera != null and not #lists.isEmpty(salaDeEspera)}">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-people-fill"></i> Sala de Espera Activa</h5>
-                        <span class="badge bg-success" th:text="${salaDeEspera.size()}">0</span>
+                        <span class="badge-hex badge-status-active" th:text="${salaDeEspera.size()}">0</span>
                     </div>
-                    <div class="card-body-premium">
-                        <div th:each="p : ${salaDeEspera}" class="flujo-item">
-                            <div class="flujo-meta">
-                                <div class="flujo-avatar">
+                    <div class="card-body-hex">
+                        <div th:each="p : ${salaDeEspera}" class="flujo-item-hex">
+                            <div class="flujo-meta-hex">
+                                <div class="flujo-avatar-hex">
                                     <i class="bi bi-heart-pulse-fill"></i>
                                 </div>
-                                <div class="flujo-details">
+                                <div class="flujo-details-hex">
                                     <h6 th:text="${p.nombreMascota}">Mascota</h6>
                                     <p th:text="${p.nombreUsuario}">Dueño</p>
                                 </div>
                             </div>
                             <div>
-                                <span class="badge" th:classappend="${p.estado == 'En Espera' ? 'bg-warning text-dark' : (p.estado == 'En Consulta' ? 'bg-info text-white' : 'bg-success text-white')}" th:text="${p.estado}">Espera</span>
+                                <span class="badge-hex"
+                                    th:classappend="${p.estado == 'En Espera' ? 'badge-waiting' : (p.estado == 'En Consulta' ? 'badge-consulting' : 'badge-done')}"
+                                    th:text="${p.estado}">Espera</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Panel de Alertas Inteligente -->
-                <div class="compact-card">
-                    <div class="card-header-premium">
+                <!-- Alerts Panel -->
+                <div class="hex-card">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-exclamation-triangle-fill"></i> Alertas de Sede</h5>
                     </div>
-                    <div class="card-body-premium">
+                    <div class="card-body-hex">
                         <div th:if="${bajoStock != null and not #lists.isEmpty(bajoStock)}">
-                            <div th:each="p : ${bajoStock}" class="alert-item-sede">
-                                <i class="bi bi-exclamation-octagon-fill text-danger"></i>
-                                <div class="alert-item-content">
-                                    <h6 class="text-danger">Stock Crítico</h6>
-                                    <p>El medicamento <strong th:text="${p.nombre}">Fármaco</strong> está en nivel mínimo (<span th:text="${p.stock}">0</span> uds).</p>
+                            <div th:each="p : ${bajoStock}" class="alert-item-hex danger">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                                <div class="alert-content-hex">
+                                    <h6 style="color: var(--accent-rose);">Stock Crítico</h6>
+                                    <p>El medicamento <strong th:text="${p.nombre}">Fármaco</strong> está en nivel
+                                        mínimo (<span th:text="${p.stock}">0</span> uds).</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="alert-item-sede warning">
-                            <i class="bi bi-clock-history text-warning"></i>
-                            <div class="alert-item-content text-warning">
-                                <h6>Consulta Retrasada</h6>
-                                    <p>El paciente Lucas tiene un retraso de 15 minutos en consulta.</p>
+                        <div class="alert-item-hex warning">
+                            <i class="bi bi-clock-history"></i>
+                            <div class="alert-content-hex">
+                                <h6 style="color: var(--accent-amber);">Consulta Retrasada</h6>
+                                <p>El paciente Lucas tiene un retraso de 15 minutos en consulta.</p>
                             </div>
                         </div>
-                        <div class="alert-item-sede">
-                            <i class="bi bi-credit-card-2-front text-danger"></i>
-                            <div class="alert-item-content text-danger">
-                                <h6>Factura Pendiente</h6>
+                        <div class="alert-item-hex info">
+                            <i class="bi bi-credit-card-2-front"></i>
+                            <div class="alert-content-hex">
+                                <h6 style="color: var(--accent-indigo);">Factura Pendiente</h6>
                                 <p>Sede tiene 2 facturas de proveedores por vencer mañana.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estado del Personal y Médicos -->
-                <div class="compact-card">
-                    <div class="card-header-premium">
+                <!-- Staff Status -->
+                <div class="hex-card">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-person-badge-fill"></i> Estado del Personal</h5>
                     </div>
-                    <div class="card-body-premium">
-                        <div class="vet-status-item">
-                            <div class="vet-avatar-status">
-                                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100" alt="Vet">
+                    <div class="card-body-hex">
+                        <div class="vet-item-hex">
+                            <div class="vet-info-hex">
+                                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=100"
+                                    alt="Vet" class="vet-avatar-hex">
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-white small">Dr. Carlos Mendoza</h6>
-                                    <small class="text-muted" style="font-size: 0.72rem;">Veterinario Principal</small>
+                                    <h6 class="vet-name-hex">Dr. Carlos Mendoza</h6>
+                                    <span class="vet-role-hex">Veterinario Principal</span>
                                 </div>
                             </div>
-                            <span class="vet-status-indicator bg-success text-white"><i class="bi bi-circle-fill" style="font-size: 0.4rem;"></i> En consulta</span>
+                            <span class="vet-status-hex status-active">
+                                <span class="room-dot dot-free" style="width: 5px; height: 5px;"></span> En consulta
+                            </span>
                         </div>
-                        <div class="vet-status-item">
-                            <div class="vet-avatar-status">
-                                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100" alt="Vet">
+                        <div class="vet-item-hex">
+                            <div class="vet-info-hex">
+                                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=100"
+                                    alt="Vet" class="vet-avatar-hex">
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-white small">Dra. Laura Restrepo</h6>
-                                    <small class="text-muted" style="font-size: 0.72rem;">Cirujana</small>
+                                    <h6 class="vet-name-hex">Dra. Laura Restrepo</h6>
+                                    <span class="vet-role-hex">Cirujana</span>
                                 </div>
                             </div>
-                            <span class="vet-status-indicator bg-info text-white"><i class="bi bi-circle-fill" style="font-size: 0.4rem;"></i> Disponible</span>
+                            <span class="vet-status-hex status-available">
+                                <span class="room-dot dot-free" style="width: 5px; height: 5px;"></span> Disponible
+                            </span>
                         </div>
-                        <div class="vet-status-item">
-                            <div class="vet-avatar-status">
-                                <img src="https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=100" alt="Vet">
+                        <div class="vet-item-hex">
+                            <div class="vet-info-hex">
+                                <img src="https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=100"
+                                    alt="Vet" class="vet-avatar-hex">
                                 <div>
-                                    <h6 class="mb-0 fw-bold text-white small">Dr. Andrés Castro</h6>
-                                    <small class="text-muted" style="font-size: 0.72rem;">General</small>
+                                    <h6 class="vet-name-hex">Dr. Andrés Castro</h6>
+                                    <span class="vet-role-hex">General</span>
                                 </div>
                             </div>
-                            <span class="vet-status-indicator bg-warning text-dark"><i class="bi bi-circle-fill" style="font-size: 0.4rem;"></i> Descanso</span>
+                            <span class="vet-status-hex status-break">
+                                <span class="room-dot dot-cleaning" style="width: 5px; height: 5px;"></span> Descanso
+                            </span>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- COLUMNA CENTRAL: GRÁFICOS Y ANALÍTICAS -->
+            <!-- CENTER COLUMN -->
             <div class="col-lg-5">
-                
-                <!-- Rendimiento de Sede (Línea) -->
-                <div class="compact-card">
-                    <div class="card-header-premium">
+
+                <!-- Revenue Chart -->
+                <div class="hex-card">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-graph-up-arrow"></i> Rendimiento Semanal</h5>
                     </div>
-                    <div class="card-body-premium">
-                        <div class="chart-container-premium">
+                    <div class="card-body-hex">
+                        <div class="chart-container-hex">
                             <canvas id="revenueChart"></canvas>
                         </div>
                     </div>
@@ -1024,26 +1607,26 @@
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <!-- Distribución de Citas -->
-                        <div class="compact-card h-100">
-                            <div class="card-header-premium">
-                                <h5>Citas</h5>
+                        <!-- Status Chart -->
+                        <div class="hex-card h-100">
+                            <div class="card-header-hex">
+                                <h5><i class="bi bi-pie-chart-fill"></i> Citas</h5>
                             </div>
-                            <div class="card-body-premium">
-                                <div class="chart-container-sm-premium">
+                            <div class="card-body-hex">
+                                <div class="chart-container-sm-hex">
                                     <canvas id="statusChart"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <!-- Servicios Más Solicitados -->
-                        <div class="compact-card h-100">
-                            <div class="card-header-premium">
-                                <h5>Servicios</h5>
+                        <!-- Services Chart -->
+                        <div class="hex-card h-100">
+                            <div class="card-header-hex">
+                                <h5><i class="bi bi-bar-chart-fill"></i> Servicios</h5>
                             </div>
-                            <div class="card-body-premium">
-                                <div class="chart-container-sm-premium">
+                            <div class="card-body-hex">
+                                <div class="chart-container-sm-hex">
                                     <canvas id="servicesChart"></canvas>
                                 </div>
                             </div>
@@ -1051,24 +1634,30 @@
                     </div>
                 </div>
 
-                <!-- Ocupación de Consultorios -->
-                <div class="compact-card mt-3">
-                    <div class="card-header-premium">
+                <!-- Room Occupancy -->
+                <div class="hex-card mt-3">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-hospital"></i> Ocupación de Consultorios</h5>
                     </div>
-                    <div class="card-body-premium">
-                        <div class="room-grid">
-                            <div class="room-box occupied">
-                                <div class="room-title">Consultorio 1</div>
-                                <span class="room-indicator text-danger">🔴 OCUPADO</span>
+                    <div class="card-body-hex">
+                        <div class="rooms-grid-hex">
+                            <div class="room-tile-hex occupied">
+                                <div class="room-title-hex">Consultorio 1</div>
+                                <div class="room-status-hex" style="color: var(--accent-rose);">
+                                    <span class="room-dot dot-occupied"></span> OCUPADO
+                                </div>
                             </div>
-                            <div class="room-box free">
-                                <div class="room-title">Consultorio 2</div>
-                                <span class="room-indicator text-success">🟢 LIBRE</span>
+                            <div class="room-tile-hex free">
+                                <div class="room-title-hex">Consultorio 2</div>
+                                <div class="room-status-hex" style="color: var(--accent-emerald);">
+                                    <span class="room-dot dot-free"></span> LIBRE
+                                </div>
                             </div>
-                            <div class="room-box cleaning">
-                                <div class="room-title">Consultorio 3</div>
-                                <span class="room-indicator text-warning">🟡 LIMPIEZA</span>
+                            <div class="room-tile-hex cleaning">
+                                <div class="room-title-hex">Consultorio 3</div>
+                                <div class="room-status-hex" style="color: var(--accent-amber);">
+                                    <span class="room-dot dot-cleaning"></span> LIMPIEZA
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1076,70 +1665,75 @@
 
             </div>
 
-            <!-- COLUMNA DERECHA: WIDGETS, IA Y CALENDARIO -->
+            <!-- RIGHT COLUMN -->
             <div class="col-lg-3">
-                
-                <!-- Widget de IA Mira -->
-                <div class="compact-card ia-insight-card">
-                    <div class="card-header-premium border-0">
+
+                <!-- IA Insights -->
+                <div class="hex-card ia-card-hex">
+                    <div class="card-header-hex border-0">
                         <h5><i class="bi bi-stars"></i> IA Mira Insights</h5>
                     </div>
-                    <div class="card-body-premium pt-0">
-                        <div class="ia-bullet">
+                    <div class="card-body-hex pt-0">
+                        <div class="ia-bullet-hex">
                             <i class="bi bi-arrow-up-right-circle-fill"></i>
-                            <p>Las consultas aumentaron un <strong>18%</strong> en comparación con la semana anterior.</p>
+                            <p>Las consultas aumentaron un <strong>18%</strong> en comparación con la semana anterior.
+                            </p>
                         </div>
-                        <div class="ia-bullet">
+                        <div class="ia-bullet-hex">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <p>El stock de <strong>Amoxicilina</strong> se agotará en las próximas 24 horas.</p>
                         </div>
-                        <div class="ia-bullet">
+                        <div class="ia-bullet-hex">
                             <i class="bi bi-check-circle-fill"></i>
                             <p>La agenda del Dr. Carlos tiene <strong>100% de ocupación</strong> para el día de hoy.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Calendario de Citas Compacto -->
-                <div class="compact-card">
-                    <div class="card-header-premium">
+                <!-- Calendar -->
+                <div class="hex-card">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-calendar3"></i> Agenda de Citas</h5>
                     </div>
-                    <div class="card-body-premium">
-                        <div class="calendar-widget-event">
+                    <div class="card-body-hex">
+                        <div class="calendar-event-hex">
                             <h6>Chequeo general - Firulais</h6>
                             <span>08:00 AM - Dr. Andrés</span>
                         </div>
-                        <div class="calendar-widget-event" style="border-color: #d946ef;">
+                        <div class="calendar-event-hex" style="border-color: #d946ef;">
                             <h6>Cirugía Dental - Luna</h6>
                             <span>10:30 AM - Dra. Laura</span>
                         </div>
-                        <div class="calendar-widget-event" style="border-color: #10b981;">
+                        <div class="calendar-event-hex" style="border-color: #34d399;">
                             <h6>Vacunación - Max</h6>
                             <span>02:00 PM - Dr. Carlos</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Timeline en Vivo -->
-                <div class="compact-card">
-                    <div class="card-header-premium">
+                <!-- Activity Timeline -->
+                <div class="hex-card">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-activity"></i> Actividad Reciente</h5>
                     </div>
-                    <div class="card-body-premium">
-                        <div class="timeline-stream">
-                            <div class="stream-item">
-                                <div class="stream-dot"></div>
+                    <div class="card-body-hex">
+                        <div class="timeline-hex">
+                            <div class="timeline-item-hex">
+                                <div class="timeline-dot-hex"></div>
                                 <small>Hace 2 min</small>
                                 <p><strong>Juan Pérez</strong> registró a la mascota <em>Rocky</em></p>
                             </div>
-                            <div class="stream-item">
-                                <div class="stream-dot" style="background: var(--success);"></div>
+                            <div class="timeline-item-hex">
+                                <div class="timeline-dot-hex"
+                                    style="background: var(--accent-emerald); box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);">
+                                </div>
                                 <small>Hace 4 min</small>
                                 <p>El <strong>Dr. Andrés</strong> inició la consulta de general</p>
                             </div>
-                            <div class="stream-item">
-                                <div class="stream-dot" style="background: var(--warning);"></div>
+                            <div class="timeline-item-hex">
+                                <div class="timeline-dot-hex"
+                                    style="background: var(--accent-amber); box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);">
+                                </div>
                                 <small>Hace 8 min</small>
                                 <p>Se procesó el pago de la factura <strong>#FC-2041</strong></p>
                             </div>
@@ -1147,40 +1741,40 @@
                     </div>
                 </div>
 
-                <!-- Objetivos del Día (Metas) -->
-                <div class="compact-card">
-                    <div class="card-header-premium">
+                <!-- Daily Goals -->
+                <div class="hex-card">
+                    <div class="card-header-hex">
                         <h5><i class="bi bi-trophy"></i> Metas del Día</h5>
                     </div>
-                    <div class="card-body-premium">
-                        <div class="goal-bar-wrapper">
-                            <div class="goal-meta">
+                    <div class="card-body-hex">
+                        <div class="goal-wrapper-hex">
+                            <div class="goal-meta-hex">
                                 <span>Meta Ingresos</span>
-                                <span>82%</span>
+                                <span style="color: var(--accent-indigo);">82%</span>
                             </div>
-                            <div class="goal-progress">
-                                <div class="goal-progress-bar" style="width: 82%;"></div>
+                            <div class="goal-progress-hex">
+                                <div class="goal-bar-hex goal-bar-indigo" style="width: 82%;"></div>
                             </div>
                         </div>
-                        <div class="goal-bar-wrapper">
-                            <div class="goal-meta">
+                        <div class="goal-wrapper-hex">
+                            <div class="goal-meta-hex">
                                 <span>Meta Consultas</span>
-                                <span>74%</span>
+                                <span style="color: var(--accent-emerald);">74%</span>
                             </div>
-                            <div class="goal-progress">
-                                <div class="goal-progress-bar" style="width: 74%; background: linear-gradient(90deg, #10b981, #0ea5e9);"></div>
+                            <div class="goal-progress-hex">
+                                <div class="goal-bar-hex goal-bar-emerald" style="width: 74%;"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Clima (Domicilios) -->
-                <div class="weather-widget">
-                    <div class="weather-info">
+                <!-- Weather -->
+                <div class="weather-hex">
+                    <div class="weather-info-hex">
                         <h6>Domicilios de Sede</h6>
                         <p>Clima óptimo para visitas</p>
                     </div>
-                    <div class="weather-temp">
+                    <div class="weather-temp-hex">
                         <i class="bi bi-sun-fill"></i>
                         <span>24°C</span>
                     </div>
@@ -1190,35 +1784,42 @@
 
         </div>
 
-        <!-- ===== 6. INFORMACIÓN DE LA SEDE ===== -->
+        <!-- ===== 6. SEDE INFO ===== -->
         <div class="row g-4 mt-1">
             <div class="col-12">
-                <div class="compact-card" style="background: rgba(255, 255, 255, 0.01);">
+                <div class="sede-info-hex">
                     <div class="row g-0 text-center text-md-start">
-                        <div class="col-md-4 p-4 border-end border-secondary border-opacity-10">
-                            <div class="d-flex align-items-center gap-3 justify-content-center justify-content-md-start">
-                                <div class="header-stat-icon"><i class="bi bi-geo-alt-fill text-primary"></i></div>
+                        <div class="col-md-4 p-4" style="border-right: 1px solid var(--border-subtle);">
+                            <div class="sede-info-item-hex justify-content-center justify-content-md-start">
+                                <div class="sede-info-icon-hex" style="color: var(--accent-indigo);">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
                                 <div>
-                                    <small class="text-muted fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Dirección</small>
-                                    <span class="text-white fw-semibold small" th:text="${clinica?.direccion}">Ubicación</span>
+                                    <span class="sede-info-label-hex">Dirección</span>
+                                    <span class="sede-info-value-hex" th:text="${clinica?.direccion}">Ubicación</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 p-4 border-end border-secondary border-opacity-10">
-                            <div class="d-flex align-items-center gap-3 justify-content-center justify-content-md-start">
-                                <div class="header-stat-icon"><i class="bi bi-telephone-fill text-success"></i></div>
+                        <div class="col-md-4 p-4" style="border-right: 1px solid var(--border-subtle);">
+                            <div class="sede-info-item-hex justify-content-center justify-content-md-start">
+                                <div class="sede-info-icon-hex" style="color: var(--accent-emerald);">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
                                 <div>
-                                    <small class="text-muted fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Teléfono de Sede</small>
-                                    <span class="text-white fw-semibold small" th:text="${clinica?.telefono}">Contacto</span>
+                                    <span class="sede-info-label-hex">Teléfono de Sede</span>
+                                    <span class="sede-info-value-hex" th:text="${clinica?.telefono}">Contacto</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4 p-4">
-                            <div class="d-flex align-items-center gap-3 justify-content-center justify-content-md-start">
-                                <div class="header-stat-icon"><i class="bi bi-info-circle-fill text-info"></i></div>
+                            <div class="sede-info-item-hex justify-content-center justify-content-md-start">
+                                <div class="sede-info-icon-hex" style="color: var(--accent-cyan);">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </div>
                                 <div>
-                                    <small class="text-muted fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Descripción</small>
-                                    <span class="text-white fw-semibold small text-truncate d-inline-block" style="max-width: 240px;" th:text="${clinica?.descripcion}">Detalles</span>
+                                    <span class="sede-info-label-hex">Descripción</span>
+                                    <span class="sede-info-value-hex text-truncate d-inline-block"
+                                        style="max-width: 240px;" th:text="${clinica?.descripcion}">Detalles</span>
                                 </div>
                             </div>
                         </div>
@@ -1228,12 +1829,11 @@
         </div>
 
         <!-- Footer -->
-        <div class="app-footer">
+        <div class="app-footer-hex">
             <p>PROAULA Clínica App &copy; 2024 | Centro de Control Inteligente Sede</p>
         </div>
 
     </div>
-
     <!-- Scripts de Analítica y Chart.js -->
     <script th:inline="javascript">
         // Datos del Servidor
@@ -1245,48 +1845,67 @@
         const dataTopServicios = JSON.parse(/*[[${dataTopServiciosJson ?: '[]'}]]*/ '[]');
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Configurar fuentes globales de Chart.js para fondo oscuro
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.font.family = 'Plus Jakarta Sans';
+            // Configuración global de Chart.js para tema claro
+            Chart.defaults.color = '#475569';
+            Chart.defaults.font.family = 'Inter';
+            Chart.defaults.font.size = 11;
+            Chart.defaults.scale.grid.color = 'rgba(15, 23, 42, 0.04)';
+            Chart.defaults.scale.grid.borderColor = 'transparent';
+            Chart.defaults.scale.ticks.color = '#64748b';
 
-            // Gráfico de Ingresos (Línea)
+            // ===== GRÁFICO DE INGRESOS (Línea) =====
             const ctxRev = document.getElementById('revenueChart').getContext('2d');
-            const gradient = ctxRev.createLinearGradient(0, 0, 0, 240);
-            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
-            gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+            const gradientRev = ctxRev.createLinearGradient(0, 0, 0, 240);
+            gradientRev.addColorStop(0, 'rgba(99, 102, 241, 0.15)');
+            gradientRev.addColorStop(0.5, 'rgba(99, 102, 241, 0.02)');
+            gradientRev.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+            const gradientRevLine = ctxRev.createLinearGradient(0, 0, 400, 0);
+            gradientRevLine.addColorStop(0, '#4f46e5');
+            gradientRevLine.addColorStop(1, '#818cf8');
 
             new Chart(ctxRev, {
                 type: 'line',
                 data: {
-                    labels: labelsIngresos,
+                    labels: labelsIngresos.length ? labelsIngresos : ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
                     datasets: [{
                         label: 'Ingresos ($)',
-                        data: dataIngresos,
-                        borderColor: '#818cf8',
-                        backgroundColor: gradient,
+                        data: dataIngresos.length ? dataIngresos : [12500, 15200, 11800, 18900, 22100, 19800, 24500],
+                        borderColor: gradientRevLine,
+                        backgroundColor: gradientRev,
                         fill: true,
                         tension: 0.4,
-                        borderWidth: 3,
+                        borderWidth: 2.5,
                         pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#6366f1',
+                        pointBorderColor: '#4f46e5',
                         pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#818cf8',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#090d16',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            backgroundColor: '#141b2d',
+                            titleColor: '#f0f4f8',
+                            bodyColor: '#f0f4f8',
+                            borderColor: 'rgba(255, 255, 255, 0.08)',
                             borderWidth: 1,
                             padding: 12,
                             cornerRadius: 10,
-                            titleFont: { size: 13, weight: '700' },
-                            bodyFont: { size: 12, weight: '600' },
+                            titleFont: { size: 13, weight: '700', family: 'Inter' },
+                            bodyFont: { size: 12, weight: '600', family: 'JetBrains Mono' },
+                            displayColors: false,
                             callbacks: {
                                 label: function (context) {
                                     return '$ ' + context.parsed.y.toLocaleString('es-CO');
@@ -1296,78 +1915,87 @@
                     },
                     scales: {
                         y: {
+                            beginAtZero: true,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)',
+                                color: 'rgba(255, 255, 255, 0.03)',
                                 borderDash: [4, 4]
                             },
                             ticks: {
-                                font: { size: 11 },
+                                font: { size: 10, family: 'JetBrains Mono' },
+                                color: '#5a6a8a',
                                 callback: v => '$' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v)
                             },
                             border: { display: false }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { font: { size: 11 } },
+                            ticks: {
+                                font: { size: 10, family: 'Inter' },
+                                color: '#5a6a8a'
+                            },
                             border: { display: false }
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
 
-            // Gráfico de Estados (Doughnut)
+            // ===== GRÁFICO DE ESTADOS (Doughnut) =====
             new Chart(document.getElementById('statusChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: labelsEstados,
+                    labels: labelsEstados.length ? labelsEstados : ['Completadas', 'Pendientes', 'Canceladas', 'Reprogramadas'],
                     datasets: [{
-                        data: dataEstados,
-                        backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#94a3b8'],
+                        data: dataEstados.length ? dataEstados : [65, 20, 10, 5],
+                        backgroundColor: ['#6366f1', '#22d3ee', '#fb7185', '#fbbf24'],
                         borderWidth: 0,
-                        hoverOffset: 8
+                        hoverOffset: 6,
+                        hoverBorderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '72%',
+                    cutout: '75%',
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                padding: 12,
+                                padding: 15,
                                 usePointStyle: true,
                                 pointStyle: 'circle',
-                                font: { size: 10, weight: '600' },
-                                color: '#94a3b8'
+                                pointStyleWidth: 8,
+                                font: { size: 10, weight: '600', family: 'Inter' },
+                                color: '#8896ab'
                             }
                         },
                         tooltip: {
-                            backgroundColor: '#090d16',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            backgroundColor: '#141b2d',
+                            titleColor: '#f0f4f8',
+                            bodyColor: '#f0f4f8',
+                            borderColor: 'rgba(255, 255, 255, 0.08)',
                             borderWidth: 1,
                             padding: 10,
                             cornerRadius: 8,
-                            bodyFont: { size: 11, weight: '600' }
+                            bodyFont: { size: 11, weight: '600', family: 'JetBrains Mono' },
+                            displayColors: true,
+                            boxPadding: 4
                         }
                     }
                 }
             });
 
-            // Gráfico de Servicios (Barras horizontales)
+            // ===== GRÁFICO DE SERVICIOS (Barras horizontales) =====
             new Chart(document.getElementById('servicesChart'), {
                 type: 'bar',
                 data: {
-                    labels: labelsTopServicios,
+                    labels: labelsTopServicios.length ? labelsTopServicios : ['Consulta', 'Vacuna', 'Cirugía', 'Baño', 'Laboratorio'],
                     datasets: [{
-                        data: dataTopServicios,
+                        data: dataTopServicios.length ? dataTopServicios : [42, 35, 18, 28, 15],
                         backgroundColor: '#6366f1',
-                        borderRadius: 6,
-                        barThickness: 16
+                        borderRadius: 5,
+                        borderSkipped: false,
+                        barThickness: 14,
+                        hoverBackgroundColor: '#818cf8'
                     }]
                 },
                 options: {
@@ -1377,12 +2005,15 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#090d16',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            backgroundColor: '#141b2d',
+                            titleColor: '#f0f4f8',
+                            bodyColor: '#f0f4f8',
+                            borderColor: 'rgba(255, 255, 255, 0.08)',
                             borderWidth: 1,
                             padding: 10,
                             cornerRadius: 8,
-                            bodyFont: { size: 11, weight: '600' }
+                            bodyFont: { size: 11, weight: '600', family: 'JetBrains Mono' },
+                            displayColors: false
                         }
                     },
                     scales: {
@@ -1393,14 +2024,39 @@
                         y: {
                             grid: { display: false },
                             ticks: {
-                                font: { size: 10, weight: '600' },
-                                color: '#94a3b8'
+                                font: { size: 10, weight: '600', family: 'Inter' },
+                                color: '#8896ab'
                             },
                             border: { display: false }
                         }
                     }
                 }
             });
+
+            // ===== ANIMACIÓN DE BARRAS DE PROGRESO =====
+            setTimeout(() => {
+                document.querySelectorAll('.goal-bar-hex').forEach(bar => {
+                    const targetWidth = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.transition = 'width 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
+                        bar.style.width = targetWidth;
+                    }, 100);
+                });
+            }, 300);
+
+            // ===== LIVE CLOCK EN HEADER (opcional) =====
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) {
+                function updateClock() {
+                    const now = new Date();
+                    const h = String(now.getHours()).padStart(2, '0');
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    clockEl.textContent = `${h}:${m}`;
+                }
+                updateClock();
+                setInterval(updateClock, 60000);
+            }
         });
     </script>
 </body>
