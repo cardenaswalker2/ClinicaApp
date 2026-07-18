@@ -253,9 +253,9 @@
 
     <!-- AJAX Message Polling script -->
     <script th:inline="javascript" th:if="${pub != null}">
-        const currentUserId = [[${usuario.id}]];
-        const adopcionId = [[${pub.id}]];
-        const otroUsuarioId = [[${otroUsuario.id}]];
+        const currentUserId = /*[[${usuario.id}]]*/ null;
+        const adopcionId = /*[[${pub.id}]]*/ null;
+        const otroUsuarioId = /*[[${otroUsuario.id}]]*/ null;
 
         function scrollToBottom() {
             const container = document.getElementById('chatMessages');
