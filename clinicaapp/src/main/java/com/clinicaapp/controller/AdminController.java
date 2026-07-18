@@ -134,6 +134,7 @@ public class AdminController {
         model.addAttribute("usuarios", todosLosUsuarios.stream().limit(5).collect(Collectors.toList()));
         long pendientes = clinicaService.buscarPorEstado(EstadoClinica.PENDIENTE).size();
         model.addAttribute("totalPendientes", pendientes);
+        model.addAttribute("totalAdopcionesPendientes", comunidadPetService.getPendingApproval().size());
 
         return "admin/dashboard_admin";
     }
@@ -457,6 +458,7 @@ public class AdminController {
         }
 
         model.addAttribute("actividades", actividades);
+        model.addAttribute("totalAdopcionesPendientes", comunidadPetService.getPendingApproval().size());
 
         return "admin/control_center";
     }
@@ -677,6 +679,7 @@ public class AdminController {
         model.addAttribute("countProfessional", countProfessional);
         model.addAttribute("countEnterprise", countEnterprise);
         model.addAttribute("rankingClinicas", rankingClinicas);
+        model.addAttribute("totalAdopcionesPendientes", comunidadPetService.getPendingApproval().size());
 
         return "admin/saas_dashboard";
     }
