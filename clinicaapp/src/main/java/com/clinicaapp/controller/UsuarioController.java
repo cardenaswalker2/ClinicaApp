@@ -56,10 +56,17 @@ import com.clinicaapp.dto.PaymentDTO;
 import com.clinicaapp.dto.CitaDisplayDTO;
 
 import java.util.Comparator; // <-- ESTE ES EL QUE FALTA
+import com.clinicaapp.service.ComunidadPetService;
+import com.clinicaapp.model.PublicacionAdopcion;
+import com.clinicaapp.model.enums.EstadoPublicacion;
+import com.clinicaapp.model.MensajeChat;
 
 @Controller
 @RequestMapping("/usuario")
 public class UsuarioController {
+
+    @Autowired
+    private ComunidadPetService comunidadPetService;
 
     @Autowired
     private IUsuarioService usuarioService;
@@ -1432,5 +1439,272 @@ public Map<String, Object> getContextoIA(Principal principal) {
         }
 
         return slots;
+    }
+
+    // ==========================================
+    //            COMUNIDAD PET (ADOPCIONES)
+    // ==========================================
+
+    @GetMapping("/comunidad")
+    public String comunidadList(Model model, Principal principal,
+                                @RequestParam(required = false) String especie,
+                                @RequestParam(required = false) String raza,
+                                @RequestParam(required = false) String edad,
+                                @RequestParam(required = false) String ciudad,
+                                @RequestParam(required = false) String sexo,
+                                @RequestParam(required = false) Boolean vacunada,
+                                @RequestParam(required = false) Boolean esterilizada,
+                                @RequestParam(required = false) String tamano) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        List<PublicacionAdopcion> filtradas = comunidadPetService.getAllApproved().stream()
+                .filter(p -> especie == null || especie.isEmpty() || p.getEspecie().equalsIgnoreCase(especie))
+                .filter(p -> raza == null || raza.isEmpty() || p.getRaza().toLowerCase().contains(raza.toLowerCase()))
+                .filter(p -> edad == null || edad.isEmpty() || p.getEdad().toLowerCase().contains(edad.toLowerCase()))
+                .filter(p -> ciudad == null || ciudad.isEmpty() || p.getCiudad().equalsIgnoreCase(ciudad))
+                .filter(p -> sexo == null || sexo.isEmpty() || p.getSexo().equalsIgnoreCase(sexo))
+                .filter(p -> vacunada == null || p.isVacunada() == vacunada)
+                .filter(p -> esterilizada == null || p.isEsterilizada() == esterilizada)
+                .filter(p -> tamano == null || tamano.isEmpty() || p.getTamano().equalsIgnoreCase(tamano))
+                .collect(Collectors.toList());
+
+        model.addAttribute("publicaciones", filtradas);
+        model.addAttribute("especie", especie);
+        model.addAttribute("raza", raza);
+        model.addAttribute("edad", edad);
+        model.addAttribute("ciudad", ciudad);
+        model.addAttribute("sexo", sexo);
+        model.addAttribute("vacunada", vacunada);
+        model.addAttribute("esterilizada", esterilizada);
+        model.addAttribute("tamano", tamano);
+
+        return "usuario/comunidad/comunidad_list";
+    }
+
+    @GetMapping("/comunidad/mis-publicaciones")
+    public String misPublicaciones(Model model, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        List<PublicacionAdopcion> misPubs = comunidadPetService.getByPropietarioId(usuario.getId());
+        model.addAttribute("publicaciones", misPubs);
+
+        return "usuario/comunidad/comunidad_mis_publicaciones";
+    }
+
+    @GetMapping("/comunidad/nueva")
+    public String nuevaPublicacionForm(Model model, Principal principal,
+                                       @RequestParam(required = false) String mascotaId) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        List<Mascota> misMascotas = mascotaService.findByPropietarioId(usuario.getId());
+        model.addAttribute("misMascotas", misMascotas);
+
+        PublicacionAdopcion pub = new PublicacionAdopcion();
+        if (mascotaId != null && !mascotaId.isEmpty()) {
+            try {
+                pub = comunidadPetService.publicarMascotaRegistrada(mascotaId, usuario.getId(), usuario.getNombre());
+            } catch (Exception e) {
+                model.addAttribute("error", e.getMessage());
+            }
+        }
+        model.addAttribute("publicacion", pub);
+
+        return "usuario/comunidad/comunidad_form";
+    }
+
+    @PostMapping("/comunidad/nueva")
+    public String guardarPublicacion(PublicacionAdopcion pub, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+
+        pub.setPropietarioId(usuario.getId());
+        pub.setNombrePublicador(usuario.getNombre());
+        pub.setTipoPublicador("USER");
+        pub.setEstado(EstadoPublicacion.PENDIENTE); // Always goes to moderation on create/edit
+
+        comunidadPetService.save(pub);
+
+        return "redirect:/usuario/comunidad/mis-publicaciones?success=created";
+    }
+
+    @GetMapping("/comunidad/editar/{id}")
+    public String editarPublicacionForm(@PathVariable String id, Model model, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getById(id);
+        if (!opt.isPresent() || !opt.get().getPropietarioId().equals(usuario.getId())) {
+            return "redirect:/usuario/comunidad/mis-publicaciones?error=noauth";
+        }
+
+        model.addAttribute("publicacion", opt.get());
+        List<Mascota> misMascotas = mascotaService.findByPropietarioId(usuario.getId());
+        model.addAttribute("misMascotas", misMascotas);
+
+        return "usuario/comunidad/comunidad_form";
+    }
+
+    @PostMapping("/comunidad/editar/{id}")
+    public String actualizarPublicacion(@PathVariable String id, PublicacionAdopcion pub, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getById(id);
+        if (!opt.isPresent() || !opt.get().getPropietarioId().equals(usuario.getId())) {
+            return "redirect:/usuario/comunidad/mis-publicaciones?error=noauth";
+        }
+
+        PublicacionAdopcion existente = opt.get();
+        // Update fields
+        existente.setNombre(pub.getNombre());
+        existente.setEspecie(pub.getEspecie());
+        existente.setRaza(pub.getRaza());
+        existente.setEdad(pub.getEdad());
+        existente.setSexo(pub.getSexo());
+        existente.setFotoPrincipalUrl(pub.getFotoPrincipalUrl());
+        existente.setHistoria(pub.getHistoria());
+        existente.setMotivoAdopcion(pub.getMotivoAdopcion());
+        existente.setRequisitosAdopcion(pub.getRequisitosAdopcion());
+        existente.setVacunada(pub.isVacunada());
+        existente.setEsterilizada(pub.isEsterilizada());
+        existente.setAceptaNinos(pub.isAceptaNinos());
+        existente.setAceptaOtrasMascotas(pub.isAceptaOtrasMascotas());
+        existente.setNivelEnergia(pub.getNivelEnergia());
+        existente.setTamano(pub.getTamano());
+        existente.setEstadoSalud(pub.getEstadoSalud());
+        existente.setCiudad(pub.getCiudad());
+        existente.setBarrio(pub.getBarrio());
+        existente.setTipoViviendaRecomendada(pub.getTipoViviendaRecomendada());
+        existente.setInformacionAdicional(pub.getInformacionAdicional());
+        
+        // Re-verify on edit
+        existente.setEstado(EstadoPublicacion.PENDIENTE);
+
+        comunidadPetService.save(existente);
+
+        return "redirect:/usuario/comunidad/mis-publicaciones?success=updated";
+    }
+
+    @GetMapping("/comunidad/detalle/{id}")
+    public String detallePublicacion(@PathVariable String id, Model model, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getByIdAndIncrementVistas(id);
+        if (!opt.isPresent()) {
+            return "redirect:/usuario/comunidad?error=notfound";
+        }
+
+        model.addAttribute("pub", opt.get());
+        return "usuario/comunidad/comunidad_detail";
+    }
+
+    @GetMapping("/comunidad/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable String id, @RequestParam EstadoPublicacion estado, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getById(id);
+        if (!opt.isPresent() || !opt.get().getPropietarioId().equals(usuario.getId())) {
+            return "redirect:/usuario/comunidad/mis-publicaciones?error=noauth";
+        }
+
+        PublicacionAdopcion pub = opt.get();
+        pub.setEstado(estado);
+        comunidadPetService.save(pub);
+
+        return "redirect:/usuario/comunidad/mis-publicaciones?success=status";
+    }
+
+    @GetMapping("/comunidad/eliminar/{id}")
+    public String eliminarPublicacion(@PathVariable String id, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getById(id);
+        if (!opt.isPresent() || !opt.get().getPropietarioId().equals(usuario.getId())) {
+            return "redirect:/usuario/comunidad/mis-publicaciones?error=noauth";
+        }
+
+        comunidadPetService.delete(id);
+        return "redirect:/usuario/comunidad/mis-publicaciones?success=deleted";
+    }
+
+    // --- CHAT SYSTEM ---
+
+    @GetMapping("/comunidad/chats")
+    public String bandejaEntradaChats(Model model, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        List<Map<String, Object>> conversaciones = comunidadPetService.getConversacionesDeUsuario(usuario.getId());
+        model.addAttribute("conversaciones", conversaciones);
+
+        return "usuario/comunidad/comunidad_chat";
+    }
+
+    @GetMapping("/comunidad/chat/{adopcionId}/{otroUsuarioId}")
+    public String chatConversacionDetail(@PathVariable String adopcionId, @PathVariable String otroUsuarioId, Model model, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+        model.addAttribute("usuario", usuario);
+
+        Optional<PublicacionAdopcion> optPub = comunidadPetService.getById(adopcionId);
+        if (!optPub.isPresent()) return "redirect:/usuario/comunidad/chats?error=notfound";
+        
+        PublicacionAdopcion pub = optPub.get();
+        model.addAttribute("pub", pub);
+
+        // Fetch other user name
+        Usuario otroUsuario = usuarioService.findById(otroUsuarioId).orElse(null);
+        if (otroUsuario == null) return "redirect:/usuario/comunidad/chats?error=notfound";
+        model.addAttribute("otroUsuario", otroUsuario);
+
+        List<MensajeChat> mensajes = comunidadPetService.getMessages(adopcionId, usuario.getId(), otroUsuarioId);
+        model.addAttribute("mensajes", mensajes);
+
+        // Mark as read
+        comunidadPetService.marcarConversacionComoLeida(adopcionId, otroUsuarioId, usuario.getId());
+
+        // For listing on sidebar
+        List<Map<String, Object>> conversaciones = comunidadPetService.getConversacionesDeUsuario(usuario.getId());
+        model.addAttribute("conversaciones", conversaciones);
+
+        return "usuario/comunidad/comunidad_chat";
+    }
+
+    @PostMapping("/comunidad/chat/enviar")
+    public String enviarMensajeChat(@RequestParam String adopcionId,
+                                    @RequestParam String receptorId,
+                                    @RequestParam String contenido,
+                                    Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return "redirect:/login?error=noauth";
+
+        Usuario receptor = usuarioService.findById(receptorId).orElse(null);
+        if (receptor != null && contenido != null && !contenido.trim().isEmpty()) {
+            comunidadPetService.enviarMensaje(adopcionId, usuario.getId(), usuario.getNombre(), receptorId, receptor.getNombre(), contenido);
+        }
+
+        return "redirect:/usuario/comunidad/chat/" + adopcionId + "/" + receptorId;
+    }
+
+    @GetMapping("/comunidad/chat/mensajes-ajax")
+    @ResponseBody
+    public List<MensajeChat> mensajesAjax(@RequestParam String adopcionId, @RequestParam String otroUsuarioId, Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) return new ArrayList<>();
+
+        comunidadPetService.marcarConversacionComoLeida(adopcionId, otroUsuarioId, usuario.getId());
+        return comunidadPetService.getMessages(adopcionId, usuario.getId(), otroUsuarioId);
     }
 }

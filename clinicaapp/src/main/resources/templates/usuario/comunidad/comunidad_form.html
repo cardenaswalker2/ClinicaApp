@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Mascota | Comunidad Pet</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --aurora-start: #6366f1;
+            --aurora-end: #d946ef;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --radius-md: 16px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            color: var(--text-secondary);
+            min-height: 100vh;
+        }
+
+        .main-navbar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand-hex {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .navbar-brand-hex i {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.15rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="main-navbar py-2 mb-4">
+        <div class="container d-flex align-items-center">
+            <a class="navbar-brand-hex" th:href="@{/usuario/dashboard}">
+                <i class="bi bi-heart-fill"></i>
+                Comunidad Pet
+            </a>
+            <div class="ms-auto">
+                <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="btn btn-sm btn-outline-secondary rounded-pill">Volver</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <!-- PREFILL SELECTOR (Only when creating) -->
+                <div class="form-card p-4 mb-4" th:if="${publicacion.id == null}">
+                    <h5 class="text-dark mb-3 fw-bold"><i class="bi bi-magic"></i> ¿Quieres publicar una mascota registrada?</h5>
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <p class="small text-muted mb-md-0">Selecciona una mascota de tu lista de "Mis Mascotas" para autocompletar su nombre, especie, raza, edad, sexo y fotografía al instante.</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <select id="mascotaSelect" class="form-select rounded-3 mb-2" onchange="loadRegisteredPet(this.value)">
+                                <option value="">Crear desde cero...</option>
+                                <option th:each="m : ${misMascotas}" th:value="${m.id}" th:text="${m.nombre}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN FORM -->
+                <div class="form-card">
+                    <h2 class="h3 text-dark fw-bold mb-4" th:text="${publicacion.id == null ? 'Crear Publicación de Adopción' : 'Editar Publicación'}">Publicar Mascota</h2>
+                    
+                    <form th:action="${publicacion.id == null ? '/usuario/comunidad/nueva' : '/usuario/comunidad/editar/' + publicacion.id}" method="post">
+                        
+                        <!-- Keep original pet ID if prefilled -->
+                        <input type="hidden" name="mascotaOriginalId" th:value="${publicacion.mascotaOriginalId}">
+
+                        <!-- SECTION 1: Datos Básicos -->
+                        <div class="section-title">1. Información Básica</div>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Nombre de la Mascota *</label>
+                                <input type="text" name="nombre" class="form-control rounded-3" th:value="${publicacion.nombre}" required placeholder="Ej. Rocky">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Especie *</label>
+                                <select name="especie" class="form-select rounded-3" required>
+                                    <option value="PERRO" th:selected="${publicacion.especie == 'PERRO'}">Perro</option>
+                                    <option value="GATO" th:selected="${publicacion.especie == 'GATO'}">Gato</option>
+                                    <option value="OTRO" th:selected="${publicacion.especie == 'OTRO'}">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Raza *</label>
+                                <input type="text" name="raza" class="form-control rounded-3" th:value="${publicacion.raza}" required placeholder="Ej. Golden Retriever">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Edad / Rango de Edad *</label>
+                                <input type="text" name="edad" class="form-control rounded-3" th:value="${publicacion.edad}" required placeholder="Ej. 3 meses, 2 años">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Sexo *</label>
+                                <select name="sexo" class="form-select rounded-3" required>
+                                    <option value="Macho" th:selected="${publicacion.sexo == 'Macho'}">Macho</option>
+                                    <option value="Hembra" th:selected="${publicacion.sexo == 'Hembra'}">Hembra</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Fotografía Principal (URL) *</label>
+                                <input type="text" name="fotoPrincipalUrl" class="form-control rounded-3" th:value="${publicacion.fotoPrincipalUrl}" required placeholder="URL de la imagen">
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: Salud e Historia -->
+                        <div class="section-title">2. Historia y Adopción</div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-dark">Historia de la Mascota *</label>
+                            <textarea name="historia" class="form-control rounded-3" rows="4" required th:text="${publicacion.historia}" placeholder="Cuéntanos su historia, de dónde viene, su carácter, etc."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-dark">Motivo de Adopción *</label>
+                            <input type="text" name="motivoAdopcion" class="form-control rounded-3" th:value="${publicacion.motivoAdopcion}" required placeholder="Ej. Cambio de ciudad, rescate callejero, etc.">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-dark">Requisitos de Adopción</label>
+                            <textarea name="requisitosAdopcion" class="form-control rounded-3" rows="2" th:text="${publicacion.requisitosAdopcion}" placeholder="Ej. Espacio grande, paciencia con cachorros, solvencia veterinaria."></textarea>
+                        </div>
+
+                        <!-- SECTION 3: Filtros y Compatibilidad -->
+                        <div class="section-title">3. Características y Compatibilidad</div>
+                        
+                        <div class="row g-3 mb-4 align-items-center">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="vacunada" th:checked="${publicacion.vacunada}" id="vacunada">
+                                    <label class="form-check-label fw-bold small text-dark" for="vacunada">¿Está Vacunada?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="esterilizada" th:checked="${publicacion.esterilizada}" id="esterilizada">
+                                    <label class="form-check-label fw-bold small text-dark" for="esterilizada">¿Está Esterilizada?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="aceptaNinos" th:checked="${publicacion.aceptaNinos}" id="aceptaNinos">
+                                    <label class="form-check-label fw-bold small text-dark" for="aceptaNinos">¿Acepta Niños?</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="aceptaOtrasMascotas" th:checked="${publicacion.aceptaOtrasMascotas}" id="aceptaOtrasMascotas">
+                                    <label class="form-check-label fw-bold small text-dark" for="aceptaOtrasMascotas">¿Acepta Otras Mascotas?</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Nivel de Energía</label>
+                                <select name="nivelEnergia" class="form-select rounded-3">
+                                    <option value="Alto" th:selected="${publicacion.nivelEnergia == 'Alto'}">Alto</option>
+                                    <option value="Medio" th:selected="${publicacion.nivelEnergia == 'Medio'}">Medio</option>
+                                    <option value="Bajo" th:selected="${publicacion.nivelEnergia == 'Bajo'}">Bajo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Tamaño</label>
+                                <select name="tamano" class="form-select rounded-3">
+                                    <option value="Pequeño" th:selected="${publicacion.tamano == 'Pequeño'}">Pequeño</option>
+                                    <option value="Mediano" th:selected="${publicacion.tamano == 'Mediano'}">Mediano</option>
+                                    <option value="Grande" th:selected="${publicacion.tamano == 'Grande'}">Grande</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: Ubicación -->
+                        <div class="section-title">4. Ubicación de la Mascota</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Ciudad *</label>
+                                <input type="text" name="ciudad" class="form-control rounded-3" th:value="${publicacion.ciudad}" required placeholder="Ej. Cartagena">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-dark">Barrio</label>
+                                <input type="text" name="barrio" class="form-control rounded-3" th:value="${publicacion.barrio}" placeholder="Ej. Bocagrande">
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-lg btn-primary rounded-pill px-5" style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end)); border: none; font-weight: 700;">
+                                <i class="bi bi-send-fill"></i> Enviar a Moderación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function loadRegisteredPet(mascotaId) {
+            if (mascotaId) {
+                window.location.href = '/usuario/comunidad/nueva?mascotaId=' + mascotaId;
+            } else {
+                window.location.href = '/usuario/comunidad/nueva';
+            }
+        }
+    </script>
+</body>
+</html>

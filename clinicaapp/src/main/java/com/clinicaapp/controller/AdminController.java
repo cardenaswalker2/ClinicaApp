@@ -18,6 +18,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.clinicaapp.service.ComunidadPetService;
+import com.clinicaapp.model.PublicacionAdopcion;
+import com.clinicaapp.model.enums.EstadoPublicacion;
 
 import java.time.*;
 import java.time.format.TextStyle;
@@ -28,6 +31,9 @@ import java.util.stream.IntStream;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    @Autowired
+    private ComunidadPetService comunidadPetService;
 
     @Autowired
     private IClinicaService clinicaService;
@@ -730,5 +736,44 @@ public class AdminController {
         
         attributes.addFlashAttribute("mensajeExito", "Anuncio global enviado con éxito a todas las sedes.");
         return "redirect:/admin/saas";
+    }
+
+    // ==========================================
+    //       MODERACIÓN DE COMUNIDAD PET
+    // ==========================================
+
+    @GetMapping("/comunidad/moderacion")
+    public String moderacionComunidad(Model model) {
+        List<PublicacionAdopcion> pendientes = comunidadPetService.getPendingApproval();
+        model.addAttribute("publicaciones", pendientes);
+        return "admin/admin_comunidad_moderacion";
+    }
+
+    @GetMapping("/comunidad/aprobar/{id}")
+    public String aprobarPublicacion(@PathVariable String id, RedirectAttributes attributes) {
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getById(id);
+        if (opt.isPresent()) {
+            PublicacionAdopcion pub = opt.get();
+            pub.setEstado(EstadoPublicacion.DISPONIBLE);
+            comunidadPetService.save(pub);
+            attributes.addFlashAttribute("mensajeExito", "La publicación de " + pub.getNombre() + " ha sido aprobada.");
+        } else {
+            attributes.addFlashAttribute("mensajeError", "Publicación no encontrada.");
+        }
+        return "redirect:/admin/comunidad/moderacion";
+    }
+
+    @GetMapping("/comunidad/rechazar/{id}")
+    public String rechazarPublicacion(@PathVariable String id, RedirectAttributes attributes) {
+        Optional<PublicacionAdopcion> opt = comunidadPetService.getById(id);
+        if (opt.isPresent()) {
+            PublicacionAdopcion pub = opt.get();
+            pub.setEstado(EstadoPublicacion.RECHAZADO);
+            comunidadPetService.save(pub);
+            attributes.addFlashAttribute("mensajeExito", "La publicación de " + pub.getNombre() + " ha sido rechazada.");
+        } else {
+            attributes.addFlashAttribute("mensajeError", "Publicación no encontrada.");
+        }
+        return "redirect:/admin/comunidad/moderacion";
     }
 }
