@@ -52,6 +52,7 @@
             grid-template-columns: 320px 1fr 340px;
             background: var(--surface);
             border-top: 1px solid var(--border);
+            position: relative;
         }
 
         @media (max-width: 1200px) {
@@ -65,7 +66,7 @@
                 display: flex !important;
                 position: absolute;
                 right: 0;
-                top: 85px;
+                top: 0;
                 bottom: 0;
                 width: 320px;
                 background: white;
@@ -760,8 +761,11 @@
 
                                 <!-- Render Document -->
                                 <div th:if="${m.tipo == 'DOCUMENTO'}" class="mb-2">
-                                    <a th:href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark">
-                                        <i class="bi bi-file-earmark-arrow-down-fill text-primaryfs-5"></i>
+                                    <div th:if="${m.attachmentNombre != null && m.attachmentNombre.contains('.webm')}">
+                                        <audio th:src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px;"></audio>
+                                    </div>
+                                    <a th:if="${m.attachmentNombre == null || !m.attachmentNombre.contains('.webm')}" th:href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark">
+                                        <i class="bi bi-file-earmark-arrow-down-fill text-primary fs-5"></i>
                                         <span class="text-truncate small" style="max-width: 140px;" th:text="${m.attachmentNombre}">Documento.pdf</span>
                                     </a>
                                 </div>
@@ -833,7 +837,7 @@
 
                             <div class="chat-input-wrap">
                                 <input type="text" id="messageInput" class="chat-input" placeholder="Escribe un mensaje..." required autocomplete="off">
-                                <button type="button" class="input-icon-btn me-2" onclick="useAudioMock()" title="Grabar audio"><i class="bi bi-mic-fill"></i></button>
+                                <button type="button" id="micBtn" class="input-icon-btn me-2" onclick="useAudioMock()" title="Grabar audio"><i class="bi bi-mic-fill"></i></button>
                             </div>
 
                             <button type="submit" class="chat-send-btn">
@@ -1059,7 +1063,7 @@
             const formData = new FormData();
             formData.append('file', file);
 
-            fetch('/comunidad/chat/subir-adjunto', {
+            fetch('/usuario/comunidad/chat/subir-adjunto', {
                 method: 'POST',
                 body: formData
             })
@@ -1083,7 +1087,7 @@
             formData.append('attachmentUrl', url);
             formData.append('attachmentNombre', nombre);
 
-            fetch('/comunidad/chat/enviar-ajax', {
+            fetch('/usuario/comunidad/chat/enviar-ajax', {
                 method: 'POST',
                 body: formData
             })
@@ -1109,7 +1113,7 @@
             formData.append('lugar', lugar);
             formData.append('fechaHora', fechaHora);
 
-            fetch('/comunidad/chat/proponer-encuentro', {
+            fetch('/usuario/comunidad/chat/proponer-encuentro', {
                 method: 'POST',
                 body: formData
             })
@@ -1127,7 +1131,7 @@
             formData.append('mensajeId', mensajeId);
             formData.append('estado', estado);
 
-            fetch('/comunidad/chat/confirmar-encuentro', {
+            fetch('/usuario/comunidad/chat/confirmar-encuentro', {
                 method: 'POST',
                 body: formData
             })
@@ -1142,7 +1146,7 @@
             formData.append('adopcionId', adopcionId);
             formData.append('estado', status);
 
-            fetch('/comunidad/chat/estado-adopcion', {
+            fetch('/usuario/comunidad/chat/estado-adopcion', {
                 method: 'POST',
                 body: formData
             })
@@ -1184,9 +1188,62 @@
             }
         }
 
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+
         function useAudioMock() {
-            alert('Grabando audio... (Simulado)');
-            sendMessageWithAttachment('TEXTO', '', '🎤 Nota de voz enviada (Simulado)');
+            const micBtn = document.getElementById('micBtn');
+            if (!isRecording) {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert('Tu navegador no soporta grabación de audio.');
+                    return;
+                }
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        
+                        mediaRecorder.addEventListener("dataavailable", event => {
+                            audioChunks.push(event.data);
+                        });
+
+                        mediaRecorder.addEventListener("stop", () => {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                            const file = new File([audioBlob], "nota_voz.webm", { type: 'audio/webm' });
+                            
+                            const formData = new FormData();
+                            formData.append('file', file);
+
+                            fetch('/usuario/comunidad/chat/subir-adjunto', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    sendMessageWithAttachment('DOCUMENTO', data.url, '🎤 Nota de Voz.webm');
+                                } else {
+                                    alert('Error subiendo audio: ' + data.error);
+                                }
+                            })
+                            .catch(err => console.error('Upload audio failed', err));
+                        });
+
+                        mediaRecorder.start();
+                        isRecording = true;
+                        micBtn.innerHTML = '<i class="bi bi-stop-circle-fill text-danger text-pulse"></i>';
+                    })
+                    .catch(err => {
+                        alert('No se pudo acceder al micrófono: ' + err.message);
+                    });
+            } else {
+                if (mediaRecorder) {
+                    mediaRecorder.stop();
+                }
+                isRecording = false;
+                micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            }
         }
 
         // Form Submit
@@ -1206,7 +1263,7 @@
 
                 input.value = '';
 
-                fetch('/comunidad/chat/enviar-ajax', {
+                fetch('/usuario/comunidad/chat/enviar-ajax', {
                     method: 'POST',
                     body: formData
                 })
@@ -1298,7 +1355,7 @@
                                     </div>
                                     <div class="bubble ${isMe ? 'me' : 'other'}">
                                         ${m.tipo === 'IMAGEN' ? `<div class="mb-2"><img src="${m.attachmentUrl}" class="img-fluid rounded" style="max-height: 200px; cursor: pointer;" onclick="window.open(this.src)"></div>` : ''}
-                                        ${m.tipo === 'DOCUMENTO' ? `<div class="mb-2"><a href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark"><i class="bi bi-file-earmark-arrow-down-fill text-primary"></i><span class="text-truncate small" style="max-width: 140px;">${escapeHtml(m.attachmentNombre)}</span></a></div>` : ''}
+                                        ${m.tipo === 'DOCUMENTO' ? (m.attachmentNombre && m.attachmentNombre.includes('.webm') ? `<div class="mb-2"><audio src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px;"></audio></div>` : `<div class="mb-2"><a href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark"><i class="bi bi-file-earmark-arrow-down-fill text-primary"></i><span class="text-truncate small" style="max-width: 140px;">${escapeHtml(m.attachmentNombre)}</span></a></div>`) : ''}
                                         <span class="msg-text-content">${escapeHtml(m.contenido)}</span>
                                     </div>
                                     ${reactionsHtml}
@@ -1385,7 +1442,7 @@
             formData.append('mensajeId', mensajeId);
             formData.append('emoji', emoji);
 
-            fetch('/comunidad/chat/reaccionar', {
+            fetch('/usuario/comunidad/chat/reaccionar', {
                 method: 'POST',
                 body: formData
             })
