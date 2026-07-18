@@ -42,6 +42,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import org.springframework.core.io.InputStreamResource; // <-- Añade este import al inicio del archivo
@@ -60,6 +62,7 @@ import com.clinicaapp.service.ComunidadPetService;
 import com.clinicaapp.model.PublicacionAdopcion;
 import com.clinicaapp.model.enums.EstadoPublicacion;
 import com.clinicaapp.model.MensajeChat;
+import com.clinicaapp.repository.MensajeChatRepository;
 
 @Controller
 @RequestMapping("/usuario")
@@ -67,6 +70,9 @@ public class UsuarioController {
 
     @Autowired
     private ComunidadPetService comunidadPetService;
+
+    @Autowired
+    private MensajeChatRepository chatRepository;
 
     @Autowired
     private IUsuarioService usuarioService;
@@ -1764,6 +1770,9 @@ public Map<String, Object> getContextoIA(Principal principal) {
     public MensajeChat enviarMensajeAjax(@RequestParam String adopcionId,
                                          @RequestParam String receptorId,
                                          @RequestParam String contenido,
+                                         @RequestParam(required = false, defaultValue = "TEXTO") String tipo,
+                                         @RequestParam(required = false) String attachmentUrl,
+                                         @RequestParam(required = false) String attachmentNombre,
                                          Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         if (usuario == null) throw new RuntimeException("Unauthorized");
@@ -1778,9 +1787,230 @@ public Map<String, Object> getContextoIA(Principal principal) {
         }
 
         Usuario receptor = usuarioService.findById(receptorId).orElse(null);
-        if (receptor != null && contenido != null && !contenido.trim().isEmpty()) {
-            return comunidadPetService.enviarMensaje(adopcionId, usuario.getId(), usuario.getNombre(), receptorId, receptor.getNombre(), contenido);
+        if (receptor != null) {
+            return comunidadPetService.enviarMensaje(
+                adopcionId, 
+                usuario.getId(), 
+                usuario.getNombre(), 
+                receptorId, 
+                receptor.getNombre(), 
+                contenido, 
+                tipo, 
+                attachmentUrl, 
+                attachmentNombre
+            );
         }
         throw new RuntimeException("Invalid request");
+    }
+
+    @PostMapping("/comunidad/chat/subir-adjunto")
+    @ResponseBody
+    public Map<String, Object> subirAdjuntoChat(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+                                                Principal principal) {
+        Map<String, Object> response = new HashMap<>();
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) {
+            response.put("success", false);
+            response.put("error", "Unauthorized");
+            return response;
+        }
+
+        if (file.isEmpty()) {
+            response.put("success", false);
+            response.put("error", "File is empty");
+            return response;
+        }
+
+        try {
+            String uploadDir = "uploads";
+            java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
+            if (!java.nio.file.Files.exists(uploadPath)) {
+                java.nio.file.Files.createDirectories(uploadPath);
+            }
+
+            String originalName = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalName != null && originalName.contains(".")) {
+                fileExtension = originalName.substring(originalName.lastIndexOf("."));
+            }
+
+            String fileName = java.util.UUID.randomUUID().toString() + fileExtension;
+            java.nio.file.Path filePath = uploadPath.resolve(fileName);
+            java.nio.file.Files.copy(file.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            response.put("success", true);
+            response.put("url", "/uploads/" + fileName);
+            response.put("nombre", originalName);
+            return response;
+        } catch (java.io.IOException e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return response;
+        }
+    }
+
+    @PostMapping("/comunidad/chat/proponer-encuentro")
+    @ResponseBody
+    public MensajeChat proponerEncuentro(@RequestParam String adopcionId,
+                                         @RequestParam String receptorId,
+                                         @RequestParam String lugar,
+                                         @RequestParam String fechaHora,
+                                         Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) throw new RuntimeException("Unauthorized");
+
+        Optional<PublicacionAdopcion> optPub = comunidadPetService.getById(adopcionId);
+        if (!optPub.isPresent()) throw new RuntimeException("Adoption not found");
+        PublicacionAdopcion pub = optPub.get();
+
+        if (!pub.getPropietarioId().equals(usuario.getId()) && !pub.getPropietarioId().equals(receptorId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        Usuario receptor = usuarioService.findById(receptorId).orElse(null);
+        if (receptor != null) {
+            MensajeChat msg = new MensajeChat();
+            msg.setAdopcionId(adopcionId);
+            msg.setEmisorId(usuario.getId());
+            msg.setEmisorNombre(usuario.getNombre());
+            msg.setReceptorId(receptorId);
+            msg.setReceptorNombre(receptor.getNombre());
+            msg.setContenido("Propuesta de encuentro de adopción");
+            msg.setTipo("ENCUENTRO");
+            msg.setLugarEncuentro(lugar);
+            msg.setFechaHoraEncuentro(fechaHora);
+            msg.setEstadoEncuentro("PROPUESTO");
+            msg.setFechaHora(LocalDateTime.now());
+            msg.setLeido(false);
+            
+            // Incrementar interesados si es el primer chat
+            List<MensajeChat> chatPrevio = chatRepository.findByAdopcionIdAndEmisorIdAndReceptorId(adopcionId, usuario.getId(), receptorId);
+            if (chatPrevio.isEmpty()) {
+                pub.setInteresados(pub.getInteresados() + 1);
+                comunidadPetService.save(pub);
+            }
+
+            return chatRepository.save(msg);
+        }
+        throw new RuntimeException("Invalid request");
+    }
+
+    @PostMapping("/comunidad/chat/confirmar-encuentro")
+    @ResponseBody
+    public MensajeChat confirmarEncuentro(@RequestParam String mensajeId,
+                                          @RequestParam String estado, // CONFIRMADO or CANCELADO
+                                          Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) throw new RuntimeException("Unauthorized");
+
+        Optional<MensajeChat> optMsg = chatRepository.findById(mensajeId);
+        if (!optMsg.isPresent()) throw new RuntimeException("Message not found");
+
+        MensajeChat msg = optMsg.get();
+        // Check that the user is one of the participants
+        if (!usuario.getId().equals(msg.getEmisorId()) && !usuario.getId().equals(msg.getReceptorId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        msg.setEstadoEncuentro(estado.toUpperCase());
+        return chatRepository.save(msg);
+    }
+
+    @PostMapping("/comunidad/chat/reaccionar")
+    @ResponseBody
+    public MensajeChat reaccionarMensaje(@RequestParam String mensajeId,
+                                         @RequestParam String emoji,
+                                         Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) throw new RuntimeException("Unauthorized");
+
+        Optional<MensajeChat> optMsg = chatRepository.findById(mensajeId);
+        if (!optMsg.isPresent()) throw new RuntimeException("Message not found");
+
+        MensajeChat msg = optMsg.get();
+        if (!usuario.getId().equals(msg.getEmisorId()) && !usuario.getId().equals(msg.getReceptorId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        java.util.Map<String, String> reacciones = msg.getReacciones();
+        if (reacciones == null) reacciones = new java.util.HashMap<>();
+
+        if (emoji == null || emoji.trim().isEmpty() || "REMOVE".equalsIgnoreCase(emoji)) {
+            reacciones.remove(usuario.getId());
+        } else {
+            reacciones.put(usuario.getId(), emoji);
+        }
+        msg.setReacciones(reacciones);
+        return chatRepository.save(msg);
+    }
+
+    @PostMapping("/comunidad/chat/estado-adopcion")
+    @ResponseBody
+    public Map<String, Object> updateAdoptionStatus(@RequestParam String adopcionId,
+                                                    @RequestParam String estado,
+                                                    Principal principal) {
+        Map<String, Object> response = new HashMap<>();
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) {
+            response.put("success", false);
+            response.put("error", "Unauthorized");
+            return response;
+        }
+
+        Optional<PublicacionAdopcion> optPub = comunidadPetService.getById(adopcionId);
+        if (!optPub.isPresent()) {
+            response.put("success", false);
+            response.put("error", "Publication not found");
+            return response;
+        }
+
+        PublicacionAdopcion pub = optPub.get();
+        if (!usuario.getId().equals(pub.getPropietarioId())) {
+            response.put("success", false);
+            response.put("error", "Only the owner can update status");
+            return response;
+        }
+
+        try {
+            com.clinicaapp.model.enums.EstadoPublicacion enumEst = com.clinicaapp.model.enums.EstadoPublicacion.valueOf(estado.toUpperCase());
+            pub.setEstado(enumEst);
+            pub.setUltimaActualizacion(LocalDateTime.now());
+            comunidadPetService.save(pub);
+
+            // Send a system message indicating the state change
+            List<MensajeChat> allMsgs = chatRepository.findByAdopcionId(adopcionId);
+            Set<String> participantIds = new HashSet<>();
+            for (MensajeChat m : allMsgs) {
+                participantIds.add(m.getEmisorId());
+                participantIds.add(m.getReceptorId());
+            }
+            participantIds.remove(usuario.getId());
+
+            for (String otherId : participantIds) {
+                Usuario otherUser = usuarioService.findById(otherId).orElse(null);
+                if (otherUser != null) {
+                    String statusText = "disponible";
+                    if (enumEst == com.clinicaapp.model.enums.EstadoPublicacion.ADOPTADO) statusText = "adoptada";
+                    else if (enumEst == com.clinicaapp.model.enums.EstadoPublicacion.RESERVADO) statusText = "reservada";
+
+                    comunidadPetService.enviarMensaje(
+                        adopcionId, 
+                        usuario.getId(), 
+                        usuario.getNombre(), 
+                        otherId, 
+                        otherUser.getNombre(), 
+                        "📢 La mascota " + pub.getNombre() + " ahora está " + statusText + "."
+                    );
+                }
+            }
+
+            response.put("success", true);
+            response.put("estado", enumEst.name());
+            return response;
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return response;
+        }
     }
 }

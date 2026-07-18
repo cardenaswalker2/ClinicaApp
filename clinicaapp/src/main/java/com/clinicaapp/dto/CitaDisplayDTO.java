@@ -173,4 +173,9 @@ public class CitaDisplayDTO {
     public void setConsultorioId(String consultorioId) { this.consultorioId = consultorioId; }
     public String getEstilistaId() { return estilistaId; }
     public void setEstilistaId(String estilistaId) { this.estilistaId = estilistaId; }
+
+    public String getMascotaId() { return mascotaId; }
+    public void setMascotaId(String mascotaId) { this.mascotaId = mascotaId; }
+    public String getClinicaId() { return clinicaId; }
+    public void setClinicaId(String clinicaId) { this.clinicaId = clinicaId; }
 }

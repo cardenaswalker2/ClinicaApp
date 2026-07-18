@@ -159,6 +159,37 @@ public class ComunidadPetService {
         return chatRepository.save(msg);
     }
 
+    public MensajeChat enviarMensaje(String adopcionId, String emisorId, String emisorNombre, 
+                                      String receptorId, String receptorNombre, String contenido,
+                                      String tipo, String attachmentUrl, String attachmentNombre) {
+        
+        MensajeChat msg = new MensajeChat();
+        msg.setAdopcionId(adopcionId);
+        msg.setEmisorId(emisorId);
+        msg.setEmisorNombre(emisorNombre);
+        msg.setReceptorId(receptorId);
+        msg.setReceptorNombre(receptorNombre);
+        msg.setContenido(contenido);
+        msg.setFechaHora(LocalDateTime.now());
+        msg.setLeido(false);
+        msg.setTipo(tipo);
+        msg.setAttachmentUrl(attachmentUrl);
+        msg.setAttachmentNombre(attachmentNombre);
+
+        // Incrementar contador de interesados si es el primer mensaje de este emisor a este receptor en esta publicación
+        List<MensajeChat> chatPrevio = chatRepository.findByAdopcionIdAndEmisorIdAndReceptorId(adopcionId, emisorId, receptorId);
+        if (chatPrevio.isEmpty()) {
+            Optional<PublicacionAdopcion> opt = publicacionRepository.findById(adopcionId);
+            if (opt.isPresent()) {
+                PublicacionAdopcion pub = opt.get();
+                pub.setInteresados(pub.getInteresados() + 1);
+                publicacionRepository.save(pub);
+            }
+        }
+
+        return chatRepository.save(msg);
+    }
+
     // Conversaciones activas de un usuario
     public List<Map<String, Object>> getConversacionesDeUsuario(String userId) {
         List<MensajeChat> todos = chatRepository.findByEmisorIdOrReceptorId(userId, userId);
