@@ -862,17 +862,523 @@
             transform: scale(1.25);
         }
 
-        .pinned-header-bar {
-            background: #fffbeb;
-            color: #b45309;
-            padding: 0.5rem 1.25rem;
-            font-size: 0.78rem;
+        /* ===== TABS SIDEBAR ===== */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1.5px solid var(--border-light);
+            margin-bottom: 1rem;
+            gap: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.6rem 0.5rem;
+            font-size: 0.75rem;
             font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 2.5px solid transparent;
+            transition: var(--transition-base);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .sidebar-tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .sidebar-tab-btn.active {
+            color: var(--aurora-start);
+            border-bottom-color: var(--aurora-start);
+        }
+
+        .sidebar-tab-content {
+            display: none;
+        }
+
+        .sidebar-tab-content.active {
+            display: block;
+        }
+
+        /* ===== CAROUSEL PET ===== */
+        .pet-carousel {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .carousel-slides {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
             display: flex;
             justify-content: space-between;
+            padding: 0 0.5rem;
+            pointer-events: none;
+        }
+
+        .carousel-btn {
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            color: var(--aurora-start);
+            transform: scale(1.1);
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+        }
+
+        .carousel-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .carousel-dot.active {
+            background: white;
+            transform: scale(1.2);
+            width: 8px;
+            border-radius: 3px;
+        }
+
+        /* ===== PROGRESS STEPS ===== */
+        .progress-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: var(--border-light);
+            z-index: 1;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            transition: var(--transition-base);
+        }
+
+        .progress-step.done .progress-step-icon {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .progress-step.active .progress-step-icon {
+            background: var(--aurora-start);
+            border-color: var(--aurora-start);
+            color: white;
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.4);
+        }
+
+        .progress-step-text {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .progress-step.done .progress-step-text {
+            color: var(--text-primary);
+        }
+
+        .progress-step.active .progress-step-text {
+            color: var(--aurora-start);
+            font-weight: 700;
+        }
+
+        /* ===== COMPATIBILITY METER ===== */
+        .compatibility-card {
+            background: var(--surface-hover);
+            border-radius: var(--radius-md);
+            padding: 0.85rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .compatibility-meter {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+
+        .compatibility-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--aurora-start), var(--aurora-end));
+            border-radius: var(--radius-full);
+            transition: width 1s ease-out;
+        }
+
+        .compatibility-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+        }
+
+        .compatibility-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 600;
+        }
+
+        .compatibility-item.yes { color: var(--success); }
+        .compatibility-item.no { color: var(--text-muted); }
+        .compatibility-item.warn { color: var(--warning); }
+
+        /* ===== TIMELINE ===== */
+        .timeline-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            position: relative;
+        }
+
+        .timeline-box::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: var(--border-light);
+        }
+
+        .timeline-event {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.78rem;
+            position: relative;
+        }
+
+        .timeline-badge {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--border-light);
+            border: 2px solid var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .timeline-event.primary .timeline-badge {
+            background: var(--aurora-start);
+            color: white;
+        }
+
+        .timeline-event.success .timeline-badge {
+            background: var(--success);
+            color: white;
+        }
+
+        .timeline-content {
+            flex-grow: 1;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .timeline-desc {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            margin-top: 1px;
+        }
+
+        /* ===== SHARED FILES ===== */
+        .shared-media-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .shared-media-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-hover);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            text-decoration: none !important;
+            transition: var(--transition-fast);
+        }
+
+        .shared-media-item:hover {
+            border-color: var(--aurora-start);
+            background: var(--surface);
+            transform: translateY(-1px);
+        }
+
+        .shared-media-icon {
+            font-size: 1.1rem;
+            color: var(--aurora-start);
+        }
+
+        .shared-media-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+        }
+
+        /* ===== QUICK QUESTIONS ===== */
+        .quick-questions-wrapper {
+            display: flex;
+            gap: 0.4rem;
+            padding: 0.4rem 1.25rem;
+            background: var(--surface);
+            border-top: 1px solid var(--border-light);
+            overflow-x: auto;
             flex-shrink: 0;
+        }
+
+        .quick-question-chip {
+            background: var(--surface-hover);
+            border: 1.2px solid var(--border);
+            border-radius: var(--radius-full);
+            padding: 0.35rem 0.85rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .quick-question-chip:hover {
+            border-color: var(--aurora-start);
+            color: var(--aurora-start);
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateY(-1px);
+        }
+
+        /* ===== PRIVATE NOTES ===== */
+        .private-notes-area {
+            width: 100%;
+            height: 90px;
+            background: #fffdf5;
+            border: 1.5px solid #fef08a;
+            border-radius: var(--radius-md);
+            padding: 0.6rem;
+            font-size: 0.8rem;
+            color: #854d0e;
+            resize: none;
+            outline: none;
+            transition: var(--transition-base);
+            font-weight: 500;
+        }
+
+        .private-notes-area:focus {
+            border-color: #ca8a04;
+            background: #fffbeb;
+        }
+
+        /* ===== AI SUMMARY ===== */
+        .ai-summary-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.04), rgba(217, 70, 239, 0.04));
+            border: 1.5px dashed var(--aurora-start);
+            border-radius: var(--radius-md);
+            padding: 0.85rem;
+            position: relative;
+        }
+
+        .ai-summary-badge {
+            position: absolute;
+            top: -9px;
+            right: 10px;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .ai-summary-text {
+            font-size: 0.78rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* ===== CHECKLIST ===== */
+        .checklist-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            border-radius: 4px;
+            border: 1.5px solid var(--border);
+            cursor: pointer;
+            accent-color: var(--aurora-start);
+        }
+
+        .checklist-item.checked span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* ===== TRUST & ACHIEVEMENTS ===== */
+        .trust-stars {
+            color: var(--warning);
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            background: var(--info-light);
+            color: var(--info);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: var(--radius-full);
+        }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.25rem 0.55rem;
+            border-radius: var(--radius-full);
+            margin-right: 0.35rem;
+            margin-bottom: 0.35rem;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .translation-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--border-light);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition-base);
+            border: none;
+        }
+
+        .translation-indicator.active {
+            background: var(--aurora-start);
+            color: white;
         }
     </style>
 </head>
@@ -1001,16 +1507,19 @@
                         <div>
                             <h6 class="text-dark fw-bold mb-0" style="font-size: 0.9rem;"
                                 th:text="${otroUsuario.nombre}">Nombre</h6>
-                            <div class="small d-flex align-items-center gap-1.5"
+                            <div class="small d-flex align-items-center gap-1.5" id="userStatusWrapper"
                                 style="color: var(--success); font-size: 0.75rem; font-weight: 600;">
-                                <span class="status-dot-active" style="width: 6px; height: 6px;"></span>
-                                <span>En línea</span>
+                                <span class="status-dot-active" id="userStatusDot" style="width: 6px; height: 6px;"></span>
+                                <span id="userStatusText">En línea</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
-                        <div class="input-group input-group-sm d-none d-sm-flex" style="max-width: 180px;">
+                        <button class="translation-indicator" id="translationBtn" onclick="toggleTranslation()" title="Traducir Conversación">
+                            <i class="bi bi-translate"></i> <span id="translationLabel" class="d-none d-sm-inline">Traducir</span>
+                        </button>
+                        <div class="input-group input-group-sm d-none d-sm-flex" style="max-width: 150px;">
                             <span class="input-group-text bg-light border-0"
                                 style="border-radius: var(--radius-full) 0 0 var(--radius-full); padding-left: 0.75rem;"><i
                                     class="bi bi-search"
@@ -1150,14 +1659,16 @@
                     </div>
                 </div>
 
-                <!-- Suggested Replies -->
-                <div class="suggested-replies" id="suggestedReplies">
-                    <span class="suggestion-chip" onclick="useSuggestion('¿Sigue disponible?')">¿Sigue
-                        disponible?</span>
-                    <span class="suggestion-chip" onclick="useSuggestion('¿Tiene todas las vacunas?')">¿Tiene
-                        vacunas?</span>
-                    <span class="suggestion-chip" onclick="useSuggestion('¿Podemos coordinar un encuentro?')">Coordinar
-                        encuentro</span>
+                <!-- Suggested Replies & Preguntas Rápidas -->
+                <div class="quick-questions-wrapper" id="suggestedReplies">
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Sigue disponible?')"><i class="bi bi-patch-question-fill" style="color: var(--aurora-start);"></i> ¿Sigue disponible?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Está vacunado y desparasitado?')"><i class="bi bi-shield-plus text-success"></i> ¿Está vacunado?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Está esterilizado?')"><i class="bi bi-scissors text-danger"></i> ¿Esterilizado?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Tiene alguna enfermedad?')"><i class="bi bi-heart-pulse-fill text-warning"></i> ¿Tiene enfermedades?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Cómo se lleva con gatos u otras mascotas?')"><i class="bi bi-emoji-smile-fill text-warning"></i> ¿Se lleva con gatos?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Convive bien con niños pequeños?')"><i class="bi bi-people-fill text-info"></i> ¿Convive con niños?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Qué tipo de comida come?')"><i class="bi bi-egg-fried text-success"></i> ¿Qué come?</span>
+                    <span class="quick-question-chip" onclick="useSuggestion('¿Podemos agendar un encuentro?')"><i class="bi bi-calendar-check-fill" style="color: var(--aurora-mid);"></i> Coordinar encuentro</span>
                 </div>
 
                 <!-- Footer Input -->
@@ -1252,108 +1763,336 @@
                 <span class="small fw-500">Ficha de adopción inactiva</span>
             </div>
 
-            <div th:if="${pub != null}" class="d-flex flex-column gap-4 h-100 overflow-y-auto">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="text-dark fw-bold mb-0" style="font-family: 'Outfit', sans-serif; font-size: 0.95rem;">
-                        Información de Adopción</h6>
-                    <button class="btn btn-sm btn-link p-0 text-dark d-lg-none" onclick="toggleRightPanel()"><i
-                            class="bi bi-x-lg"></i></button>
+                <!-- Tab Headers -->
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab-btn active" onclick="switchSidebarTab('pet')">Mascota</button>
+                    <button class="sidebar-tab-btn" onclick="switchSidebarTab('adopt')">Proceso</button>
+                    <button class="sidebar-tab-btn" onclick="switchSidebarTab('trust')">Adoptante</button>
+                    <button class="sidebar-tab-btn" onclick="switchSidebarTab('extra')">Extras</button>
                 </div>
 
-                <!-- Pet Card -->
-                <div class="right-pet-card">
-                    <img th:src="${pub.fotoPrincipalUrl}" alt="Mascota" class="right-pet-img">
-                    <h5 class="text-dark fw-bold mb-0" style="font-size: 1rem;" th:text="${pub.nombre}">Doki</h5>
-                    <span class="small text-muted" style="font-size: 0.8rem;"
-                        th:text="${pub.raza != null ? pub.raza : pub.especie}">Raza</span>
-
-                    <span id="adopStatusBadge" class="adoption-status-badge"
-                        th:classappend="${pub.estado.name() == 'DISPONIBLE' ? 'status-disponible' : (pub.estado.name() == 'RESERVADO' ? 'status-reservado' : 'status-adoptado')}"
-                        th:text="${pub.estado.name() == 'DISPONIBLE' ? 'Disponible' : (pub.estado.name() == 'RESERVADO' ? 'Reservado' : 'Adoptado')}">
-                        Disponible
-                    </span>
-
-                    <div th:if="${usuario.id == pub.propietarioId}" class="mt-3 w-100">
-                        <label class="small text-muted d-block mb-1 fw-bold"
-                            style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Actualizar
-                            Estado</label>
-                        <select class="form-select form-select-sm" id="petStatusSelect"
-                            onchange="changePetAdoptionStatus(this.value)"
-                            style="border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; border: 1.5px solid var(--border);">
-                            <option value="DISPONIBLE" th:selected="${pub.estado.name() == 'DISPONIBLE'}">Disponible
-                            </option>
-                            <option value="RESERVADO" th:selected="${pub.estado.name() == 'RESERVADO'}">Reservar Mascota
-                            </option>
-                            <option value="ADOPTADO" th:selected="${pub.estado.name() == 'ADOPTADO'}">Mascota Adoptada
-                            </option>
-                        </select>
-                    </div>
-
-                    <a th:href="@{/usuario/comunidad/detalle/{id}(id=${pub.id})}"
-                        class="btn btn-sm btn-outline-primary rounded-pill w-100 mt-3 fw-bold"
-                        style="font-size: 0.8rem; padding: 0.5rem; border: 1.5px solid var(--aurora-start); color: var(--aurora-start);">
-                        <i class="bi bi-heart-fill me-1" style="color: var(--danger);"></i> Ver Ficha Pública
-                    </a>
-                </div>
-
-                <!-- Contact Card -->
-                <div class="profile-summary-card">
-                    <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.9rem;">
-                        <i class="bi bi-person-badge-fill me-1" style="color: var(--aurora-start);"></i> Contacto
-                    </h6>
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <div class="avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem;"
-                            th:text="${#strings.substring(otroUsuario.nombre,0,1).toUpperCase()}">U</div>
-                        <div>
-                            <strong class="text-dark small d-block" style="font-size: 0.85rem;"
-                                th:text="${otroUsuario.nombre}">Nombre</strong>
-                            <span class="small" style="color: var(--warning); font-size: 0.75rem;">⭐⭐⭐⭐⭐ <span
-                                    style="color: var(--text-muted);">(4.9)</span></span>
+                <!-- TAB 1: MASCOTA -->
+                <div class="sidebar-tab-content active" id="tabContent-pet">
+                    <!-- Carousel (5) -->
+                    <div class="pet-carousel" id="petCarousel">
+                        <div class="carousel-slides" id="carouselSlides">
+                            <div class="carousel-slide">
+                                <img th:src="${pub.fotoPrincipalUrl}" alt="Foto Principal">
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=300" alt="Mascota Jugando">
+                            </div>
+                        </div>
+                        <div class="carousel-controls">
+                            <button class="carousel-btn" type="button" onclick="prevCarouselSlide()"><i class="bi bi-chevron-left"></i></button>
+                            <button class="carousel-btn" type="button" onclick="nextCarouselSlide()"><i class="bi bi-chevron-right"></i></button>
+                        </div>
+                        <div class="carousel-dots" id="carouselDots">
+                            <span class="carousel-dot active" onclick="setCarouselSlide(0)"></span>
+                            <span class="carousel-dot" onclick="setCarouselSlide(1)"></span>
                         </div>
                     </div>
 
-                    <div class="profile-stat-item">
-                        <span style="color: var(--text-muted);">Miembro desde</span>
-                        <strong class="text-dark" style="font-size: 0.8rem;">2026</strong>
+                    <!-- Pet Card -->
+                    <div class="right-pet-card mb-3">
+                        <h5 class="text-dark fw-bold mb-0" style="font-size: 1rem;" th:text="${pub.nombre}">Doki</h5>
+                        <span class="small text-muted" style="font-size: 0.8rem;"
+                            th:text="${pub.raza != null ? pub.raza : pub.especie}">Raza</span>
+
+                        <span id="adopStatusBadge" class="adoption-status-badge mt-2"
+                            th:classappend="${pub.estado.name() == 'DISPONIBLE' ? 'status-disponible' : (pub.estado.name() == 'RESERVADO' ? 'status-reservado' : 'status-adoptado')}"
+                            th:text="${pub.estado.name() == 'DISPONIBLE' ? 'Disponible' : (pub.estado.name() == 'RESERVADO' ? 'Reservado' : 'Adoptado')}">
+                            Disponible
+                        </span>
+
+                        <div th:if="${usuario.id == pub.propietarioId}" class="mt-3 w-100">
+                            <label class="small text-muted d-block mb-1 fw-bold"
+                                style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Actualizar Estado</label>
+                            <select class="form-select form-select-sm" id="petStatusSelect"
+                                onchange="changePetAdoptionStatus(this.value)"
+                                style="border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; border: 1.5px solid var(--border);">
+                                <option value="DISPONIBLE" th:selected="${pub.estado.name() == 'DISPONIBLE'}">Disponible</option>
+                                <option value="RESERVADO" th:selected="${pub.estado.name() == 'RESERVADO'}">Reservar Mascota</option>
+                                <option value="ADOPTADO" th:selected="${pub.estado.name() == 'ADOPTADO'}">Mascota Adoptada</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="profile-stat-item">
-                        <span style="color: var(--text-muted);">Mascotas registradas</span>
-                        <strong class="text-dark" style="font-size: 0.8rem;">3</strong>
-                    </div>
-                    <div class="profile-stat-item">
-                        <span style="color: var(--text-muted);">Adopciones exitosas</span>
-                        <strong class="text-dark" style="font-size: 0.8rem;">2</strong>
+
+                    <!-- Medical Info (6) & Profile Details (19) -->
+                    <div class="profile-summary-card">
+                        <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-heart-pulse-fill me-1 text-danger"></i> Estado Médico y Ficha
+                        </h6>
+                        <div class="profile-stat-item">
+                            <span>Vacunas:</span>
+                            <strong class="text-success"><i class="bi bi-check-circle-fill"></i> Completas</strong>
+                        </div>
+                        <div class="profile-stat-item">
+                            <span>Esterilizado:</span>
+                            <strong class="text-success" th:text="${pub.esterilizada ? 'Sí' : 'No'}">Sí</strong>
+                        </div>
+                        <div class="profile-stat-item" th:if="${pub.edad != null}">
+                            <span>Edad:</span>
+                            <strong class="text-dark" th:text="${pub.edad}">2 años</strong>
+                        </div>
+                        <div class="profile-stat-item" th:if="${pub.tamano != null}">
+                            <span>Tamaño:</span>
+                            <strong class="text-dark" th:text="${pub.tamano}">Mediano</strong>
+                        </div>
+                        <div class="profile-stat-item">
+                            <span>Desparasitado:</span>
+                            <strong class="text-success"><i class="bi bi-check-circle-fill"></i> Sí</strong>
+                        </div>
+                        
+                        <a th:href="@{/usuario/comunidad/detalle/{id}(id=${pub.id})}"
+                            class="btn btn-sm btn-outline-primary rounded-pill w-100 mt-3 fw-bold"
+                            style="font-size: 0.8rem; padding: 0.5rem; border: 1.5px solid var(--aurora-start); color: var(--aurora-start);">
+                            <i class="bi bi-heart-fill me-1" style="color: var(--danger);"></i> Ver Ficha Pública
+                        </a>
                     </div>
                 </div>
 
-                <!-- Security Actions -->
-                <div>
-                    <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.9rem;">
-                        Acciones de Seguridad</h6>
-                    <div class="d-flex flex-column gap-2">
-                        <button
-                            class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
-                            style="border: 1px solid var(--border-light); padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 600; transition: var(--transition-base);"
-                            onclick="simulateCall()">
-                            <i class="bi bi-telephone-fill" style="color: var(--success);"></i> Solicitar llamada por
-                            voz
-                        </button>
-                        <button
-                            class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
-                            style="border: 1px solid var(--border-light); padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 600; transition: var(--transition-base);"
-                            onclick="shareLocation()">
-                            <i class="bi bi-geo-alt-fill" style="color: var(--danger);"></i> Compartir mi ubicación
-                        </button>
-                        <button
-                            class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
-                            style="border: 1px solid var(--border-light); padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 600; transition: var(--transition-base);"
-                            onclick="blockUser()">
-                            <i class="bi bi-slash-circle-fill" style="color: var(--text-muted);"></i> Bloquear usuario
-                        </button>
+                <!-- TAB 2: PROCESO -->
+                <div class="sidebar-tab-content" id="tabContent-adopt">
+                    <!-- Progress Line (1) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-bar-chart-steps me-1" style="color: var(--aurora-start);"></i> Progreso de Adopción
+                        </h6>
+                        <div class="progress-steps">
+                            <div class="progress-step done">
+                                <span class="progress-step-icon"><i class="bi bi-check"></i></span>
+                                <span class="progress-step-text">Conversación iniciada</span>
+                            </div>
+                            <div class="progress-step done">
+                                <span class="progress-step-icon"><i class="bi bi-check"></i></span>
+                                <span class="progress-step-text">Intercambio de datos</span>
+                            </div>
+                            <div class="progress-step active" id="progStepEncuentro">
+                                <span class="progress-step-icon">3</span>
+                                <span class="progress-step-text">Encuentro de socialización</span>
+                            </div>
+                            <div class="progress-step" id="progStepFirma">
+                                <span class="progress-step-icon">4</span>
+                                <span class="progress-step-text">Compromiso firmado</span>
+                            </div>
+                            <div class="progress-step" id="progStepCompleto">
+                                <span class="progress-step-icon">5</span>
+                                <span class="progress-step-text">Adopción completada 🎉</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checklist (14) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-check2-square me-1 text-success"></i> Tareas de Verificación
+                        </h6>
+                        <div class="checklist-box">
+                            <label class="checklist-item checked">
+                                <input type="checkbox" checked disabled> <span>Revisar cartilla de vacunas</span>
+                            </label>
+                            <label class="checklist-item checked">
+                                <input type="checkbox" checked disabled> <span>Validar fotos del hogar</span>
+                            </label>
+                            <label class="checklist-item" id="chkEncuentroLabel">
+                                <input type="checkbox" id="chkEncuentro" onchange="toggleChecklistStep('encuentro', this.checked)"> <span>Realizar encuentro físico</span>
+                            </label>
+                            <label class="checklist-item" id="chkFirmaLabel">
+                                <input type="checkbox" id="chkFirma" onchange="toggleChecklistStep('firma', this.checked)"> <span>Firmar compromiso de adopción</span>
+                            </label>
+                            <label class="checklist-item" id="chkAdopcionLabel">
+                                <input type="checkbox" id="chkAdopcion" onchange="toggleChecklistStep('completado', this.checked)"> <span>Entrega y cierre de proceso</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Agenda (11) & Calendar (18) -->
+                    <div class="profile-summary-card">
+                        <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-calendar-event me-1" style="color: var(--success);"></i> Próxima Cita
+                        </h6>
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Lugar:</span>
+                                <strong class="text-dark">Parque del Centenario</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Fecha:</span>
+                                <strong class="text-dark">Domingo, 3:00 PM</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Estado:</span>
+                                <span class="badge bg-success-subtle text-success rounded-pill px-2">Agendado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: ADOPTANTE -->
+                <div class="sidebar-tab-content" id="tabContent-trust">
+                    <!-- Contact Card & Trust level (10) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-person-badge-fill me-1" style="color: var(--aurora-start);"></i> Adoptante Protector
+                        </h6>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem;"
+                                th:text="${#strings.substring(otroUsuario.nombre,0,1).toUpperCase()}">U</div>
+                            <div>
+                                <strong class="text-dark small d-block" style="font-size: 0.85rem;"
+                                    th:text="${otroUsuario.nombre}">Nombre</strong>
+                                <div class="trust-stars">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <span class="text-muted small ms-1">(5.0)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-1 mb-3">
+                            <span class="verification-badge"><i class="bi bi-check-circle-fill"></i> Correo</span>
+                            <span class="verification-badge"><i class="bi bi-check-circle-fill"></i> Teléfono</span>
+                            <span class="verification-badge"><i class="bi bi-check-circle-fill"></i> Cédula</span>
+                        </div>
+
+                        <div class="profile-stat-item">
+                            <span style="color: var(--text-muted);">Miembro desde:</span>
+                            <strong class="text-dark" style="font-size: 0.8rem;">2026</strong>
+                        </div>
+                        <div class="profile-stat-item">
+                            <span style="color: var(--text-muted);">Adopciones previas:</span>
+                            <strong class="text-dark" style="font-size: 0.8rem;">2 exitosas</strong>
+                        </div>
+                    </div>
+
+                    <!-- Achievements (20) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-trophy-fill me-1" style="color: var(--warning);"></i> Logros de Comunidad
+                        </h6>
+                        <div class="d-flex flex-wrap">
+                            <span class="achievement-badge"><i class="bi bi-heart-fill"></i> Adoptante Gold</span>
+                            <span class="achievement-badge"><i class="bi bi-lightning-fill"></i> Responde Rápido</span>
+                            <span class="achievement-badge"><i class="bi bi-shield-check"></i> Verificado</span>
+                        </div>
+                    </div>
+
+                    <!-- Compatibility Meter (2) -->
+                    <div class="compatibility-card">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small fw-bold text-dark">Compatibilidad General</span>
+                            <span class="small fw-800 text-primary">87%</span>
+                        </div>
+                        <div class="compatibility-meter">
+                            <div class="compatibility-fill" style="width: 87%"></div>
+                        </div>
+                        <div class="compatibility-info-grid">
+                            <div class="compatibility-item yes"><i class="bi bi-check-circle-fill"></i> Tiene patio</div>
+                            <div class="compatibility-item yes"><i class="bi bi-check-circle-fill"></i> Exp. previa</div>
+                            <div class="compatibility-item yes"><i class="bi bi-check-circle-fill"></i> Apto niños</div>
+                            <div class="compatibility-item warn"><i class="bi bi-exclamation-triangle-fill"></i> Primer perro</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: EXTRAS -->
+                <div class="sidebar-tab-content" id="tabContent-extra">
+                    <!-- Private Notes (12) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-sticky-fill me-1 text-warning"></i> Mis Notas Privadas
+                        </h6>
+                        <textarea class="private-notes-area" id="privateNotesTxt" placeholder="Escribe notas aquí que solo tú podrás ver..." oninput="saveConversationNotes(this.value)"></textarea>
+                    </div>
+
+                    <!-- AI Summary (13) -->
+                    <div class="profile-summary-card mb-3">
+                        <div class="ai-summary-card">
+                            <span class="ai-summary-badge">IA Resumen</span>
+                            <p class="ai-summary-text" id="aiSummaryTxt">
+                                Conversación sobre vacunas y desparasitación completada. Quedaron en encontrarse este Domingo a las 3:00 PM para la primera socialización de la mascota en el parque.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Shared Files (4) & Stats (15) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-folder-fill me-1" style="color: var(--aurora-start);"></i> Archivos Compartidos
+                        </h6>
+                        <div class="shared-media-container" id="sharedMediaContainer">
+                            <div class="text-center py-2 small text-muted">Ningún archivo compartido aún.</div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mt-3 pt-2" style="border-top: 1px solid var(--border-light);">
+                            <span>Total Mensajes: <strong class="text-dark" id="statsMsgCount">0</strong></span>
+                            <span>Archivos: <strong class="text-dark" id="statsFileCount">0</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Timeline of actions (3) -->
+                    <div class="profile-summary-card mb-3">
+                        <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            <i class="bi bi-clock-history me-1"></i> Historial de Acciones
+                        </h6>
+                        <div class="timeline-box">
+                            <div class="timeline-event success">
+                                <span class="timeline-badge"><i class="bi bi-plus-lg"></i></span>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">Chat Iniciado</span>
+                                    <div class="timeline-desc">Se creó este canal seguro</div>
+                                </div>
+                            </div>
+                            <div class="timeline-event primary" id="timelineMeetingNode" style="display: none;">
+                                <span class="timeline-badge"><i class="bi bi-calendar-date"></i></span>
+                                <div class="timeline-content">
+                                    <span class="timeline-title">Cita Coordinada</span>
+                                    <div class="timeline-desc">Domingo, Parque Centenario</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security, Contact (16) & Report (17) -->
+                    <div class="profile-summary-card">
+                        <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.85rem;">
+                            Contacto y Seguridad
+                        </h6>
+                        <div class="d-flex flex-column gap-2">
+                            <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                                style="border: 1px solid var(--border-light); padding: 0.55rem; font-size: 0.8rem; font-weight: 600;"
+                                onclick="shareContactInfo()">
+                                <i class="bi bi-share-fill text-primary"></i> Compartir Datos de Contacto
+                            </button>
+                            <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                                style="border: 1px solid var(--border-light); padding: 0.55rem; font-size: 0.8rem; font-weight: 600;"
+                                onclick="simulateCall()">
+                                <i class="bi bi-telephone-fill text-success"></i> Solicitar llamada por voz
+                            </button>
+                            <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                                style="border: 1px solid var(--border-light); padding: 0.55rem; font-size: 0.8rem; font-weight: 600;"
+                                onclick="shareLocation()">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> Compartir mi ubicación
+                            </button>
+                            <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                                style="border: 1px solid var(--border-light); padding: 0.55rem; font-size: 0.8rem; font-weight: 600;"
+                                onclick="blockUser()">
+                                <i class="bi bi-slash-circle-fill text-muted"></i> Bloquear usuario
+                            </button>
+                            <button class="btn btn-sm btn-light text-start text-danger d-flex align-items-center gap-2 rounded"
+                                style="border: 1px solid var(--border-light); padding: 0.55rem; font-size: 0.8rem; font-weight: 600;"
+                                onclick="reportConversation()">
+                                <i class="bi bi-exclamation-octagon-fill"></i> Reportar Conversación
+                            </button>
+                        </div>
                     </div>
                 </div>
 
             </div>
+        </div>
         </div>
 
     </div>
@@ -1824,6 +2563,7 @@
                         scrollToBottom();
                         refreshInboxList();
                     }
+                    updateChatStatsAndMedia();
                 })
                 .catch(err => console.debug('Polled messages skipped:', err));
         }
@@ -1919,11 +2659,242 @@
             });
         }
 
+        // ===== 20 FEATURES PREMIUM JS LOGIC =====
+
+        // 1. Sidebar Tab Switcher
+        function switchSidebarTab(tabName) {
+            document.querySelectorAll('.sidebar-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('onclick').includes(tabName)) {
+                    btn.classList.add('active');
+                }
+            });
+            document.querySelectorAll('.sidebar-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            const activeContent = document.getElementById('tabContent-' + tabName);
+            if (activeContent) {
+                activeContent.classList.add('active');
+            }
+        }
+
+        // 2. Pet Photo Carousel
+        let currentCarouselIndex = 0;
+        function prevCarouselSlide() {
+            const slides = document.getElementById('carouselSlides');
+            if (!slides) return;
+            const totalSlides = slides.children.length;
+            currentCarouselIndex = (currentCarouselIndex - 1 + totalSlides) % totalSlides;
+            updateCarouselPosition();
+        }
+        function nextCarouselSlide() {
+            const slides = document.getElementById('carouselSlides');
+            if (!slides) return;
+            const totalSlides = slides.children.length;
+            currentCarouselIndex = (currentCarouselIndex + 1) % totalSlides;
+            updateCarouselPosition();
+        }
+        function setCarouselSlide(idx) {
+            currentCarouselIndex = idx;
+            updateCarouselPosition();
+        }
+        function updateCarouselPosition() {
+            const slides = document.getElementById('carouselSlides');
+            if (!slides) return;
+            slides.style.transform = `translateX(-${currentCarouselIndex * 100}%)`;
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentCarouselIndex);
+            });
+        }
+
+        // 3. Auto Translation Simulation
+        let translationActive = false;
+        const translations = {
+            "¿Sigue disponible?": "Is it still available?",
+            "¿Está vacunado y desparasitado?": "Is it vaccinated and dewormed?",
+            "¿Está esterilizado?": "Is it neutered?",
+            "¿Tiene alguna enfermedad?": "Does it have any disease?",
+            "¿Cómo se lleva con gatos u otras mascotas?": "How does it get along with cats or other pets?",
+            "¿Convive bien con niños pequeños?": "Does it live well with small children?",
+            "¿Qué tipo de comida come?": "What kind of food does it eat?",
+            "¿Podemos agendar un encuentro?": "Can we schedule a meeting?",
+            "Hola": "Hello",
+            "Hola, ¿cómo estás?": "Hello, how are you?",
+            "Sí, claro": "Yes, of course",
+            "Perfecto, nos vemos": "Perfect, see you"
+        };
+        function toggleTranslation() {
+            translationActive = !translationActive;
+            const btn = document.getElementById('translationBtn');
+            const label = document.getElementById('translationLabel');
+            if (btn) btn.classList.toggle('active', translationActive);
+            if (label) label.textContent = translationActive ? 'Traducido' : 'Traducir';
+
+            document.querySelectorAll('.msg-text-content').forEach(el => {
+                const originalText = el.getAttribute('data-original') || el.textContent.trim();
+                if (!el.getAttribute('data-original')) {
+                    el.setAttribute('data-original', originalText);
+                }
+
+                if (translationActive) {
+                    if (translations[originalText]) {
+                        el.textContent = translations[originalText];
+                    } else {
+                        el.textContent = "[Translated] " + originalText;
+                    }
+                } else {
+                    el.textContent = originalText;
+                }
+            });
+        }
+
+        // 4. Private Notes (localStorage)
+        function loadConversationNotes() {
+            const key = `notes_${adopcionId}_${currentUserId}`;
+            const txt = localStorage.getItem(key) || '';
+            const area = document.getElementById('privateNotesTxt');
+            if (area) area.value = txt;
+        }
+        function saveConversationNotes(text) {
+            const key = `notes_${adopcionId}_${currentUserId}`;
+            localStorage.setItem(key, text);
+        }
+
+        // 5. Checklist and Progress flow linkage
+        function toggleChecklistStep(stepName, checked) {
+            const labelEl = document.getElementById(`chk${stepName.charAt(0).toUpperCase() + stepName.slice(1)}Label`);
+            if (labelEl) labelEl.classList.toggle('checked', checked);
+
+            // Update Progress Steps in UI
+            if (stepName === 'encuentro') {
+                const progStep = document.getElementById('progStepEncuentro');
+                const timelineNode = document.getElementById('timelineMeetingNode');
+                if (progStep) {
+                    progStep.classList.toggle('done', checked);
+                    progStep.classList.toggle('active', !checked);
+                }
+                if (timelineNode) timelineNode.style.display = checked ? 'flex' : 'none';
+            } else if (stepName === 'firma') {
+                const progStep = document.getElementById('progStepFirma');
+                if (progStep) {
+                    progStep.classList.toggle('done', checked);
+                    progStep.classList.toggle('active', checked);
+                }
+            } else if (stepName === 'completado') {
+                const progStep = document.getElementById('progStepCompleto');
+                if (progStep) {
+                    progStep.classList.toggle('done', checked);
+                    progStep.classList.toggle('active', checked);
+                }
+            }
+        }
+
+        // 6. Shared Media Extraction & Chat Stats
+        function updateChatStatsAndMedia() {
+            const wrappers = document.querySelectorAll('#chatMessages .bubble-wrapper');
+            const totalMsgs = wrappers.length;
+            const statsMsg = document.getElementById('statsMsgCount');
+            if (statsMsg) statsMsg.textContent = totalMsgs;
+
+            let fileCount = 0;
+            const container = document.getElementById('sharedMediaContainer');
+            if (!container) return;
+
+            let mediaHtml = '';
+
+            wrappers.forEach(w => {
+                const img = w.querySelector('img');
+                const docLink = w.querySelector('a[download]');
+                const audio = w.querySelector('audio');
+
+                if (img) {
+                    fileCount++;
+                    mediaHtml += `
+                        <a href="${img.src}" target="_blank" class="shared-media-item">
+                            <i class="bi bi-image shared-media-icon"></i>
+                            <span class="shared-media-name">Foto_${fileCount}.jpg</span>
+                        </a>
+                    `;
+                } else if (docLink) {
+                    fileCount++;
+                    const name = docLink.querySelector('span') ? docLink.querySelector('span').textContent : 'Archivo';
+                    mediaHtml += `
+                        <a href="${docLink.href}" download class="shared-media-item">
+                            <i class="bi bi-file-earmark-pdf-fill shared-media-icon text-danger"></i>
+                            <span class="shared-media-name">${escapeHtml(name)}</span>
+                        </a>
+                    `;
+                } else if (audio) {
+                    fileCount++;
+                    mediaHtml += `
+                        <a href="${audio.src}" download class="shared-media-item">
+                            <i class="bi bi-mic-fill shared-media-icon text-success"></i>
+                            <span class="shared-media-name">Audio_${fileCount}.webm</span>
+                        </a>
+                    `;
+                }
+            });
+
+            if (fileCount > 0) {
+                container.innerHTML = mediaHtml;
+            } else {
+                container.innerHTML = '<div class="text-center py-2 small text-muted">Ningún archivo compartido aún.</div>';
+            }
+
+            const statsFile = document.getElementById('statsFileCount');
+            if (statsFile) statsFile.textContent = fileCount;
+        }
+
+        // 7. Security Action Simulations
+        function shareContactInfo() {
+            useSuggestion('📞 Aquí tienes mi información de contacto para coordinar la adopción.');
+        }
+        function shareLocation() {
+            useSuggestion('📍 Te comparto mi ubicación aproximada para el encuentro: Parque del Centenario, Calle Principal.');
+        }
+        function simulateCall() {
+            alert('Llamada de voz solicitada. Esperando a que el otro usuario acepte la llamada.');
+        }
+        function blockUser() {
+            if(confirm('¿Estás seguro de que deseas bloquear a este usuario? Ya no recibirás sus mensajes.')) {
+                window.location.href = '/usuario/comunidad/chats';
+            }
+        }
+        function reportConversation() {
+            const reason = prompt('Selecciona el motivo del reporte:\n1. Spam\n2. Sospecha de Estafa\n3. Comportamiento Inadecuado\n4. Otro');
+            if (reason) {
+                alert('Gracias. La conversación ha sido reportada y nuestro equipo la revisará de inmediato.');
+            }
+        }
+
+        // Status pulsing simulation
+        let statusCycle = 0;
+        function updateOnlineStatusMock() {
+            const statusText = document.getElementById('userStatusText');
+            if (!statusText) return;
+            statusCycle = (statusCycle + 1) % 4;
+            if (statusCycle === 0) {
+                statusText.textContent = "En línea";
+            } else if (statusCycle === 1) {
+                statusText.textContent = "Escribiendo...";
+            } else if (statusCycle === 2) {
+                statusText.textContent = "Grabando audio...";
+            } else {
+                statusText.textContent = "Última conexión hace 1 min";
+            }
+        }
+        setInterval(updateOnlineStatusMock, 15000);
+
         window.addEventListener('DOMContentLoaded', () => {
             scrollToBottom();
             document.body.classList.add('chat-active');
             setInterval(pollMessages, 3000);
             setInterval(refreshInboxList, 7000);
+
+            // Load extra premium variables
+            loadConversationNotes();
+            setTimeout(updateChatStatsAndMedia, 1500);
 
             const backBtn = document.getElementById('backToInboxBtn');
             if (backBtn) {
