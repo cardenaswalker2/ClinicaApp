@@ -252,4 +252,52 @@ public class ComunidadPetService {
         }
         chatRepository.saveAll(msgs);
     }
+
+    public List<Map<String, Object>> getAllConversaciones() {
+        List<MensajeChat> todos = chatRepository.findAll();
+        Map<String, List<MensajeChat>> agrupado = todos.stream()
+                .collect(Collectors.groupingBy(m -> {
+                    String p1 = m.getEmisorId();
+                    String p2 = m.getReceptorId();
+                    if (p1.compareTo(p2) > 0) {
+                        return m.getAdopcionId() + "_" + p2 + "_" + p1;
+                    } else {
+                        return m.getAdopcionId() + "_" + p1 + "_" + p2;
+                    }
+                }));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Map.Entry<String, List<MensajeChat>> entry : agrupado.entrySet()) {
+            List<MensajeChat> msgs = entry.getValue();
+            msgs.sort(Comparator.comparing(MensajeChat::getFechaHora).reversed());
+            MensajeChat ultimo = msgs.get(0);
+
+            String adopId = ultimo.getAdopcionId();
+            String p1 = ultimo.getEmisorId();
+            String p2 = ultimo.getReceptorId();
+            String p1Nombre = ultimo.getEmisorNombre();
+            String p2Nombre = ultimo.getReceptorNombre();
+
+            Optional<PublicacionAdopcion> optPub = publicacionRepository.findById(adopId);
+            String mascotaNombre = optPub.isPresent() ? optPub.get().getNombre() : "Desconocida";
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("adopcionId", adopId);
+            map.put("mascotaNombre", mascotaNombre);
+            map.put("p1Id", p1);
+            map.put("p1Nombre", p1Nombre);
+            map.put("p2Id", p2);
+            map.put("p2Nombre", p2Nombre);
+            map.put("ultimoMensaje", ultimo.getContenido());
+            map.put("fechaHora", ultimo.getFechaHora());
+            map.put("cantidadMensajes", msgs.size());
+            map.put("ultimoMensajeEmisor", ultimo.getEmisorNombre());
+
+            result.add(map);
+        }
+
+        result.sort((m1, m2) -> ((LocalDateTime) m2.get("fechaHora")).compareTo((LocalDateTime) m1.get("fechaHora")));
+        return result;
+    }
 }
