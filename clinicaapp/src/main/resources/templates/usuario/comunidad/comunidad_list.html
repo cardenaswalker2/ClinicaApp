@@ -12,7 +12,9 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -21,164 +23,431 @@
             --aurora-end: #d946ef;
             --bg: #f8fafc;
             --surface: #ffffff;
+            --surface-hover: #f8fafc;
             --border: #e2e8f0;
+            --border-light: #f1f5f9;
             --text-primary: #0f172a;
-            --text-secondary: #64748b;
+            --text-secondary: #475569;
             --text-muted: #94a3b8;
-            --accent-indigo: #6366f1;
-            --accent-indigo-dim: rgba(99, 102, 241, 0.08);
-            --radius-md: 16px;
-            --radius-lg: 20px;
+            --success: #10b981;
+            --info: #3b82f6;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.07), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
             color: var(--text-secondary);
             min-height: 100vh;
+            line-height: 1.6;
         }
 
+        /* ===== NAVBAR ===== */
         .main-navbar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            transition: var(--transition-base);
+        }
+
+        .main-navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.96);
         }
 
         .navbar-brand-hex {
             font-weight: 800;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
             text-decoration: none;
+            letter-spacing: -0.02em;
         }
 
         .navbar-brand-hex i {
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
+            background-clip: text;
+            font-size: 1.35rem;
         }
 
-        .btn-comunidad-nav {
+        .nav-pills-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #f1f5f9;
+            padding: 0.3rem;
+            border-radius: var(--radius-full);
+        }
+
+        .nav-pill {
             font-weight: 600;
-            font-size: 0.9rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            transition: all 0.2s;
+            font-size: 0.82rem;
+            padding: 0.45rem 1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
             text-decoration: none;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border: none;
+            background: transparent;
+            white-space: nowrap;
         }
 
-        .btn-comunidad-nav.active {
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
-            color: white;
-        }
-
-        .btn-comunidad-nav:not(.active) {
-            color: var(--text-secondary);
-        }
-
-        .btn-comunidad-nav:hover:not(.active) {
-            background: rgba(0, 0, 0, 0.03);
+        .nav-pill:hover {
             color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.6);
         }
 
-        /* ===== HERO HEADER ===== */
+        .nav-pill.active {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .nav-back-btn {
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 0.45rem 1.1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            margin-left: 0.5rem;
+        }
+
+        .nav-back-btn:hover {
+            border-color: var(--aurora-start);
+            color: var(--aurora-start);
+            background: rgba(99, 102, 241, 0.06);
+            transform: translateY(-1px);
+        }
+
+        /* ===== HERO SECTION ===== */
         .hero-section {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(217, 70, 239, 0.03) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.1);
-            border-radius: var(--radius-lg);
-            padding: 2.5rem;
-            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            margin-bottom: 1.5rem;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.05);
+            box-shadow: var(--shadow-sm);
         }
 
-        .hero-section h1 {
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(217, 70, 239, 0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-title {
             font-family: 'Outfit', sans-serif;
             font-weight: 800;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
-            font-size: 2.2rem;
+            font-size: 1.9rem;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
         }
 
-        .hero-section h1 span {
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* ===== FILTER BAR ===== */
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            max-width: 480px;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 0;
+        }
+
+        .btn-publish-hero {
+            background: linear-gradient(135deg, var(--aurora-start) 0%, var(--aurora-mid) 50%, var(--aurora-end) 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 0.75rem 1.6rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-publish-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-publish-hero:hover::after {
+            left: 100%;
+        }
+
+        .btn-publish-hero:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        /* ===== FILTER CARD ===== */
         .filter-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xs);
+            margin-bottom: 1.5rem;
+            transition: var(--transition-base);
+        }
+
+        .filter-card:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-title i {
+            font-size: 0.95rem;
+            color: var(--aurora-start);
+        }
+
+        .form-label-custom {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control-custom,
+        .form-select-custom {
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.6rem 0.9rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: var(--transition-base);
+        }
+
+        .form-control-custom:focus,
+        .form-select-custom:focus {
+            border-color: var(--aurora-start);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        .form-control-custom::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .btn-filter-clear {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.4rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            text-decoration: none;
+        }
+
+        .btn-filter-clear:hover {
+            border-color: var(--text-muted);
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-filter-search {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.4rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-filter-search:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
         }
 
         /* ===== PET CARDS ===== */
         .pet-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            transition: var(--transition-slow);
+            box-shadow: var(--shadow-xs);
             height: 100%;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
+        .pet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(90deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
+            transition: var(--transition-base);
+            z-index: 2;
+        }
+
         .pet-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.12);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
             border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .pet-card:hover::before {
+            height: 3px;
         }
 
         .pet-img-container {
             position: relative;
-            height: 240px;
+            height: 220px;
             overflow: hidden;
-            background: #f1f5f9;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
         }
 
         .pet-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s;
+            transition: var(--transition-slow);
         }
 
         .pet-card:hover .pet-img {
-            transform: scale(1.06);
+            transform: scale(1.08);
         }
 
-        .pet-badge {
+        .pet-badge-gender {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 0.85rem;
+            right: 0.85rem;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(4px);
-            color: var(--accent-indigo);
+            backdrop-filter: blur(8px);
+            color: var(--aurora-start);
             font-weight: 700;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             text-transform: uppercase;
-            padding: 0.35rem 0.85rem;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            letter-spacing: 0.5px;
+            padding: 0.35rem 0.8rem;
+            border-radius: var(--radius-full);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            letter-spacing: 0.6px;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .pet-badge-gender i {
+            font-size: 0.75rem;
         }
 
         .pet-info {
-            padding: 1.5rem;
+            padding: 1.25rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -186,77 +455,261 @@
 
         .pet-name {
             font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 1.35rem;
+            font-weight: 800;
+            font-size: 1.15rem;
             color: var(--text-primary);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.01em;
         }
 
         .pet-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.35rem;
+            margin-bottom: 0.75rem;
         }
 
-        .pet-meta span {
+        .pet-meta-tag {
             background: #f1f5f9;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-weight: 500;
+            padding: 0.25rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
         }
 
         .pet-story {
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-bottom: 1.25rem;
-            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            line-height: 1.55;
+        }
+
+        .pet-location {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pet-location i {
+            color: var(--aurora-start);
+            font-size: 0.8rem;
         }
 
         .pet-footer-stats {
-            margin-top: auto;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--border-light);
             padding-top: 0.75rem;
             display: flex;
             justify-content: space-between;
-            font-size: 0.78rem;
+            align-items: center;
+            font-size: 0.75rem;
             color: var(--text-muted);
+            margin-bottom: 0.75rem;
         }
 
         .pet-footer-stats span {
             display: flex;
             align-items: center;
             gap: 0.3rem;
+            font-weight: 600;
         }
 
         .pet-footer-stats i {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        .pet-footer-stats strong {
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
         .btn-view-pet {
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
             border: none;
             color: white;
             font-weight: 700;
-            border-radius: 12px;
-            padding: 0.7rem;
+            font-size: 0.82rem;
+            border-radius: var(--radius-md);
+            padding: 0.65rem;
             width: 100%;
-            transition: opacity 0.2s;
-            margin-top: 1rem;
+            transition: var(--transition-base);
             text-align: center;
             text-decoration: none;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-view-pet::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-view-pet:hover::after {
+            left: 100%;
         }
 
         .btn-view-pet:hover {
-            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
             color: white;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state-icon-wrap {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state-icon-wrap i {
+            font-size: 2.2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h5 {
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+            font-size: 1.1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .nav-pills-group {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .hero-section {
+                padding: 1.75rem;
+            }
+
+            .pet-img-container {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-section .row {
+                text-align: center;
+            }
+
+            .hero-section .col-md-4 {
+                margin-top: 1.25rem;
+            }
+
+            .btn-publish-hero {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filter-card {
+                padding: 1.25rem;
+            }
+
+            .pet-img-container {
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .hero-title {
+                font-size: 1.3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .pet-card {
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pet-card {
+            animation: fadeInUp 0.45s ease-out forwards;
+        }
+
+        .pet-card:nth-child(1) {
+            animation-delay: 0.03s;
+        }
+
+        .pet-card:nth-child(2) {
+            animation-delay: 0.06s;
+        }
+
+        .pet-card:nth-child(3) {
+            animation-delay: 0.09s;
+        }
+
+        .pet-card:nth-child(4) {
+            animation-delay: 0.12s;
+        }
+
+        .pet-card:nth-child(5) {
+            animation-delay: 0.15s;
+        }
+
+        .pet-card:nth-child(6) {
+            animation-delay: 0.18s;
         }
     </style>
 </head>
@@ -264,46 +717,56 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="main-navbar py-2 mb-4">
-        <div class="container d-flex align-items-center">
+    <nav class="main-navbar py-2 mb-0">
+        <div class="container d-flex align-items-center" style="max-width: 1200px;">
             <a class="navbar-brand-hex" th:href="@{/usuario/dashboard}">
                 <i class="bi bi-heart-fill"></i>
                 Comunidad Pet
             </a>
-            <div class="ms-auto d-flex align-items-center gap-2">
-                <a th:href="@{/usuario/comunidad}" class="btn-comunidad-nav active">Adopciones</a>
-                <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="btn-comunidad-nav">Mis Publicaciones</a>
-                <a th:href="@{/usuario/comunidad/chats}" class="btn-comunidad-nav"><i class="bi bi-chat-dots-fill"></i> Mensajes</a>
-                <a th:href="@{/usuario/dashboard}" class="btn btn-sm btn-outline-secondary rounded-pill ms-3">Volver al Dashboard</a>
+            <div class="ms-auto d-flex align-items-center">
+                <div class="nav-pills-group">
+                    <a th:href="@{/usuario/comunidad}" class="nav-pill active">Adopciones</a>
+                    <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="nav-pill">Mis Publicaciones</a>
+                    <a th:href="@{/usuario/comunidad/chats}" class="nav-pill"><i class="bi bi-chat-dots-fill"></i>
+                        Mensajes</a>
+                </div>
+                <a th:href="@{/usuario/dashboard}" class="nav-back-btn">
+                    <i class="bi bi-arrow-left"></i> Dashboard
+                </a>
             </div>
         </div>
     </nav>
 
-    <div class="container mb-5">
+    <div class="container mb-5" style="max-width: 1200px;">
 
-        <!-- ===== HERO HEADER ===== -->
+        <!-- Hero Header -->
         <div class="hero-section">
             <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1>Comunidad Pet <span>Adopciones</span> ❤️</h1>
-                    <p class="lead mb-0">Encuentra tu nuevo mejor amigo o ayuda a mascotas registradas a encontrar un hogar amoroso.</p>
+                <div class="col-lg-8">
+                    <h1 class="hero-title">
+                        Comunidad Pet <span class="gradient-text">Adopciones</span> <span
+                            style="font-size: 1.4rem;">❤️</span>
+                    </h1>
+                    <p class="hero-subtitle">Encuentra tu nuevo mejor amigo o ayuda a mascotas registradas a encontrar
+                        un hogar amoroso y seguro.</p>
                 </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <a th:href="@{/usuario/comunidad/nueva}" class="btn btn-primary btn-lg rounded-pill" style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end)); border: none; font-weight: 700; box-shadow: 0 4px 15px rgba(99,102,241,0.3);">
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a th:href="@{/usuario/comunidad/nueva}" class="btn-publish-hero">
                         <i class="bi bi-plus-lg"></i> Publicar Mascota
                     </a>
                 </div>
             </div>
         </div>
-
-        <!-- ===== FILTERS ===== -->
+        <!-- Filters -->
         <div class="filter-card">
-            <h5 class="mb-3 text-dark"><i class="bi bi-funnel-fill"></i> Filtrar Búsqueda</h5>
+            <div class="filter-title">
+                <i class="bi bi-funnel-fill"></i> Filtrar Búsqueda
+            </div>
             <form th:action="@{/usuario/comunidad}" method="get">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Especie</label>
-                        <select name="especie" class="form-select">
+                        <label class="form-label-custom">Especie</label>
+                        <select name="especie" class="form-select form-select-custom">
                             <option value="">Todas</option>
                             <option value="PERRO" th:selected="${especie == 'PERRO'}">Perros</option>
                             <option value="GATO" th:selected="${especie == 'GATO'}">Gatos</option>
@@ -311,65 +774,93 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Ciudad</label>
-                        <input type="text" name="ciudad" class="form-select" th:value="${ciudad}" placeholder="Ej. Cartagena">
+                        <label class="form-label-custom">Ciudad</label>
+                        <input type="text" name="ciudad" class="form-control form-control-custom" th:value="${ciudad}"
+                            placeholder="Ej. Cartagena">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Raza / Características</label>
-                        <input type="text" name="raza" class="form-control" th:value="${raza}" placeholder="Ej. Golden">
+                        <label class="form-label-custom">Raza / Características</label>
+                        <input type="text" name="raza" class="form-control form-control-custom" th:value="${raza}"
+                            placeholder="Ej. Golden">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">Sexo</label>
-                        <select name="sexo" class="form-select">
+                        <label class="form-label-custom">Sexo</label>
+                        <select name="sexo" class="form-select form-select-custom">
                             <option value="">Todos</option>
                             <option value="Macho" th:selected="${sexo == 'Macho'}">Macho</option>
                             <option value="Hembra" th:selected="${sexo == 'Hembra'}">Hembra</option>
                         </select>
                     </div>
-                    <div class="col-12 text-end">
-                        <a th:href="@{/usuario/comunidad}" class="btn btn-outline-secondary px-4 me-2 rounded-3">Limpiar</a>
-                        <button type="submit" class="btn btn-primary px-4 rounded-3" style="background: var(--accent-indigo); border: none;">Buscar</button>
+                    <div class="col-12 text-end mt-2">
+                        <a th:href="@{/usuario/comunidad}" class="btn-filter-clear">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </a>
+                        <button type="submit" class="btn-filter-search ms-2">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
 
-        <!-- ===== PUBLICACIONES FEED ===== -->
+        <!-- Publications Feed -->
         <div class="row g-4">
+
+            <!-- Empty State -->
             <div class="col-12" th:if="${#lists.isEmpty(publicaciones)}">
-                <div class="text-center py-5 bg-white border rounded-4">
-                    <i class="bi bi-emoji-frown text-muted fs-1 mb-3 d-block"></i>
-                    <h5 class="text-dark">No se encontraron mascotas en adopción</h5>
-                    <p class="text-muted small">Intenta ajustando los filtros de búsqueda o publica una mascota para iniciar la comunidad.</p>
+                <div class="empty-state">
+                    <div class="empty-state-icon-wrap">
+                        <i class="bi bi-search-heart"></i>
+                    </div>
+                    <h5>No se encontraron mascotas en adopción</h5>
+                    <p>Intenta ajustando los filtros de búsqueda o publica una mascota para iniciar la comunidad.</p>
                 </div>
             </div>
 
-            <div class="col-md-4" th:each="pub : ${publicaciones}">
+            <!-- Pet Cards -->
+            <div class="col-md-6 col-lg-4" th:each="pub : ${publicaciones}">
                 <div class="pet-card">
                     <div class="pet-img-container">
                         <img th:src="${pub.fotoPrincipalUrl}" class="pet-img" alt="Mascota">
-                        <span class="pet-badge" th:text="${pub.sexo}">Macho</span>
+                        <span class="pet-badge-gender">
+                            <i class="bi"
+                                th:classappend="${pub.sexo == 'Macho' ? 'bi-gender-male' : 'bi-gender-female'}"></i>
+                            <span th:text="${pub.sexo}">Macho</span>
+                        </span>
                     </div>
                     <div class="pet-info">
                         <div class="pet-name" th:text="${pub.nombre}">Fido</div>
                         <div class="pet-meta">
-                            <span th:text="${pub.especie}">Especie</span>
-                            <span th:text="${pub.raza}">Raza</span>
-                            <span th:text="${pub.edad}">Edad</span>
+                            <span class="pet-meta-tag" th:text="${pub.especie}">Especie</span>
+                            <span class="pet-meta-tag" th:text="${pub.raza}">Raza</span>
+                            <span class="pet-meta-tag" th:text="${pub.edad}">Edad</span>
                         </div>
-                        <p class="pet-story text-muted" th:text="${pub.historia}">Historia de la mascota...</p>
-                        
-                        <div class="mb-2 small">
-                            <i class="bi bi-geo-alt-fill text-danger"></i> <span th:text="${pub.ciudad + (pub.barrio != null ? ' - ' + pub.barrio : '')}">Cartagena</span>
+                        <p class="pet-story" th:text="${pub.historia}">Historia de la mascota...</p>
+
+                        <div class="pet-location">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span
+                                th:text="${pub.ciudad + (pub.barrio != null ? ' - ' + pub.barrio : '')}">Cartagena</span>
                         </div>
 
-                        <div class="pet-footer-stats mt-auto">
-                            <span><i class="bi bi-eye"></i> <strong th:text="${pub.vistas}">0</strong></span>
-                            <span><i class="bi bi-chat-heart"></i> <strong th:text="${pub.interesados}">0</strong></span>
-                            <span><i class="bi bi-calendar-event"></i> <span th:text="${#temporals.format(pub.fechaCreacion, 'dd/MM/yyyy')}">Fecha</span></span>
+                        <div class="pet-footer-stats">
+                            <span>
+                                <i class="bi bi-eye text-primary"></i>
+                                <strong th:text="${pub.vistas}">0</strong> vistas
+                            </span>
+                            <span>
+                                <i class="bi bi-chat-heart text-success"></i>
+                                <strong th:text="${pub.interesados}">0</strong> chats
+                            </span>
+                            <span>
+                                <i class="bi bi-calendar-event text-muted"></i>
+                                <span th:text="${#temporals.format(pub.fechaCreacion, 'dd/MM')}">Fecha</span>
+                            </span>
                         </div>
 
-                        <a th:href="@{/usuario/comunidad/detalle/{id}(id=${pub.id})}" class="btn-view-pet">Ver información</a>
+                        <a th:href="@{/usuario/comunidad/detalle/{id}(id=${pub.id})}" class="btn-view-pet">
+                            <i class="bi bi-eye-fill"></i> Ver información
+                        </a>
                     </div>
                 </div>
             </div>
@@ -377,5 +868,21 @@
 
     </div>
 
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Navbar scroll effect -->
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.main-navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+
 </body>
+
 </html>

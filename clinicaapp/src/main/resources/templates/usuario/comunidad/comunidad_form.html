@@ -12,70 +12,606 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
             --aurora-start: #6366f1;
+            --aurora-mid: #8b5cf6;
             --aurora-end: #d946ef;
             --bg: #f8fafc;
             --surface: #ffffff;
+            --surface-hover: #f8fafc;
             --border: #e2e8f0;
+            --border-light: #f1f5f9;
             --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --radius-md: 16px;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.07), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
             color: var(--text-secondary);
             min-height: 100vh;
+            line-height: 1.6;
         }
 
+        /* ===== NAVBAR ===== */
         .main-navbar {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            transition: var(--transition-base);
+        }
+
+        .main-navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.96);
         }
 
         .navbar-brand-hex {
             font-weight: 800;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
             text-decoration: none;
+            letter-spacing: -0.02em;
         }
 
         .navbar-brand-hex i {
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
+            background-clip: text;
+            font-size: 1.35rem;
         }
 
+        .nav-back-btn {
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 0.45rem 1.1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .nav-back-btn:hover {
+            border-color: var(--aurora-start);
+            color: var(--aurora-start);
+            background: rgba(99, 102, 241, 0.06);
+            transform: translateY(-1px);
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            padding: 2rem 0 1.5rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-title .gradient-text {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* ===== STEPPER ===== */
+        .stepper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            font-weight: 800;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .step-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-divider {
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--aurora-start), var(--aurora-mid));
+            margin: 0 0.5rem;
+            opacity: 0.3;
+            border-radius: 1px;
+        }
+
+        /* ===== PREFILL CARD ===== */
+        .prefill-card {
+            background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+        }
+
+        .prefill-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .prefill-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .prefill-header i {
+            font-size: 1.1rem;
+            color: var(--warning);
+        }
+
+        .prefill-header h6 {
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .prefill-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .prefill-select {
+            border: 1.5px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            padding: 0.55rem 0.9rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: white;
+            transition: var(--transition-base);
+            width: 100%;
+        }
+
+        .prefill-select:focus {
+            border-color: var(--warning);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+            outline: none;
+        }
+
+        /* ===== FORM CARD ===== */
         .form-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 2.5rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            border-radius: var(--radius-xl);
+            padding: 2rem 2.5rem;
+            box-shadow: var(--shadow-sm);
             margin-bottom: 3rem;
+            transition: var(--transition-base);
+        }
+
+        .form-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ===== SECTIONS ===== */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
         }
 
         .section-title {
             font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-size: 1rem;
+            letter-spacing: -0.01em;
+            margin: 0;
+        }
+
+        .section-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.15rem;
+        }
+
+        /* ===== FORM INPUTS ===== */
+        .form-label-custom {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .form-label-custom .required {
+            color: var(--aurora-end);
+            font-size: 0.6rem;
+        }
+
+        .form-control-custom,
+        .form-select-custom {
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.65rem 0.9rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: var(--transition-base);
+        }
+
+        .form-control-custom:focus,
+        .form-select-custom:focus {
+            border-color: var(--aurora-start);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+            background: var(--surface);
+        }
+
+        .form-control-custom::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        textarea.form-control-custom {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+        .input-icon-wrap .form-control-custom {
+            padding-left: 2.4rem;
+        }
+
+        .input-icon-wrap i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        /* ===== SWITCHES ===== */
+        .switch-group {
+            background: var(--surface-hover);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-base);
+        }
+
+        .switch-group:hover {
+            border-color: var(--border);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .switch-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .switch-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .switch-icon.vaccine {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+        }
+
+        .switch-icon.sterile {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+        }
+
+        .switch-icon.kids {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .switch-icon.pets {
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+            color: #9d174d;
+        }
+
+        .switch-text {
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-primary);
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 1.15rem;
+            line-height: 1.3;
+        }
+
+        .switch-text small {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .form-check-input-custom {
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            background-color: var(--border-light);
+            transition: var(--transition-base);
+        }
+
+        .form-check-input-custom:checked {
+            background-color: var(--aurora-start);
+            border-color: var(--aurora-start);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .form-check-input-custom:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            border-color: var(--aurora-start);
+        }
+
+        /* ===== SUBMIT BUTTON ===== */
+        .btn-submit {
+            background: linear-gradient(135deg, var(--aurora-start) 0%, var(--aurora-mid) 50%, var(--aurora-end) 100%);
+            border: none;
+            color: white;
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 0.85rem 2.5rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-submit:hover::after {
+            left: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .step-divider {
+                width: 20px;
+            }
+
+            .step-label {
+                display: none;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .page-header {
+                padding: 1.5rem 0 1rem;
+            }
+
+            .stepper {
+                gap: 0.5rem;
+            }
+
+            .step-divider {
+                width: 15px;
+            }
+
+            .form-card {
+                padding: 1.25rem;
+                border-radius: var(--radius-lg);
+            }
+
+            .switch-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .prefill-card {
+                padding: 1rem;
+            }
+
+            .section-header {
+                gap: 0.4rem;
+            }
+
+            .section-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+
+            .btn-submit {
+                width: 100%;
+                justify-content: center;
+                padding: 0.75rem;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-card {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .form-section {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        .form-section:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .form-section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .form-section:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .form-section:nth-child(4) {
+            animation-delay: 0.2s;
         }
     </style>
 </head>
@@ -83,170 +619,355 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="main-navbar py-2 mb-4">
-        <div class="container d-flex align-items-center">
+    <nav class="main-navbar py-2 mb-0">
+        <div class="container d-flex align-items-center" style="max-width: 900px;">
             <a class="navbar-brand-hex" th:href="@{/usuario/dashboard}">
                 <i class="bi bi-heart-fill"></i>
                 Comunidad Pet
             </a>
             <div class="ms-auto">
-                <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="btn btn-sm btn-outline-secondary rounded-pill">Volver</a>
+                <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="nav-back-btn">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                
-                <!-- PREFILL SELECTOR (Only when creating) -->
-                <div class="form-card p-4 mb-4" th:if="${publicacion.id == null}">
-                    <h5 class="text-dark mb-3 fw-bold"><i class="bi bi-magic"></i> ¿Quieres publicar una mascota registrada?</h5>
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <p class="small text-muted mb-md-0">Selecciona una mascota de tu lista de "Mis Mascotas" para autocompletar su nombre, especie, raza, edad, sexo y fotografía al instante.</p>
+    <div class="container mb-5" style="max-width: 900px;">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <span th:text="${publicacion.id == null ? 'Crear' : 'Editar'}">Crear</span> Publicación <span
+                    class="gradient-text">de Adopción</span>
+            </h1>
+            <p class="page-subtitle">Completa los datos de tu mascota para que pueda ser revisada y publicada en la
+                comunidad.</p>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper">
+            <div class="step">
+                <div class="step-number">1</div>
+                <span class="step-label">Básicos</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <span class="step-label">Historia</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <span class="step-label">Compatibilidad</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <span class="step-label">Ubicación</span>
+            </div>
+        </div>
+
+        <!-- Prefill Selector -->
+        <div class="prefill-card" th:if="${publicacion.id == null}">
+            <div class="prefill-header">
+                <i class="bi bi-magic"></i>
+                <h6>¿Quieres publicar una mascota registrada?</h6>
+            </div>
+            <p class="prefill-text">Selecciona una mascota de tu lista para autocompletar nombre, especie, raza, edad,
+                sexo y fotografía al instante.</p>
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <select id="mascotaSelect" class="prefill-select" onchange="loadRegisteredPet(this.value)">
+                        <option value="">Crear desde cero...</option>
+                        <option th:each="m : ${misMascotas}" th:value="${m.id}" th:text="${m.nombre}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="form-card">
+            <form
+                th:action="${publicacion.id == null ? '/usuario/comunidad/nueva' : '/usuario/comunidad/editar/' + publicacion.id}"
+                method="post">
+                <input type="hidden" name="mascotaOriginalId" th:value="${publicacion.mascotaOriginalId}">
+                <!-- SECTION 1: Datos Básicos -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon"><i class="bi bi-person-vcard"></i></div>
+                        <div>
+                            <div class="section-title">Información Básica</div>
+                            <div class="section-subtitle">Datos esenciales para identificar a tu mascota</div>
                         </div>
-                        <div class="col-md-4 text-md-end">
-                            <select id="mascotaSelect" class="form-select rounded-3 mb-2" onchange="loadRegisteredPet(this.value)">
-                                <option value="">Crear desde cero...</option>
-                                <option th:each="m : ${misMascotas}" th:value="${m.id}" th:text="${m.nombre}"></option>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Nombre <span class="required">●</span></label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-type"></i>
+                                <input type="text" name="nombre" class="form-control form-control-custom"
+                                    th:value="${publicacion.nombre}" required placeholder="Ej. Rocky">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Especie <span class="required">●</span></label>
+                            <select name="especie" class="form-select form-select-custom" required>
+                                <option value="PERRO" th:selected="${publicacion.especie == 'PERRO'}">Perro</option>
+                                <option value="GATO" th:selected="${publicacion.especie == 'GATO'}">Gato</option>
+                                <option value="OTRO" th:selected="${publicacion.especie == 'OTRO'}">Otro</option>
                             </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Raza <span class="required">●</span></label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-tag"></i>
+                                <input type="text" name="raza" class="form-control form-control-custom"
+                                    th:value="${publicacion.raza}" required placeholder="Ej. Golden Retriever">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Edad <span class="required">●</span></label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-calendar-event"></i>
+                                <input type="text" name="edad" class="form-control form-control-custom"
+                                    th:value="${publicacion.edad}" required placeholder="Ej. 3 meses, 2 años">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Sexo <span class="required">●</span></label>
+                            <select name="sexo" class="form-select form-select-custom" required>
+                                <option value="Macho" th:selected="${publicacion.sexo == 'Macho'}">Macho</option>
+                                <option value="Hembra" th:selected="${publicacion.sexo == 'Hembra'}">Hembra</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Foto Principal (URL) <span
+                                    class="required">●</span></label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-image"></i>
+                                <input type="text" name="fotoPrincipalUrl" class="form-control form-control-custom"
+                                    th:value="${publicacion.fotoPrincipalUrl}" required placeholder="https://...">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- MAIN FORM -->
-                <div class="form-card">
-                    <h2 class="h3 text-dark fw-bold mb-4" th:text="${publicacion.id == null ? 'Crear Publicación de Adopción' : 'Editar Publicación'}">Publicar Mascota</h2>
-                    
-                    <form th:action="${publicacion.id == null ? '/usuario/comunidad/nueva' : '/usuario/comunidad/editar/' + publicacion.id}" method="post">
-                        
-                        <!-- Keep original pet ID if prefilled -->
-                        <input type="hidden" name="mascotaOriginalId" th:value="${publicacion.mascotaOriginalId}">
+                <!-- SECTION 2: Historia y Adopción -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon"><i class="bi bi-book-half"></i></div>
+                        <div>
+                            <div class="section-title">Historia y Adopción</div>
+                            <div class="section-subtitle">Cuéntanos la historia y motivos de adopción</div>
+                        </div>
+                    </div>
 
-                        <!-- SECTION 1: Datos Básicos -->
-                        <div class="section-title">1. Información Básica</div>
-                        
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Nombre de la Mascota *</label>
-                                <input type="text" name="nombre" class="form-control rounded-3" th:value="${publicacion.nombre}" required placeholder="Ej. Rocky">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Especie *</label>
-                                <select name="especie" class="form-select rounded-3" required>
-                                    <option value="PERRO" th:selected="${publicacion.especie == 'PERRO'}">Perro</option>
-                                    <option value="GATO" th:selected="${publicacion.especie == 'GATO'}">Gato</option>
-                                    <option value="OTRO" th:selected="${publicacion.especie == 'OTRO'}">Otro</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Raza *</label>
-                                <input type="text" name="raza" class="form-control rounded-3" th:value="${publicacion.raza}" required placeholder="Ej. Golden Retriever">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Edad / Rango de Edad *</label>
-                                <input type="text" name="edad" class="form-control rounded-3" th:value="${publicacion.edad}" required placeholder="Ej. 3 meses, 2 años">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Sexo *</label>
-                                <select name="sexo" class="form-select rounded-3" required>
-                                    <option value="Macho" th:selected="${publicacion.sexo == 'Macho'}">Macho</option>
-                                    <option value="Hembra" th:selected="${publicacion.sexo == 'Hembra'}">Hembra</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Fotografía Principal (URL) *</label>
-                                <input type="text" name="fotoPrincipalUrl" class="form-control rounded-3" th:value="${publicacion.fotoPrincipalUrl}" required placeholder="URL de la imagen">
-                            </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Historia de la Mascota <span class="required">●</span></label>
+                        <textarea name="historia" class="form-control form-control-custom" rows="4" required
+                            th:text="${publicacion.historia}"
+                            placeholder="Cuéntanos su historia, de dónde viene, su carácter, su comportamiento..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Motivo de Adopción <span class="required">●</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-question-circle"></i>
+                            <input type="text" name="motivoAdopcion" class="form-control form-control-custom"
+                                th:value="${publicacion.motivoAdopcion}" required
+                                placeholder="Ej. Cambio de ciudad, rescate callejero...">
                         </div>
-
-                        <!-- SECTION 2: Salud e Historia -->
-                        <div class="section-title">2. Historia y Adopción</div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-dark">Historia de la Mascota *</label>
-                            <textarea name="historia" class="form-control rounded-3" rows="4" required th:text="${publicacion.historia}" placeholder="Cuéntanos su historia, de dónde viene, su carácter, etc."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-dark">Motivo de Adopción *</label>
-                            <input type="text" name="motivoAdopcion" class="form-control rounded-3" th:value="${publicacion.motivoAdopcion}" required placeholder="Ej. Cambio de ciudad, rescate callejero, etc.">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small text-dark">Requisitos de Adopción</label>
-                            <textarea name="requisitosAdopcion" class="form-control rounded-3" rows="2" th:text="${publicacion.requisitosAdopcion}" placeholder="Ej. Espacio grande, paciencia con cachorros, solvencia veterinaria."></textarea>
-                        </div>
-
-                        <!-- SECTION 3: Filtros y Compatibilidad -->
-                        <div class="section-title">3. Características y Compatibilidad</div>
-                        
-                        <div class="row g-3 mb-4 align-items-center">
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="vacunada" th:checked="${publicacion.vacunada}" id="vacunada">
-                                    <label class="form-check-label fw-bold small text-dark" for="vacunada">¿Está Vacunada?</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="esterilizada" th:checked="${publicacion.esterilizada}" id="esterilizada">
-                                    <label class="form-check-label fw-bold small text-dark" for="esterilizada">¿Está Esterilizada?</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="aceptaNinos" th:checked="${publicacion.aceptaNinos}" id="aceptaNinos">
-                                    <label class="form-check-label fw-bold small text-dark" for="aceptaNinos">¿Acepta Niños?</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="aceptaOtrasMascotas" th:checked="${publicacion.aceptaOtrasMascotas}" id="aceptaOtrasMascotas">
-                                    <label class="form-check-label fw-bold small text-dark" for="aceptaOtrasMascotas">¿Acepta Otras Mascotas?</label>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Nivel de Energía</label>
-                                <select name="nivelEnergia" class="form-select rounded-3">
-                                    <option value="Alto" th:selected="${publicacion.nivelEnergia == 'Alto'}">Alto</option>
-                                    <option value="Medio" th:selected="${publicacion.nivelEnergia == 'Medio'}">Medio</option>
-                                    <option value="Bajo" th:selected="${publicacion.nivelEnergia == 'Bajo'}">Bajo</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Tamaño</label>
-                                <select name="tamano" class="form-select rounded-3">
-                                    <option value="Pequeño" th:selected="${publicacion.tamano == 'Pequeño'}">Pequeño</option>
-                                    <option value="Mediano" th:selected="${publicacion.tamano == 'Mediano'}">Mediano</option>
-                                    <option value="Grande" th:selected="${publicacion.tamano == 'Grande'}">Grande</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- SECTION 4: Ubicación -->
-                        <div class="section-title">4. Ubicación de la Mascota</div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Ciudad *</label>
-                                <input type="text" name="ciudad" class="form-control rounded-3" th:value="${publicacion.ciudad}" required placeholder="Ej. Cartagena">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-dark">Barrio</label>
-                                <input type="text" name="barrio" class="form-control rounded-3" th:value="${publicacion.barrio}" placeholder="Ej. Bocagrande">
-                            </div>
-                        </div>
-
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-lg btn-primary rounded-pill px-5" style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end)); border: none; font-weight: 700;">
-                                <i class="bi bi-send-fill"></i> Enviar a Moderación
-                            </button>
-                        </div>
-                    </form>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Requisitos de Adopción</label>
+                        <textarea name="requisitosAdopcion" class="form-control form-control-custom" rows="2"
+                            th:text="${publicacion.requisitosAdopcion}"
+                            placeholder="Ej. Espacio grande, paciencia con cachorros, solvencia veterinaria..."></textarea>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label-custom">Información Adicional</label>
+                        <textarea name="informacionAdicional" class="form-control form-control-custom" rows="2"
+                            th:text="${publicacion.informacionAdicional}"
+                            placeholder="Cualquier otro detalle de interés (ej. horarios de contacto, señas particulares)..."></textarea>
+                    </div>
                 </div>
 
-            </div>
+                <!-- SECTION 3: Características y Compatibilidad -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-icon"><i class="bi bi-shield-check"></i></div>
+                        <div>
+                            <div class="section-title">Características y Compatibilidad</div>
+                            <div class="section-subtitle">Salud, comportamiento y preferencias de convivencia</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="switch-group">
+                                <div class="switch-label">
+                                    <div class="switch-icon vaccine"><i class="bi bi-shield-plus"></i></div>
+                                    <div class="switch-text">
+                                        Vacunada
+                                        <small>¿La mascota tiene sus vacunas al día?</small>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input form-check-input-custom" type="checkbox"
+                                        name="vacunada" th:checked="${publicacion.vacunada}" id="vacunada">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="switch-group">
+                                <div class="switch-label">
+                                    <div class="switch-icon sterile"><i class="bi bi-scissors"></i></div>
+                                    <div class="switch-text">
+                                        Esterilizada
+                                        <small>¿La mascota está esterilizada/castrada?</small>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input form-check-input-custom" type="checkbox"
+                                        name="esterilizada" th:checked="${publicacion.esterilizada}" id="esterilizada">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="switch-group">
+                                <div class="switch-label">
+                                    <div class="switch-icon kids"><i class="bi bi-people-fill"></i></div>
+                                    <div class="switch-text">
+                                        Apta para Niños
+                                        <small>¿Se lleva bien con niños?</small>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input form-check-input-custom" type="checkbox"
+                                        name="aceptaNinos" th:checked="${publicacion.aceptaNinos}" id="aceptaNinos">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="switch-group">
+                                <div class="switch-label">
+                                    <div class="switch-icon pets"><i class="bi bi-heart-fill"></i></div>
+                                    <div class="switch-text">
+                                        Acepta Mascotas
+                                        <small>¿Convive bien con otras mascotas?</small>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input form-check-input-custom" type="checkbox"
+                                        name="aceptaOtrasMascotas" th:checked="${publicacion.aceptaOtrasMascotas}"
+                                        id="aceptaOtrasMascotas">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Nivel de Energía</label>
+                            <select name="nivelEnergia" class="form-select form-select-custom">
+                                <option value="Alto" th:selected="${publicacion.nivelEnergia == 'Alto'}">Alto — Muy
+                                    activa y juguetona</option>
+                                <option value="Medio" th:selected="${publicacion.nivelEnergia == 'Medio'}">Medio —
+                                    Equilibrada</option>
+                                <option value="Bajo" th:selected="${publicacion.nivelEnergia == 'Bajo'}">Bajo —
+                                    Tranquila y relajada</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Tamaño</label>
+                            <select name="tamano" class="form-select form-select-custom">
+                                <option value="Pequeño" th:selected="${publicacion.tamano == 'Pequeño'}">Pequeño
+                                </option>
+                                <option value="Mediano" th:selected="${publicacion.tamano == 'Mediano'}">Mediano
+                                </option>
+                                <option value="Grande" th:selected="${publicacion.tamano == 'Grande'}">Grande</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Estado de Salud</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-heart-pulse"></i>
+                                <input type="text" name="estadoSalud" class="form-control form-control-custom"
+                                    th:value="${publicacion.estadoSalud}" placeholder="Ej. Excelente, Estable, Sano">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Vivienda Recomendada</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-house"></i>
+                                <input type="text" name="tipoViviendaRecomendada" class="form-control form-control-custom"
+                                    th:value="${publicacion.tipoViviendaRecomendada}" placeholder="Ej. Casa con patio, Apto sin mascotas">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Ubicación -->
+                <div class="form-section mb-0">
+                    <div class="section-header">
+                        <div class="section-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <div class="section-title">Ubicación de la Mascota</div>
+                            <div class="section-subtitle">¿Dónde se encuentra actualmente?</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Ciudad <span class="required">●</span></label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-building"></i>
+                                <input type="text" name="ciudad" class="form-control form-control-custom"
+                                    th:value="${publicacion.ciudad}" required placeholder="Ej. Cartagena">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Barrio</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-pin-map"></i>
+                                <input type="text" name="barrio" class="form-control form-control-custom"
+                                    th:value="${publicacion.barrio}" placeholder="Ej. Bocagrande">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="text-center mt-4 pt-3" style="border-top: 2px solid var(--border-light);">
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-send-fill"></i>
+                        <span th:text="${publicacion.id == null ? 'Enviar a Moderación' : 'Guardar Cambios'}">Enviar a
+                            Moderación</span>
+                    </button>
+                </div>
+            </form>
         </div>
+
     </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Navbar scroll effect -->
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.main-navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
 
     <script th:inline="javascript">
         function loadRegisteredPet(mascotaId) {
@@ -257,5 +978,7 @@
             }
         }
     </script>
+
 </body>
+
 </html>

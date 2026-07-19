@@ -12,41 +12,74 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
-            --bg: #f8fafc;
+            --bg: #f1f5f9;
             --surface: #ffffff;
+            --surface-elevated: #ffffff;
             --border: #e2e8f0;
+            --border-light: #f1f5f9;
             --text-primary: #0f172a;
             --text-secondary: #475569;
-            --text-muted: #64748b;
-            --accent-indigo: #4f46e5;
-            --accent-indigo-glow: rgba(79, 70, 229, 0.15);
+            --text-muted: #94a3b8;
+            --accent-indigo: #6366f1;
+            --accent-indigo-dark: #4f46e5;
+            --accent-indigo-glow: rgba(99, 102, 241, 0.12);
             --accent-emerald: #10b981;
-            --accent-rose: #e11d48;
-            --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.05);
-            --shadow-hover: 0 20px 40px rgba(79, 70, 229, 0.1);
-            --radius-lg: 16px;
+            --accent-emerald-dark: #059669;
+            --accent-rose: #f43f5e;
+            --accent-rose-dark: #e11d48;
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.07), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --shadow-glow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            --radius-sm: 8px;
             --radius-md: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg);
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
             color: var(--text-secondary);
             min-height: 100vh;
+            line-height: 1.6;
         }
 
+        /* ===== NAVBAR ===== */
         .main-navbar {
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.01);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            transition: var(--transition-base);
+        }
+
+        .main-navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .navbar-brand-admin {
@@ -54,107 +87,607 @@
             color: var(--text-primary) !important;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             text-decoration: none;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .navbar-brand-admin i {
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .navbar-brand-admin span {
             font-weight: 500;
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 0.9rem;
+            letter-spacing: 0;
         }
 
+        .nav-back-btn {
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .nav-back-btn:hover {
+            border-color: var(--accent-indigo);
+            color: var(--accent-indigo);
+            background: var(--accent-indigo-glow);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header-section {
+            padding: 2.5rem 0 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-title i {
+            background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-right: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            max-width: 500px;
+        }
+
+        .pending-badge {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            box-shadow: var(--shadow-xs);
+            animation: pulse-soft 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-soft {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.15);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+            }
+        }
+
+        /* ===== MODERATION CARDS ===== */
         .moderation-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 1.5rem;
-            transition: var(--transition);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.25rem;
+            transition: var(--transition-slow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .moderation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-indigo) 0%, var(--accent-blue) 50%, var(--accent-indigo) 100%);
+            opacity: 0;
+            transition: var(--transition-base);
         }
 
         .moderation-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--accent-indigo-glow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .moderation-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ===== PET THUMBNAIL ===== */
+        .pet-thumbnail-wrap {
+            position: relative;
+            display: inline-block;
         }
 
         .pet-thumbnail {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             object-fit: cover;
-            border-radius: var(--radius-md);
-            border: 2px solid var(--border);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-            transition: var(--transition);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-slow);
         }
 
         .moderation-card:hover .pet-thumbnail {
-            transform: scale(1.03);
+            transform: scale(1.04) rotate(-1deg);
             border-color: var(--accent-indigo);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
         }
 
-        /* Modal custom styles */
+        .pet-thumbnail-badge {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-blue) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            border: 2px solid white;
+        }
+
+        /* ===== PET INFO ===== */
+        .pet-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .pet-badges {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .pet-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.3rem 0.7rem;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.3px;
+            border: none;
+        }
+
+        .pet-badge.species {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+        }
+
+        .pet-badge.gender {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .pet-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .pet-meta i {
+            color: var(--accent-indigo);
+            font-size: 0.8rem;
+        }
+
+        .pet-meta .dot {
+            width: 4px;
+            height: 4px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 0.3rem;
+            opacity: 0.5;
+        }
+
+        .pet-story {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.65;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .pet-publisher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--border-light);
+        }
+
+        .publisher-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-blue) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .publisher-info {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .publisher-info strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .publisher-location {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--text-muted);
+        }
+
+        .publisher-location i {
+            color: var(--accent-rose);
+            font-size: 0.75rem;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .btn-view-detail {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.82rem;
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn-view-detail:hover {
+            border-color: var(--accent-indigo);
+            color: var(--accent-indigo);
+            background: var(--accent-indigo-glow);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-emerald-dark) 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            text-decoration: none;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-approve::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-approve:hover::after {
+            left: 100%;
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+            color: white;
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, var(--accent-rose) 0%, var(--accent-rose-dark) 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.6rem 1rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            text-decoration: none;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-reject::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-reject:hover::after {
+            left: 100%;
+        }
+
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.35);
+            color: white;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .empty-state-icon i {
+            font-size: 2.5rem;
+            color: var(--accent-emerald);
+        }
+
+        .empty-state h5 {
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.15rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+
+        /* ===== ALERT ===== */
+        .alert-premium {
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .alert-premium.alert-success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: #065f46;
+        }
+
+        .alert-premium.alert-success i {
+            color: var(--accent-emerald);
+            font-size: 1.25rem;
+        }
+
+        /* ===== MODAL PREMIUM ===== */
         .modal-content-premium {
-            border-radius: 20px;
+            border-radius: 24px;
             border: none;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 25px 80px rgba(15, 23, 42, 0.2);
         }
 
         .modal-header-premium {
-            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, var(--accent-indigo) 0%, var(--accent-blue) 50%, #8b5cf6 100%);
             border: none;
-            padding: 1.75rem;
+            padding: 1.75rem 2.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-header-premium::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .modal-header-premium .modal-title {
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-header-premium .modal-subtitle {
+            font-size: 0.82rem;
+            opacity: 0.85;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
         }
 
         .modal-body-premium {
-            padding: 2.25rem;
-            background-color: #ffffff;
+            padding: 2rem 2.25rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         }
 
         .modal-footer-premium {
-            border-top: 1px solid #f1f5f9;
-            background-color: #f8fafc;
-            padding: 1.5rem 2.25rem;
+            border-top: 1px solid var(--border-light);
+            background: #f8fafc;
+            padding: 1.25rem 2.25rem;
         }
 
-        .badge-pill-custom {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.4rem 0.85rem;
-            border-radius: 50px;
-            letter-spacing: 0.5px;
+        /* ===== GALLERY ===== */
+        .gallery-main {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 0.75rem;
+            transition: var(--transition-base);
+        }
+
+        .gallery-main:hover {
+            transform: scale(1.01);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .gallery-thumb {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition-base);
+            opacity: 0.7;
+        }
+
+        .gallery-thumb:hover,
+        .gallery-thumb.active {
+            opacity: 1;
+            transform: scale(1.08);
+            border-color: var(--accent-indigo);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        /* ===== DETAIL BOXES ===== */
+        .detail-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-xs);
+            transition: var(--transition-base);
+        }
+
+        .detail-box:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: rgba(99, 102, 241, 0.15);
         }
 
         .detail-title {
-            font-size: 0.9rem;
+            font-size: 0.78rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             color: var(--text-muted);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
-        .detail-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1rem;
-            height: 100%;
+        .detail-title i {
+            font-size: 0.9rem;
         }
 
         .spec-item {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px dashed #e2e8f0;
-            font-size: 0.9rem;
+            align-items: center;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.85rem;
         }
 
         .spec-item:last-child {
@@ -164,90 +697,326 @@
         .spec-label {
             font-weight: 600;
             color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .spec-value {
             font-weight: 700;
             color: var(--text-primary);
+            background: #f8fafc;
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
         }
 
+        /* ===== HEALTH BADGES ===== */
         .health-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 0.82rem;
+            gap: 0.4rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: var(--radius-full);
+            font-size: 0.78rem;
             font-weight: 700;
-            margin-right: 8px;
-            margin-bottom: 8px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: var(--transition-base);
+            cursor: default;
+        }
+
+        .health-badge:hover {
+            transform: translateY(-1px);
         }
 
         .health-true {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: #059669;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            color: #065f46;
             border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
         .health-false {
-            background-color: rgba(244, 63, 94, 0.08);
-            color: #dc2626;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #991b1b;
             border: 1px solid rgba(244, 63, 94, 0.15);
         }
 
-        .gallery-main {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            margin-bottom: 12px;
+        /* ===== MODAL QUICK BADGES ===== */
+        .modal-quick-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1.5rem;
         }
 
-        .gallery-thumb {
-            width: 64px;
-            height: 64px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: var(--transition);
+        .modal-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.3px;
+            border: none;
         }
 
-        .gallery-thumb:hover {
-            transform: scale(1.05);
-            border-color: var(--accent-indigo);
+        .modal-badge.species {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+        }
+
+        .modal-badge.breed {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .modal-badge.age {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .modal-badge.gender {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .modal-badge.health {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            color: #9d174d;
+        }
+
+        /* ===== STORY & INFO SECTIONS ===== */
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            text-align: justify;
+            margin-bottom: 0;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--accent-indigo);
+        }
+
+        /* ===== MODAL FOOTER BUTTONS ===== */
+        .btn-modal-close {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            font-size: 0.85rem;
+        }
+
+        .btn-modal-close:hover {
+            border-color: var(--text-muted);
+            background: #f8fafc;
         }
 
         .btn-premium-approve {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-emerald-dark) 100%);
             border: none;
             color: white;
             font-weight: 700;
+            padding: 0.65rem 1.5rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            font-size: 0.85rem;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-premium-approve::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-premium-approve:hover::after {
+            left: 100%;
         }
 
         .btn-premium-approve:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
             color: white;
         }
 
         .btn-premium-reject {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            background: linear-gradient(135deg, var(--accent-rose) 0%, var(--accent-rose-dark) 100%);
             border: none;
             color: white;
             font-weight: 700;
+            padding: 0.65rem 1.5rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            font-size: 0.85rem;
             box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
-            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-premium-reject::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-premium-reject:hover::after {
+            left: 100%;
         }
 
         .btn-premium-reject:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 63, 94, 0.4);
             color: white;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 767.98px) {
+            .page-title {
+                font-size: 1.35rem;
+            }
+
+            .page-header-section {
+                padding: 1.5rem 0 1rem;
+            }
+
+            .moderation-card {
+                padding: 1.25rem;
+            }
+
+            .pet-thumbnail {
+                width: 100px;
+                height: 100px;
+            }
+
+            .action-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .btn-view-detail {
+                flex: 1 1 100%;
+            }
+
+            .action-row {
+                flex: 1;
+            }
+
+            .modal-body-premium {
+                padding: 1.25rem;
+            }
+
+            .modal-header-premium {
+                padding: 1.25rem;
+            }
+
+            .modal-footer-premium {
+                padding: 1rem 1.25rem;
+                flex-direction: column-reverse;
+                gap: 0.5rem;
+            }
+
+            .modal-footer-premium .d-flex {
+                width: 100%;
+            }
+
+            .btn-premium-approve,
+            .btn-premium-reject,
+            .btn-modal-close {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .gallery-main {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .pet-name {
+                font-size: 1.05rem;
+            }
+
+            .pet-story {
+                -webkit-line-clamp: 3;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+
+            .btn-approve,
+            .btn-reject {
+                width: 100%;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .moderation-card {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Stagger animations */
+        .moderation-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .moderation-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .moderation-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .moderation-card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .moderation-card:nth-child(5) {
+            animation-delay: 0.25s;
         }
     </style>
 </head>
@@ -255,83 +1024,124 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="main-navbar py-3 mb-4">
-        <div class="container d-flex align-items-center">
+    <nav class="main-navbar py-3">
+        <div class="container d-flex align-items-center" style="max-width: 1000px;">
             <a class="navbar-brand-admin mb-0" th:href="@{/admin/dashboard}">
-                <i class="bi bi-shield-lock-fill text-primary" style="color: var(--accent-indigo) !important;"></i>
+                <i class="bi bi-shield-lock-fill"></i>
                 HEX Moderación <span>• Comunidad Pet</span>
             </a>
-            <div class="ms-auto d-flex align-items-center gap-2">
-                <a th:href="@{/admin/dashboard}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 fw-semibold">
+            <div class="ms-auto">
+                <a th:href="@{/admin/dashboard}" class="nav-back-btn">
                     <i class="bi bi-arrow-left"></i> Dashboard
                 </a>
             </div>
         </div>
     </nav>
-
     <div class="container mb-5" style="max-width: 1000px;">
-        
-        <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <!-- Page Header -->
+        <div class="page-header-section d-flex justify-content-between align-items-start flex-wrap gap-3">
             <div>
-                <h2 class="text-dark fw-bold h3 mb-1"><i class="bi bi-shield-check text-primary" style="color: var(--accent-indigo) !important;"></i> Panel de Moderación de Adopciones</h2>
-                <p class="text-muted small mb-0">Revisa la ficha técnica, historia y condiciones de cada mascota antes de aprobar su publicación.</p>
+                <h2 class="page-title">
+                    <i class="bi bi-shield-check"></i> Panel de Moderación de Adopciones
+                </h2>
+                <p class="page-subtitle">Revisa la ficha técnica, historia y condiciones de cada mascota antes de
+                    aprobar su publicación.</p>
             </div>
-            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-bold" th:if="${not #lists.isEmpty(publicaciones)}" th:text="${#lists.size(publicaciones)} + ' Pendientes'">0 Pendientes</span>
+            <span class="pending-badge" th:if="${not #lists.isEmpty(publicaciones)}"
+                th:text="${#lists.size(publicaciones)} + ' Pendientes'">
+                <i class="bi bi-hourglass-split"></i> 0 Pendientes
+            </span>
         </div>
 
-        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show rounded-4 mb-4 border-0 shadow-sm py-3" role="alert">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-check-circle-fill fs-5 text-success"></i>
-                <span class="fw-semibold" th:text="${mensajeExito}">Operación completada con éxito.</span>
+        <!-- Success Alert -->
+        <div th:if="${mensajeExito}" class="alert alert-premium alert-success alert-dismissible fade show mb-4"
+            role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${mensajeExito}">Operación completada con éxito.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                style="opacity: 0.5;"></button>
+        </div>
+
+        <!-- Error Alert -->
+        <div th:if="${mensajeError}" class="alert alert-premium alert-danger alert-dismissible fade show mb-4"
+            role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${mensajeError}">Ocurrió un error.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+                style="opacity: 0.5;"></button>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(publicaciones)}" class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-emoji-smile"></i>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <h5>No hay publicaciones pendientes de revisión</h5>
+            <p>La comunidad de adopción de ClínicaApp está completamente moderada y al día. ¡Buen trabajo!</p>
         </div>
 
-        <div th:if="${#lists.isEmpty(publicaciones)}" class="text-center py-5 bg-white border border-secondary-subtle rounded-4 shadow-sm">
-            <i class="bi bi-emoji-smile text-success fs-1 mb-3 d-block" style="color: var(--accent-emerald) !important;"></i>
-            <h5 class="text-dark fw-bold">No hay publicaciones pendientes de revisión</h5>
-            <p class="text-muted small mb-0">La comunidad de adopción de ClínicaApp está completamente moderada y al día.</p>
-        </div>
-
-        <!-- Pending publications list -->
+        <!-- Pending Publications List -->
         <div class="moderation-card" th:each="pub : ${publicaciones}">
             <div class="row align-items-center g-4">
-                
+
                 <!-- Thumbnail -->
                 <div class="col-sm-3 col-md-2 text-center text-sm-start">
-                    <img th:src="${pub.fotoPrincipalUrl}" alt="Foto Mascota" class="pet-thumbnail">
+                    <div class="pet-thumbnail-wrap">
+                        <img th:src="${pub.fotoPrincipalUrl}" alt="Foto Mascota" class="pet-thumbnail">
+                        <div class="pet-thumbnail-badge">
+                            <i class="bi bi-camera-fill"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Info -->
                 <div class="col-sm-9 col-md-6">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <h4 class="text-dark fw-bold h5 mb-0" th:text="${pub.nombre}">Nombre</h4>
-                        <span class="badge bg-info-subtle text-info badge-pill-custom" th:text="${pub.sexo}">Macho</span>
-                        <span class="badge bg-secondary-subtle text-secondary badge-pill-custom" th:text="${pub.especie}">Perro</span>
+                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                        <h4 class="pet-name mb-0" th:text="${pub.nombre}">Nombre</h4>
+                        <div class="pet-badges">
+                            <span class="pet-badge gender" th:text="${pub.sexo}">Macho</span>
+                            <span class="pet-badge species" th:text="${pub.especie}">Perro</span>
+                        </div>
                     </div>
-                    <div class="small text-muted mb-2 fw-semibold">
-                        <i class="bi bi-tags"></i> <span th:text="${pub.raza}">Cruza</span> • <i class="bi bi-egg-fried"></i> <span th:text="${pub.edad}">1 año</span>
+                    <div class="pet-meta">
+                        <i class="bi bi-tag"></i> <span th:text="${pub.raza}">Cruza</span>
+                        <span class="dot"></span>
+                        <i class="bi bi-calendar-event"></i> <span th:text="${pub.edad}">1 año</span>
                     </div>
-                    <p class="text-secondary small mb-3" th:text="${pub.historia}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;"></p>
-                    
-                    <div class="d-flex align-items-center gap-3 text-muted small flex-wrap">
-                        <span><i class="bi bi-person-fill text-primary"></i> <strong class="text-dark" th:text="${pub.nombrePublicador}">Publicador</strong></span>
-                        <span><i class="bi bi-geo-alt-fill text-danger"></i> <span th:text="${pub.ciudad + (pub.barrio != null ? ', ' + pub.barrio : '')}">Medellín</span></span>
+                    <p class="pet-story" th:text="${pub.historia}">Historia de la mascota...</p>
+
+                    <div class="pet-publisher">
+                        <div class="publisher-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="publisher-info">
+                            <strong th:text="${pub.nombrePublicador}">Publicador</strong>
+                            <span class="publisher-location">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span
+                                    th:text="${pub.ciudad + (pub.barrio != null ? ', ' + pub.barrio : '')}">Medellín</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="col-md-4 text-center text-md-end d-flex flex-md-column flex-row gap-2 justify-content-center align-items-stretch">
-                    <button class="btn btn-outline-primary rounded-pill fw-bold btn-sm py-2" data-bs-toggle="modal" th:data-bs-target="'#detailModal-' + ${pub.id}">
-                        <i class="bi bi-eye-fill"></i> Ver Ficha Completa
-                    </button>
-                    <div class="d-flex gap-2">
-                        <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn btn-success rounded-pill fw-bold btn-sm py-2 flex-grow-1">
-                            <i class="bi bi-check-lg"></i> Aprobar
-                        </a>
-                        <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn btn-danger rounded-pill fw-bold btn-sm py-2 flex-grow-1">
-                            <i class="bi bi-x-lg"></i> Rechazar
-                        </a>
+                <div class="col-md-4">
+                    <div class="action-group">
+                        <button class="btn-view-detail" data-bs-toggle="modal"
+                            th:data-bs-target="'#detailModal-' + ${pub.id}">
+                            <i class="bi bi-eye-fill"></i> Ver Ficha Completa
+                        </button>
+                        <div class="action-row">
+                            <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn-approve">
+                                <i class="bi bi-check-lg"></i> Aprobar
+                            </a>
+                            <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn-reject"
+                                onclick="return confirm('¿Seguro que deseas rechazar esta publicación?')">
+                                <i class="bi bi-x-lg"></i> Rechazar
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -341,120 +1151,159 @@
             <div class="modal fade" th:id="'detailModal-' + ${pub.id}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                     <div class="modal-content modal-content-premium">
-                        
+
                         <!-- Header -->
-                        <div class="modal-header modal-header-premium text-white d-flex align-items-center justify-content-between">
+                        <div
+                            class="modal-header modal-header-premium text-white d-flex align-items-center justify-content-between">
                             <div>
-                                <h5 class="modal-title fw-bold h4 mb-1" th:text="'Detalle de ' + ${pub.nombre}">Ficha Mascota</h5>
-                                <div class="small opacity-75">
-                                    <i class="bi bi-shield-exclamation"></i> Pendiente de validación • Publicado por <span th:text="${pub.nombrePublicador + ' (' + pub.tipoPublicador + ')'}">Admin</span>
+                                <h5 class="modal-title mb-1" th:text="'Detalle de ' + ${pub.nombre}">Ficha Mascota</h5>
+                                <div class="modal-subtitle">
+                                    <i class="bi bi-shield-exclamation"></i> Pendiente de validación • Publicado por
+                                    <span
+                                        th:text="${pub.nombrePublicador + ' (' + pub.tipoPublicador + ')'}">Admin</span>
                                 </div>
                             </div>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
-                        
+
                         <!-- Body -->
                         <div class="modal-body modal-body-premium">
                             <div class="row g-4">
-                                
+
                                 <!-- Left side (Gallery & Specifications) -->
                                 <div class="col-md-5">
                                     <div class="mb-3">
                                         <img th:src="${pub.fotoPrincipalUrl}" alt="Foto Principal" class="gallery-main">
-                                        
+
                                         <!-- Album list if exists -->
-                                        <div class="d-flex gap-2 flex-wrap mb-2" th:if="${pub.albumFotos != null && !#lists.isEmpty(pub.albumFotos)}">
+                                        <div class="d-flex gap-2 flex-wrap mb-2"
+                                            th:if="${pub.albumFotos != null && !#lists.isEmpty(pub.albumFotos)}">
                                             <div th:each="img : ${pub.albumFotos}">
-                                                <img th:src="${img}" alt="Album Img" class="gallery-thumb" onclick="window.open(this.src)">
+                                                <img th:src="${img}" alt="Album Img" class="gallery-thumb"
+                                                    onclick="window.open(this.src)">
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Specifications box -->
                                     <div class="detail-box">
-                                        <h6 class="detail-title"><i class="bi bi-info-circle-fill text-primary"></i> Especificaciones</h6>
+                                        <h6 class="detail-title"><i class="bi bi-info-circle-fill text-primary"></i>
+                                            Especificaciones</h6>
                                         <div class="spec-item">
-                                            <span class="spec-label">Tamaño:</span>
-                                            <span class="spec-value" th:text="${pub.tamano ?: 'No especificado'}">Mediano</span>
+                                            <span class="spec-label"><i class="bi bi-arrows-angle-expand"></i>
+                                                Tamaño</span>
+                                            <span class="spec-value"
+                                                th:text="${pub.tamano ?: 'No especificado'}">Mediano</span>
                                         </div>
                                         <div class="spec-item">
-                                            <span class="spec-label">Nivel de Energía:</span>
-                                            <span class="spec-value" th:text="${pub.nivelEnergia ?: 'Medio'}">Medio</span>
+                                            <span class="spec-label"><i class="bi bi-lightning-charge-fill"></i>
+                                                Energía</span>
+                                            <span class="spec-value"
+                                                th:text="${pub.nivelEnergia ?: 'Medio'}">Medio</span>
                                         </div>
                                         <div class="spec-item">
-                                            <span class="spec-label">Vivienda recomendada:</span>
-                                            <span class="spec-value" th:text="${pub.tipoViviendaRecomendada ?: 'Indiferente'}">Casa con patio</span>
+                                            <span class="spec-label"><i class="bi bi-house-door-fill"></i>
+                                                Vivienda</span>
+                                            <span class="spec-value"
+                                                th:text="${pub.tipoViviendaRecomendada ?: 'Indiferente'}">Casa con
+                                                patio</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Right side (Detailed info & health) -->
                                 <div class="col-md-7">
-                                    
+
                                     <!-- Quick Badges -->
-                                    <div class="mb-4">
-                                        <span class="badge bg-primary-subtle text-primary badge-pill-custom me-1" th:text="${pub.especie}">Perro</span>
-                                        <span class="badge bg-info-subtle text-info badge-pill-custom me-1" th:text="${pub.raza}">Cruza</span>
-                                        <span class="badge bg-success-subtle text-success badge-pill-custom me-1" th:text="${pub.edad}">1 año</span>
-                                        <span class="badge bg-warning-subtle text-warning badge-pill-custom me-1" th:text="${pub.sexo}">Macho</span>
-                                        <span class="badge bg-danger-subtle text-danger badge-pill-custom" th:text="${'Salud: ' + (pub.estadoSalud ?: 'Estable')}">Sano</span>
+                                    <div class="modal-quick-badges">
+                                        <span class="modal-badge species" th:text="${pub.especie}">Perro</span>
+                                        <span class="modal-badge breed" th:text="${pub.raza}">Cruza</span>
+                                        <span class="modal-badge age" th:text="${pub.edad}">1 año</span>
+                                        <span class="modal-badge gender" th:text="${pub.sexo}">Macho</span>
+                                        <span class="modal-badge health"
+                                            th:text="${'Salud: ' + (pub.estadoSalud ?: 'Estable')}">Sano</span>
                                     </div>
 
                                     <!-- Health Checklist -->
-                                    <div class="mb-4">
-                                        <h6 class="detail-title"><i class="bi bi-shield-check text-success"></i> Salud y Convivencia</h6>
+                                    <div class="info-section">
+                                        <h6 class="detail-title"><i class="bi bi-shield-check text-success"></i> Salud y
+                                            Convivencia</h6>
                                         <div class="d-flex flex-wrap">
-                                            <span class="health-badge" th:classappend="${pub.vacunada} ? 'health-true' : 'health-false'">
-                                                <i class="bi" th:classappend="${pub.vacunada} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Vacunada
+                                            <span class="health-badge"
+                                                th:classappend="${pub.vacunada} ? 'health-true' : 'health-false'">
+                                                <i class="bi"
+                                                    th:classappend="${pub.vacunada} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                                                Vacunada
                                             </span>
-                                            <span class="health-badge" th:classappend="${pub.esterilizada} ? 'health-true' : 'health-false'">
-                                                <i class="bi" th:classappend="${pub.esterilizada} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Esterilizada
+                                            <span class="health-badge"
+                                                th:classappend="${pub.esterilizada} ? 'health-true' : 'health-false'">
+                                                <i class="bi"
+                                                    th:classappend="${pub.esterilizada} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                                                Esterilizada
                                             </span>
-                                            <span class="health-badge" th:classappend="${pub.aceptaNinos} ? 'health-true' : 'health-false'">
-                                                <i class="bi" th:classappend="${pub.aceptaNinos} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Apta para niños
+                                            <span class="health-badge"
+                                                th:classappend="${pub.aceptaNinos} ? 'health-true' : 'health-false'">
+                                                <i class="bi"
+                                                    th:classappend="${pub.aceptaNinos} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                                                Apta para niños
                                             </span>
-                                            <span class="health-badge" th:classappend="${pub.aceptaOtrasMascotas} ? 'health-true' : 'health-false'">
-                                                <i class="bi" th:classappend="${pub.aceptaOtrasMascotas} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i> Acepta mascotas
+                                            <span class="health-badge"
+                                                th:classappend="${pub.aceptaOtrasMascotas} ? 'health-true' : 'health-false'">
+                                                <i class="bi"
+                                                    th:classappend="${pub.aceptaOtrasMascotas} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                                                Acepta mascotas
                                             </span>
                                         </div>
                                     </div>
 
                                     <!-- Story -->
-                                    <div class="mb-4">
-                                        <h6 class="detail-title"><i class="bi bi-book-half text-primary"></i> Su Historia</h6>
-                                        <p class="text-secondary small mb-0" th:text="${pub.historia}" style="line-height: 1.6; text-align: justify;"></p>
+                                    <div class="info-section">
+                                        <h6 class="detail-title"><i class="bi bi-book-half text-primary"></i> Su
+                                            Historia</h6>
+                                        <p th:text="${pub.historia}">Historia...</p>
                                     </div>
 
                                     <!-- Motivo de adopcion -->
-                                    <div class="mb-4" th:if="${pub.motivoAdopcion != null && !#strings.isEmpty(pub.motivoAdopcion)}">
-                                        <h6 class="detail-title"><i class="bi bi-question-circle-fill text-primary"></i> Motivo de Adopción</h6>
-                                        <p class="text-secondary small mb-0" th:text="${pub.motivoAdopcion}" style="line-height: 1.6;"></p>
+                                    <div class="info-section"
+                                        th:if="${pub.motivoAdopcion != null && !#strings.isEmpty(pub.motivoAdopcion)}">
+                                        <h6 class="detail-title"><i class="bi bi-question-circle-fill text-primary"></i>
+                                            Motivo de Adopción</h6>
+                                        <p th:text="${pub.motivoAdopcion}">Motivo...</p>
                                     </div>
 
                                     <!-- Requisitos de adopcion -->
-                                    <div class="mb-4" th:if="${pub.requisitosAdopcion != null && !#strings.isEmpty(pub.requisitosAdopcion)}">
-                                        <h6 class="detail-title"><i class="bi bi-card-checklist text-primary"></i> Requisitos de Adopción</h6>
-                                        <p class="text-secondary small mb-0" th:text="${pub.requisitosAdopcion}" style="line-height: 1.6;"></p>
+                                    <div class="info-section"
+                                        th:if="${pub.requisitosAdopcion != null && !#strings.isEmpty(pub.requisitosAdopcion)}">
+                                        <h6 class="detail-title"><i class="bi bi-card-checklist text-primary"></i>
+                                            Requisitos de Adopción</h6>
+                                        <p th:text="${pub.requisitosAdopcion}">Requisitos...</p>
                                     </div>
 
                                     <!-- Info adicional -->
-                                    <div class="mb-2" th:if="${pub.informacionAdicional != null && !#strings.isEmpty(pub.informacionAdicional)}">
-                                        <h6 class="detail-title"><i class="bi bi-plus-circle-fill text-primary"></i> Información Adicional</h6>
-                                        <p class="text-secondary small mb-0" th:text="${pub.informacionAdicional}" style="line-height: 1.6;"></p>
+                                    <div class="info-section"
+                                        th:if="${pub.informacionAdicional != null && !#strings.isEmpty(pub.informacionAdicional)}">
+                                        <h6 class="detail-title"><i class="bi bi-plus-circle-fill text-primary"></i>
+                                            Información Adicional</h6>
+                                        <p th:text="${pub.informacionAdicional}">Info adicional...</p>
                                     </div>
 
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Footer -->
-                        <div class="modal-footer modal-footer-premium d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+                        <div
+                            class="modal-footer modal-footer-premium d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg"></i> Cerrar
+                            </button>
                             <div class="d-flex gap-2">
-                                <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn btn-premium-reject rounded-pill px-4" onclick="return confirm('¿Seguro que deseas rechazar esta publicación?')">
+                                <a th:href="@{/admin/comunidad/rechazar/{id}(id=${pub.id})}" class="btn-premium-reject"
+                                    onclick="return confirm('¿Seguro que deseas rechazar esta publicación?')">
                                     <i class="bi bi-x-lg"></i> Rechazar
                                 </a>
-                                <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn btn-premium-approve rounded-pill px-4">
+                                <a th:href="@{/admin/comunidad/aprobar/{id}(id=${pub.id})}" class="btn-premium-approve">
                                     <i class="bi bi-check-lg"></i> Aprobar y Publicar
                                 </a>
                             </div>
@@ -471,5 +1320,18 @@
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Navbar scroll effect -->
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.main-navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+
 </body>
+
 </html>

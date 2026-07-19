@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mensajería Interactiva | Comunidad Pet</title>
+    <title>Mensajería | Comunidad Pet</title>
     <link th:replace="~{fragments/header :: favIcon}">
 
     <!-- Bootstrap 5.3 CSS -->
@@ -12,56 +12,440 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
             --aurora-start: #6366f1;
+            --aurora-mid: #8b5cf6;
             --aurora-end: #d946ef;
-            --bg: #f8fafc;
+            --bg: #f1f5f9;
             --surface: #ffffff;
+            --surface-hover: #f8fafc;
             --border: #e2e8f0;
+            --border-light: #f1f5f9;
             --text-primary: #0f172a;
-            --text-secondary: #64748b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.07), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fdf2f8 100%);
+            background: var(--bg);
             color: var(--text-secondary);
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            overflow: hidden;
+            line-height: 1.6;
         }
 
+        /* ===== NAVBAR ===== */
         .main-navbar {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--border);
             z-index: 1000;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            transition: var(--transition-base);
+            flex-shrink: 0;
         }
 
+        .main-navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .navbar-brand-hex {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .navbar-brand-hex i {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid), var(--aurora-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.3rem;
+        }
+
+        .nav-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-pills-group {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: var(--radius-full);
+        }
+
+        .nav-pill {
+            font-weight: 600;
+            font-size: 0.78rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: var(--radius-full);
+            transition: var(--transition-base);
+            text-decoration: none;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .nav-pill:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .nav-pill.active {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-toggle-panel {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .btn-toggle-panel:hover {
+            border-color: var(--aurora-start);
+            color: var(--aurora-start);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* ===== CHAT LAYOUT ===== */
         .chat-main-container {
-            height: calc(100vh - 85px);
+            height: calc(100vh - 60px);
+            height: calc(100dvh - 60px);
             overflow: hidden;
             display: grid;
-            grid-template-columns: 320px 1fr 340px;
+            grid-template-columns: 300px 1fr 320px;
             background: var(--surface);
-            border-top: 1px solid var(--border);
             position: relative;
         }
 
+        .panel-column {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== LEFT PANEL ===== */
+        .left-panel-col {
+            border-right: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .left-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .left-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .left-title i {
+            color: var(--aurora-start);
+            font-size: 1rem;
+        }
+
+        .chat-search-wrap {
+            position: relative;
+        }
+
+        .chat-search-wrap i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        .chat-search-input {
+            width: 100%;
+            background: var(--surface-hover);
+            border: 1.5px solid var(--border-light);
+            padding: 0.55rem 0.9rem 0.55rem 2.2rem;
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: var(--transition-base);
+        }
+
+        .chat-search-input:focus {
+            background: var(--surface);
+            border-color: var(--aurora-start);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+            outline: none;
+        }
+
+        .chat-search-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.5rem 1.25rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: none;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: var(--radius-full);
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: var(--transition-base);
+            cursor: pointer;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-btn:hover {
+            color: var(--text-primary);
+            background: var(--surface-hover);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid));
+            color: white;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.2);
+        }
+
+        .convo-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+
+        .convo-item {
+            padding: 0.85rem 1.25rem;
+            margin: 0 0.5rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition-base);
+            cursor: pointer;
+            text-decoration: none !important;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            position: relative;
+        }
+
+        .convo-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .convo-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.04));
+            border-left: 3px solid var(--aurora-start);
+        }
+
+        .avatar-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-initials {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            color: var(--aurora-start);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            border: 2px solid var(--surface);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: var(--transition-base);
+        }
+
+        .convo-item:hover .avatar-initials,
+        .convo-item.active .avatar-initials {
+            transform: scale(1.05);
+        }
+
+        .avatar-pet-overlay {
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2.5px solid var(--surface);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .convo-info {
+            flex-grow: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .convo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.2rem;
+        }
+
+        .convo-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .convo-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .convo-pet-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.72rem;
+            color: var(--aurora-start);
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .convo-pet-tag i {
+            font-size: 0.65rem;
+        }
+
+        .convo-preview {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .convo-preview.attachment {
+            color: var(--aurora-start);
+            font-weight: 600;
+        }
+
+        .badge-unread-chat {
+            background: linear-gradient(135deg, var(--danger), #f87171);
+            color: white;
+            font-weight: 800;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-full);
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+            flex-shrink: 0;
+        }
+
+        .empty-convos {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .empty-convos i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            opacity: 0.4;
+        }
+
+        .empty-convos-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .chat-main-container {
                 grid-template-columns: 280px 1fr;
             }
+
             .right-panel-col {
                 display: none;
             }
+
             .right-panel-active .right-panel-col {
                 display: flex !important;
                 position: absolute;
@@ -72,7 +456,7 @@
                 background: white;
                 z-index: 500;
                 border-left: 1px solid var(--border);
-                box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
             }
         }
 
@@ -80,513 +464,38 @@
             .chat-main-container {
                 grid-template-columns: 1fr;
             }
+
             .left-panel-col {
                 display: flex;
             }
+
             .center-panel-col {
                 display: none;
             }
+
             body.chat-active .left-panel-col {
                 display: none !important;
             }
+
             body.chat-active .center-panel-col {
                 display: flex !important;
             }
+
+            .nav-pills-group {
+                display: none;
+            }
         }
 
-        /* Panels Shared Styles */
-        .panel-column {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        @media (max-width: 575.98px) {
+            .main-navbar {
+                padding: 0.5rem 0;
+                height: auto;
+                min-height: 56px;
+            }
 
-        /* Left Column */
-        .left-panel-col {
-            border-right: 1px solid var(--border);
-            background: #fafbfc;
-        }
-
-        .left-search-wrap {
-            padding: 1rem;
-            background: #ffffff;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .chat-search-input {
-            background: #f1f5f9;
-            border: 1px solid transparent;
-            padding: 0.6rem 1rem;
-            border-radius: 50px;
-            font-size: 0.88rem;
-            transition: var(--transition);
-        }
-
-        .chat-search-input:focus {
-            background: #ffffff;
-            border-color: var(--aurora-start);
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.1);
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: 0.25rem;
-            padding: 0.5rem 1rem;
-            background: #ffffff;
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-        }
-
-        .filter-btn {
-            background: transparent;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            border-radius: 50px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            transition: var(--transition);
-        }
-
-        .filter-btn.active {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--aurora-start);
-        }
-
-        .convo-list {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .convo-item {
-            padding: 1.1rem 1.25rem;
-            border-bottom: 1px solid #f1f5f9;
-            transition: var(--transition);
-            cursor: pointer;
-            text-decoration: none !important;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            position: relative;
-        }
-
-        .convo-item:hover {
-            background: #f1f5f9;
-        }
-
-        .convo-item.active {
-            background: rgba(99, 102, 241, 0.05);
-            border-left: 4px solid var(--aurora-start);
-        }
-
-        .avatar-container {
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .avatar-initials {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 100%);
-            color: #4338ca;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            border: 2px solid #ffffff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .avatar-pet-overlay {
-            position: absolute;
-            bottom: -4px;
-            right: -4px;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .badge-unread-chat {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-            color: white;
-            font-weight: 800;
-            font-size: 0.68rem;
-            padding: 0.25rem 0.55rem;
-            border-radius: 50px;
-            box-shadow: 0 2px 6px rgba(244, 63, 94, 0.3);
-        }
-
-        /* Center Column */
-        .center-panel-col {
-            background: #ffffff;
-            border-right: 1px solid var(--border);
-        }
-
-        .chat-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-        }
-
-        .status-dot-active {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
-            animation: statusPulse 2s infinite ease-in-out;
-        }
-
-        @keyframes statusPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.5; }
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            background: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        /* Bubbles & Meta */
-        .bubble-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 75%;
-            position: relative;
-        }
-
-        .bubble-wrapper.me {
-            align-self: flex-end;
-            align-items: flex-end;
-        }
-
-        .bubble-wrapper.other {
-            align-self: flex-start;
-            align-items: flex-start;
-        }
-
-        .bubble {
-            padding: 0.75rem 1.1rem;
-            border-radius: 18px;
-            font-size: 0.92rem;
-            line-height: 1.45;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            position: relative;
-            transition: var(--transition);
-        }
-
-        .bubble-wrapper:hover .reaction-trigger-btn {
-            opacity: 1;
-        }
-
-        .reaction-trigger-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: var(--transition);
-            z-index: 5;
-        }
-
-        .bubble-wrapper.me .reaction-trigger-btn {
-            left: -35px;
-        }
-
-        .bubble-wrapper.other .reaction-trigger-btn {
-            right: -35px;
-        }
-
-        .bubble.me {
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
-            color: #ffffff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .bubble.other {
-            background: #ffffff;
-            color: var(--text-primary);
-            border-bottom-left-radius: 4px;
-            border: 1px solid var(--border);
-        }
-
-        .bubble-meta {
-            font-size: 0.68rem;
-            margin-top: 4px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .bubble-reacciones {
-            display: flex;
-            gap: 2px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 2px 6px;
-            font-size: 0.72rem;
-            position: absolute;
-            bottom: -15px;
-            right: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            z-index: 2;
-        }
-
-        /* Date Separator */
-        .date-separator {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 1rem 0;
-        }
-
-        .date-separator::before,
-        .date-separator::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .date-separator:not(:empty)::before { margin-right: .75em; }
-        .date-separator:not(:empty)::after { margin-left: .75em; }
-
-        /* Suggested Replies */
-        .suggested-replies {
-            padding: 0.5rem 1.5rem;
-            background: #f8fafc;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-        }
-
-        .suggestion-chip {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--aurora-start);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: var(--transition);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-
-        .suggestion-chip:hover {
-            background: var(--aurora-start);
-            color: #ffffff;
-            border-color: var(--aurora-start);
-        }
-
-        /* Footer Input Area */
-        .chat-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--border);
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .chat-input-row {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .input-icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 0.25rem;
-        }
-
-        .input-icon-btn:hover {
-            color: var(--aurora-start);
-        }
-
-        .chat-input-wrap {
-            flex-grow: 1;
-            background: #f1f5f9;
-            border-radius: 30px;
-            padding: 4px 6px;
-            display: flex;
-            align-items: center;
-            border: 1.5px solid transparent;
-            transition: var(--transition);
-        }
-
-        .chat-input-wrap:focus-within {
-            background: #ffffff;
-            border-color: var(--aurora-start);
-            box-shadow: 0 0 12px rgba(99, 102, 241, 0.1);
-        }
-
-        .chat-input {
-            flex-grow: 1;
-            border: none;
-            background: transparent;
-            outline: none;
-            padding: 8px 12px;
-            font-size: 0.92rem;
-            color: var(--text-primary);
-        }
-
-        .chat-send-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end));
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
-            transition: var(--transition);
-        }
-
-        .chat-send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Right Column */
-        .right-panel-col {
-            border-left: 1px solid var(--border);
-            background: #ffffff;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-        }
-
-        .right-pet-card {
-            background: #f8fafc;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .right-pet-img {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            margin-bottom: 0.75rem;
-        }
-
-        .adoption-status-badge {
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 0.3rem 0.8rem;
-            border-radius: 50px;
-            margin-top: 0.5rem;
-        }
-
-        .status-disponible { background: #d1fae5; color: #065f46; }
-        .status-reservado { background: #fef3c7; color: #92400e; }
-        .status-adoptado { background: #e0f2fe; color: #0369a1; }
-
-        .profile-summary-card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1rem;
-        }
-
-        .profile-stat-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            padding: 0.25rem 0;
-            border-bottom: 1px dashed #f1f5f9;
-        }
-
-        /* Interactive Proposals */
-        .meeting-proposal-card {
-            background: #ffffff;
-            border: 1.5px solid var(--aurora-start);
-            border-radius: var(--radius-lg);
-            padding: 1.1rem;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.06);
-            max-width: 320px;
-            margin: 0.5rem 0;
-        }
-
-        /* Reactions Popover */
-        .reactions-popover {
-            display: flex;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .reaction-emoji-btn {
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .reaction-emoji-btn:hover {
-            transform: scale(1.3);
-        }
-
-        .pinned-header-bar {
-            background: #fef08a;
-            color: #854d0e;
-            padding: 0.4rem 1rem;
-            font-size: 0.78rem;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            .chat-main-container {
+                height: calc(100vh - 56px);
+            }
         }
     </style>
 </head>
@@ -594,18 +503,21 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="main-navbar py-3">
-        <div class="container-fluid px-4 d-flex align-items-center">
+    <nav class="main-navbar py-0">
+        <div class="container-fluid px-3 px-lg-4 d-flex align-items-center h-100">
             <a class="navbar-brand-hex" th:href="@{/usuario/dashboard}">
                 <i class="bi bi-heart-fill"></i>
-                Comunidad Pet <span class="badge bg-secondary ms-2" style="font-size: 0.65rem;">Interactivo</span>
+                Comunidad Pet
             </a>
-            
+
             <div class="ms-auto d-flex align-items-center gap-2">
-                <a th:href="@{/usuario/comunidad}" class="btn btn-sm btn-outline-secondary rounded-pill border-0 px-3 py-1.5 fw-semibold">Adopciones</a>
-                <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="btn btn-sm btn-outline-secondary rounded-pill border-0 px-3 py-1.5 fw-semibold">Mis Publicaciones</a>
-                <a th:href="@{/usuario/comunidad/chats}" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 fw-semibold"><i class="bi bi-chat-fill me-1"></i> Mensajes</a>
-                <button class="btn btn-sm btn-outline-dark rounded-pill ms-2 px-3" onclick="toggleRightPanel()" title="Info de Adopción">
+                <div class="nav-pills-group">
+                    <a th:href="@{/usuario/comunidad}" class="nav-pill">Adopciones</a>
+                    <a th:href="@{/usuario/comunidad/mis-publicaciones}" class="nav-pill">Mis Publicaciones</a>
+                    <a th:href="@{/usuario/comunidad/chats}" class="nav-pill active"><i class="bi bi-chat-fill"></i>
+                        Mensajes</a>
+                </div>
+                <button class="btn-toggle-panel d-lg-none" onclick="toggleRightPanel()" title="Info de Adopción">
                     <i class="bi bi-layout-sidebar-reverse"></i>
                 </button>
             </div>
@@ -613,170 +525,233 @@
     </nav>
 
     <div class="chat-main-container">
-        
-        <!-- Left Panel: Conversaciones con filtros y búsqueda -->
+
+        <!-- Left Panel -->
         <div class="panel-column left-panel-col">
-            <div class="left-search-wrap">
-                <input type="text" class="form-control chat-search-input" id="searchChatsInput" placeholder="Buscar contactos o mascotas..." onkeyup="filterChatsList()">
+            <div class="left-header">
+                <div class="left-title">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    Conversaciones
+                </div>
+                <div class="chat-search-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="chat-search-input" id="searchChatsInput"
+                        placeholder="Buscar contactos o mascotas..." onkeyup="filterChatsList()">
+                </div>
             </div>
-            
+
             <div class="filter-tabs">
                 <button class="filter-btn active" id="tabAll" onclick="setChatFilter('all')">Todas</button>
                 <button class="filter-btn" id="tabUnread" onclick="setChatFilter('unread')">Sin Leer</button>
             </div>
 
             <div class="convo-list" id="convoList">
-                <div th:if="${#lists.isEmpty(conversaciones)}" class="text-center py-5 text-muted small">
-                    <i class="bi bi-chat-square-dots d-block fs-3 mb-2 opacity-50"></i>
-                    No tienes mensajes activos.
+                <div th:if="${#lists.isEmpty(conversaciones)}" class="empty-convos">
+                    <i class="bi bi-chat-square-dots"></i>
+                    <div class="empty-convos-text">No tienes mensajes activos</div>
                 </div>
 
-                <a th:each="c : ${conversaciones}" 
-                   th:href="@{/usuario/comunidad/chat/{adopcionId}/{otroUsuarioId}(adopcionId=${c.adopcionId}, otroUsuarioId=${c.otroParticipanteId})}"
-                   class="convo-item" 
-                   th:data-name="${c.otroParticipanteNombre}"
-                   th:data-pet="${c.mascotaNombre}"
-                   th:data-unread="${c.noLeido}"
-                   th:classappend="${pub != null and pub.id == c.adopcionId and otroUsuario != null and otroUsuario.id == c.otroParticipanteId} ? 'active'">
-                    
+                <a th:each="c : ${conversaciones}"
+                    th:href="@{/usuario/comunidad/chat/{adopcionId}/{otroUsuarioId}(adopcionId=${c.adopcionId}, otroUsuarioId=${c.otroParticipanteId})}"
+                    class="convo-item" th:data-name="${c.otroParticipanteNombre}" th:data-pet="${c.mascotaNombre}"
+                    th:data-unread="${c.noLeido}"
+                    th:classappend="${pub != null and pub.id == c.adopcionId and otroUsuario != null and otroUsuario.id == c.otroParticipanteId} ? 'active'">
+
                     <div class="avatar-container">
-                        <div class="avatar-initials" th:text="${#strings.substring(c.otroParticipanteNombre,0,1).toUpperCase()}">U</div>
+                        <div class="avatar-initials"
+                            th:text="${#strings.substring(c.otroParticipanteNombre,0,1).toUpperCase()}">U</div>
                         <img th:src="${c.mascotaFoto}" alt="Mascota" class="avatar-pet-overlay">
                     </div>
 
-                    <div class="flex-grow-1 overflow-hidden">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <strong class="text-dark small fw-bold" th:text="${c.otroParticipanteNombre}">Nombre</strong>
-                            <span th:if="${c.noLeido}" class="badge-unread-chat" th:text="${c.cantidadNoLeidos}">1</span>
+                    <div class="convo-info">
+                        <div class="convo-header">
+                            <span class="convo-name" th:text="${c.otroParticipanteNombre}">Nombre</span>
+                            <span th:if="${c.noLeido}" class="badge-unread-chat"
+                                th:text="${c.cantidadNoLeidos}">1</span>
                         </div>
-                        <div class="pet-context-tag">
-                            <i class="bi bi-tag-fill text-muted" style="font-size: 0.65rem;"></i>
+                        <div class="convo-pet-tag">
+                            <i class="bi bi-tag-fill"></i>
                             <span th:text="${c.mascotaNombre}">Mascota</span>
                         </div>
-                        <span class="text-muted text-truncate d-block small mt-1" style="font-size: 0.78rem;" 
-                              th:text="${c.ultimoMensaje.startsWith('/uploads/') ? '📷 Archivo Compartido' : c.ultimoMensaje}">Último mensaje</span>
+                        <span class="convo-preview"
+                            th:classappend="${c.ultimoMensaje.startsWith('/uploads/') ? 'attachment' : ''}"
+                            th:text="${c.ultimoMensaje.startsWith('/uploads/') ? '📎 Archivo Compartido' : c.ultimoMensaje}">Último
+                            mensaje</span>
                     </div>
                 </a>
             </div>
         </div>
-
-        <!-- Center Panel: Chat completo -->
+        <!-- Center Panel -->
         <div class="panel-column center-panel-col">
-            
+
             <!-- Default Screen -->
-            <div th:if="${pub == null}" class="h-100 d-flex flex-column align-items-center justify-content-center text-muted p-4">
-                <i class="bi bi-chat-quote-fill fs-1 mb-3" style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                <h5 class="text-dark fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Mensajería Segura</h5>
-                <p class="small text-center" style="max-width: 320px;">Selecciona una conversación a la izquierda para iniciar la adopción.</p>
+            <div th:if="${pub == null}"
+                class="h-100 d-flex flex-column align-items-center justify-content-center text-muted p-4">
+                <div
+                    style="width: 80px; height: 80px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                    <i class="bi bi-chat-quote-fill" style="font-size: 2rem; color: var(--aurora-start);"></i>
+                </div>
+                <h5 class="text-dark fw-bold mb-1" style="font-family: 'Outfit', sans-serif; font-size: 1.1rem;">
+                    Mensajería Segura</h5>
+                <p class="small text-center" style="max-width: 280px; color: var(--text-muted); font-weight: 500;">
+                    Selecciona una conversación para iniciar el proceso de adopción.</p>
             </div>
 
-            <!-- Active Chat Pane -->
-            <div th:if="${pub != null}" class="chat-pane">
-                
+            <!-- Active Chat -->
+            <div th:if="${pub != null}" class="chat-pane d-flex flex-column h-100">
+
                 <!-- Pinned Message Bar -->
                 <div class="pinned-header-bar" id="pinnedMsgBar" style="display: none;">
                     <div><i class="bi bi-pin-angle-fill me-1"></i> <span id="pinnedMsgText">Fijado: ...</span></div>
-                    <button class="btn btn-sm p-0 border-0 text-dark" onclick="hidePinnedBar()"><i class="bi bi-x-lg"></i></button>
+                    <button class="btn btn-sm p-0 border-0" style="color: #854d0e;" onclick="hidePinnedBar()"><i
+                            class="bi bi-x-lg"></i></button>
                 </div>
 
-                <!-- Header -->
+                <!-- Chat Header -->
                 <div class="chat-header">
                     <div class="d-flex align-items-center gap-3">
-                        <button type="button" class="btn btn-link p-0 text-dark d-md-none" id="backToInboxBtn" aria-label="Atrás">
+                        <button type="button" class="btn btn-link p-0 text-dark d-md-none" id="backToInboxBtn"
+                            aria-label="Atrás">
                             <i class="bi bi-chevron-left fs-4"></i>
                         </button>
-                        
+
                         <div class="avatar-container">
-                            <div class="avatar-initials" th:text="${#strings.substring(otroUsuario.nombre,0,1).toUpperCase()}">U</div>
+                            <div class="avatar-initials" style="width: 40px; height: 40px; font-size: 0.9rem;"
+                                th:text="${#strings.substring(otroUsuario.nombre,0,1).toUpperCase()}">U</div>
+                            <span class="status-dot-active"
+                                style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border: 2px solid white;"></span>
                         </div>
                         <div>
-                            <h6 class="text-dark fw-bold mb-0" th:text="${otroUsuario.nombre}">Nombre</h6>
-                            <div class="small text-muted d-flex align-items-center gap-1.5">
-                                <span class="status-dot-active"></span>
+                            <h6 class="text-dark fw-bold mb-0" style="font-size: 0.9rem;"
+                                th:text="${otroUsuario.nombre}">Nombre</h6>
+                            <div class="small d-flex align-items-center gap-1.5"
+                                style="color: var(--success); font-size: 0.75rem; font-weight: 600;">
+                                <span class="status-dot-active" style="width: 6px; height: 6px;"></span>
                                 <span>En línea</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Search Message Icon -->
                     <div class="d-flex align-items-center gap-2">
                         <div class="input-group input-group-sm d-none d-sm-flex" style="max-width: 180px;">
-                            <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control bg-light border-0" id="searchMsgsInput" placeholder="Buscar en chat..." onkeyup="searchInsideChat()">
+                            <span class="input-group-text bg-light border-0"
+                                style="border-radius: var(--radius-full) 0 0 var(--radius-full); padding-left: 0.75rem;"><i
+                                    class="bi bi-search"
+                                    style="font-size: 0.75rem; color: var(--text-muted);"></i></span>
+                            <input type="text" class="form-control bg-light border-0"
+                                style="border-radius: 0 var(--radius-full) var(--radius-full) 0; font-size: 0.8rem;"
+                                id="searchMsgsInput" placeholder="Buscar en chat..." onkeyup="searchInsideChat()">
                         </div>
+                        <button class="btn-toggle-panel" onclick="toggleRightPanel()" title="Info de Adopción">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Message Area -->
+                <!-- Messages Area -->
                 <div class="chat-messages" id="chatMessages">
-                    <div th:each="m, iter : ${mensajes}" th:data-msg-id="${m.id}" th:classappend="${m.fijado} ? 'msg-pinned-highlight' : ''">
-                        
+                    <div th:each="m, iter : ${mensajes}" th:data-msg-id="${m.id}"
+                        th:classappend="${m.fijado} ? 'msg-pinned-highlight' : ''">
+
                         <!-- Date Separator -->
-                        <div class="date-separator" th:if="${iter.first || !#temporals.format(m.fechaHora, 'dd/MM/yyyy').equals(#temporals.format(mensajes[iter.index-1].fechaHora, 'dd/MM/yyyy'))}"
-                             th:text="${#temporals.format(m.fechaHora, 'dd MMMM yyyy', new java.util.Locale('es', 'ES'))}">
+                        <div class="date-separator"
+                            th:if="${iter.first || !#temporals.format(m.fechaHora, 'dd/MM/yyyy').equals(#temporals.format(mensajes[iter.index-1].fechaHora, 'dd/MM/yyyy'))}"
+                            th:text="${#temporals.format(m.fechaHora, 'dd MMMM yyyy', new java.util.Locale('es', 'ES'))}">
                             Hoy
                         </div>
 
-                        <!-- Render based on Message Type -->
-
-                        <!-- ENCUENTRO CARD -->
+                        <!-- Meeting Card -->
                         <div th:if="${m.tipo == 'ENCUENTRO'}" class="d-flex justify-content-center w-100 my-2">
                             <div class="meeting-proposal-card text-center">
-                                <i class="bi bi-calendar-event-fill text-indigo fs-3" style="color: var(--aurora-start);"></i>
-                                <h6 class="text-dark fw-bold mt-2">Propuesta de Encuentro</h6>
-                                <p class="small text-muted mb-3" th:text="${'Nos vemos en: ' + m.lugarEncuentro + ' a las ' + m.fechaHoraEncuentro}">Lugar y Hora</p>
-                                
+                                <div
+                                    style="width: 48px; height: 48px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;">
+                                    <i class="bi bi-calendar-event-fill"
+                                        style="color: var(--aurora-start); font-size: 1.3rem;"></i>
+                                </div>
+                                <h6 class="text-dark fw-bold mt-2" style="font-size: 0.95rem;">Propuesta de Encuentro
+                                </h6>
+                                <p class="small text-muted mb-3" style="font-size: 0.82rem;"
+                                    th:text="${'Nos vemos en: ' + m.lugarEncuentro + ' a las ' + m.fechaHoraEncuentro}">
+                                    Lugar y Hora</p>
+
                                 <div th:if="${m.estadoEncuentro == 'PROPUESTO'}">
-                                    <div th:if="${m.emisorId != usuario.id}" class="d-flex gap-2 justify-content-center">
-                                        <button class="btn btn-sm btn-success rounded-pill px-3" th:data-msg-id="${m.id}" onclick="confirmMeeting(this.getAttribute('data-msg-id'), 'CONFIRMADO')">Aceptar</button>
-                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" th:data-msg-id="${m.id}" onclick="confirmMeeting(this.getAttribute('data-msg-id'), 'CANCELADO')">Rechazar</button>
+                                    <div th:if="${m.emisorId != usuario.id}"
+                                        class="d-flex gap-2 justify-content-center">
+                                        <button class="btn btn-sm btn-success rounded-pill px-3"
+                                            style="font-weight: 700; font-size: 0.78rem;" th:data-msg-id="${m.id}"
+                                            onclick="confirmMeeting(this.getAttribute('data-msg-id'), 'CONFIRMADO')">
+                                            <i class="bi bi-check-lg"></i> Aceptar
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                            style="font-weight: 700; font-size: 0.78rem;" th:data-msg-id="${m.id}"
+                                            onclick="confirmMeeting(this.getAttribute('data-msg-id'), 'CANCELADO')">
+                                            <i class="bi bi-x-lg"></i> Rechazar
+                                        </button>
                                     </div>
-                                    <span th:if="${m.emisorId == usuario.id}" class="badge bg-secondary-subtle text-secondary rounded-pill">Esperando confirmación</span>
+                                    <span th:if="${m.emisorId == usuario.id}"
+                                        class="badge bg-secondary-subtle text-secondary rounded-pill"
+                                        style="font-size: 0.75rem; font-weight: 700;">Esperando confirmación</span>
                                 </div>
 
                                 <div th:if="${m.estadoEncuentro == 'CONFIRMADO'}">
-                                    <span class="badge bg-success rounded-pill"><i class="bi bi-check-circle-fill me-1"></i> Encuentro Confirmado</span>
+                                    <span class="badge bg-success rounded-pill"
+                                        style="font-size: 0.75rem; font-weight: 700;">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Encuentro Confirmado
+                                    </span>
                                 </div>
 
                                 <div th:if="${m.estadoEncuentro == 'CANCELADO'}">
-                                    <span class="badge bg-danger rounded-pill"><i class="bi bi-x-circle-fill me-1"></i> Propuesta Cancelada</span>
+                                    <span class="badge bg-danger rounded-pill"
+                                        style="font-size: 0.75rem; font-weight: 700;">
+                                        <i class="bi bi-x-circle-fill me-1"></i> Propuesta Cancelada
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- STANDARD BUBBLE (TEXTO, IMAGEN, DOCUMENTO) -->
-                        <div th:if="${m.tipo != 'ENCUENTRO'}" class="bubble-wrapper" th:classappend="${m.emisorId == usuario.id} ? 'me' : 'other'">
-                            
-                            <!-- Hover Reaction trigger -->
-                            <div class="reaction-trigger-btn" th:data-msg-id="${m.id}" onclick="showReactionMenu(event, this.getAttribute('data-msg-id'))">
+                        <!-- Standard Bubble -->
+                        <div th:if="${m.tipo != 'ENCUENTRO'}" class="bubble-wrapper"
+                            th:classappend="${m.emisorId == usuario.id} ? 'me' : 'other'">
+
+                            <div class="reaction-trigger-btn" th:data-msg-id="${m.id}"
+                                onclick="showReactionMenu(event, this.getAttribute('data-msg-id'))">
                                 <i class="bi bi-emoji-smile"></i>
                             </div>
 
                             <div class="bubble" th:classappend="${m.emisorId == usuario.id} ? 'me' : 'other'">
-                                
-                                <!-- Render Image -->
+
+                                <!-- Image -->
                                 <div th:if="${m.tipo == 'IMAGEN'}" class="mb-2">
-                                    <img th:src="${m.attachmentUrl}" alt="Compartido" class="img-fluid rounded" style="max-height: 200px; cursor: pointer;" onclick="window.open(this.src)">
+                                    <img th:src="${m.attachmentUrl}" alt="Compartido" class="img-fluid rounded"
+                                        style="max-height: 200px; cursor: pointer; border-radius: var(--radius-md);"
+                                        onclick="window.open(this.src)">
                                 </div>
 
-                                <!-- Render Document -->
+                                <!-- Document -->
                                 <div th:if="${m.tipo == 'DOCUMENTO'}" class="mb-2">
                                     <div th:if="${m.attachmentNombre != null && m.attachmentNombre.contains('.webm')}">
-                                        <audio th:src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px;"></audio>
+                                        <audio th:src="${m.attachmentUrl}" controls class="w-100"
+                                            style="max-width: 240px; height: 36px;"></audio>
                                     </div>
-                                    <a th:if="${m.attachmentNombre == null || !m.attachmentNombre.contains('.webm')}" th:href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark">
-                                        <i class="bi bi-file-earmark-arrow-down-fill text-primary fs-5"></i>
-                                        <span class="text-truncate small" style="max-width: 140px;" th:text="${m.attachmentNombre}">Documento.pdf</span>
+                                    <a th:if="${m.attachmentNombre == null || !m.attachmentNombre.contains('.webm')}"
+                                        th:href="${m.attachmentUrl}" download
+                                        class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark"
+                                        style="font-size: 0.8rem; padding: 0.5rem 0.75rem;">
+                                        <i class="bi bi-file-earmark-arrow-down-fill"
+                                            style="color: var(--aurora-start); font-size: 1rem;"></i>
+                                        <span class="text-truncate small" style="max-width: 140px; font-weight: 600;"
+                                            th:text="${m.attachmentNombre}">Documento.pdf</span>
                                     </a>
                                 </div>
 
                                 <span class="msg-text-content" th:text="${m.contenido}">Mensaje...</span>
 
-                                <!-- Render Pinned Anchor -->
-                                <span th:if="${m.fijado}" class="position-absolute top-0 end-0 p-1"><i class="bi bi-pin-angle-fill" style="font-size: 0.65rem;"></i></span>
+                                <span th:if="${m.fijado}" class="position-absolute top-0 end-0 p-1"><i
+                                        class="bi bi-pin-angle-fill"
+                                        style="font-size: 0.6rem; color: rgba(255,255,255,0.7);"></i></span>
                             </div>
 
-                            <!-- Reaction List -->
+                            <!-- Reactions -->
                             <div th:if="${m.reacciones != null && !m.reacciones.isEmpty()}" class="bubble-reacciones">
                                 <span th:each="entry : ${m.reacciones}" th:text="${entry.value}">👍</span>
                             </div>
@@ -784,10 +759,12 @@
                             <div class="bubble-meta">
                                 <span th:text="${#temporals.format(m.fechaHora, 'HH:mm')}">Hora</span>
                                 <span th:if="${m.emisorId == usuario.id}">
-                                    <i th:class="${m.leido} ? 'bi bi-check-all text-info' : 'bi bi-check'"></i>
+                                    <i th:class="${m.leido} ? 'bi bi-check-all' : 'bi bi-check'"
+                                        style="font-size: 0.7rem;"></i>
                                 </span>
-                                <!-- Pin / Unpin option -->
-                                <button class="btn btn-sm p-0 border-0 text-muted ms-2" th:data-msg-id="${m.id}" onclick="togglePinMessage(this.getAttribute('data-msg-id'))" title="Fijar mensaje">
+                                <button class="btn btn-sm p-0 border-0 text-muted ms-1" style="font-size: 0.65rem;"
+                                    th:data-msg-id="${m.id}"
+                                    onclick="togglePinMessage(this.getAttribute('data-msg-id'))" title="Fijar mensaje">
                                     <i class="bi bi-pin-angle"></i>
                                 </button>
                             </div>
@@ -796,48 +773,86 @@
                     </div>
                 </div>
 
-                <!-- Suggested replies -->
+                <!-- Suggested Replies -->
                 <div class="suggested-replies" id="suggestedReplies">
-                    <span class="suggestion-chip" onclick="useSuggestion('¿Sigue disponible?')">¿Sigue disponible?</span>
-                    <span class="suggestion-chip" onclick="useSuggestion('¿Tiene todas las vacunas?')">¿Tiene vacunas?</span>
-                    <span class="suggestion-chip" onclick="useSuggestion('¿Podemos coordinar un encuentro?')">Coordinar encuentro</span>
+                    <span class="suggestion-chip" onclick="useSuggestion('¿Sigue disponible?')">¿Sigue
+                        disponible?</span>
+                    <span class="suggestion-chip" onclick="useSuggestion('¿Tiene todas las vacunas?')">¿Tiene
+                        vacunas?</span>
+                    <span class="suggestion-chip" onclick="useSuggestion('¿Podemos coordinar un encuentro?')">Coordinar
+                        encuentro</span>
                 </div>
 
-                <!-- Footer Send Bar -->
+                <!-- Footer Input -->
                 <div class="chat-footer">
                     <form id="chatSendForm">
                         <div class="chat-input-row">
-                            <!-- Popover Attachment trigger -->
                             <div class="dropdown">
-                                <button class="input-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="input-icon-btn" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
                                     <i class="bi bi-plus-circle-fill"></i>
                                 </button>
-                                <ul class="dropdown-menu">
-                                    <li><button class="dropdown-item" type="button" onclick="triggerFileInput('IMAGEN')"><i class="bi bi-camera-fill me-2 text-pink"></i> Enviar Foto</button></li>
-                                    <li><button class="dropdown-item" type="button" onclick="triggerFileInput('DOCUMENTO')"><i class="bi bi-file-earmark-fill me-2 text-indigo"></i> Adjuntar PDF / Carnet</button></li>
-                                    <li><button class="dropdown-item" type="button" onclick="showMeetingModal()"><i class="bi bi-calendar-event-fill me-2 text-success"></i> Agendar Encuentro</button></li>
+                                <ul class="dropdown-menu"
+                                    style="border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border);">
+                                    <li><button class="dropdown-item" type="button" onclick="triggerFileInput('IMAGEN')"
+                                            style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;"><i
+                                                class="bi bi-camera-fill me-2" style="color: var(--aurora-end);"></i>
+                                            Enviar Foto</button></li>
+                                    <li><button class="dropdown-item" type="button"
+                                            onclick="triggerFileInput('DOCUMENTO')"
+                                            style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;"><i
+                                                class="bi bi-file-earmark-fill me-2"
+                                                style="color: var(--aurora-start);"></i> Adjuntar PDF / Carnet</button>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><button class="dropdown-item" type="button" onclick="showMeetingModal()"
+                                            style="font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem;"><i
+                                                class="bi bi-calendar-event-fill me-2"
+                                                style="color: var(--success);"></i> Agendar Encuentro</button></li>
                                 </ul>
                             </div>
 
-                            <!-- Emoji Dropdown -->
                             <div class="dropdown">
-                                <button class="input-icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="input-icon-btn" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
                                     <i class="bi bi-emoji-smile-fill"></i>
                                 </button>
-                                <div class="dropdown-menu p-2" style="min-width: 160px; max-width: 200px;">
+                                <div class="dropdown-menu p-2"
+                                    style="min-width: 160px; max-width: 200px; border-radius: var(--radius-lg);">
                                     <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                        <span class="fs-4" style="cursor:pointer;" onclick="insertEmoji('😊')">😊</span>
-                                        <span class="fs-4" style="cursor:pointer;" onclick="insertEmoji('❤️')">❤️</span>
-                                        <span class="fs-4" style="cursor:pointer;" onclick="insertEmoji('😂')">😂</span>
-                                        <span class="fs-4" style="cursor:pointer;" onclick="insertEmoji('🐶')">🐶</span>
-                                        <span class="fs-4" style="cursor:pointer;" onclick="insertEmoji('🐱')">🐱</span>
+                                        <span class="fs-4" style="cursor:pointer; transition: transform 0.15s;"
+                                            onmouseover="this.style.transform='scale(1.2)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                            onclick="insertEmoji('😊')">😊</span>
+                                        <span class="fs-4" style="cursor:pointer; transition: transform 0.15s;"
+                                            onmouseover="this.style.transform='scale(1.2)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                            onclick="insertEmoji('❤️')">❤️</span>
+                                        <span class="fs-4" style="cursor:pointer; transition: transform 0.15s;"
+                                            onmouseover="this.style.transform='scale(1.2)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                            onclick="insertEmoji('😂')">😂</span>
+                                        <span class="fs-4" style="cursor:pointer; transition: transform 0.15s;"
+                                            onmouseover="this.style.transform='scale(1.2)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                            onclick="insertEmoji('🐶')">🐶</span>
+                                        <span class="fs-4" style="cursor:pointer; transition: transform 0.15s;"
+                                            onmouseover="this.style.transform='scale(1.2)'"
+                                            onmouseout="this.style.transform='scale(1)'"
+                                            onclick="insertEmoji('🐱')">🐱</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="chat-input-wrap">
-                                <input type="text" id="messageInput" class="chat-input" placeholder="Escribe un mensaje..." required autocomplete="off">
-                                <button type="button" id="micBtn" class="input-icon-btn me-2" onclick="useAudioMock()" title="Grabar audio"><i class="bi bi-mic-fill"></i></button>
+                                <input type="text" id="messageInput" class="chat-input"
+                                    placeholder="Escribe un mensaje..." required autocomplete="off">
+                                <button type="button" id="micBtn" class="input-icon-btn me-1" onclick="useAudioMock()"
+                                    title="Grabar audio" style="color: var(--text-muted);">
+                                    <i class="bi bi-mic-fill"></i>
+                                </button>
                             </div>
 
                             <button type="submit" class="chat-send-btn">
@@ -849,83 +864,114 @@
 
             </div>
         </div>
-
-        <!-- Right Panel: Ficha de Adopción e Información contextual -->
+        <!-- Right Panel -->
         <div class="panel-column right-panel-col" id="rightPanel">
-            <div th:if="${pub == null}" class="text-center py-5 text-muted small">
-                Ficha de adopción inactiva.
+            <div th:if="${pub == null}"
+                class="h-100 d-flex flex-column align-items-center justify-content-center text-muted p-4">
+                <div
+                    style="width: 60px; height: 60px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                    <i class="bi bi-info-circle" style="font-size: 1.5rem; color: var(--text-muted);"></i>
+                </div>
+                <span class="small fw-500">Ficha de adopción inactiva</span>
             </div>
 
-            <div th:if="${pub != null}" class="d-flex flex-column gap-4">
+            <div th:if="${pub != null}" class="d-flex flex-column gap-4 h-100 overflow-y-auto">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="text-dark fw-bold mb-0" style="font-family: 'Outfit', sans-serif;">Información de Adopción</h6>
-                    <button class="btn btn-sm btn-link p-0 text-dark d-lg-none" onclick="toggleRightPanel()"><i class="bi bi-x-lg"></i></button>
+                    <h6 class="text-dark fw-bold mb-0" style="font-family: 'Outfit', sans-serif; font-size: 0.95rem;">
+                        Información de Adopción</h6>
+                    <button class="btn btn-sm btn-link p-0 text-dark d-lg-none" onclick="toggleRightPanel()"><i
+                            class="bi bi-x-lg"></i></button>
                 </div>
 
-                <!-- Mini Ficha Mascota -->
+                <!-- Pet Card -->
                 <div class="right-pet-card">
                     <img th:src="${pub.fotoPrincipalUrl}" alt="Mascota" class="right-pet-img">
-                    <h5 class="text-dark fw-bold mb-0" th:text="${pub.nombre}">Doki</h5>
-                    <span class="small text-muted" th:text="${pub.raza != null ? pub.raza : pub.especie}">Raza</span>
-                    
-                    <span id="adopStatusBadge" class="adoption-status-badge" 
-                          th:classappend="${pub.estado.name() == 'DISPONIBLE' ? 'status-disponible' : (pub.estado.name() == 'RESERVADO' ? 'status-reservado' : 'status-adoptado')}"
-                          th:text="${pub.estado.name() == 'DISPONIBLE' ? 'Disponible' : (pub.estado.name() == 'RESERVADO' ? 'Reservado' : 'Adoptado')}">
+                    <h5 class="text-dark fw-bold mb-0" style="font-size: 1rem;" th:text="${pub.nombre}">Doki</h5>
+                    <span class="small text-muted" style="font-size: 0.8rem;"
+                        th:text="${pub.raza != null ? pub.raza : pub.especie}">Raza</span>
+
+                    <span id="adopStatusBadge" class="adoption-status-badge"
+                        th:classappend="${pub.estado.name() == 'DISPONIBLE' ? 'status-disponible' : (pub.estado.name() == 'RESERVADO' ? 'status-reservado' : 'status-adoptado')}"
+                        th:text="${pub.estado.name() == 'DISPONIBLE' ? 'Disponible' : (pub.estado.name() == 'RESERVADO' ? 'Reservado' : 'Adoptado')}">
                         Disponible
                     </span>
 
-                    <!-- Propietario Dropdown to change state -->
                     <div th:if="${usuario.id == pub.propietarioId}" class="mt-3 w-100">
-                        <label class="small text-muted d-block mb-1 fw-bold">Actualizar Estado:</label>
-                        <select class="form-select form-select-sm rounded-pill" id="petStatusSelect" onchange="changePetAdoptionStatus(this.value)">
-                            <option value="DISPONIBLE" th:selected="${pub.estado.name() == 'DISPONIBLE'}">Disponible</option>
-                            <option value="RESERVADO" th:selected="${pub.estado.name() == 'RESERVADO'}">Reservar Mascota</option>
-                            <option value="ADOPTADO" th:selected="${pub.estado.name() == 'ADOPTADO'}">Mascota Adoptada</option>
+                        <label class="small text-muted d-block mb-1 fw-bold"
+                            style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Actualizar
+                            Estado</label>
+                        <select class="form-select form-select-sm" id="petStatusSelect"
+                            onchange="changePetAdoptionStatus(this.value)"
+                            style="border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; border: 1.5px solid var(--border);">
+                            <option value="DISPONIBLE" th:selected="${pub.estado.name() == 'DISPONIBLE'}">Disponible
+                            </option>
+                            <option value="RESERVADO" th:selected="${pub.estado.name() == 'RESERVADO'}">Reservar Mascota
+                            </option>
+                            <option value="ADOPTADO" th:selected="${pub.estado.name() == 'ADOPTADO'}">Mascota Adoptada
+                            </option>
                         </select>
                     </div>
 
-                    <a th:href="@{/usuario/comunidad/detalle/{id}(id=${pub.id})}" class="btn btn-sm btn-outline-primary rounded-pill w-100 mt-3 fw-bold">
-                        <i class="bi bi-heart-fill me-1 text-danger"></i> Ver Ficha Pública
+                    <a th:href="@{/usuario/comunidad/detalle/{id}(id=${pub.id})}"
+                        class="btn btn-sm btn-outline-primary rounded-pill w-100 mt-3 fw-bold"
+                        style="font-size: 0.8rem; padding: 0.5rem; border: 1.5px solid var(--aurora-start); color: var(--aurora-start);">
+                        <i class="bi bi-heart-fill me-1" style="color: var(--danger);"></i> Ver Ficha Pública
                     </a>
                 </div>
 
-                <!-- Perfil del usuario / Miembro -->
+                <!-- Contact Card -->
                 <div class="profile-summary-card">
-                    <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif;"><i class="bi bi-person-badge-fill me-1 text-primary"></i> Contacto</h6>
+                    <h6 class="text-dark fw-bold mb-3" style="font-family: 'Outfit', sans-serif; font-size: 0.9rem;">
+                        <i class="bi bi-person-badge-fill me-1" style="color: var(--aurora-start);"></i> Contacto
+                    </h6>
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <div class="avatar-initials" style="width: 38px; height: 38px; font-size: 0.9rem;" th:text="${#strings.substring(otroUsuario.nombre,0,1).toUpperCase()}">U</div>
+                        <div class="avatar-initials" style="width: 38px; height: 38px; font-size: 0.85rem;"
+                            th:text="${#strings.substring(otroUsuario.nombre,0,1).toUpperCase()}">U</div>
                         <div>
-                            <strong class="text-dark small d-block" th:text="${otroUsuario.nombre}">Nombre</strong>
-                            <span class="text-warning small">⭐⭐⭐⭐⭐ <span class="text-muted">(4.9)</span></span>
+                            <strong class="text-dark small d-block" style="font-size: 0.85rem;"
+                                th:text="${otroUsuario.nombre}">Nombre</strong>
+                            <span class="small" style="color: var(--warning); font-size: 0.75rem;">⭐⭐⭐⭐⭐ <span
+                                    style="color: var(--text-muted);">(4.9)</span></span>
                         </div>
                     </div>
 
                     <div class="profile-stat-item">
-                        <span>Miembro desde:</span>
-                        <strong class="text-dark">2026</strong>
+                        <span style="color: var(--text-muted);">Miembro desde</span>
+                        <strong class="text-dark" style="font-size: 0.8rem;">2026</strong>
                     </div>
                     <div class="profile-stat-item">
-                        <span>Mascotas registradas:</span>
-                        <strong class="text-dark">3</strong>
+                        <span style="color: var(--text-muted);">Mascotas registradas</span>
+                        <strong class="text-dark" style="font-size: 0.8rem;">3</strong>
                     </div>
                     <div class="profile-stat-item">
-                        <span>Adopciones Exitosas:</span>
-                        <strong class="text-dark">2</strong>
+                        <span style="color: var(--text-muted);">Adopciones exitosas</span>
+                        <strong class="text-dark" style="font-size: 0.8rem;">2</strong>
                     </div>
                 </div>
 
-                <!-- Acciones Rápidas -->
+                <!-- Security Actions -->
                 <div>
-                    <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif;">Acciones de Seguridad</h6>
+                    <h6 class="text-dark fw-bold mb-2" style="font-family: 'Outfit', sans-serif; font-size: 0.9rem;">
+                        Acciones de Seguridad</h6>
                     <div class="d-flex flex-column gap-2">
-                        <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded" onclick="simulateCall()">
-                            <i class="bi bi-telephone-fill text-success"></i> Solicitar llamada por voz
+                        <button
+                            class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                            style="border: 1px solid var(--border-light); padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 600; transition: var(--transition-base);"
+                            onclick="simulateCall()">
+                            <i class="bi bi-telephone-fill" style="color: var(--success);"></i> Solicitar llamada por
+                            voz
                         </button>
-                        <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded" onclick="shareLocation()">
-                            <i class="bi bi-geo-alt-fill text-danger"></i> Compartir mi ubicación
+                        <button
+                            class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                            style="border: 1px solid var(--border-light); padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 600; transition: var(--transition-base);"
+                            onclick="shareLocation()">
+                            <i class="bi bi-geo-alt-fill" style="color: var(--danger);"></i> Compartir mi ubicación
                         </button>
-                        <button class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded" onclick="blockUser()">
-                            <i class="bi bi-slash-circle-fill text-muted"></i> Bloquear usuario
+                        <button
+                            class="btn btn-sm btn-light text-start text-dark d-flex align-items-center gap-2 rounded"
+                            style="border: 1px solid var(--border-light); padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 600; transition: var(--transition-base);"
+                            onclick="blockUser()">
+                            <i class="bi bi-slash-circle-fill" style="color: var(--text-muted);"></i> Bloquear usuario
                         </button>
                     </div>
                 </div>
@@ -936,42 +982,69 @@
     </div>
 
     <!-- Hidden File Inputs -->
-    <input type="file" id="hiddenImageInput" style="display: none;" accept="image/*" onchange="uploadChatFile(this, 'IMAGEN')">
-    <input type="file" id="hiddenDocInput" style="display: none;" accept=".pdf,.doc,.docx" onchange="uploadChatFile(this, 'DOCUMENTO')">
+    <input type="file" id="hiddenImageInput" style="display: none;" accept="image/*"
+        onchange="uploadChatFile(this, 'IMAGEN')">
+    <input type="file" id="hiddenDocInput" style="display: none;" accept=".pdf,.doc,.docx"
+        onchange="uploadChatFile(this, 'DOCUMENTO')">
 
-    <!-- Proposal Meeting Modal -->
+    <!-- Meeting Modal -->
     <div class="modal fade" id="meetingModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 border-0 shadow-lg">
-                <div class="modal-header border-bottom-0">
-                    <h5 class="modal-title fw-bold text-dark">Agendar Encuentro de Adopción</h5>
+            <div class="modal-content"
+                style="border-radius: var(--radius-xl); border: none; box-shadow: var(--shadow-xl); overflow: hidden;">
+                <div class="modal-header" style="border: none; padding: 1.5rem 1.5rem 0.5rem;">
+                    <h5 class="modal-title fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">Agendar
+                        Encuentro de Adopción</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 1rem 1.5rem;">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Lugar del Encuentro</label>
-                        <input type="text" class="form-control" id="meetingLugar" placeholder="Ej: Parque Centenario, Entrada Principal" required>
+                        <label class="form-label small fw-bold"
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Lugar
+                            del Encuentro</label>
+                        <input type="text" class="form-control" id="meetingLugar"
+                            placeholder="Ej: Parque Centenario, Entrada Principal" required
+                            style="border-radius: var(--radius-md); border: 1.5px solid var(--border); font-size: 0.9rem; padding: 0.6rem 0.9rem;">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Fecha y Hora</label>
-                        <input type="text" class="form-control" id="meetingFechaHora" placeholder="Ej: Domingo 3:00 PM" required>
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold"
+                            style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Fecha
+                            y Hora</label>
+                        <input type="text" class="form-control" id="meetingFechaHora" placeholder="Ej: Domingo 3:00 PM"
+                            required
+                            style="border-radius: var(--radius-md); border: 1.5px solid var(--border); font-size: 0.9rem; padding: 0.6rem 0.9rem;">
                     </div>
                 </div>
-                <div class="modal-footer border-top-0">
-                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="submitMeetingProposal()">Coordinar</button>
+                <div class="modal-footer" style="border: none; padding: 0.5rem 1.5rem 1.5rem;">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal"
+                        style="font-weight: 600; font-size: 0.85rem; padding: 0.5rem 1.25rem;">Cancelar</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="submitMeetingProposal()"
+                        style="background: linear-gradient(135deg, var(--aurora-start), var(--aurora-mid)); border: none; font-weight: 700; font-size: 0.85rem; padding: 0.5rem 1.5rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);">Coordinar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Audio Beep sound for message notifications -->
-    <audio id="msgNotificationSound" src="https://assets.mixkit.co/active_storage/sfx/2357/2357-84.wav" preload="auto"></audio>
+    <!-- Audio Notification -->
+    <audio id="msgNotificationSound" src="https://assets.mixkit.co/active_storage/sfx/2357/2357-84.wav"
+        preload="auto"></audio>
 
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- AJAX Message Polling script -->
+    <!-- Navbar scroll -->
+    <script>
+        window.addEventListener('scroll', function () {
+            const navbar = document.querySelector('.main-navbar');
+            if (window.scrollY > 5) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+
+    <!-- Chat Logic -->
     <script th:inline="javascript" th:if="${pub != null}">
         const currentUserId = /*[[${usuario.id}]]*/ null;
         const adopcionId = /*[[${pub.id}]]*/ null;
@@ -991,7 +1064,6 @@
         }
 
         function togglePinMessage(msgId) {
-            // Simply mockup highlight for pinned message
             const el = document.querySelector(`[data-msg-id="${msgId}"]`);
             if (el) {
                 const isPinnedNow = el.classList.toggle('msg-pinned-highlight');
@@ -1020,7 +1092,7 @@
         function filterChatsList() {
             const query = document.getElementById('searchChatsInput').value.toLowerCase();
             const items = document.querySelectorAll('.convo-item');
-            
+
             items.forEach(item => {
                 const name = item.getAttribute('data-name').toLowerCase();
                 const pet = item.getAttribute('data-pet').toLowerCase();
@@ -1039,7 +1111,6 @@
             });
         }
 
-        // Suggested reply click
         function useSuggestion(text) {
             document.getElementById('messageInput').value = text;
             document.getElementById('chatSendForm').dispatchEvent(new Event('submit'));
@@ -1067,15 +1138,15 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    sendMessageWithAttachment(type, data.url, data.nombre);
-                } else {
-                    alert('Error subiendo archivo: ' + data.error);
-                }
-            })
-            .catch(err => console.error('Upload failed', err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        sendMessageWithAttachment(type, data.url, data.nombre);
+                    } else {
+                        alert('Error subiendo archivo: ' + data.error);
+                    }
+                })
+                .catch(err => console.error('Upload failed', err));
         }
 
         function sendMessageWithAttachment(type, url, nombre) {
@@ -1091,10 +1162,10 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(() => {
-                pollMessages();
-            });
+                .then(res => res.json())
+                .then(() => {
+                    pollMessages();
+                });
         }
 
         function showMeetingModal() {
@@ -1117,13 +1188,13 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(() => {
-                bootstrap.Modal.getInstance(document.getElementById('meetingModal')).hide();
-                document.getElementById('meetingLugar').value = '';
-                document.getElementById('meetingFechaHora').value = '';
-                pollMessages();
-            });
+                .then(res => res.json())
+                .then(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('meetingModal')).hide();
+                    document.getElementById('meetingLugar').value = '';
+                    document.getElementById('meetingFechaHora').value = '';
+                    pollMessages();
+                });
         }
 
         function confirmMeeting(mensajeId, estado) {
@@ -1135,10 +1206,10 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(() => {
-                pollMessages();
-            });
+                .then(res => res.json())
+                .then(() => {
+                    pollMessages();
+                });
         }
 
         function changePetAdoptionStatus(status) {
@@ -1150,21 +1221,21 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const badge = document.getElementById('adopStatusBadge');
-                    badge.textContent = status === 'DISPONIBLE' ? 'Disponible' : (status === 'RESERVADO' ? 'Reservado' : 'Adoptado');
-                    badge.className = 'adoption-status-badge';
-                    if (status === 'DISPONIBLE') badge.classList.add('status-disponible');
-                    else if (status === 'RESERVADO') badge.classList.add('status-reservado');
-                    else badge.classList.add('status-adoptado');
-                    
-                    pollMessages();
-                } else {
-                    alert('Error actualizando estado: ' + data.error);
-                }
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.getElementById('adopStatusBadge');
+                        badge.textContent = status === 'DISPONIBLE' ? 'Disponible' : (status === 'RESERVADO' ? 'Reservado' : 'Adoptado');
+                        badge.className = 'adoption-status-badge';
+                        if (status === 'DISPONIBLE') badge.classList.add('status-disponible');
+                        else if (status === 'RESERVADO') badge.classList.add('status-reservado');
+                        else badge.classList.add('status-adoptado');
+
+                        pollMessages();
+                    } else {
+                        alert('Error actualizando estado: ' + data.error);
+                    }
+                });
         }
 
         function simulateCall() {
@@ -1203,7 +1274,7 @@
                     .then(stream => {
                         mediaRecorder = new MediaRecorder(stream);
                         audioChunks = [];
-                        
+
                         mediaRecorder.addEventListener("dataavailable", event => {
                             audioChunks.push(event.data);
                         });
@@ -1211,7 +1282,7 @@
                         mediaRecorder.addEventListener("stop", () => {
                             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                             const file = new File([audioBlob], "nota_voz.webm", { type: 'audio/webm' });
-                            
+
                             const formData = new FormData();
                             formData.append('file', file);
 
@@ -1219,20 +1290,21 @@
                                 method: 'POST',
                                 body: formData
                             })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    sendMessageWithAttachment('DOCUMENTO', data.url, '🎤 Nota de Voz.webm');
-                                } else {
-                                    alert('Error subiendo audio: ' + data.error);
-                                }
-                            })
-                            .catch(err => console.error('Upload audio failed', err));
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        sendMessageWithAttachment('DOCUMENTO', data.url, '🎤 Nota de Voz.webm');
+                                    } else {
+                                        alert('Error subiendo audio: ' + data.error);
+                                    }
+                                })
+                                .catch(err => console.error('Upload audio failed', err));
                         });
 
                         mediaRecorder.start();
                         isRecording = true;
-                        micBtn.innerHTML = '<i class="bi bi-stop-circle-fill text-danger text-pulse"></i>';
+                        micBtn.innerHTML = '<i class="bi bi-stop-circle-fill text-danger"></i>';
+                        micBtn.style.color = 'var(--danger)';
                     })
                     .catch(err => {
                         alert('No se pudo acceder al micrófono: ' + err.message);
@@ -1243,10 +1315,10 @@
                 }
                 isRecording = false;
                 micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+                micBtn.style.color = 'var(--text-muted)';
             }
         }
 
-        // Form Submit
         const sendForm = document.getElementById('chatSendForm');
         if (sendForm) {
             sendForm.addEventListener('submit', (e) => {
@@ -1267,10 +1339,10 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(res => res.json())
-                .then(() => {
-                    pollMessages();
-                });
+                    .then(res => res.json())
+                    .then(() => {
+                        pollMessages();
+                    });
             });
         }
 
@@ -1294,7 +1366,6 @@
                     let html = '';
                     let currentDate = '';
 
-                    // Play sound if new message received
                     if (messageCountCache > 0 && messages.length > messageCountCache) {
                         const lastMsg = messages[messages.length - 1];
                         if (lastMsg.emisorId !== currentUserId) {
@@ -1308,8 +1379,7 @@
                         const isMe = m.emisorId === currentUserId;
                         const dateObj = new Date(m.fechaHora);
                         const timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
-                        
-                        // Simple Date header
+
                         const dateStr = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
                         if (dateStr !== currentDate) {
                             html += `<div class="date-separator">${dateStr}</div>`;
@@ -1320,32 +1390,34 @@
                             html += `
                                 <div class="d-flex justify-content-center w-100 my-2">
                                     <div class="meeting-proposal-card text-center">
-                                        <i class="bi bi-calendar-event-fill text-indigo fs-3" style="color: var(--aurora-start);"></i>
-                                        <h6 class="text-dark fw-bold mt-2">Propuesta de Encuentro</h6>
-                                        <p class="small text-muted mb-3">Nos vemos en: ${escapeHtml(m.lugarEncuentro)} a las ${escapeHtml(m.fechaHoraEncuentro)}</p>
+                                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem;">
+                                            <i class="bi bi-calendar-event-fill" style="color: var(--aurora-start); font-size: 1.3rem;"></i>
+                                        </div>
+                                        <h6 class="text-dark fw-bold mt-2" style="font-size: 0.95rem;">Propuesta de Encuentro</h6>
+                                        <p class="small text-muted mb-3" style="font-size: 0.82rem;">Nos vemos en: ${escapeHtml(m.lugarEncuentro)} a las ${escapeHtml(m.fechaHoraEncuentro)}</p>
                                         
                                         ${m.estadoEncuentro === 'PROPUESTO' ? `
                                             <div>
                                                 ${m.emisorId !== currentUserId ? `
                                                     <div class="d-flex gap-2 justify-content-center">
-                                                        <button class="btn btn-sm btn-success rounded-pill px-3" onclick="confirmMeeting('${m.id}', 'CONFIRMADO')">Aceptar</button>
-                                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="confirmMeeting('${m.id}', 'CANCELADO')">Rechazar</button>
+                                                        <button class="btn btn-sm btn-success rounded-pill px-3" style="font-weight: 700; font-size: 0.78rem;" onclick="confirmMeeting('${m.id}', 'CONFIRMADO')"><i class="bi bi-check-lg"></i> Aceptar</button>
+                                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" style="font-weight: 700; font-size: 0.78rem;" onclick="confirmMeeting('${m.id}', 'CANCELADO')"><i class="bi bi-x-lg"></i> Rechazar</button>
                                                     </div>
                                                 ` : `
-                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill">Esperando confirmación</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill" style="font-size: 0.75rem; font-weight: 700;">Esperando confirmación</span>
                                                 `}
                                             </div>
                                         ` : m.estadoEncuentro === 'CONFIRMADO' ? `
-                                            <span class="badge bg-success rounded-pill"><i class="bi bi-check-circle-fill me-1"></i> Encuentro Confirmado</span>
+                                            <span class="badge bg-success rounded-pill" style="font-size: 0.75rem; font-weight: 700;"><i class="bi bi-check-circle-fill me-1"></i> Encuentro Confirmado</span>
                                         ` : `
-                                            <span class="badge bg-danger rounded-pill"><i class="bi bi-x-circle-fill me-1"></i> Propuesta Cancelada</span>
+                                            <span class="badge bg-danger rounded-pill" style="font-size: 0.75rem; font-weight: 700;"><i class="bi bi-x-circle-fill me-1"></i> Propuesta Cancelada</span>
                                         `}
                                     </div>
                                 </div>
                             `;
                         } else {
-                            const tickHtml = isMe ? (m.leido ? '<i class="bi bi-check-all text-info"></i>' : '<i class="bi bi-check"></i>') : '';
-                            const reactionsHtml = m.reacciones && Object.keys(m.reacciones).length > 0 ? 
+                            const tickHtml = isMe ? (m.leido ? '<i class="bi bi-check-all" style="color: var(--aurora-start);"></i>' : '<i class="bi bi-check"></i>') : '';
+                            const reactionsHtml = m.reacciones && Object.keys(m.reacciones).length > 0 ?
                                 `<div class="bubble-reacciones">${Object.values(m.reacciones).join('')}</div>` : '';
 
                             html += `
@@ -1354,14 +1426,15 @@
                                         <i class="bi bi-emoji-smile"></i>
                                     </div>
                                     <div class="bubble ${isMe ? 'me' : 'other'}">
-                                        ${m.tipo === 'IMAGEN' ? `<div class="mb-2"><img src="${m.attachmentUrl}" class="img-fluid rounded" style="max-height: 200px; cursor: pointer;" onclick="window.open(this.src)"></div>` : ''}
-                                        ${m.tipo === 'DOCUMENTO' ? (m.attachmentNombre && m.attachmentNombre.includes('.webm') ? `<div class="mb-2"><audio src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px;"></audio></div>` : `<div class="mb-2"><a href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark"><i class="bi bi-file-earmark-arrow-down-fill text-primary"></i><span class="text-truncate small" style="max-width: 140px;">${escapeHtml(m.attachmentNombre)}</span></a></div>`) : ''}
+                                        ${m.tipo === 'IMAGEN' ? `<div class="mb-2"><img src="${m.attachmentUrl}" class="img-fluid rounded" style="max-height: 200px; cursor: pointer; border-radius: var(--radius-md);" onclick="window.open(this.src)"></div>` : ''}
+                                        ${m.tipo === 'DOCUMENTO' ? (m.attachmentNombre && m.attachmentNombre.includes('.webm') ? `<div class="mb-2"><audio src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px; height: 36px;"></audio></div>` : `<div class="mb-2"><a href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark" style="font-size: 0.8rem; padding: 0.5rem 0.75rem;"><i class="bi bi-file-earmark-arrow-down-fill" style="color: var(--aurora-start); font-size: 1rem;"></i><span class="text-truncate small" style="max-width: 140px; font-weight: 600;">${escapeHtml(m.attachmentNombre)}</span></a></div>`) : ''}
                                         <span class="msg-text-content">${escapeHtml(m.contenido)}</span>
                                     </div>
                                     ${reactionsHtml}
                                     <div class="bubble-meta">
                                         <span>${timeStr}</span>
                                         ${isMe ? `<span>${tickHtml}</span>` : ''}
+                                        <button class="btn btn-sm p-0 border-0 text-muted ms-1" style="font-size: 0.65rem;" onclick="togglePinMessage('${m.id}')" title="Fijar mensaje"><i class="bi bi-pin-angle"></i></button>
                                     </div>
                                 </div>
                             `;
@@ -1369,7 +1442,7 @@
                     });
 
                     const currentHtml = container.innerHTML;
-                    if (currentHtml.trim().replace(/\s/g,'') !== html.trim().replace(/\s/g,'')) {
+                    if (currentHtml.trim().replace(/\s/g, '') !== html.trim().replace(/\s/g, '')) {
                         container.innerHTML = html;
                         scrollToBottom();
                         refreshInboxList();
@@ -1393,7 +1466,6 @@
                 .catch(err => console.debug('Failed to refresh inbox list:', err));
         }
 
-        // Reaction menu popover
         function showReactionMenu(event, msgId) {
             event.stopPropagation();
             const existing = document.getElementById('reactionsMenuPopover');
@@ -1446,10 +1518,10 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(() => {
-                pollMessages();
-            });
+                .then(res => res.json())
+                .then(() => {
+                    pollMessages();
+                });
         }
 
         function searchInsideChat() {
@@ -1470,17 +1542,12 @@
             });
         }
 
-        // Run on load
         window.addEventListener('DOMContentLoaded', () => {
             scrollToBottom();
-            
-            // Poll for messages every 3 seconds
+            document.body.classList.add('chat-active');
             setInterval(pollMessages, 3000);
-            
-            // Poll sidebar conversations list every 7 seconds
             setInterval(refreshInboxList, 7000);
 
-            // Back button on Mobile
             const backBtn = document.getElementById('backToInboxBtn');
             if (backBtn) {
                 backBtn.addEventListener('click', () => {
@@ -1491,4 +1558,5 @@
         });
     </script>
 </body>
+
 </html>
