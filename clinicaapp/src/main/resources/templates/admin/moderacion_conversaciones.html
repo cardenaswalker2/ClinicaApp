@@ -488,18 +488,40 @@
                             <div class="mod-bubble">
                                 <!-- Image attachment -->
                                 <div th:if="${m.tipo == 'IMAGEN'}" class="mb-2">
-                                    <img th:src="${m.attachmentUrl}" alt="Foto" class="img-fluid rounded" style="max-height: 200px;">
+                                    <img th:src="${m.attachmentUrl}" alt="Foto" class="img-fluid rounded" style="max-height: 200px; cursor: pointer;" onclick="window.open(this.src)">
                                 </div>
                                 <!-- Audio / voice note -->
                                 <div th:if="${m.tipo == 'DOCUMENTO' && m.attachmentNombre != null && m.attachmentNombre.contains('.webm')}" class="mb-2">
                                     <audio th:src="${m.attachmentUrl}" controls class="w-100" style="max-height: 36px; max-width: 240px;"></audio>
                                 </div>
-                                <span th:text="${m.contenido}">Mensaje</span>
+                                <!-- Document file -->
+                                <div th:if="${m.tipo == 'DOCUMENTO' && (m.attachmentNombre == null || !m.attachmentNombre.contains('.webm'))}" class="mb-2">
+                                    <a th:href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark" style="font-size: 0.8rem; padding: 0.5rem 0.75rem;">
+                                        <i class="bi bi-file-earmark-arrow-down-fill text-primary" style="font-size: 1rem;"></i>
+                                        <span class="text-truncate small" style="max-width: 140px; font-weight: 600;" th:text="${m.attachmentNombre}">archivo.pdf</span>
+                                    </a>
+                                </div>
+                                <!-- Meeting proposal -->
+                                <div th:if="${m.tipo == 'ENCUENTRO'}" class="meeting-proposal-card text-center p-3 bg-dark bg-opacity-25 rounded border border-secondary-subtle mb-2">
+                                    <i class="bi bi-calendar-event-fill text-primary" style="font-size: 1.3rem;"></i>
+                                    <h6 class="text-white fw-bold mt-2" style="font-size: 0.85rem;">Propuesta de Encuentro</h6>
+                                    <p class="small text-muted mb-2" style="font-size: 0.78rem;" th:text="${'Lugar: ' + m.lugarEncuentro + ' a las ' + m.fechaHoraEncuentro}">Lugar y Hora</p>
+                                    <span class="badge" th:classappend="${m.estadoEncuentro == 'CONFIRMADO' ? 'bg-success' : (m.estadoEncuentro == 'CANCELADO' ? 'bg-danger' : 'bg-warning')}" th:text="${m.estadoEncuentro}">PROPUESTO</span>
+                                </div>
+                                
+                                <span th:if="${m.attachmentNombre == null || !m.attachmentNombre.contains('.webm')}" th:text="${m.contenido}">Mensaje</span>
                             </div>
-                            <div class="mod-bubble-meta">
+                            <div class="mod-bubble-meta d-flex align-items-center gap-2">
                                 <span th:text="${m.emisorNombre}">Usuario</span>
                                 <span>•</span>
                                 <span th:text="${#temporals.format(m.fechaHora, 'HH:mm')}">Hora</span>
+                                <span th:if="${m.reacciones != null && !m.reacciones.isEmpty()}" class="ms-1 px-1 bg-dark rounded" style="font-size: 0.75rem;">
+                                    <span th:each="r : ${m.reacciones.values()}" th:text="${r}"></span>
+                                </span>
+                                <span th:if="${m.emisorId != u1.id}" class="ms-1">
+                                    <i th:if="${m.leido}" class="bi bi-check-all text-info" style="font-size: 1.1rem;"></i>
+                                    <i th:unless="${m.leido}" class="bi bi-check text-muted" style="font-size: 1.1rem;"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -642,6 +664,13 @@
             const modal = new bootstrap.Modal(document.getElementById('preAuditModal'));
             modal.show();
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const chatHistory = document.querySelector('.mod-chat-history');
+            if (chatHistory) {
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+        });
     </script>
 </body>
 
