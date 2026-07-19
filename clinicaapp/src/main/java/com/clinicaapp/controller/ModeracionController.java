@@ -39,7 +39,7 @@ public class ModeracionController {
 
     private Usuario getLoggedUser(Principal principal) {
         if (principal == null) return null;
-        return usuarioService.findByEmail(principal.getName()).orElse(null);
+        return usuarioService.findByEmail(principal.getName());
     }
 
     @GetMapping
@@ -192,7 +192,7 @@ public class ModeracionController {
             if (opt.isPresent()) {
                 Usuario target = opt.get();
                 target.setActivo(false);
-                usuarioService.save(target);
+                usuarioService.saveExisting(target);
                 redirectAttributes.addFlashAttribute("mensajeExito", "Usuario " + target.getNombre() + " suspendido correctamente.");
             }
         } else if ("REACTIVATE_USER".equals(actionType) && targetUserId != null) {
@@ -200,7 +200,7 @@ public class ModeracionController {
             if (opt.isPresent()) {
                 Usuario target = opt.get();
                 target.setActivo(true);
-                usuarioService.save(target);
+                usuarioService.saveExisting(target);
                 redirectAttributes.addFlashAttribute("mensajeExito", "Usuario " + target.getNombre() + " reactivado correctamente.");
             }
         }
