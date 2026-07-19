@@ -1630,7 +1630,7 @@
                                     </a>
                                 </div>
 
-                                <span class="msg-text-content" th:text="${m.contenido}">Mensaje...</span>
+                                <span class="msg-text-content" th:if="${m.attachmentNombre == null || !m.attachmentNombre.contains('.webm')}" th:text="${m.contenido}">Mensaje...</span>
 
                                 <span th:if="${m.fijado}" class="position-absolute top-0 end-0 p-1"><i
                                         class="bi bi-pin-angle-fill"
@@ -2382,27 +2382,34 @@
 
         function useAudioMock() {
             const micBtn = document.getElementById('micBtn');
+            const messageInput = document.getElementById('messageInput');
             if (!isRecording) {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     alert('Tu navegador no soporta grabación de audio.');
                     return;
                 }
-                navigator.mediaDevices.getUserMedia({ audio: true })
+                navigator.mediaDevices.getUserMedia({ 
+                    audio: { 
+                        echoCancellation: true, 
+                        noiseSuppression: true, 
+                        autoGainControl: true 
+                    } 
+                })
                     .then(stream => {
                         mediaRecorder = new MediaRecorder(stream);
                         audioChunks = [];
-
+ 
                         mediaRecorder.addEventListener("dataavailable", event => {
                             audioChunks.push(event.data);
                         });
-
+ 
                         mediaRecorder.addEventListener("stop", () => {
                             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                             const file = new File([audioBlob], "nota_voz.webm", { type: 'audio/webm' });
-
+ 
                             const formData = new FormData();
                             formData.append('file', file);
-
+ 
                             fetch('/usuario/comunidad/chat/subir-adjunto', {
                                 method: 'POST',
                                 body: formData
@@ -2417,11 +2424,15 @@
                                 })
                                 .catch(err => console.error('Upload audio failed', err));
                         });
-
+ 
                         mediaRecorder.start();
                         isRecording = true;
                         micBtn.innerHTML = '<i class="bi bi-stop-circle-fill text-danger"></i>';
                         micBtn.style.color = 'var(--danger)';
+                        if (messageInput) {
+                            messageInput.placeholder = '🔴 Grabando audio... Haz clic en el botón rojo para enviar';
+                            messageInput.readOnly = true;
+                        }
                     })
                     .catch(err => {
                         alert('No se pudo acceder al micrófono: ' + err.message);
@@ -2433,6 +2444,10 @@
                 isRecording = false;
                 micBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
                 micBtn.style.color = 'var(--text-muted)';
+                if (messageInput) {
+                    messageInput.placeholder = 'Escribe un mensaje...';
+                    messageInput.readOnly = false;
+                }
             }
         }
 
@@ -2494,10 +2509,23 @@
 
                     messages.forEach((m, idx) => {
                         const isMe = m.emisorId === currentUserId;
-                        const dateObj = new Date(m.fechaHora);
-                        const timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
+                        
+                        let timeStr = '';
+                        let dateStr = '';
+                        if (m.fechaHora && m.fechaHora.includes('T')) {
+                            const datePart = m.fechaHora.split('T')[0];
+                            const timePart = m.fechaHora.split('T')[1];
+                            timeStr = timePart.substring(0, 5);
+                            
+                            const ymd = datePart.split('-');
+                            const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                            dateStr = parseInt(ymd[2]) + ' de ' + months[parseInt(ymd[1]) - 1] + ' de ' + ymd[0];
+                        } else {
+                            const dateObj = new Date(m.fechaHora);
+                            timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
+                            dateStr = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                        }
 
-                        const dateStr = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
                         if (dateStr !== currentDate) {
                             html += `<div class="date-separator">${dateStr}</div>`;
                             currentDate = dateStr;
@@ -2537,6 +2565,8 @@
                             const reactionsHtml = m.reacciones && Object.keys(m.reacciones).length > 0 ?
                                 `<div class="bubble-reacciones">${Object.values(m.reacciones).join('')}</div>` : '';
 
+                            const isVoiceNote = m.tipo === 'DOCUMENTO' && m.attachmentNombre && m.attachmentNombre.includes('.webm');
+
                             html += `
                                 <div class="bubble-wrapper ${isMe ? 'me' : 'other'}" data-msg-id="${m.id}">
                                     <div class="reaction-trigger-btn" onclick="showReactionMenu(event, '${m.id}')">
@@ -2544,8 +2574,8 @@
                                     </div>
                                     <div class="bubble ${isMe ? 'me' : 'other'}">
                                         ${m.tipo === 'IMAGEN' ? `<div class="mb-2"><img src="${m.attachmentUrl}" class="img-fluid rounded" style="max-height: 200px; cursor: pointer; border-radius: var(--radius-md);" onclick="window.open(this.src)"></div>` : ''}
-                                        ${m.tipo === 'DOCUMENTO' ? (m.attachmentNombre && m.attachmentNombre.includes('.webm') ? `<div class="mb-2"><audio src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px; height: 36px;"></audio></div>` : `<div class="mb-2"><a href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark" style="font-size: 0.8rem; padding: 0.5rem 0.75rem;"><i class="bi bi-file-earmark-arrow-down-fill" style="color: var(--aurora-start); font-size: 1rem;"></i><span class="text-truncate small" style="max-width: 140px; font-weight: 600;">${escapeHtml(m.attachmentNombre)}</span></a></div>`) : ''}
-                                        <span class="msg-text-content">${escapeHtml(m.contenido)}</span>
+                                        ${m.tipo === 'DOCUMENTO' ? (isVoiceNote ? `<div class="mb-2"><audio src="${m.attachmentUrl}" controls class="w-100" style="max-width: 240px; height: 36px;"></audio></div>` : `<div class="mb-2"><a href="${m.attachmentUrl}" download class="btn btn-sm btn-light border d-flex align-items-center gap-2 rounded text-dark" style="font-size: 0.8rem; padding: 0.5rem 0.75rem;"><i class="bi bi-file-earmark-arrow-down-fill" style="color: var(--aurora-start); font-size: 1rem;"></i><span class="text-truncate small" style="max-width: 140px; font-weight: 600;">${escapeHtml(m.attachmentNombre)}</span></a></div>`) : ''}
+                                        ${!isVoiceNote ? `<span class="msg-text-content">${escapeHtml(m.contenido)}</span>` : ''}
                                     </div>
                                     ${reactionsHtml}
                                     <div class="bubble-meta">
