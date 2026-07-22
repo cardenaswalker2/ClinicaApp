@@ -1617,6 +1617,7 @@
                                 <span class="mod-bubble-sender" th:text="${m.emisorNombre}">Usuario</span>
                                 <span class="mod-bubble-sep">•</span>
                                 <span class="mod-bubble-time"
+                                    th:data-timestamp="${m.fechaHora}"
                                     th:text="${#temporals.format(m.fechaHora, 'HH:mm')}">Hora</span>
                                 <span th:if="${m.reacciones != null && !m.reacciones.isEmpty()}"
                                     class="mod-bubble-reaction">
@@ -1815,7 +1816,16 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const currentAdopcionId = /*[[${adopcionId}]]*/ null;
+        const currentP1Id = /*[[${p1Id}]]*/ null;
+        const currentP2Id = /*[[${p2Id}]]*/ null;
+        /*]]>*/
+    </script>
     <script>
+        let lastMessageCount = 0;
+
         function preAudit(btn) {
             const adopId = btn.getAttribute('data-adop-id');
             const p1 = btn.getAttribute('data-p1');
@@ -1829,10 +1839,134 @@
             modal.show();
         }
 
+        function formatChatTime(dateString) {
+            if (!dateString) return '';
+            try {
+                let formattedStr = dateString;
+                // If it doesn't end with Z and doesn't contain a timezone, assume it's UTC from the database
+                if (!dateString.endsWith('Z') && !dateString.includes('+') && !dateString.includes('-')) {
+                    formattedStr = dateString + 'Z';
+                }
+                const d = new Date(formattedStr);
+                if (!isNaN(d.getTime())) {
+                    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+            } catch (e) {}
+            return dateString;
+        }
+
+        function formatPrintedTimes() {
+            document.querySelectorAll('.mod-bubble-time[data-timestamp]').forEach(el => {
+                const ts = el.getAttribute('data-timestamp');
+                if (ts) {
+                    el.textContent = formatChatTime(ts);
+                }
+            });
+        }
+
+        function pollMessages() {
+            if (!currentAdopcionId || !currentP1Id || !currentP2Id) return;
+            
+            fetch(`/admin/moderacion/conversaciones/api/mensajes/${currentAdopcionId}/${currentP1Id}/${currentP2Id}`)
+                .then(res => res.json())
+                .then(mensajes => {
+                    if (!Array.isArray(mensajes)) return;
+                    
+                    if (mensajes.length !== lastMessageCount) {
+                        const chatHistory = document.getElementById('chatHistory');
+                        if (!chatHistory) return;
+                        
+                        let html = '';
+                        mensajes.forEach(m => {
+                            const isOther = (m.emisorId === currentP1Id);
+                            const bubbleClass = isOther ? 'other' : 'me';
+                            
+                            let attachmentHtml = '';
+                            if (m.tipo === 'IMAGEN') {
+                                attachmentHtml = `
+                                    <div class="mb-2">
+                                        <img src="${m.attachmentUrl}" alt="Foto" class="img-fluid rounded"
+                                            style="max-height: 200px; cursor: pointer; border-radius: 8px;"
+                                            onclick="window.open(this.src)">
+                                    </div>`;
+                            } else if (m.tipo === 'DOCUMENTO' && m.attachmentNombre && m.attachmentNombre.includes('.webm')) {
+                                attachmentHtml = `
+                                    <div class="mb-2">
+                                        <audio src="${m.attachmentUrl}" controls class="w-100"
+                                            style="max-height: 36px; max-width: 240px; border-radius: 8px;"></audio>
+                                    </div>`;
+                            } else if (m.tipo === 'DOCUMENTO') {
+                                attachmentHtml = `
+                                    <div class="mb-2">
+                                        <a href="${m.attachmentUrl}" download class="mod-file-attachment">
+                                            <i class="bi bi-file-earmark-arrow-down-fill"></i>
+                                            <span>${m.attachmentNombre || 'archivo.pdf'}</span>
+                                        </a>
+                                    </div>`;
+                            } else if (m.tipo === 'ENCUENTRO') {
+                                attachmentHtml = `
+                                    <div class="mod-meeting-card">
+                                        <div class="mod-meeting-icon"><i class="bi bi-calendar-event-fill"></i></div>
+                                        <h6 class="mod-meeting-title">Propuesta de Encuentro</h6>
+                                        <p class="mod-meeting-detail">Lugar: ${m.lugarEncuentro || ''} a las ${m.fechaHoraEncuentro || ''}</p>
+                                        <span class="badge-hex ${m.estadoEncuentro === 'CONFIRMADO' ? 'success' : (m.estadoEncuentro === 'CANCELADO' ? 'danger' : 'warning')}">${m.estadoEncuentro}</span>
+                                    </div>`;
+                            }
+                            
+                            const contentHtml = (m.attachmentNombre && m.attachmentNombre.includes('.webm')) ? '' : `<span>${m.contenido || ''}</span>`;
+                            
+                            let reactionsHtml = '';
+                            if (m.reacciones && Object.keys(m.reacciones).length > 0) {
+                                reactionsHtml = `<span class="mod-bubble-reaction">`;
+                                Object.values(m.reacciones).forEach(r => {
+                                    reactionsHtml += `<span>${r}</span>`;
+                                });
+                                reactionsHtml += `</span>`;
+                            }
+                            
+                            const statusIcon = !isOther ? (m.leido ? '<i class="bi bi-check-all text-info"></i>' : '<i class="bi bi-check text-muted"></i>') : '';
+                            
+                            html += `
+                                <div class="mod-bubble-wrapper ${bubbleClass}">
+                                    <div class="mod-bubble">
+                                        ${attachmentHtml}
+                                        ${contentHtml}
+                                    </div>
+                                    <div class="mod-bubble-meta">
+                                        <span class="mod-bubble-sender">${m.emisorNombre}</span>
+                                        <span class="mod-bubble-sep">•</span>
+                                        <span class="mod-bubble-time">${formatChatTime(m.fechaHora)}</span>
+                                        ${reactionsHtml}
+                                        ${statusIcon ? `<span class="mod-bubble-status">${statusIcon}</span>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        chatHistory.innerHTML = html;
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                        lastMessageCount = mensajes.length;
+                    }
+                })
+                .catch(err => console.error("Error polling messages:", err));
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const chatHistory = document.getElementById('chatHistory');
             if (chatHistory) {
                 chatHistory.scrollTop = chatHistory.scrollHeight;
+                
+                // Store initial count
+                const bubbles = chatHistory.querySelectorAll('.mod-bubble-wrapper');
+                lastMessageCount = bubbles.length;
+            }
+            
+            // Format initial message times
+            formatPrintedTimes();
+            
+            // Poll for new messages every 3 seconds
+            if (currentAdopcionId && currentP1Id && currentP2Id) {
+                setInterval(pollMessages, 3000);
             }
         });
     </script>

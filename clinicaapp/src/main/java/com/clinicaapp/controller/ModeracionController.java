@@ -219,4 +219,31 @@ public class ModeracionController {
 
         return "redirect:/admin/moderacion/conversaciones/ver/" + adopcionId + "/" + p1Id + "/" + p2Id;
     }
+
+    @GetMapping("/api/mensajes/{adopcionId}/{p1Id}/{p2Id}")
+    @ResponseBody
+    public List<MensajeChat> getConversacionMensajes(@PathVariable String adopcionId,
+                                                      @PathVariable String p1Id,
+                                                      @PathVariable String p2Id,
+                                                      Principal principal) {
+        Usuario admin = getLoggedUser(principal);
+        if (admin == null || admin.getRole() != Role.ROLE_ADMIN) {
+            return new ArrayList<>();
+        }
+
+        String convoId = adopcionId + "_" + p1Id + "_" + p2Id;
+        List<ModeracionAuditoria> logs = auditoriaRepository.findByConversacionIdOrderByFechaHoraDesc(convoId);
+        boolean auditado = false;
+        for (ModeracionAuditoria l : logs) {
+            if (l.getSuperAdminId().equals(admin.getId()) && l.getFechaHora().isAfter(LocalDateTime.now().minusMinutes(15))) {
+                auditado = true;
+                break;
+            }
+        }
+        if (!auditado) {
+            return new ArrayList<>();
+        }
+
+        return comunidadPetService.getMessages(adopcionId, p1Id, p2Id);
+    }
 }
