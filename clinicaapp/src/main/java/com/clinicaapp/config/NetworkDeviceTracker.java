@@ -63,7 +63,7 @@ public class NetworkDeviceTracker {
     private final Set<String> pinVerifiedIps = ConcurrentHashMap.newKeySet();
 
     public NetworkDeviceTracker() {
-        seedDefaultDevices();
+        // Only real devices tracked live
     }
 
     public int getTotalScans() {

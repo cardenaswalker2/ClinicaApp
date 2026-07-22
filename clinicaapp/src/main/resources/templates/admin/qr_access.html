@@ -48,6 +48,86 @@
             --hex-glow-accent: rgba(168, 85, 247, 0.2);
         }
 
+        /* Custom modal for device detail */
+        .custom-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .custom-modal-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .custom-modal-content {
+            background: var(--hex-surface);
+            border: 1px solid var(--hex-border);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .custom-modal-backdrop.show .custom-modal-content {
+            transform: scale(1);
+        }
+        .custom-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--hex-border);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .btn-close-custom {
+            background: transparent;
+            border: none;
+            color: var(--hex-text-secondary);
+            font-size: 2.2rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .btn-close-custom:hover {
+            color: var(--hex-danger);
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.9rem;
+        }
+        .detail-label {
+            color: var(--hex-text-secondary);
+            font-weight: 500;
+        }
+        .detail-value {
+            color: var(--hex-text);
+            font-weight: 600;
+        }
+        .custom-modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--hex-border);
+            padding-top: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -1613,9 +1693,12 @@
                             <p>Gestión de sesiones activas conectadas al servidor</p>
                         </div>
                     </div>
-                    <button type="button" class="btn-hex-outline" id="btnSimulateScan">
+                    <button type="button" class="btn-hex-outline" id="btnSimulateScan" style="display: none;">
                         <i class="bi bi-plus-circle"></i> Simular Escaneo
                     </button>
+                    <a href="/admin/sesiones" class="btn-hex-outline" style="text-decoration: none;">
+                        <i class="bi bi-person-workspace text-success"></i> Control de Sesiones
+                    </a>
                 </div>
 
                 <div class="table-responsive">
@@ -1771,42 +1854,8 @@
             let currentRoute = "/";
             let currentQrColor = "#00d4ff";
             
-            // Pre-populate with standard devices so layout is never empty
-            let currentDevices = [
-                {
-                    id: "dev_1",
-                    name: "iPhone 15 Pro",
-                    ip: "192.168.1.50",
-                    mac: "BC:D1:EC:11:A2:3B",
-                    status: "ACTIVE",
-                    os: "iOS",
-                    type: "Mobile",
-                    latency: "12ms",
-                    accessTime: "Hace 2 minutos"
-                },
-                {
-                    id: "dev_2",
-                    name: "Samsung Galaxy S24",
-                    ip: "192.168.1.62",
-                    mac: "48:5F:99:A5:72:0D",
-                    status: "ACTIVE",
-                    os: "Android",
-                    type: "Mobile",
-                    latency: "18ms",
-                    accessTime: "Hace 5 minutos"
-                },
-                {
-                    id: "dev_3",
-                    name: "iPad Pro M4",
-                    ip: "192.168.1.15",
-                    mac: "D4:A3:3D:88:2E:FF",
-                    status: "IDLE",
-                    os: "iPadOS",
-                    type: "Tablet",
-                    latency: "15ms",
-                    accessTime: "Hace 15 minutos"
-                }
-            ];
+            // Empty on load, populated only with real active devices from the tracker
+            let currentDevices = [];
 
             const qrCanvas = document.getElementById('qrCanvas');
             const urlDisplay = document.getElementById('urlDisplay');
@@ -2160,6 +2209,14 @@
                         `;
                     }
 
+                    tr.style.cursor = 'pointer';
+                    tr.addEventListener('click', function(e) {
+                        if (e.target.closest('.disconnect-btn') || e.target.closest('.restore-btn')) {
+                            return;
+                        }
+                        openDeviceModal(device);
+                    });
+
                     tr.innerHTML = `
                         <td>
                             <div class="device-info-cell">
@@ -2259,6 +2316,112 @@
                 footerYear.textContent = new Date().getFullYear();
             }
         });
+    </script>
+    <!-- Custom Device Detail Modal -->
+    <div id="deviceModal" class="custom-modal-backdrop" style="display: none;">
+        <div class="custom-modal-content">
+            <div class="custom-modal-header">
+                <h4 class="m-0 fw-bold font-monospace text-info"><i class="bi bi-cpu"></i> Detalles del Dispositivo</h4>
+                <button type="button" class="btn-close-custom" onclick="closeDeviceModal()">&times;</button>
+            </div>
+            <div class="custom-modal-body">
+                <div class="detail-row">
+                    <span class="detail-label">Nombre:</span>
+                    <span class="detail-value text-white" id="modalDeviceName">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Dirección IP:</span>
+                    <span class="detail-value font-monospace text-white" id="modalDeviceIp">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Dirección MAC:</span>
+                    <span class="detail-value font-monospace text-white" id="modalDeviceMac">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Sistema Operativo:</span>
+                    <span class="detail-value text-white" id="modalDeviceOs">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Latencia de Red:</span>
+                    <span class="detail-value text-info font-monospace" id="modalDeviceLatency">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Último Acceso:</span>
+                    <span class="detail-value text-white" id="modalDeviceAccessTime">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Estado de Conexión:</span>
+                    <span class="detail-value" id="modalDeviceStatus">-</span>
+                </div>
+            </div>
+            <div class="custom-modal-footer">
+                <div id="modalActionContainer">
+                    <!-- Action button will be injected here -->
+                </div>
+                <button type="button" class="btn-hex-outline py-2 px-4" onclick="closeDeviceModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal logic
+        window.openDeviceModal = function(device) {
+            document.getElementById('modalDeviceName').textContent = device.name;
+            document.getElementById('modalDeviceIp').textContent = device.ip;
+            document.getElementById('modalDeviceMac').textContent = device.mac;
+            document.getElementById('modalDeviceOs').textContent = device.os;
+            document.getElementById('modalDeviceLatency').textContent = device.latency;
+            document.getElementById('modalDeviceAccessTime').textContent = device.accessTime;
+            
+            const statusEl = document.getElementById('modalDeviceStatus');
+            statusEl.textContent = device.status;
+            statusEl.className = 'detail-value badge-dev-status ' + device.status.toLowerCase();
+            
+            const actionContainer = document.getElementById('modalActionContainer');
+            if (device.status === 'REVOKED') {
+                actionContainer.innerHTML = `
+                    <button type="button" class="btn btn-sm btn-outline-success px-4 py-2" onclick="restoreDeviceFromModal('${device.id}')" style="border-radius: 12px; font-weight: 600;">
+                        <i class="bi bi-check-circle"></i> Habilitar Acceso
+                    </button>
+                `;
+            } else {
+                actionContainer.innerHTML = `
+                    <button type="button" class="btn btn-sm btn-outline-danger px-4 py-2" onclick="revokeDeviceFromModal('${device.id}')" style="border-radius: 12px; font-weight: 600;">
+                        <i class="bi bi-x-circle"></i> Revocar Acceso
+                    </button>
+                `;
+            }
+
+            const modal = document.getElementById('deviceModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        };
+
+        window.closeDeviceModal = function() {
+            const modal = document.getElementById('deviceModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        };
+
+        window.revokeDeviceFromModal = function(id) {
+            closeDeviceModal();
+            // Call the existing revokeDevice function
+            const row = document.getElementById(`device-row-${id}`);
+            if (row) {
+                const btn = row.querySelector('.disconnect-btn');
+                if (btn) btn.click();
+            }
+        };
+
+        window.restoreDeviceFromModal = function(id) {
+            closeDeviceModal();
+            // Call the existing restoreDevice function
+            const row = document.getElementById(`device-row-${id}`);
+            if (row) {
+                const btn = row.querySelector('.restore-btn');
+                if (btn) btn.click();
+            }
+        };
     </script>
 </body>
 
