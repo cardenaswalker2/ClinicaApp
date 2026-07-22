@@ -26,6 +26,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private com.clinicaapp.repository.ConfiguracionRepository configRepo;
     @Autowired private com.clinicaapp.service.LogActividadService logActividadService;
+    @Autowired private com.clinicaapp.service.UserSessionTracker sessionTracker;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -65,14 +66,20 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         // Registrar log de inicio de sesión exitoso con OAuth2
         try {
+            String logUser = email != null ? email : "ANÓNIMO_OAUTH2";
             logActividadService.registrar(
-                email != null ? email : "ANÓNIMO_OAUTH2",
+                logUser,
                 "Inicio de sesión exitoso (OAuth2)",
                 "SEGURIDAD",
                 "SUCCESS",
                 "Usuario autenticado mediante proveedor de identidad externo (OAuth2/Google).",
                 request.getRemoteAddr()
             );
+
+            // Registrar sesión activa
+            String sessionId = request.getSession().getId();
+            String userAgent = request.getHeader("User-Agent");
+            sessionTracker.registerSession(sessionId, logUser, request.getRemoteAddr(), userAgent);
         } catch (Exception e) {
             // Ignorar
         }

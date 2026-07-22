@@ -22,6 +22,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Autowired
     private com.clinicaapp.service.LogActividadService logActividadService;
 
+    @Autowired
+    private com.clinicaapp.service.UserSessionTracker sessionTracker;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -38,6 +41,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 "Usuario autenticado por formulario con roles: " + rol,
                 request.getRemoteAddr()
             );
+
+            // Registrar sesión activa
+            String sessionId = request.getSession().getId();
+            String userAgent = request.getHeader("User-Agent");
+            sessionTracker.registerSession(sessionId, authentication.getName(), request.getRemoteAddr(), userAgent);
         } catch (Exception e) {
             // Ignorar
         }
