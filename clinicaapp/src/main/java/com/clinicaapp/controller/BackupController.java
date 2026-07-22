@@ -148,6 +148,101 @@ public class BackupController {
         }
     }
 
+    @PostMapping("/respaldos/restaurar")
+    public String restaurarBackup(@RequestParam("backupFile") org.springframework.web.multipart.MultipartFile file, RedirectAttributes attributes) {
+        if (file.isEmpty()) {
+            attributes.addFlashAttribute("mensajeError", "El archivo de respaldo está vacío o no fue seleccionado.");
+            return "redirect:/admin/respaldos";
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
+
+            java.util.zip.ZipInputStream zis = new java.util.zip.ZipInputStream(file.getInputStream());
+            java.util.zip.ZipEntry entry;
+
+            int usuariosRestaurados = 0;
+            int clinicasRestauradas = 0;
+            int citasRestauradas = 0;
+            int logsRestaurados = 0;
+            int configsRestauradas = 0;
+
+            while ((entry = zis.getNextEntry()) != null) {
+                String name = entry.getName();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    out.write(buffer, 0, len);
+                }
+                String content = out.toString(StandardCharsets.UTF_8.name());
+
+                if ("usuarios.json".equals(name)) {
+                    List<Usuario> list = mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, Usuario.class));
+                    if (!list.isEmpty()) {
+                        usuarioRepo.deleteAll();
+                        usuarioRepo.saveAll(list);
+                        usuariosRestaurados = list.size();
+                    }
+                } else if ("clinicas.json".equals(name)) {
+                    List<Clinica> list = mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, Clinica.class));
+                    if (!list.isEmpty()) {
+                        clinicaRepo.deleteAll();
+                        clinicaRepo.saveAll(list);
+                        clinicasRestauradas = list.size();
+                    }
+                } else if ("citas.json".equals(name)) {
+                    List<Cita> list = mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, Cita.class));
+                    if (!list.isEmpty()) {
+                        citaRepo.deleteAll();
+                        citaRepo.saveAll(list);
+                        citasRestauradas = list.size();
+                    }
+                } else if ("logs_auditoria.json".equals(name)) {
+                    List<LogActividad> list = mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, LogActividad.class));
+                    if (!list.isEmpty()) {
+                        logRepo.deleteAll();
+                        logRepo.saveAll(list);
+                        logsRestaurados = list.size();
+                    }
+                } else if ("configuracion_global.json".equals(name)) {
+                    List<ConfiguracionGlobal> list = mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, ConfiguracionGlobal.class));
+                    if (!list.isEmpty()) {
+                        configRepo.deleteAll();
+                        configRepo.saveAll(list);
+                        configsRestauradas = list.size();
+                    }
+                }
+                zis.closeEntry();
+            }
+            zis.close();
+
+            String resumen = String.format("Restauración completada con éxito. Usuarios: %d, Clínicas: %d, Citas: %d, Configs: %d",
+                    usuariosRestaurados, clinicasRestauradas, citasRestauradas, configsRestauradas);
+            
+            logActividadService.registrarAuto(
+                "Restauración de copia de seguridad", 
+                "SISTEMA", 
+                "SUCCESS", 
+                resumen
+            );
+
+            attributes.addFlashAttribute("mensajeExito", resumen);
+
+        } catch (Exception e) {
+            logActividadService.registrarAuto(
+                "Fallo en restauración de copia de seguridad", 
+                "SISTEMA", 
+                "ERROR", 
+                "Error crítico al restaurar la copia de seguridad: " + e.getMessage()
+            );
+            attributes.addFlashAttribute("mensajeError", "Error al procesar el archivo de respaldo: " + e.getMessage());
+        }
+
+        return "redirect:/admin/respaldos";
+    }
+
     private void agregarArchivoZip(ZipOutputStream zos, String nombreArchivo, String contenido) throws IOException {
         ZipEntry entry = new ZipEntry(nombreArchivo);
         zos.putNextEntry(entry);

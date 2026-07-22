@@ -1099,6 +1099,16 @@
     <!-- Main Content -->
     <main class="main-content">
 
+        <!-- Alertas del Sistema -->
+        <div th:if="${mensajeExito}" class="hex-alert hex-alert-success" style="border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.05); color: #10b981; margin-bottom: 20px; padding: 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+            <i class="bi bi-check-circle-fill"></i>
+            <span class="fw-bold" th:text="${mensajeExito}">Operación completada con éxito.</span>
+        </div>
+        <div th:if="${mensajeError}" class="hex-alert hex-alert-danger" style="border-color: rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.05); color: #f43f5e; margin-bottom: 20px; padding: 15px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span class="fw-bold" th:text="${mensajeError}">Ocurrió un error.</span>
+        </div>
+
         <!-- Hero -->
         <div class="hero-section">
             <div class="hero-badge">
@@ -1298,6 +1308,49 @@
                         Guardar Directiva
                     </button>
                 </form>
+            </div>
+
+            <!-- Right 2: Restore Backup -->
+            <div class="hex-card">
+                <div class="card-header">
+                    <div class="card-header-icon" style="background: var(--hex-accent-dim); color: var(--hex-accent);">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                    </div>
+                    <div class="card-header-text">
+                        <h3>Restaurar Base de Datos</h3>
+                        <p>Carga un archivo ZIP para sobreescribir las colecciones</p>
+                    </div>
+                </div>
+
+                <div class="hex-alert" style="border-color: rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.05); color: #f43f5e; border-radius: 8px; padding: 12px; margin-bottom: 15px; display: flex; align-items: start; gap: 8px;">
+                    <i class="bi bi-exclamation-triangle-fill" style="margin-top: 3px;"></i>
+                    <p style="font-size: 0.8rem; margin: 0;"><strong>ADVERTENCIA:</strong> Este proceso eliminará todos los datos actuales del sistema e importará los datos del archivo ZIP.</p>
+                </div>
+
+                <form th:action="@{/admin/respaldos/restaurar}" method="post" enctype="multipart/form-data" id="restoreForm" onsubmit="showRestoreLoading()">
+                    <div class="hex-input-group">
+                        <label class="hex-label">Archivo de Respaldo (.zip)</label>
+                        <div class="input-icon-wrap">
+                            <i class="bi bi-file-earmark-zip-fill"></i>
+                            <input type="file" name="backupFile" class="hex-input" accept=".zip" required style="padding-left: 36px; line-height: 2;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-hex" style="background: linear-gradient(135deg, var(--hex-accent), #c084fc); border: none; color: white; margin-top: 15px; width: 100%;">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Iniciar Restauración
+                    </button>
+                </form>
+
+                <!-- Animación de carga para restauración -->
+                <div class="progress-box" id="restoreProgressBox" style="display: none; margin-top: 15px;">
+                    <div class="progress-header">
+                        <span class="progress-status" style="color: var(--hex-accent);">Restaurando base de datos...</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 100%; background: var(--hex-accent); animation: pulseWidth 2s infinite;"></div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -1552,8 +1605,18 @@
                         }, 2000);
                     }, 800);
                 }
-            }, 120);
+            }, 100);
         }
+
+        window.showRestoreLoading = function() {
+            document.getElementById('restoreProgressBox').style.display = 'block';
+            const restoreForm = document.getElementById('restoreForm');
+            const submitBtn = restoreForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<div class="spinner-border spinner-border-sm me-2"></div> Restaurando...';
+            }
+        };
     </script>
 </body>
 
