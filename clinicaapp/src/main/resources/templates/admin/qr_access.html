@@ -2358,6 +2358,16 @@
                         <span class="detail-label">Latencia de Red:</span>
                         <span class="detail-value text-info font-monospace" id="modalDeviceLatency">-</span>
                     </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Coordenadas GPS:</span>
+                        <span class="detail-value text-accent font-monospace" id="modalDeviceGps">-</span>
+                    </div>
+                    <div class="detail-row" id="gpsMapRow" style="display: none;">
+                        <span class="detail-label">Ubicación Física:</span>
+                        <a href="#" target="_blank" class="btn btn-sm btn-outline-info py-1 px-3" id="modalDeviceGpsLink" style="font-size: 0.72rem; border-radius: 8px; text-decoration: none;">
+                            <i class="bi bi-geo-alt-fill text-danger"></i> Abrir en Google Maps
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Tab 2: Sistema & UA -->
@@ -2460,6 +2470,16 @@
             document.getElementById('modalDeviceLanguage').textContent = device.preferredLanguage || 'es';
             document.getElementById('modalDeviceUA').textContent = device.userAgent || 'Desconocida';
             
+            // GPS Location
+            if (device.latitude && device.longitude) {
+                document.getElementById('modalDeviceGps').textContent = `${device.latitude.toFixed(6)}, ${device.longitude.toFixed(6)} (±${device.gpsAccuracy ? device.gpsAccuracy.toFixed(1) + 'm' : '?'})`;
+                document.getElementById('gpsMapRow').style.display = 'flex';
+                document.getElementById('modalDeviceGpsLink').href = `https://www.google.com/maps?q=${device.latitude},${device.longitude}`;
+            } else {
+                document.getElementById('modalDeviceGps').textContent = 'No concedido / No disponible';
+                document.getElementById('gpsMapRow').style.display = 'none';
+            }
+
             // Telemetry fields
             document.getElementById('modalDeviceScreen').textContent = device.screenResolution || 'No detectado';
             document.getElementById('modalDeviceTimezone').textContent = device.timezone || 'No detectado';
@@ -2525,17 +2545,41 @@
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Desconocido',
                     cpuCores: navigator.hardwareConcurrency || 0,
                     deviceMemory: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'No disponible',
-                    networkType: navigator.connection ? navigator.connection.effectiveType : 'Desconocida'
+                    networkType: navigator.connection ? navigator.connection.effectiveType : 'Desconocida',
+                    latitude: null,
+                    longitude: null,
+                    gpsAccuracy: null
                 };
                 
-                fetch('/api/system/telemetry', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(telemetry)
-                }).catch(err => console.error("Telemetry error:", err));
+                // Request HTML5 Geolocation coordinates
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            telemetry.latitude = position.coords.latitude;
+                            telemetry.longitude = position.coords.longitude;
+                            telemetry.gpsAccuracy = position.coords.accuracy;
+                            sendTelemetry(telemetry);
+                        },
+                        (error) => {
+                            // Permission denied or error, send standard telemetry
+                            sendTelemetry(telemetry);
+                        },
+                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                    );
+                } else {
+                    sendTelemetry(telemetry);
+                }
             } catch(e) {
                 // Ignore
             }
+        }
+
+        function sendTelemetry(telemetry) {
+            fetch('/api/system/telemetry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(telemetry)
+            }).catch(err => console.error("Telemetry error:", err));
         }
         
         // Run on load

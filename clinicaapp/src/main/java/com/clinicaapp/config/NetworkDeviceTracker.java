@@ -40,6 +40,11 @@ public class NetworkDeviceTracker {
         private String deviceMemory = "No detectado";
         private String networkType = "No detectado";
 
+        // GPS Real-time Coordinates
+        private Double latitude = null;
+        private Double longitude = null;
+        private Double gpsAccuracy = null;
+
         // Getters and Setters
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
@@ -106,6 +111,15 @@ public class NetworkDeviceTracker {
 
         public String getNetworkType() { return networkType; }
         public void setNetworkType(String networkType) { this.networkType = networkType; }
+
+        public Double getLatitude() { return latitude; }
+        public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+        public Double getLongitude() { return longitude; }
+        public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+        public Double getGpsAccuracy() { return gpsAccuracy; }
+        public void setGpsAccuracy(Double gpsAccuracy) { this.gpsAccuracy = gpsAccuracy; }
     }
 
     private final Map<String, DeviceSession> devices = new ConcurrentHashMap<>();
@@ -184,6 +198,17 @@ public class NetworkDeviceTracker {
                 if (telemetry.containsKey("cpuCores")) device.setCpuCores((Integer) telemetry.get("cpuCores"));
                 if (telemetry.containsKey("deviceMemory")) device.setDeviceMemory(String.valueOf(telemetry.get("deviceMemory")));
                 if (telemetry.containsKey("networkType")) device.setNetworkType(String.valueOf(telemetry.get("networkType")));
+                
+                // Parse GPS Coordinates
+                if (telemetry.containsKey("latitude") && telemetry.get("latitude") != null) {
+                    device.setLatitude(Double.valueOf(String.valueOf(telemetry.get("latitude"))));
+                }
+                if (telemetry.containsKey("longitude") && telemetry.get("longitude") != null) {
+                    device.setLongitude(Double.valueOf(String.valueOf(telemetry.get("longitude"))));
+                }
+                if (telemetry.containsKey("gpsAccuracy") && telemetry.get("gpsAccuracy") != null) {
+                    device.setGpsAccuracy(Double.valueOf(String.valueOf(telemetry.get("gpsAccuracy"))));
+                }
                 break;
             }
         }
