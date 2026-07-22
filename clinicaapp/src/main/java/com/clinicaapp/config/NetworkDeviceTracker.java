@@ -1,6 +1,10 @@
 package com.clinicaapp.config;
 
 import org.springframework.stereotype.Component;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +17,7 @@ public class NetworkDeviceTracker {
         private String name;
         private String ip;
         private String mac;
-        private String status; // ACTIVE, IDLE
+        private String status; // ACTIVE, IDLE, REVOKED
         private String os;
         private String type; // Mobile, Tablet, PC
         private String latency;
@@ -21,6 +25,22 @@ public class NetworkDeviceTracker {
         private long lastAccessMs;
         private boolean simulated;
 
+        // --- NEW ENHANCED METADATA ---
+        private String browser = "Desconocido";
+        private String userAgent = "Desconocido";
+        private String ipGeoCountry = "Localizando...";
+        private String ipGeoCity = "Localizando...";
+        private String ipGeoIsp = "Localizando...";
+        private String preferredLanguage = "es";
+        
+        // Telemetry details
+        private String screenResolution = "No detectado";
+        private String timezone = "No detectado";
+        private int cpuCores = 0;
+        private String deviceMemory = "No detectado";
+        private String networkType = "No detectado";
+
+        // Getters and Setters
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
 
@@ -53,17 +73,50 @@ public class NetworkDeviceTracker {
 
         public boolean isSimulated() { return simulated; }
         public void setSimulated(boolean simulated) { this.simulated = simulated; }
+
+        public String getBrowser() { return browser; }
+        public void setBrowser(String browser) { this.browser = browser; }
+
+        public String getUserAgent() { return userAgent; }
+        public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
+
+        public String getIpGeoCountry() { return ipGeoCountry; }
+        public void setIpGeoCountry(String ipGeoCountry) { this.ipGeoCountry = ipGeoCountry; }
+
+        public String getIpGeoCity() { return ipGeoCity; }
+        public void setIpGeoCity(String ipGeoCity) { this.ipGeoCity = ipGeoCity; }
+
+        public String getIpGeoIsp() { return ipGeoIsp; }
+        public void setIpGeoIsp(String ipGeoIsp) { this.ipGeoIsp = ipGeoIsp; }
+
+        public String getPreferredLanguage() { return preferredLanguage; }
+        public void setPreferredLanguage(String preferredLanguage) { this.preferredLanguage = preferredLanguage; }
+
+        public String getScreenResolution() { return screenResolution; }
+        public void setScreenResolution(String screenResolution) { this.screenResolution = screenResolution; }
+
+        public String getTimezone() { return timezone; }
+        public void setTimezone(String timezone) { this.timezone = timezone; }
+
+        public int getCpuCores() { return cpuCores; }
+        public void setCpuCores(int cpuCores) { this.cpuCores = cpuCores; }
+
+        public String getDeviceMemory() { return deviceMemory; }
+        public void setDeviceMemory(String deviceMemory) { this.deviceMemory = deviceMemory; }
+
+        public String getNetworkType() { return networkType; }
+        public void setNetworkType(String networkType) { this.networkType = networkType; }
     }
 
     private final Map<String, DeviceSession> devices = new ConcurrentHashMap<>();
     private final Set<String> blacklistedIps = ConcurrentHashMap.newKeySet();
     private final Set<String> revokedDeviceIds = ConcurrentHashMap.newKeySet();
-    private final java.util.concurrent.atomic.AtomicInteger totalScans = new java.util.concurrent.atomic.AtomicInteger(47);
+    private final java.util.concurrent.atomic.AtomicInteger totalScans = new java.util.concurrent.atomic.AtomicInteger(0);
     private boolean pinRequired = false;
     private final Set<String> pinVerifiedIps = ConcurrentHashMap.newKeySet();
 
     public NetworkDeviceTracker() {
-        // Only real devices tracked live
+        // No mock seeding - 100% real live tracking
     }
 
     public int getTotalScans() {
@@ -89,51 +142,7 @@ public class NetworkDeviceTracker {
         pinVerifiedIps.add(ip);
     }
 
-    private void seedDefaultDevices() {
-        DeviceSession dev1 = new DeviceSession();
-        dev1.setId("dev_1");
-        dev1.setName("iPhone 15 Pro");
-        dev1.setIp("192.168.1.50");
-        dev1.setMac("BC:D1:EC:11:A2:3B");
-        dev1.setStatus("ACTIVE");
-        dev1.setOs("iOS");
-        dev1.setType("Mobile");
-        dev1.setLatency("12ms");
-        dev1.setAccessTime("Hace 2 minutos");
-        dev1.setLastAccessMs(System.currentTimeMillis() - 120000);
-        dev1.setSimulated(true);
-        devices.put(dev1.getId(), dev1);
-
-        DeviceSession dev2 = new DeviceSession();
-        dev2.setId("dev_2");
-        dev2.setName("Samsung Galaxy S24");
-        dev2.setIp("192.168.1.62");
-        dev2.setMac("48:5F:99:A5:72:0D");
-        dev2.setStatus("ACTIVE");
-        dev2.setOs("Android");
-        dev2.setType("Mobile");
-        dev2.setLatency("18ms");
-        dev2.setAccessTime("Hace 5 minutos");
-        dev2.setLastAccessMs(System.currentTimeMillis() - 300000);
-        dev2.setSimulated(true);
-        devices.put(dev2.getId(), dev2);
-
-        DeviceSession dev3 = new DeviceSession();
-        dev3.setId("dev_3");
-        dev3.setName("iPad Pro M4");
-        dev3.setIp("192.168.1.15");
-        dev3.setMac("D4:A3:3D:88:2E:FF");
-        dev3.setStatus("IDLE");
-        dev3.setOs("iPadOS");
-        dev3.setType("Tablet");
-        dev3.setLatency("15ms");
-        dev3.setAccessTime("Hace 15 minutos");
-        dev3.setLastAccessMs(System.currentTimeMillis() - 900000);
-        dev3.setSimulated(true);
-        devices.put(dev3.getId(), dev3);
-    }
-
-    public void registerDevice(String ip, String userAgent) {
+    public void registerDevice(String ip, String userAgent, String language) {
         if (blacklistedIps.contains(ip)) {
             return;
         }
@@ -150,8 +159,14 @@ public class NetworkDeviceTracker {
             device.setIp(ip);
             device.setMac(generateMacFromIpAndUserAgent(ip, userAgent));
             device.setSimulated(false);
+            device.setUserAgent(userAgent);
+            device.setPreferredLanguage(language != null ? parseLanguage(language) : "es");
             parseUserAgent(device, userAgent);
             device.setLatency((new Random().nextInt(15) + 3) + "ms");
+            
+            // Asynchronously fetch Geo Location data
+            lookupGeoLocation(device, ip);
+            
             totalScans.incrementAndGet();
         }
 
@@ -160,22 +175,18 @@ public class NetworkDeviceTracker {
         devices.put(id, device);
     }
 
-    public void simulateDevice(String name, String os, String type, String ip, String mac) {
-        totalScans.incrementAndGet();
-        String id = "dev_sim_" + System.currentTimeMillis() + "_" + new Random().nextInt(1000);
-        DeviceSession device = new DeviceSession();
-        device.setId(id);
-        device.setName(name);
-        device.setIp(ip);
-        device.setMac(mac);
-        device.setOs(os);
-        device.setType(type);
-        device.setStatus("ACTIVE");
-        device.setLatency((new Random().nextInt(20) + 5) + "ms");
-        device.setAccessTime("Ahora mismo");
-        device.setLastAccessMs(System.currentTimeMillis());
-        device.setSimulated(true);
-        devices.put(id, device);
+    public void updateTelemetry(String ip, Map<String, Object> telemetry) {
+        // Find active device by IP
+        for (DeviceSession device : devices.values()) {
+            if (device.getIp().equals(ip)) {
+                if (telemetry.containsKey("screenResolution")) device.setScreenResolution(String.valueOf(telemetry.get("screenResolution")));
+                if (telemetry.containsKey("timezone")) device.setTimezone(String.valueOf(telemetry.get("timezone")));
+                if (telemetry.containsKey("cpuCores")) device.setCpuCores((Integer) telemetry.get("cpuCores"));
+                if (telemetry.containsKey("deviceMemory")) device.setDeviceMemory(String.valueOf(telemetry.get("deviceMemory")));
+                if (telemetry.containsKey("networkType")) device.setNetworkType(String.valueOf(telemetry.get("networkType")));
+                break;
+            }
+        }
     }
 
     public List<DeviceSession> getActiveDevices() {
@@ -186,7 +197,7 @@ public class NetworkDeviceTracker {
             if (revokedDeviceIds.contains(dev.getId())) {
                 dev.setStatus("REVOKED");
                 dev.setAccessTime("Bloqueado");
-            } else if (!dev.isSimulated()) {
+            } else {
                 long diff = now - dev.getLastAccessMs();
                 if (diff > 15 * 60 * 1000) {
                     dev.setStatus("IDLE");
@@ -201,23 +212,7 @@ public class NetworkDeviceTracker {
                 } else {
                     dev.setAccessTime("Hace " + (diff / (60 * 60 * 1000)) + " horas");
                 }
-            } else {
-                long diff = now - dev.getLastAccessMs();
-                if (diff > 10 * 60 * 1000) {
-                    dev.setStatus("IDLE");
-                } else {
-                    dev.setStatus("ACTIVE");
-                }
-                
-                if (diff < 15 * 1000) {
-                    dev.setAccessTime("Ahora mismo");
-                } else if (diff < 60 * 1000) {
-                    dev.setAccessTime("Hace " + (diff / 1000) + " s");
-                } else {
-                    dev.setAccessTime("Hace " + (diff / 60000) + " min");
-                }
             }
-            
             list.add(dev);
         }
         
@@ -280,6 +275,8 @@ public class NetworkDeviceTracker {
 
     private void parseUserAgent(DeviceSession device, String userAgent) {
         String ua = userAgent.toLowerCase();
+        
+        // Parse OS and Device Type
         if (ua.contains("iphone")) {
             device.setName("iPhone");
             device.setOs("iOS");
@@ -310,9 +307,24 @@ public class NetworkDeviceTracker {
             device.setOs("Linux");
             device.setType("PC");
         } else {
-            device.setName("Dispositivo Desconocido");
+            device.setName("Dispositivo Genérico");
             device.setOs("Desconocido");
             device.setType("Mobile");
+        }
+
+        // Parse Browser
+        if (ua.contains("edg/") || ua.contains("edge")) {
+            device.setBrowser("Microsoft Edge");
+        } else if (ua.contains("opr/") || ua.contains("opera")) {
+            device.setBrowser("Opera");
+        } else if (ua.contains("chrome") || ua.contains("crios")) {
+            device.setBrowser("Google Chrome");
+        } else if (ua.contains("firefox") || ua.contains("fxios")) {
+            device.setBrowser("Mozilla Firefox");
+        } else if (ua.contains("safari") && !ua.contains("chrome") && !ua.contains("android")) {
+            device.setBrowser("Apple Safari");
+        } else {
+            device.setBrowser("Navegador Web");
         }
     }
 
@@ -335,21 +347,16 @@ public class NetworkDeviceTracker {
                 if (androidIdx != -1) {
                     for (int i = androidIdx + 1; i < parts.length; i++) {
                         String candidate = parts[i].trim();
-                        
-                        // Ignore locale tags (like es-es, en-us, es, en)
                         if (candidate.length() <= 5 && (candidate.contains("-") || candidate.contains("_") || candidate.length() <= 3)) {
                             continue;
                         }
                         if (candidate.equalsIgnoreCase("wv")) {
                             continue;
                         }
-                        
-                        // Clean up Build info
                         if (candidate.toLowerCase().contains("build/")) {
                             int bIdx = candidate.toLowerCase().indexOf("build/");
                             candidate = candidate.substring(0, bIdx).trim();
                         }
-                        
                         if (!candidate.isEmpty()) {
                             return mapModelToPrettyName(candidate);
                         }
@@ -395,5 +402,76 @@ public class NetworkDeviceTracker {
             return model;
         }
         return model;
+    }
+
+    private String parseLanguage(String acceptLanguage) {
+        try {
+            if (acceptLanguage != null && acceptLanguage.length() >= 2) {
+                String firstLang = acceptLanguage.split(",")[0].trim();
+                if (firstLang.contains("-")) {
+                    firstLang = firstLang.split("-")[0];
+                }
+                Locale locale = new Locale(firstLang);
+                return locale.getDisplayLanguage(new Locale("es"));
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        return "Español";
+    }
+
+    private void lookupGeoLocation(DeviceSession device, String ip) {
+        if (ip == null || ip.equals("127.0.0.1") || ip.equals("0:0:0:0:0:0:0:1") || ip.equals("localhost") || ip.startsWith("192.168.") || ip.startsWith("10.") || ip.startsWith("172.")) {
+            device.setIpGeoCountry("Desarrollo Local");
+            device.setIpGeoCity("Red Privada");
+            device.setIpGeoIsp("Red de Desarrollo Interna");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://ip-api.com/json/" + ip);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(2500);
+                conn.setReadTimeout(2500);
+                
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        response.append(line);
+                    }
+                    in.close();
+                    
+                    String json = response.toString();
+                    device.setIpGeoCountry(extractJsonValue(json, "country"));
+                    device.setIpGeoCity(extractJsonValue(json, "city"));
+                    device.setIpGeoIsp(extractJsonValue(json, "isp"));
+                } else {
+                    device.setIpGeoCountry("Proveedor Externo");
+                    device.setIpGeoCity("Red Pública");
+                    device.setIpGeoIsp("ISP Desconocido");
+                }
+            } catch (Exception e) {
+                device.setIpGeoCountry("Proveedor Externo");
+                device.setIpGeoCity("Red Pública");
+                device.setIpGeoIsp("ISP Desconocido");
+            }
+        }).start();
+    }
+
+    private String extractJsonValue(String json, String key) {
+        String searchKey = "\"" + key + "\":\"";
+        int start = json.indexOf(searchKey);
+        if (start != -1) {
+            start += searchKey.length();
+            int end = json.indexOf("\"", start);
+            if (end != -1) {
+                return json.substring(start, end);
+            }
+        }
+        return "Desconocido";
     }
 }

@@ -20,7 +20,18 @@ public class NetworkDeviceFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String ip = request.getRemoteAddr();
+        // Resolve real IP (supports Cloudflare proxy and general load balancers)
+        String ip = request.getHeader("CF-Connecting-IP");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Forwarded-For");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+
         String path = request.getRequestURI();
 
         // 1. Register the device (ignore static assets and system APIs)
@@ -28,8 +39,9 @@ public class NetworkDeviceFilter extends OncePerRequestFilter {
                 !path.startsWith("/webjars/") && !path.startsWith("/api/system") && !path.equals("/error")) {
             
             String userAgent = request.getHeader("User-Agent");
+            String acceptLanguage = request.getHeader("Accept-Language");
             if (userAgent != null) {
-                deviceTracker.registerDevice(ip, userAgent);
+                deviceTracker.registerDevice(ip, userAgent, acceptLanguage);
             }
         }
 

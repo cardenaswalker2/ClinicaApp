@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.clinicaapp.config.NetworkDeviceTracker;
+import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -135,39 +137,10 @@ public class ApiSystemController {
 
     @PostMapping("/simulate-scan")
     public Map<String, Object> simulateScan() {
-        String[] deviceNames = {"iPhone 14", "Xiaomi Redmi Note 12", "MacBook Pro M3", "Samsung Galaxy A54", "iPad Air", "Google Pixel 8"};
-        String[] deviceOS = {"iOS", "Android", "macOS", "Android", "iPadOS", "Android"};
-        String[] deviceTypes = {"Mobile", "Mobile", "PC", "Mobile", "Tablet", "Mobile"};
-        
-        int idx = new java.util.Random().nextInt(deviceNames.length);
-        String ip = getLocalIPv4Address();
-        String subnet = "192.168.1.";
-        if (ip.contains(".")) {
-            subnet = ip.substring(0, ip.lastIndexOf(".") + 1);
-        }
-        String randomIp = subnet + (new java.util.Random().nextInt(200) + 2);
-        String mac = generateRandomMac();
-        
-        deviceTracker.simulateDevice(deviceNames[idx], deviceOS[idx], deviceTypes[idx], randomIp, mac);
-        
         Map<String, Object> response = new HashMap<>();
-        response.put("status", "SIMULATED");
-        response.put("name", deviceNames[idx]);
-        response.put("ip", randomIp);
-        response.put("mac", mac);
+        response.put("status", "DISABLED");
+        response.put("message", "Simulated scanning is disabled on production console.");
         return response;
-    }
-
-    private String generateRandomMac() {
-        String hexDigits = "0123456789ABCDEF";
-        StringBuilder mac = new StringBuilder();
-        java.util.Random rand = new java.util.Random();
-        for (int i = 0; i < 6; i++) {
-            mac.append(hexDigits.charAt(rand.nextInt(16)));
-            mac.append(hexDigits.charAt(rand.nextInt(16)));
-            if (i < 5) mac.append(":");
-        }
-        return mac.toString();
     }
 
     private List<Map<String, String>> getAllLocalIPv4Addresses() {
@@ -271,5 +244,25 @@ public class ApiSystemController {
         status.put("maintenanceProgress", maintenanceProgress);
         
         return status;
+    }
+
+    @PostMapping("/telemetry")
+    public Map<String, Object> updateDeviceTelemetry(@RequestBody Map<String, Object> telemetry, HttpServletRequest request) {
+        String ip = request.getHeader("CF-Connecting-IP");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Forwarded-For");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+
+        deviceTracker.updateTelemetry(ip, telemetry);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        return response;
     }
 }
