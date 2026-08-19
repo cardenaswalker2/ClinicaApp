@@ -46,6 +46,9 @@ public class Tech1428Controller {
     @Value("${groq.api.url:https://api.groq.com/openai/v1/chat/completions}")
     private String groqApiUrl;
 
+    @Value("${groq.api.model:llama-3.3-70b-versatile}")
+    private String groqApiModel;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @PostMapping("/send-email")
@@ -102,7 +105,7 @@ public class Tech1428Controller {
             headers.setBearerAuth(groqApiKey);
 
             Map<String, Object> body = new HashMap<>();
-            body.put("model", "llama-3.1-8b-instant");
+            body.put("model", groqApiModel);
             
             List<Map<String, String>> messages = new ArrayList<>();
             messages.add(Map.of("role", "system", "content", 

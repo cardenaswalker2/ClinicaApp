@@ -29,6 +29,9 @@ public class NovaAIController {
     @Value("${groq.api.url:https://api.groq.com/openai/v1/chat/completions}")
     private String groqApiUrl;
 
+    @Value("${groq.api.model:llama-3.3-70b-versatile}")
+    private String groqApiModel;
+
     @Autowired
     private IUsuarioService usuarioService;
     @Autowired
@@ -262,7 +265,7 @@ public class NovaAIController {
         headers.setBearerAuth(groqApiKey);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("model", "llama-3.1-8b-instant");
+        body.put("model", groqApiModel);
         body.put("messages", messages);
         body.put("temperature", 0.4);
 
