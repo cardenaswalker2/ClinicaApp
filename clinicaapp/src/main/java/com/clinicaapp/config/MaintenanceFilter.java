@@ -28,7 +28,7 @@ public class MaintenanceFilter extends OncePerRequestFilter {
 
         // 1. Recursos estáticos e infraestructura base (SIEMPRE PERMITIDOS)
         if (path.startsWith("/css/") || path.startsWith("/js/") || path.startsWith("/img/") || 
-            path.startsWith("/api/system") || path.equals("/mantenimiento") || path.startsWith("/logout")) {
+            path.startsWith("/api/system") || path.startsWith("/api/health") || path.equals("/mantenimiento") || path.startsWith("/logout")) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -36,7 +36,7 @@ public class NetworkDeviceFilter extends OncePerRequestFilter {
 
         // 1. Register the device (ignore static assets and system APIs)
         if (!path.startsWith("/css/") && !path.startsWith("/js/") && !path.startsWith("/img/") &&
-                !path.startsWith("/webjars/") && !path.startsWith("/api/system") && !path.equals("/error")) {
+                !path.startsWith("/webjars/") && !path.startsWith("/api/system") && !path.startsWith("/api/health") && !path.equals("/error")) {
             
             String userAgent = request.getHeader("User-Agent");
             String acceptLanguage = request.getHeader("Accept-Language");
@@ -77,7 +77,7 @@ public class NetworkDeviceFilter extends OncePerRequestFilter {
         if (deviceTracker.isPinRequired()) {
             if (!ip.equals("127.0.0.1") && !ip.equals("0:0:0:0:0:0:0:1") && !ip.equals("localhost") &&
                     !path.startsWith("/css/") && !path.startsWith("/js/") && !path.startsWith("/img/") &&
-                    !path.startsWith("/webjars/") && !path.startsWith("/api/system") && !path.equals("/error")) {
+                    !path.startsWith("/webjars/") && !path.startsWith("/api/system") && !path.startsWith("/api/health") && !path.equals("/error")) {
                 
                 if (!deviceTracker.isIpPinVerified(ip)) {
                     response.setContentType("text/html;charset=UTF-8");
