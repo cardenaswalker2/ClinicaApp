@@ -111,12 +111,8 @@
 
 <body>
     <!-- Header Fragment -->
-    <div sec:authorize="isAuthenticated()">
-        <div th:replace="~{fragments/header :: header-usuario}"></div>
-    </div>
-    <div sec:authorize="!isAuthenticated()">
-        <div th:replace="~{fragments/header :: header-publico}"></div>
-    </div>
+    <div th:replace="~{fragments/header :: header-usuario}"></div>
+    <link th:replace="~{fragments/header :: headerStyles}">
 
     <main class="container py-4">
 
