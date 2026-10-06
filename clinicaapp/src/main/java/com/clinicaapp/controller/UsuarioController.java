@@ -2013,4 +2013,95 @@ public Map<String, Object> getContextoIA(Principal principal) {
             return response;
         }
     }
-}
+
+    // =========================================================================
+    // INVESTIGACIÓN DE OPERACIONES: MODELO DE OPTIMIZACIÓN DE CLÍNICAS
+    // =========================================================================
+
+    @Autowired
+    private com.clinicaapp.service.IOptimizacionService optimizacionService;
+
+    /**
+     * Vista interactiva de Investigación de Operaciones:
+     * Planteamiento del modelo matemático PLEB, variables de decisión,
+     * función objetivo Min Z, restricciones y resolución en tiempo real.
+     */
+    @GetMapping("/optimizacion-clinicas")
+    public String vistaOptimizacionClinicas(
+            @RequestParam(value = "lat", required = false) Double lat,
+            @RequestParam(value = "lng", required = false) Double lng,
+            @RequestParam(value = "radio", required = false, defaultValue = "15.0") Double radio,
+            Model model, Principal principal) {
+        
+        Usuario usuario = getLoggedUser(principal);
+        model.addAttribute("usuario", usuario);
+
+        // Coordenadas iniciales: del request, del perfil o por defecto en Cartagena
+        double latFinal = (lat != null && lat != 0.0) ? lat : (usuario != null && usuario.getLatitud() != null ? usuario.getLatitud() : 10.3910);
+        double lngFinal = (lng != null && lng != 0.0) ? lng : (usuario != null && usuario.getLongitud() != null ? usuario.getLongitud() : -75.4794);
+        String direccion = (usuario != null && usuario.getDireccion() != null && !usuario.getDireccion().isEmpty()) ? usuario.getDireccion() : "Cartagena de Indias";
+
+        com.clinicaapp.dto.OptimizacionClinicaResultadoDTO resultado = optimizacionService.resolverOptimizacion(latFinal, lngFinal, radio, direccion);
+        model.addAttribute("resultadoOptimizacion", resultado);
+        model.addAttribute("currentLat", latFinal);
+        model.addAttribute("currentLng", lngFinal);
+        model.addAttribute("currentRadio", radio);
+
+        return "usuario/optimizacion_clinicas";
+    }
+
+    /**
+     * Endpoint API REST para resolver el modelo de optimización dinámicamente vía AJAX/Fetch
+     */
+    @GetMapping("/api/optimizacion-clinicas")
+    @ResponseBody
+    public ResponseEntity<?> apiOptimizacionClinicas(
+            @RequestParam("lat") double lat,
+            @RequestParam("lng") double lng,
+            @RequestParam(value = "radio", defaultValue = "15.0") double radio,
+            @RequestParam(value = "direccion", required = false) String direccion,
+            Principal principal) {
+        
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario != null && direccion == null && usuario.getDireccion() != null) {
+            direccion = usuario.getDireccion();
+        }
+
+        com.clinicaapp.dto.OptimizacionClinicaResultadoDTO resultado = optimizacionService.resolverOptimizacion(lat, lng, radio, direccion);
+        return ResponseEntity.ok(resultado);
+    }
+
+    /**
+     * Endpoint para guardar la ubicación GPS actual directamente en el perfil del usuario
+     */
+    @PostMapping("/api/actualizar-ubicacion")
+    @ResponseBody
+    public ResponseEntity<?> actualizarUbicacionUsuario(
+            @RequestBody Map<String, Object> payload,
+            Principal principal) {
+        Usuario usuario = getLoggedUser(principal);
+        if (usuario == null) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "No autenticado"));
+        }
+
+        try {
+            if (payload.containsKey("latitud") && payload.containsKey("longitud")) {
+                Double lat = Double.valueOf(payload.get("latitud").toString());
+                Double lng = Double.valueOf(payload.get("longitud").toString());
+                usuario.setLatitud(lat);
+                usuario.setLongitud(lng);
+            }
+            if (payload.containsKey("direccion") && payload.get("direccion") != null) {
+                usuario.setDireccion(payload.get("direccion").toString());
+            }
+            if (payload.containsKey("ciudad") && payload.get("ciudad") != null) {
+                usuario.setCiudad(payload.get("ciudad").toString());
+            }
+
+            usuarioRepository.save(usuario);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Ubicación guardada en tu perfil"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Error al actualizar ubicación: " + e.getMessage()));
+        }
+    }
+}

@@ -2121,8 +2121,11 @@
                     </form>
 
                     <!-- Filtros Rápidos -->
-                    <div class="quick-filters mt-4">
+                    <div class="quick-filters mt-4 align-items-center">
                         <span class="filters-label text-muted small fw-bold">DESTACADOS:</span>
+                        <a th:href="@{/usuario/optimizacion-clinicas}" class="filter-chip glass-chip" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(99, 102, 241, 0.25)) !important; border: 1.5px solid #0ea5e9 !important; font-weight: 700; color: #0284c7;">
+                            <i class="bi bi-bullseye text-primary"></i> 🎯 Optimizar por mi Ubicación (I.O.)
+                        </a>
                         <a th:href="@{/buscar-clinicas(query='Manga')}" class="filter-chip glass-chip">
                             <i class="bi bi-geo-alt"></i> Manga
                         </a>
@@ -2136,6 +2139,7 @@
                             <i class="bi bi-geo-alt"></i> Crespo
                         </a>
                     </div>
+
                 </div>
             </div>
         </section>

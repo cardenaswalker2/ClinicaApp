@@ -210,6 +210,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuario.setApellido(usuarioDTO.getApellido());
         usuario.setTelefono(usuarioDTO.getTelefono());
         usuario.setRole(role);
+        if (StringUtils.hasText(usuarioDTO.getDireccion())) {
+            usuario.setDireccion(usuarioDTO.getDireccion());
+        }
+        if (usuarioDTO.getLatitud() != null) {
+            usuario.setLatitud(usuarioDTO.getLatitud());
+        }
+        if (usuarioDTO.getLongitud() != null) {
+            usuario.setLongitud(usuarioDTO.getLongitud());
+        }
+        if (StringUtils.hasText(usuarioDTO.getCiudad())) {
+            usuario.setCiudad(usuarioDTO.getCiudad());
+        }
         if (StringUtils.hasText(usuarioDTO.getPassword())) {
             usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         }
@@ -226,6 +238,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setApellido(usuarioDTO.getApellido());
         usuario.setTelefono(usuarioDTO.getTelefono());
+        if (StringUtils.hasText(usuarioDTO.getDireccion())) {
+            usuario.setDireccion(usuarioDTO.getDireccion());
+        }
+        if (usuarioDTO.getLatitud() != null) {
+            usuario.setLatitud(usuarioDTO.getLatitud());
+        }
+        if (usuarioDTO.getLongitud() != null) {
+            usuario.setLongitud(usuarioDTO.getLongitud());
+        }
+        if (StringUtils.hasText(usuarioDTO.getCiudad())) {
+            usuario.setCiudad(usuarioDTO.getCiudad());
+        }
         if (StringUtils.hasText(usuarioDTO.getPassword())) {
             usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         }

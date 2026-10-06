@@ -58,6 +58,12 @@ public class Usuario {
     private Integer experiencia = 0;
 
 
+    // --- CAMPOS DE GEOLOCALIZACIÓN Y OPTIMIZACIÓN (I.O.) ---
+    private Double latitud;
+    private Double longitud;
+    private String ciudad = "Cartagena";
+
+
 
     // Constructor vacío
     @PersistenceCreator
@@ -306,4 +312,12 @@ public class Usuario {
     public void setCalificacion(Double calificacion) { this.calificacion = calificacion; }
     public Integer getExperiencia() { return experiencia != null ? experiencia : 0; }
     public void setExperiencia(Integer experiencia) { this.experiencia = experiencia; }
-}
+
+    public Double getLatitud() { return latitud; }
+    public void setLatitud(Double latitud) { this.latitud = latitud; }
+    public Double getLongitud() { return longitud; }
+    public void setLongitud(Double longitud) { this.longitud = longitud; }
+    public String getCiudad() { return ciudad != null ? ciudad : "Cartagena"; }
+    public void setCiudad(String ciudad) { this.ciudad = ciudad; }
+}
+

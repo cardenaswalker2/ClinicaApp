@@ -217,8 +217,14 @@
                                 <span id="navChatBadge" class="badge bg-danger rounded-pill ms-1" style="font-size: 0.7rem; font-weight: 800; padding: 0.25em 0.6em;" th:if="${unreadChatCount != null && unreadChatCount > 0}" th:text="${unreadChatCount}"></span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-1" th:href="@{/usuario/optimizacion-clinicas}">
+                                <i class="bi bi-bullseye text-primary"></i> Optimización I.O.
+                            </a>
+                        </li>
                         <li class="nav-item"><a class="nav-link" th:href="@{/usuario/pagos}">Mis Pagos</a></li>
                     </ul>
+
                     <div class="navbar-nav ms-auto align-items-center gap-3">
                         <!-- ICONO DE RECORDATORIOS PREMIUM -->
                         <a th:href="@{/usuario/recordatorios}" class="notif-bell-btn me-2" title="Mis Recordatorios">

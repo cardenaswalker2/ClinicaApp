@@ -436,7 +436,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group mb-0">
+                                <div class="form-group">
                                     <label for="telefono" class="form-label">Teléfono</label>
                                     <div class="input-group-custom">
                                         <i class="bi bi-telephone input-icon"></i>
@@ -444,6 +444,54 @@
                                             th:field="*{telefono}" placeholder="+57 300 123 4567">
                                     </div>
                                 </div>
+
+                                <div class="form-group mb-0">
+                                    <label for="direccion" class="form-label">Dirección de Residencia</label>
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-geo-alt input-icon"></i>
+                                        <input type="text" id="direccion" class="form-control-custom"
+                                            th:field="*{direccion}" placeholder="Ej: Calle 24 #20-15, Manga, Cartagena">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-divider"></div>
+
+                            <!-- SECCIÓN DE GEOLOCALIZACIÓN PARA OPTIMIZACIÓN (I.O.) -->
+                            <div class="section-header">
+                                <div class="section-icon text-primary">
+                                    <i class="bi bi-crosshair"></i>
+                                </div>
+                                <div>
+                                    <h5 class="section-title">Geolocalización y Coordenadas GPS</h5>
+                                    <small class="text-muted" style="font-size: 0.8rem;">Permite que el modelo de optimización matemática seleccione la clínica más cercana a ti.</small>
+                                </div>
+                            </div>
+                            <div class="card-body-custom">
+                                <div class="row g-3">
+                                    <div class="col-md-5">
+                                        <label for="latitud" class="form-label">Latitud</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-compass input-icon"></i>
+                                            <input type="number" step="any" id="latitud" class="form-control-custom"
+                                                th:field="*{latitud}" placeholder="10.4000">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="longitud" class="form-label">Longitud</label>
+                                        <div class="input-group-custom">
+                                            <i class="bi bi-compass input-icon"></i>
+                                            <input type="number" step="any" id="longitud" class="form-control-custom"
+                                                th:field="*{longitud}" placeholder="-75.5000">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-outline-primary w-100" id="btnDetectarGps" style="padding: 0.875rem 0.5rem; border-radius: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.25rem;" title="Obtener mi ubicación actual">
+                                            <i class="bi bi-geo-fill"></i> GPS
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="gpsStatusMsg" class="mt-2 text-muted small"></div>
                             </div>
 
                             <div class="section-divider"></div>
@@ -614,13 +662,45 @@
                 .catch(err => alert("Error al guardar: " + err));
         }
 
-        function cerrarCamara() {
-            const stream = video.srcObject;
-            if (stream) stream.getTracks().forEach(t => t.stop());
-            overlay.style.display = 'none';
+        // --- Detección de Geolocalización GPS para Optimización ---
+        const btnGps = document.getElementById('btnDetectarGps');
+        const latInput = document.getElementById('latitud');
+        const lngInput = document.getElementById('longitud');
+        const gpsStatus = document.getElementById('gpsStatusMsg');
+
+        if (btnGps) {
+            btnGps.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    gpsStatus.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Tu navegador no soporta geolocalización.</span>';
+                    return;
+                }
+                gpsStatus.innerHTML = '<span class="text-primary"><i class="bi bi-hourglass-split"></i> Obteniendo coordenadas de satélite...</span>';
+                btnGps.disabled = true;
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        latInput.value = lat;
+                        lngInput.value = lng;
+                        gpsStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill"></i> Coordenadas detectadas: Lat ' + lat + ', Lng ' + lng + '</span>';
+                        btnGps.disabled = false;
+                    },
+                    function(error) {
+                        let msg = 'No se pudo obtener la ubicación: ' + error.message;
+                        if (error.code === error.PERMISSION_DENIED) {
+                            msg = 'Permiso denegado. Activa la ubicación en tu navegador.';
+                        }
+                        gpsStatus.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill"></i> ' + msg + '</span>';
+                        btnGps.disabled = false;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            });
         }
     </script>
     <div th:replace="~{fragments/asistente_voz :: mic-button}"></div>
 </body>
+
 
 </html>
