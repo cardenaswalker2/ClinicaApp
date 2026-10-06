@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Encuentra la clínica veterinaria más cercana a tu ubicación en tiempo real.">
+    <meta name="description" content="Encuentra la clínica veterinaria más cercana a tu ubicación en tiempo real con ruta guiada.">
     <title>Clínica Más Cercana | ClínicaApp</title>
     <link th:replace="~{fragments/header :: favIcon}">
 
@@ -29,14 +29,14 @@
             --primary-glow: rgba(14, 165, 233, 0.35);
             --secondary: #6366f1;
             --success: #10b981;
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.7);
             --radius-md: 16px;
             --radius-lg: 24px;
         }
 
         [data-theme="dark"] {
-            --glass-bg: rgba(30, 41, 59, 0.9);
+            --glass-bg: rgba(30, 41, 59, 0.92);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
@@ -62,49 +62,145 @@
         }
 
         .winner-card {
-            background: linear-gradient(135deg, #059669 0%, #10b981 50%, #0ea5e9 100%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 45%, #0ea5e9 100%);
             color: white;
             border-radius: var(--radius-lg);
             padding: 2.25rem;
             position: relative;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.35);
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.4);
+        }
+
+        .winner-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .map-container-wrapper {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.06);
         }
 
         #mapOpt {
-            height: 440px;
+            height: 100%;
             width: 100%;
-            border-radius: var(--radius-md);
             z-index: 1;
         }
 
+        /* Boton flotante sobre el mapa */
+        .map-floating-panel {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] .map-floating-panel {
+            background: rgba(15, 23, 42, 0.95);
+            color: white;
+            border-color: rgba(255,255,255,0.1);
+        }
+
         .clinic-item {
-            padding: 1.25rem;
+            padding: 1.15rem;
             border-radius: var(--radius-md);
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.65);
             margin-bottom: 0.75rem;
             border: 1px solid var(--glass-border);
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+            cursor: pointer;
         }
 
         [data-theme="dark"] .clinic-item {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30, 41, 59, 0.65);
         }
 
         .clinic-item:hover {
             transform: translateY(-2px);
             background: white;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+            border-color: #0ea5e9;
         }
 
         [data-theme="dark"] .clinic-item:hover {
             background: rgba(30, 41, 59, 0.95);
+            border-color: #38bdf8;
         }
 
         .clinic-item.is-closest {
             border: 2px solid #10b981;
             background: rgba(16, 185, 129, 0.08);
+        }
+
+        /* Marker Pulses */
+        .user-pulse-marker {
+            position: relative;
+            width: 22px;
+            height: 22px;
+        }
+
+        .user-pulse-dot {
+            width: 22px;
+            height: 22px;
+            background: #ef4444;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        .user-pulse-ring {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.4);
+            animation: ringPulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+            z-index: 1;
+        }
+
+        @keyframes ringPulse {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 16px !important;
+            padding: 4px !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 12px 14px !important;
+            line-height: 1.5 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
     </style>
 </head>
@@ -117,15 +213,15 @@
     <main class="container py-4">
 
         <!-- CABECERA PRINCIPAL -->
-        <div class="text-center mb-4" data-aos="fade-down">
+        <div class="text-center mb-4">
             <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-2">
-                <i class="bi bi-geo-alt-fill"></i> GEOLOCALIZACIÓN EN TIEMPO REAL
+                <i class="bi bi-geo-alt-fill"></i> GEOLOCALIZACIÓN Y ENRUTAMIENTO EN TIEMPO REAL
             </span>
             <h1 class="fw-black display-6 mb-2" style="font-weight: 800;">
                 Clínicas Veterinarias Cercanas a Ti
             </h1>
-            <p class="text-muted mx-auto" style="max-width: 600px;">
-                Identificamos automáticamente la clínica veterinaria disponible más próxima a tu ubicación para que recibas atención oportuna.
+            <p class="text-muted mx-auto" style="max-width: 620px;">
+                Identificamos automáticamente la clínica veterinaria disponible más próxima y trazamos la ruta de viaje directa en el mapa.
             </p>
         </div>
 
@@ -134,7 +230,7 @@
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div class="d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm" id="btnLocalizarGps">
-                        <i class="bi bi-crosshair"></i> Usar mi ubicación actual
+                        <i class="bi bi-crosshair"></i> Usar mi ubicación actual (GPS)
                     </button>
                     <span id="gpsStatusText" class="text-muted small"></span>
                 </div>
@@ -142,7 +238,7 @@
                 <form id="optForm" th:action="@{/usuario/optimizacion-clinicas}" method="get" class="d-flex align-items-center gap-2 m-0">
                     <input type="hidden" id="inputLat" name="lat" th:value="${currentLat}">
                     <input type="hidden" id="inputLng" name="lng" th:value="${currentLng}">
-                    <label class="small text-muted fw-bold text-nowrap">Radio:</label>
+                    <label class="small text-muted fw-bold text-nowrap"><i class="bi bi-broadcast"></i> Radio de Búsqueda:</label>
                     <select class="form-select form-select-sm rounded-pill fw-bold" name="radio" onchange="this.form.submit()" style="width: 120px;">
                         <option value="5" th:selected="${currentRadio == 5}">5 km</option>
                         <option value="10" th:selected="${currentRadio == 10}">10 km</option>
@@ -155,10 +251,10 @@
         </div>
 
         <!-- TARJETA DESTACADA: CLÍNICA MÁS CERCANA -->
-        <div th:if="${resultadoOptimizacion.solucionEncontrada}" class="winner-card mb-4" data-aos="zoom-in">
+        <div th:if="${resultadoOptimizacion.solucionEncontrada}" class="winner-card mb-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <span class="badge bg-white text-success fw-bold px-3 py-1 rounded-pill mb-2">
+                    <span class="badge bg-white text-success fw-bold px-3 py-1 rounded-pill mb-2 shadow-sm">
                         <i class="bi bi-star-fill text-warning"></i> LA CLÍNICA MÁS CERCANA A TI
                     </span>
                     <h2 class="fw-bold mb-2 text-white" th:text="${resultadoOptimizacion.clinicaSeleccionada.nombre}">
@@ -170,17 +266,17 @@
                         <i class="bi bi-telephone-fill"></i> <span th:text="${resultadoOptimizacion.clinicaSeleccionada.telefono}">Teléfono</span>
                     </p>
                     <div class="d-flex gap-2 flex-wrap">
-                        <a th:href="@{/usuario/citas/solicitar(clinicaId=${resultadoOptimizacion.clinicaSeleccionada.id})}" class="btn btn-light fw-bold px-4 rounded-pill text-success shadow-sm">
+                        <a th:href="@{/usuario/citas/solicitar(clinicaId=${resultadoOptimizacion.clinicaSeleccionada.id})}" class="btn btn-light fw-bold px-4 rounded-pill text-success shadow">
                             <i class="bi bi-calendar-check-fill"></i> Agendar Cita Aquí
                         </a>
                         <a th:href="@{https://www.google.com/maps/dir/?api=1&destination={lat},{lng}(lat=${resultadoOptimizacion.clinicaSeleccionada.latitud},lng=${resultadoOptimizacion.clinicaSeleccionada.longitud})}" target="_blank" class="btn btn-outline-light fw-bold px-4 rounded-pill">
-                            <i class="bi bi-map-fill"></i> Cómo llegar (Google Maps)
+                            <i class="bi bi-map-fill"></i> Abrir en Google Maps
                         </a>
                     </div>
                 </div>
                 <div class="col-md-4 text-center mt-3 mt-md-0">
-                    <div class="bg-white p-3 rounded-4 shadow-sm text-dark d-inline-block text-center" style="min-width: 200px;">
-                        <small class="text-muted text-uppercase fw-bold d-block">Distancia de viaje</small>
+                    <div class="bg-white p-3 rounded-4 shadow text-dark d-inline-block text-center" style="min-width: 210px;">
+                        <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.75rem;">Distancia de viaje calculada</small>
                         <h1 class="fw-black text-primary mb-0" th:text="${resultadoOptimizacion.distanciaMinimaKm} + ' km'">1.7 km</h1>
                         <span class="badge bg-success-subtle text-success border border-success mt-1">
                             <i class="bi bi-check-circle-fill"></i> Clínica Disponible
@@ -192,21 +288,29 @@
 
         <div th:if="${!resultadoOptimizacion.solucionEncontrada}" class="alert alert-warning p-4 rounded-4 shadow-sm mb-4">
             <h5 class="fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> No encontramos clínicas en este radio</h5>
-            <p class="mb-0">Prueba aumentando el radio de búsqueda o actualizando tu ubicación.</p>
+            <p class="mb-0">Prueba aumentando el radio de búsqueda o actualizando tu ubicación con el botón GPS.</p>
         </div>
 
         <!-- SECCIÓN: MAPA Y OTRAS ALTERNATIVAS CERCANAS -->
         <div class="row g-4">
-            <!-- MAPA -->
+            <!-- MAPA INTERACTIVO -->
             <div class="col-lg-7">
                 <div class="glass-card p-3 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-2 px-2">
-                        <h6 class="fw-bold text-primary mb-0"><i class="bi bi-map"></i> Mapa de clínicas en tu zona</h6>
+                        <h6 class="fw-bold text-primary mb-0">
+                            <i class="bi bi-map"></i> Mapa de Ruta y Clínicas en tu zona
+                        </h6>
                         <span class="badge bg-light text-dark border">
                             <span th:text="${resultadoOptimizacion.clinicasFactibles}">0</span> opciones encontradas
                         </span>
                     </div>
-                    <div id="mapOpt"></div>
+                    
+                    <div class="map-container-wrapper">
+                        <div id="mapOpt"></div>
+                        <div class="map-floating-panel">
+                            <i class="bi bi-pin-map-fill text-danger"></i> <span id="routeInfoBadge">Ruta a la más cercana trazada</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -214,30 +318,39 @@
             <div class="col-lg-5">
                 <div class="glass-card p-3 h-100">
                     <h6 class="fw-bold text-primary mb-3 px-2">
-                        <i class="bi bi-list-ul"></i> Clínicas ordenadas por distancia
+                        <i class="bi bi-list-ul"></i> Clínicas ordenadas por cercanía
                     </h6>
 
-                    <div style="max-height: 440px; overflow-y: auto; padding-right: 5px;">
+                    <div style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
                         <div th:each="var : ${resultadoOptimizacion.variablesDecision}" 
                              th:if="${var.disponible}"
                              class="clinic-item" 
-                             th:classappend="${var.valorOptimo == 1} ? 'is-closest' : ''">
+                             th:classappend="${var.valorOptimo == 1} ? 'is-closest' : ''"
+                             th:attr="data-lat=${var.latitud},data-lng=${var.longitud},data-nombre=${var.clinicaNombre},data-dist=${var.distanciaKm}"
+                             onclick="centrarEnClinica(this)">
                             <div class="d-flex justify-content-between align-items-start mb-1">
-                                <h6 class="fw-bold mb-0" th:text="${var.clinicaNombre}">Nombre de Clínica</h6>
+                                <h6 class="fw-bold mb-0 text-dark" th:text="${var.clinicaNombre}">Nombre de Clínica</h6>
                                 <span class="badge bg-primary-subtle text-primary fw-bold" th:text="${var.distanciaKm} + ' km'">2.1 km</span>
                             </div>
                             <p class="small text-muted mb-2 text-truncate" th:text="${var.direccion}">Dirección</p>
                             
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span th:if="${var.valorOptimo == 1}" class="badge bg-success text-white fw-bold">
-                                    <i class="bi bi-check-circle"></i> Más cercana
-                                </span>
-                                <span th:if="${var.valorOptimo == 0}" class="badge bg-light text-muted">
-                                    Disponible
-                                </span>
-                                <a th:href="@{/usuario/citas/solicitar(clinicaId=${var.clinicaId})}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold">
-                                    Agendar
-                                </a>
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <div>
+                                    <span th:if="${var.valorOptimo == 1}" class="badge bg-success text-white fw-bold">
+                                        <i class="bi bi-check-circle-fill"></i> Más cercana
+                                    </span>
+                                    <span th:if="${var.valorOptimo == 0}" class="badge bg-light text-muted border">
+                                        Disponible
+                                    </span>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" style="font-size: 0.75rem;" title="Trazar ruta hacia aquí" onclick="event.stopPropagation(); trazarRutaHacia(this.closest('.clinic-item'))">
+                                        <i class="bi bi-signpost-2-fill text-primary"></i> Ruta
+                                    </button>
+                                    <a th:href="@{/usuario/citas/solicitar(clinicaId=${var.clinicaId})}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold px-3" onclick="event.stopPropagation()">
+                                        Agendar
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -247,7 +360,7 @@
 
     </main>
 
-    <!-- Leaflet & GPS Script -->
+    <!-- Leaflet & Real Route Engine Script -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         const userLat = /*[[${resultadoOptimizacion.userLat}]]*/ 10.3910;
@@ -255,63 +368,193 @@
         const radioKm = /*[[${resultadoOptimizacion.radioMaxKm}]]*/ 15.0;
         const variables = /*[[${resultadoOptimizacion.variablesDecision}]]*/ [];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const map = L.map('mapOpt').setView([userLat, userLng], 12);
+        let map = null;
+        let routeLayer = null;
+        const clinicMarkers = {};
 
+        function initMap() {
+            const mapContainer = document.getElementById('mapOpt');
+            if (!mapContainer) return;
+
+            map = L.map('mapOpt', {
+                center: [userLat, userLng],
+                zoom: 13,
+                zoomControl: true
+            });
+
+            // Usar mosaico OpenStreetMap con alta disponibilidad
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors | ClínicaApp'
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors | ClínicaApp Geo'
             }).addTo(map);
 
+            // Icono Usuario con Pulso Radiante
             const userIcon = L.divIcon({
-                className: 'custom-user-marker',
-                html: '<div style="background:#ef4444; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(239,68,68,0.8);"></div>',
-                iconSize: [20, 20]
+                className: 'custom-user-marker-wrapper',
+                html: '<div class="user-pulse-marker"><div class="user-pulse-ring"></div><div class="user-pulse-dot"></div></div>',
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
             });
 
+            // Icono Ganadora (Estrella Dorada Verde)
             const winnerIcon = L.divIcon({
                 className: 'custom-winner-marker',
-                html: '<div style="background:#10b981; width:26px; height:26px; border-radius:50%; border:3px solid white; box-shadow:0 0 12px rgba(16,185,129,0.9); display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">★</div>',
-                iconSize: [26, 26]
+                html: '<div style="background:linear-gradient(135deg, #10b981, #059669); width:32px; height:32px; border-radius:50%; border:3px solid white; box-shadow:0 4px 15px rgba(16,185,129,0.8); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:bold;"><i class="bi bi-star-fill text-warning"></i></div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
             });
 
+            // Icono Clínicas Regulares
             const regularIcon = L.divIcon({
                 className: 'custom-regular-marker',
-                html: '<div style="background:#0ea5e9; width:16px; height:16px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(14,165,233,0.6);"></div>',
-                iconSize: [16, 16]
+                html: '<div style="background:linear-gradient(135deg, #0ea5e9, #0284c7); width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 3px 10px rgba(14,165,233,0.7); display:flex; align-items:center; justify-content:center; color:white; font-size:11px;"><i class="bi bi-hospital-fill"></i></div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
             });
 
-            // Marcador usuario
+            // Marcador Usuario
             const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
-            userMarker.bindPopup('<b>📍 Tu Ubicación Actual</b>').openPopup();
+            userMarker.bindPopup(`
+                <div style="text-align:center;">
+                    <span style="color:#ef4444; font-weight:bold; font-size:0.9rem;">📍 Tu Ubicación Actual</span><br>
+                    <small style="color:#64748b;">(${userLat.toFixed(4)}, ${userLng.toFixed(4)})</small>
+                </div>
+            `).openPopup();
 
-            // Círculo radio
+            // Círculo de Radio de Búsqueda
             L.circle([userLat, userLng], {
                 color: '#0ea5e9',
+                weight: 2,
+                dashArray: '6, 6',
                 fillColor: '#38bdf8',
-                fillOpacity: 0.08,
+                fillOpacity: 0.07,
                 radius: radioKm * 1000
             }).addTo(map);
 
-            // Marcadores clínicas
+            let winnerClinica = null;
+
+            // Marcadores de Clínicas
             if (variables && variables.length > 0) {
                 variables.forEach(function(v) {
                     if (!v.disponible) return;
                     const isWinner = (v.valorOptimo === 1);
-                    const markerIcon = isWinner ? winnerIcon : regularIcon;
-                    const marker = L.marker([v.latitud, v.longitud], { icon: markerIcon }).addTo(map);
+                    if (isWinner) winnerClinica = v;
 
-                    let popup = '<b>' + v.clinicaNombre + '</b><br>Distancia: ' + v.distanciaKm + ' km';
-                    if (isWinner) {
-                        popup += '<br><strong style="color:#059669;">★ La más cercana</strong>';
-                        L.polyline([[userLat, userLng], [v.latitud, v.longitud]], {
-                            color: '#10b981', weight: 3, dashArray: '5, 10'
-                        }).addTo(map);
-                    }
-                    marker.bindPopup(popup);
+                    const marker = L.marker([v.latitud, v.longitud], {
+                        icon: isWinner ? winnerIcon : regularIcon,
+                        zIndexOffset: isWinner ? 1000 : 100
+                    }).addTo(map);
+
+                    const gMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${v.latitud},${v.longitud}`;
+                    const popupHtml = `
+                        <div style="min-width: 180px;">
+                            <h6 style="margin:0 0 4px 0; font-weight:800; color:#0f172a;">${v.clinicaNombre}</h6>
+                            <div style="font-size:0.8rem; color:#64748b; margin-bottom:6px;">${v.direccion}</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <span style="background:#e0f2fe; color:#0284c7; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:10px;">${v.distanciaKm} km</span>
+                                ${isWinner ? '<span style="color:#059669; font-weight:800; font-size:0.75rem;">★ La más cercana</span>' : ''}
+                            </div>
+                            <a href="${gMapsUrl}" target="_blank" style="display:block; text-align:center; background:#0ea5e9; color:white; text-decoration:none; padding:5px 10px; border-radius:20px; font-weight:700; font-size:0.75rem;">
+                                <i class="bi bi-map-fill"></i> Abrir en Google Maps
+                            </a>
+                        </div>
+                    `;
+                    marker.bindPopup(popupHtml);
+                    clinicMarkers[v.clinicaNombre] = marker;
                 });
             }
 
-            // GPS Click
+            // Trazar Ruta por carreteras hacia la clínica más cercana
+            if (winnerClinica) {
+                fetchRoadRoute(userLat, userLng, winnerClinica.latitud, winnerClinica.longitud, winnerClinica.clinicaNombre);
+            }
+
+            // Forzar render de tiles de mapa
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
+        }
+
+        // Trazar ruta real por carreteras usando OSRM (Open Source Routing Machine)
+        function fetchRoadRoute(startLat, startLng, endLat, endLng, clinicaNombre) {
+            if (routeLayer) {
+                map.removeLayer(routeLayer);
+            }
+
+            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
+
+            fetch(osrmUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.routes && data.routes.length > 0) {
+                        const route = data.routes[0];
+                        const coordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                        const distanciaRealKm = (route.distance / 1000).toFixed(2);
+                        const duracionMin = Math.round(route.duration / 60);
+
+                        // Línea de ruta moderna con resplandor
+                        const glowLine = L.polyline(coordinates, {
+                            color: '#10b981',
+                            weight: 8,
+                            opacity: 0.3
+                        });
+                        const mainLine = L.polyline(coordinates, {
+                            color: '#059669',
+                            weight: 4,
+                            opacity: 0.95
+                        });
+
+                        routeLayer = L.featureGroup([glowLine, mainLine]).addTo(map);
+
+                        const badge = document.getElementById('routeInfoBadge');
+                        if (badge) {
+                            badge.innerHTML = `Ruta a <b>${clinicaNombre}</b>: ${distanciaRealKm} km (~${duracionMin} min)`;
+                        }
+
+                        // Ajustar vista para encuadrar la ruta
+                        map.fitBounds(mainLine.getBounds(), { padding: [40, 40] });
+                    } else {
+                        // Fallback a línea recta
+                        trazarLineaDirecta(startLat, startLng, endLat, endLng);
+                    }
+                })
+                .catch(() => {
+                    trazarLineaDirecta(startLat, startLng, endLat, endLng);
+                });
+        }
+
+        function trazarLineaDirecta(startLat, startLng, endLat, endLng) {
+            routeLayer = L.polyline([[startLat, startLng], [endLat, endLng]], {
+                color: '#10b981',
+                weight: 4,
+                dashArray: '6, 10'
+            }).addTo(map);
+            map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
+        }
+
+        function centrarEnClinica(elem) {
+            const lat = parseFloat(elem.getAttribute('data-lat'));
+            const lng = parseFloat(elem.getAttribute('data-lng'));
+            const nombre = elem.getAttribute('data-nombre');
+
+            if (map && clinicMarkers[nombre]) {
+                map.setView([lat, lng], 15);
+                clinicMarkers[nombre].openPopup();
+            }
+        }
+
+        function trazarRutaHacia(elem) {
+            const lat = parseFloat(elem.getAttribute('data-lat'));
+            const lng = parseFloat(elem.getAttribute('data-lng'));
+            const nombre = elem.getAttribute('data-nombre');
+
+            fetchRoadRoute(userLat, userLng, lat, lng, nombre);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+
+            // GPS Click Handler
             const btnGps = document.getElementById('btnLocalizarGps');
             const statusTxt = document.getElementById('gpsStatusText');
 
@@ -321,7 +564,7 @@
                         alert('Geolocalización no soportada en este navegador.');
                         return;
                     }
-                    statusTxt.innerHTML = '<span class="text-primary"><i class="bi bi-hourglass-split"></i> Buscando...</span>';
+                    statusTxt.innerHTML = '<span class="text-primary"><i class="bi bi-hourglass-split"></i> Obteniendo coordenadas exactas...</span>';
                     navigator.geolocation.getCurrentPosition(function(pos) {
                         document.getElementById('inputLat').value = pos.coords.latitude.toFixed(6);
                         document.getElementById('inputLng').value = pos.coords.longitude.toFixed(6);
