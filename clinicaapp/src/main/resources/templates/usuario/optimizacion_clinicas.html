@@ -15,9 +15,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Header Styles -->
     <th:block th:replace="~{fragments/header :: headerStyles}"></th:block>
@@ -372,111 +373,137 @@
         let routeLayer = null;
         const clinicMarkers = {};
 
-        function initMap() {
+        function startMapEngine() {
+            if (typeof L === 'undefined') {
+                console.warn('Leaflet aún no está disponible, reintentando en 150ms...');
+                setTimeout(startMapEngine, 150);
+                return;
+            }
+
             const mapContainer = document.getElementById('mapOpt');
             if (!mapContainer) return;
 
-            map = L.map('mapOpt', {
-                center: [userLat, userLng],
-                zoom: 13,
-                zoomControl: true
-            });
-
-            // Usar mosaico OpenStreetMap con alta disponibilidad
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors | ClínicaApp Geo'
-            }).addTo(map);
-
-            // Icono Usuario con Pulso Radiante
-            const userIcon = L.divIcon({
-                className: 'custom-user-marker-wrapper',
-                html: '<div class="user-pulse-marker"><div class="user-pulse-ring"></div><div class="user-pulse-dot"></div></div>',
-                iconSize: [22, 22],
-                iconAnchor: [11, 11]
-            });
-
-            // Icono Ganadora (Estrella Dorada Verde)
-            const winnerIcon = L.divIcon({
-                className: 'custom-winner-marker',
-                html: '<div style="background:linear-gradient(135deg, #10b981, #059669); width:32px; height:32px; border-radius:50%; border:3px solid white; box-shadow:0 4px 15px rgba(16,185,129,0.8); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:bold;"><i class="bi bi-star-fill text-warning"></i></div>',
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
-            });
-
-            // Icono Clínicas Regulares
-            const regularIcon = L.divIcon({
-                className: 'custom-regular-marker',
-                html: '<div style="background:linear-gradient(135deg, #0ea5e9, #0284c7); width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 3px 10px rgba(14,165,233,0.7); display:flex; align-items:center; justify-content:center; color:white; font-size:11px;"><i class="bi bi-hospital-fill"></i></div>',
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
-            });
-
-            // Marcador Usuario
-            const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
-            userMarker.bindPopup(`
-                <div style="text-align:center;">
-                    <span style="color:#ef4444; font-weight:bold; font-size:0.9rem;">📍 Tu Ubicación Actual</span><br>
-                    <small style="color:#64748b;">(${userLat.toFixed(4)}, ${userLng.toFixed(4)})</small>
-                </div>
-            `).openPopup();
-
-            // Círculo de Radio de Búsqueda
-            L.circle([userLat, userLng], {
-                color: '#0ea5e9',
-                weight: 2,
-                dashArray: '6, 6',
-                fillColor: '#38bdf8',
-                fillOpacity: 0.07,
-                radius: radioKm * 1000
-            }).addTo(map);
-
-            let winnerClinica = null;
-
-            // Marcadores de Clínicas
-            if (variables && variables.length > 0) {
-                variables.forEach(function(v) {
-                    if (!v.disponible) return;
-                    const isWinner = (v.valorOptimo === 1);
-                    if (isWinner) winnerClinica = v;
-
-                    const marker = L.marker([v.latitud, v.longitud], {
-                        icon: isWinner ? winnerIcon : regularIcon,
-                        zIndexOffset: isWinner ? 1000 : 100
-                    }).addTo(map);
-
-                    const gMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${v.latitud},${v.longitud}`;
-                    const popupHtml = `
-                        <div style="min-width: 180px;">
-                            <h6 style="margin:0 0 4px 0; font-weight:800; color:#0f172a;">${v.clinicaNombre}</h6>
-                            <div style="font-size:0.8rem; color:#64748b; margin-bottom:6px;">${v.direccion}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                                <span style="background:#e0f2fe; color:#0284c7; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:10px;">${v.distanciaKm} km</span>
-                                ${isWinner ? '<span style="color:#059669; font-weight:800; font-size:0.75rem;">★ La más cercana</span>' : ''}
-                            </div>
-                            <a href="${gMapsUrl}" target="_blank" style="display:block; text-align:center; background:#0ea5e9; color:white; text-decoration:none; padding:5px 10px; border-radius:20px; font-weight:700; font-size:0.75rem;">
-                                <i class="bi bi-map-fill"></i> Abrir en Google Maps
-                            </a>
-                        </div>
-                    `;
-                    marker.bindPopup(popupHtml);
-                    clinicMarkers[v.clinicaNombre] = marker;
+            try {
+                map = L.map('mapOpt', {
+                    center: [userLat, userLng],
+                    zoom: 13,
+                    zoomControl: true,
+                    preferCanvas: true
                 });
-            }
 
-            // Trazar Ruta por carreteras hacia la clínica más cercana
-            if (winnerClinica) {
-                fetchRoadRoute(userLat, userLng, winnerClinica.latitud, winnerClinica.longitud, winnerClinica.clinicaNombre);
-            }
+                // Capa de mapas de alta velocidad y compatibilidad mundial (CartoDB / OpenStreetMap)
+                const osmLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="https://carto.com/">CARTO</a> | ClínicaApp Maps'
+                });
 
-            // Forzar render de tiles de mapa
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 300);
+                const standardOsm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                });
+
+                osmLayer.addTo(map);
+
+                // Control de Capas
+                L.control.layers({
+                    "Vista Moderna (Recomendada)": osmLayer,
+                    "OpenStreetMap Estándar": standardOsm
+                }, null, { position: 'bottomright' }).addTo(map);
+
+                // Icono Usuario con Pulso Radiante
+                const userIcon = L.divIcon({
+                    className: 'custom-user-marker-wrapper',
+                    html: '<div class="user-pulse-marker"><div class="user-pulse-ring"></div><div class="user-pulse-dot"></div></div>',
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                });
+
+                // Icono Ganadora (Estrella Dorada Verde)
+                const winnerIcon = L.divIcon({
+                    className: 'custom-winner-marker',
+                    html: '<div style="background:linear-gradient(135deg, #10b981, #059669); width:32px; height:32px; border-radius:50%; border:3px solid white; box-shadow:0 4px 15px rgba(16,185,129,0.8); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; font-weight:bold;"><i class="bi bi-star-fill text-warning"></i></div>',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+
+                // Icono Clínicas Regulares
+                const regularIcon = L.divIcon({
+                    className: 'custom-regular-marker',
+                    html: '<div style="background:linear-gradient(135deg, #0ea5e9, #0284c7); width:24px; height:24px; border-radius:50%; border:2px solid white; box-shadow:0 3px 10px rgba(14,165,233,0.7); display:flex; align-items:center; justify-content:center; color:white; font-size:11px;"><i class="bi bi-hospital-fill"></i></div>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                // Marcador Usuario
+                const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
+                userMarker.bindPopup(`
+                    <div style="text-align:center;">
+                        <span style="color:#ef4444; font-weight:bold; font-size:0.9rem;">📍 Tu Ubicación Actual</span><br>
+                        <small style="color:#64748b;">(${userLat.toFixed(4)}, ${userLng.toFixed(4)})</small>
+                    </div>
+                `).openPopup();
+
+                // Círculo de Radio de Búsqueda
+                L.circle([userLat, userLng], {
+                    color: '#0ea5e9',
+                    weight: 2,
+                    dashArray: '6, 6',
+                    fillColor: '#38bdf8',
+                    fillOpacity: 0.07,
+                    radius: radioKm * 1000
+                }).addTo(map);
+
+                let winnerClinica = null;
+
+                // Marcadores de Clínicas
+                if (variables && variables.length > 0) {
+                    variables.forEach(function(v) {
+                        if (!v.disponible) return;
+                        const isWinner = (v.valorOptimo === 1);
+                        if (isWinner) winnerClinica = v;
+
+                        const marker = L.marker([v.latitud, v.longitud], {
+                            icon: isWinner ? winnerIcon : regularIcon,
+                            zIndexOffset: isWinner ? 1000 : 100
+                        }).addTo(map);
+
+                        const gMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${v.latitud},${v.longitud}`;
+                        const popupHtml = `
+                            <div style="min-width: 180px;">
+                                <h6 style="margin:0 0 4px 0; font-weight:800; color:#0f172a;">${v.clinicaNombre}</h6>
+                                <div style="font-size:0.8rem; color:#64748b; margin-bottom:6px;">${v.direccion}</div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <span style="background:#e0f2fe; color:#0284c7; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:10px;">${v.distanciaKm} km</span>
+                                    ${isWinner ? '<span style="color:#059669; font-weight:800; font-size:0.75rem;">★ La más cercana</span>' : ''}
+                                </div>
+                                <a href="${gMapsUrl}" target="_blank" style="display:block; text-align:center; background:#0ea5e9; color:white; text-decoration:none; padding:5px 10px; border-radius:20px; font-weight:700; font-size:0.75rem;">
+                                    <i class="bi bi-map-fill"></i> Abrir en Google Maps
+                                </a>
+                            </div>
+                        `;
+                        marker.bindPopup(popupHtml);
+                        clinicMarkers[v.clinicaNombre] = marker;
+                    });
+                }
+
+                // Trazar Ruta por carreteras hacia la clínica más cercana
+                if (winnerClinica) {
+                    fetchRoadRoute(userLat, userLng, winnerClinica.latitud, winnerClinica.longitud, winnerClinica.clinicaNombre);
+                }
+
+                // Invalidate size en intervalos para asegurar que pinte en cualquier render
+                setTimeout(() => map.invalidateSize(), 100);
+                setTimeout(() => map.invalidateSize(), 500);
+                setTimeout(() => map.invalidateSize(), 1000);
+
+            } catch (err) {
+                console.error("Error inicializando mapa Leaflet:", err);
+            }
         }
 
-        // Trazar ruta real por carreteras usando OSRM (Open Source Routing Machine)
+        // Trazar ruta real por carreteras usando OSRM
         function fetchRoadRoute(startLat, startLng, endLat, endLng, clinicaNombre) {
+            if (!map) return;
             if (routeLayer) {
                 map.removeLayer(routeLayer);
             }
@@ -496,7 +523,7 @@
                         const glowLine = L.polyline(coordinates, {
                             color: '#10b981',
                             weight: 8,
-                            opacity: 0.3
+                            opacity: 0.35
                         });
                         const mainLine = L.polyline(coordinates, {
                             color: '#059669',
@@ -514,7 +541,6 @@
                         // Ajustar vista para encuadrar la ruta
                         map.fitBounds(mainLine.getBounds(), { padding: [40, 40] });
                     } else {
-                        // Fallback a línea recta
                         trazarLineaDirecta(startLat, startLng, endLat, endLng);
                     }
                 })
@@ -524,6 +550,7 @@
         }
 
         function trazarLineaDirecta(startLat, startLng, endLat, endLng) {
+            if (!map) return;
             routeLayer = L.polyline([[startLat, startLng], [endLat, endLng]], {
                 color: '#10b981',
                 weight: 4,
@@ -551,8 +578,8 @@
             fetchRoadRoute(userLat, userLng, lat, lng, nombre);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initMap();
+        window.addEventListener('load', function() {
+            startMapEngine();
 
             // GPS Click Handler
             const btnGps = document.getElementById('btnLocalizarGps');
