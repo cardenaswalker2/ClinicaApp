@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Módulo de Investigación de Operaciones de ClínicaApp. Modelo de optimización matemática para selección de clínicas según ubicación geodésica.">
-    <title>Optimización de Clínicas (I.O.) | ClínicaApp</title>
+    <meta name="description" content="Encuentra la clínica veterinaria más cercana a tu ubicación en tiempo real.">
+    <title>Clínica Más Cercana | ClínicaApp</title>
     <link th:replace="~{fragments/header :: favIcon}">
 
     <!-- Bootstrap 5.3 CSS -->
@@ -14,16 +14,10 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- MathJax for rendering LaTeX math formulas -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Header Styles -->
     <th:block th:replace="~{fragments/header :: headerStyles}"></th:block>
@@ -35,18 +29,14 @@
             --primary-glow: rgba(14, 165, 233, 0.35);
             --secondary: #6366f1;
             --success: #10b981;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --dark-card: #1e293b;
-            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.9);
             --glass-border: rgba(255, 255, 255, 0.6);
             --radius-md: 16px;
             --radius-lg: 24px;
-            --radius-xl: 32px;
         }
 
         [data-theme="dark"] {
-            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glass-bg: rgba(30, 41, 59, 0.9);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
@@ -62,138 +52,59 @@
             color: #f1f5f9;
         }
 
-        .code-font {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .glass-panel {
+        .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: var(--radius-lg);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-        }
-
-        .glass-panel:hover {
-            box-shadow: 0 25px 50px -12px rgba(14, 165, 233, 0.15);
-        }
-
-        .hero-banner {
-            padding: 3rem 0 2rem;
-            position: relative;
-        }
-
-        .badge-academic {
-            background: linear-gradient(135deg, #6366f1, #0ea5e9);
-            color: white;
-            padding: 0.5rem 1.25rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 15px var(--primary-glow);
-        }
-
-        .formula-box {
-            background: rgba(15, 23, 42, 0.92);
-            color: #38bdf8;
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow-x: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
         }
 
         .winner-card {
             background: linear-gradient(135deg, #059669 0%, #10b981 50%, #0ea5e9 100%);
             color: white;
             border-radius: var(--radius-lg);
-            padding: 2rem;
+            padding: 2.25rem;
             position: relative;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.4);
-        }
-
-        .winner-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
-            animation: float-glow 6s infinite alternate;
-        }
-
-        @keyframes float-glow {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.2); }
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.35);
         }
 
         #mapOpt {
-            height: 480px;
+            height: 440px;
             width: 100%;
             border-radius: var(--radius-md);
             z-index: 1;
         }
 
-        .table-custom {
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-
-        .table-custom tr {
-            background: rgba(255, 255, 255, 0.7);
+        .clinic-item {
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--glass-border);
             transition: all 0.2s ease;
         }
 
-        [data-theme="dark"] .table-custom tr {
-            background: rgba(30, 41, 59, 0.7);
+        [data-theme="dark"] .clinic-item {
+            background: rgba(30, 41, 59, 0.6);
         }
 
-        .table-custom tr:hover {
-            transform: scale(1.01);
-            background: rgba(255, 255, 255, 0.95);
+        .clinic-item:hover {
+            transform: translateY(-2px);
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
         }
 
-        [data-theme="dark"] .table-custom tr:hover {
+        [data-theme="dark"] .clinic-item:hover {
             background: rgba(30, 41, 59, 0.95);
         }
 
-        .table-custom td, .table-custom th {
-            padding: 1rem;
-            border: none;
-        }
-
-        .table-custom td:first-child, .table-custom th:first-child {
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
-        }
-
-        .table-custom td:last-child, .table-custom th:last-child {
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-
-        .badge-winner {
-            background: #10b981;
-            color: white;
-            font-weight: 800;
-            padding: 0.35rem 0.75rem;
-            border-radius: 9999px;
-            animation: pulse-badge 2s infinite;
-        }
-
-        @keyframes pulse-badge {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        .clinic-item.is-closest {
+            border: 2px solid #10b981;
+            background: rgba(16, 185, 129, 0.08);
         }
     </style>
 </head>
@@ -209,101 +120,74 @@
 
     <main class="container py-4">
 
-        <!-- HEADER HERO ACADÉMICO -->
-        <div class="hero-banner text-center" data-aos="fade-down">
-            <div class="badge-academic mb-3">
-                <i class="bi bi-mortarboard-fill"></i> INVESTIGACIÓN DE OPERACIONES | MODELO DE OPTIMIZACIÓN
-            </div>
-            <h1 class="fw-black display-5 mb-2" style="font-weight: 900;">
-                Selección Óptima de Clínicas Veterinarias
+        <!-- CABECERA PRINCIPAL -->
+        <div class="text-center mb-4" data-aos="fade-down">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-2">
+                <i class="bi bi-geo-alt-fill"></i> GEOLOCALIZACIÓN EN TIEMPO REAL
+            </span>
+            <h1 class="fw-black display-6 mb-2" style="font-weight: 800;">
+                Clínicas Veterinarias Cercanas a Ti
             </h1>
-            <p class="lead text-muted mx-auto" style="max-width: 800px;">
-                Implementación computacional del modelo de <strong>Programación Lineal Entera Binaria (PLEB)</strong> con cálculo de distancias geodésicas (Haversine) y restricciones de cobertura y disponibilidad.
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Identificamos automáticamente la clínica veterinaria disponible más próxima a tu ubicación para que recibas atención oportuna.
             </p>
         </div>
 
-        <!-- PANEL DE CONTROL DE PARÁMETROS -->
-        <div class="glass-panel p-4 mb-4">
-            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                <h5 class="fw-bold mb-0 text-primary">
-                    <i class="bi bi-sliders2-vertical"></i> Parámetros de Entrada del Modelo
-                </h5>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill fw-bold" id="btnLocalizarGps">
-                        <i class="bi bi-crosshair"></i> Obtener mi Ubicación GPS
+        <!-- BARRA DE ACCIONES RÁPIDAS (GPS Y FILTROS) -->
+        <div class="glass-card p-3 mb-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-primary rounded-pill fw-bold px-4 shadow-sm" id="btnLocalizarGps">
+                        <i class="bi bi-crosshair"></i> Usar mi ubicación actual
                     </button>
-                    <button type="button" class="btn btn-primary btn-sm rounded-pill fw-bold px-3" id="btnGuardarUbicacionPerfil" sec:authorize="isAuthenticated()">
-                        <i class="bi bi-save"></i> Guardar en mi Perfil
-                    </button>
+                    <span id="gpsStatusText" class="text-muted small"></span>
                 </div>
-            </div>
 
-            <form id="optForm" th:action="@{/usuario/optimizacion-clinicas}" method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold">Latitud del Usuario (\(lat_u\))</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="bi bi-geo"></i></span>
-                        <input type="number" step="any" class="form-control code-font fw-bold" id="inputLat" name="lat" th:value="${currentLat}" required>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold">Longitud del Usuario (\(lon_u\))</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="bi bi-geo"></i></span>
-                        <input type="number" step="any" class="form-control code-font fw-bold" id="inputLng" name="lng" th:value="${currentLng}" required>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Radio Máximo \(D_{max}\) (km)</label>
-                    <div class="input-group">
-                        <input type="number" step="1" min="1" max="100" class="form-control code-font fw-bold" id="inputRadio" name="radio" th:value="${currentRadio != null ? currentRadio : 15}">
-                        <span class="input-group-text bg-white">km</span>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" style="border-radius: 12px;">
-                        <i class="bi bi-lightning-charge-fill"></i> Resolver
-                    </button>
-                </div>
-            </form>
-            <div id="gpsAlert" class="mt-2 small"></div>
+                <form id="optForm" th:action="@{/usuario/optimizacion-clinicas}" method="get" class="d-flex align-items-center gap-2 m-0">
+                    <input type="hidden" id="inputLat" name="lat" th:value="${currentLat}">
+                    <input type="hidden" id="inputLng" name="lng" th:value="${currentLng}">
+                    <label class="small text-muted fw-bold text-nowrap">Radio:</label>
+                    <select class="form-select form-select-sm rounded-pill fw-bold" name="radio" onchange="this.form.submit()" style="width: 120px;">
+                        <option value="5" th:selected="${currentRadio == 5}">5 km</option>
+                        <option value="10" th:selected="${currentRadio == 10}">10 km</option>
+                        <option value="15" th:selected="${currentRadio == 15 or currentRadio == null}">15 km</option>
+                        <option value="25" th:selected="${currentRadio == 25}">25 km</option>
+                        <option value="50" th:selected="${currentRadio == 50}">50 km</option>
+                    </select>
+                </form>
+            </div>
         </div>
 
-        <!-- SOLUCIÓN ÓPTIMA DESTACADA (Z*) -->
+        <!-- TARJETA DESTACADA: CLÍNICA MÁS CERCANA -->
         <div th:if="${resultadoOptimizacion.solucionEncontrada}" class="winner-card mb-4" data-aos="zoom-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge bg-white text-dark fw-bold px-3 py-1 rounded-pill">
-                            <i class="bi bi-trophy-fill text-warning"></i> SOLUCIÓN ÓPTIMA: \(X_k = 1\)
-                        </span>
-                        <span class="badge bg-dark text-white fw-bold px-3 py-1 rounded-pill">
-                            \(Z^* = \) <span th:text="${resultadoOptimizacion.distanciaMinimaKm}">0.0</span> km
-                        </span>
-                    </div>
+                    <span class="badge bg-white text-success fw-bold px-3 py-1 rounded-pill mb-2">
+                        <i class="bi bi-star-fill text-warning"></i> LA CLÍNICA MÁS CERCANA A TI
+                    </span>
                     <h2 class="fw-bold mb-2 text-white" th:text="${resultadoOptimizacion.clinicaSeleccionada.nombre}">
-                        Clínica Seleccionada
+                        Clínica Más Cercana
                     </h2>
-                    <p class="mb-3 opacity-90 text-white">
-                        <i class="bi bi-geo-alt-fill"></i> <span th:text="${resultadoOptimizacion.clinicaSeleccionada.direccion}">Dirección</span> | 
-                        <i class="bi bi-clock-fill"></i> <span th:text="${resultadoOptimizacion.clinicaSeleccionada.horarioAtencion}">Horario</span> | 
+                    <p class="mb-3 opacity-90 text-white" style="font-size: 0.95rem;">
+                        <i class="bi bi-geo-alt-fill"></i> <span th:text="${resultadoOptimizacion.clinicaSeleccionada.direccion}">Dirección</span><br>
+                        <i class="bi bi-clock-fill"></i> <span th:text="${resultadoOptimizacion.clinicaSeleccionada.horarioAtencion}">Horario</span> &nbsp;|&nbsp; 
                         <i class="bi bi-telephone-fill"></i> <span th:text="${resultadoOptimizacion.clinicaSeleccionada.telefono}">Teléfono</span>
                     </p>
-                    <div class="d-flex gap-3 flex-wrap">
+                    <div class="d-flex gap-2 flex-wrap">
                         <a th:href="@{/usuario/citas/solicitar(clinicaId=${resultadoOptimizacion.clinicaSeleccionada.id})}" class="btn btn-light fw-bold px-4 rounded-pill text-success shadow-sm">
-                            <i class="bi bi-calendar-check-fill"></i> Agendar Cita en esta Clínica
+                            <i class="bi bi-calendar-check-fill"></i> Agendar Cita Aquí
                         </a>
                         <a th:href="@{https://www.google.com/maps/dir/?api=1&destination={lat},{lng}(lat=${resultadoOptimizacion.clinicaSeleccionada.latitud},lng=${resultadoOptimizacion.clinicaSeleccionada.longitud})}" target="_blank" class="btn btn-outline-light fw-bold px-4 rounded-pill">
-                            <i class="bi bi-map-fill"></i> Ver Ruta en GPS
+                            <i class="bi bi-map-fill"></i> Cómo llegar (Google Maps)
                         </a>
                     </div>
                 </div>
                 <div class="col-md-4 text-center mt-3 mt-md-0">
-                    <div class="bg-white p-3 rounded-4 shadow-sm text-dark d-inline-block text-center" style="min-width: 220px;">
-                        <small class="text-muted text-uppercase fw-bold d-block">Distancia Mínima (\(d_i\))</small>
+                    <div class="bg-white p-3 rounded-4 shadow-sm text-dark d-inline-block text-center" style="min-width: 200px;">
+                        <small class="text-muted text-uppercase fw-bold d-block">Distancia de viaje</small>
                         <h1 class="fw-black text-primary mb-0" th:text="${resultadoOptimizacion.distanciaMinimaKm} + ' km'">1.7 km</h1>
                         <span class="badge bg-success-subtle text-success border border-success mt-1">
-                            <i class="bi bi-check-circle-fill"></i> No Negativa (\(d_i \ge 0\))
+                            <i class="bi bi-check-circle-fill"></i> Clínica Disponible
                         </span>
                     </div>
                 </div>
@@ -311,276 +195,150 @@
         </div>
 
         <div th:if="${!resultadoOptimizacion.solucionEncontrada}" class="alert alert-warning p-4 rounded-4 shadow-sm mb-4">
-            <h5 class="fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Espacio de Soluciones Vacío (No Factible)</h5>
-            <p class="mb-0" th:text="${resultadoOptimizacion.mensaje}">No se encontraron clínicas factibles.</p>
+            <h5 class="fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> No encontramos clínicas en este radio</h5>
+            <p class="mb-0">Prueba aumentando el radio de búsqueda o actualizando tu ubicación.</p>
         </div>
 
+        <!-- SECCIÓN: MAPA Y OTRAS ALTERNATIVAS CERCANAS -->
         <div class="row g-4">
-            <!-- COLUMNA IZQUIERDA: FORMULACIÓN MATEMÁTICA FORMAL -->
-            <div class="col-lg-6">
-                <div class="glass-panel p-4 h-100">
-                    <h5 class="fw-bold text-primary mb-3">
-                        <i class="bi bi-journal-code"></i> Formulación Matemática del Modelo
-                    </h5>
-
-                    <!-- 1. Variables de Decisión -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-dark"><i class="bi bi-1-circle-fill text-primary"></i> 1. Variables de Decisión Binarias</h6>
-                        <p class="small text-muted mb-2">Se define una variable de decisión binaria para cada clínica evaluada \(i \in \{1, \dots, n\}\):</p>
-                        <div class="formula-box mb-2">
-                            \[ X_i = \begin{cases} 1, & \text{si se selecciona la clínica } i \\ 0, & \text{en caso contrario} \end{cases} \]
-                        </div>
-                    </div>
-
-                    <!-- 2. Función Objetivo -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-dark"><i class="bi bi-2-circle-fill text-primary"></i> 2. Función Objetivo</h6>
-                        <p class="small text-muted mb-2">Minimizar la distancia total recorrida por el usuario hasta la clínica seleccionada:</p>
-                        <div class="formula-box mb-2">
-                            \[ \text{Min } Z = \sum_{i=1}^{n} d_i X_i = d_1 X_1 + d_2 X_2 + \dots + d_n X_n \]
-                        </div>
-                        <small class="code-font text-muted d-block mt-1" style="font-size: 0.8rem;" th:text="'Instancia Actual: ' + ${resultadoOptimizacion.funcionObjetivoFormula}">
-                            Min Z = 2.4·X1 + 5.1·X2 + ...
-                        </small>
-                    </div>
-
-                    <!-- 3. Restricciones del Modelo -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-dark"><i class="bi bi-3-circle-fill text-primary"></i> 3. Restricciones del Sistema</h6>
-                        
-                        <div class="p-3 bg-white rounded-3 border mb-2" style="font-size: 0.9rem;">
-                            <strong>a) Unicidad de Selección:</strong>
-                            <p class="mb-1 text-muted small">Se debe seleccionar exactamente una sola clínica veterinaria:</p>
-                            <div class="code-font text-primary fw-bold">\[ \sum_{i=1}^{n} X_i = 1 \]</div>
-                        </div>
-
-                        <div class="p-3 bg-white rounded-3 border mb-2" style="font-size: 0.9rem;">
-                            <strong>b) Radio Máximo de Cobertura:</strong>
-                            <p class="mb-1 text-muted small">No seleccionar clínicas que superen el radio \(D_{max}\):</p>
-                            <div class="code-font text-primary fw-bold">\[ d_i X_i \le D_{max}, \quad \forall i \]</div>
-                        </div>
-
-                        <div class="p-3 bg-white rounded-3 border mb-2" style="font-size: 0.9rem;">
-                            <strong>c) Disponibilidad y Operatividad:</strong>
-                            <p class="mb-1 text-muted small">Solo clínicas aprobadas y abiertas (\(A_i = 1\)):</p>
-                            <div class="code-font text-primary fw-bold">\[ X_i \le A_i, \quad A_i \in \{0, 1\} \]</div>
-                        </div>
-
-                        <div class="p-3 bg-white rounded-3 border" style="font-size: 0.9rem;">
-                            <strong>d) Condición de No Negatividad y Binariedad:</strong>
-                            <p class="mb-1 text-muted small">Garantía de distancia positiva (\(d_i \ge 0\)) mediante Haversine y variables binarias:</p>
-                            <div class="code-font text-primary fw-bold">\[ X_i \in \{0, 1\}, \quad d_i \ge 0, \quad \forall i \]</div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Fórmula de Haversine -->
-                    <div>
-                        <h6 class="fw-bold text-dark"><i class="bi bi-4-circle-fill text-primary"></i> 4. Cálculo Geodésico de Haversine (\(d_i \ge 0\))</h6>
-                        <p class="small text-muted mb-2">Garantiza que la distancia física entre \((lat_1, lon_1)\) y \((lat_2, lon_2)\) nunca sea negativa:</p>
-                        <div class="formula-box">
-                            \[ a = \sin^2\left(\frac{\Delta lat}{2}\right) + \cos(lat_1)\cos(lat_2)\sin^2\left(\frac{\Delta lon}{2}\right) \]
-                            \[ d = 2R \cdot \text{atan2}\left(\sqrt{a}, \sqrt{1-a}\right) \ge 0 \]
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COLUMNA DERECHA: MAPA INTERACTIVO Y MATRIZ DE DECISIÓN -->
-            <div class="col-lg-6">
-                <!-- MAPA LEAFLET -->
-                <div class="glass-panel p-4 mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold text-primary mb-0">
-                            <i class="bi bi-map"></i> Mapa de Georreferenciación y Cobertura
-                        </h5>
-                        <span class="badge bg-primary rounded-pill code-font">
-                            Radio: <span th:text="${resultadoOptimizacion.radioMaxKm}">15</span> km
+            <!-- MAPA -->
+            <div class="col-lg-7">
+                <div class="glass-card p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                        <h6 class="fw-bold text-primary mb-0"><i class="bi bi-map"></i> Mapa de clínicas en tu zona</h6>
+                        <span class="badge bg-light text-dark border">
+                            <span th:text="${resultadoOptimizacion.clinicasFactibles}">0</span> opciones encontradas
                         </span>
                     </div>
                     <div id="mapOpt"></div>
-                    <div class="d-flex justify-content-between align-items-center mt-3 small text-muted">
-                        <span><i class="bi bi-person-fill text-danger"></i> Tu Ubicación</span>
-                        <span><i class="bi bi-geo-alt-fill text-success"></i> Clínica Óptima \(X_i = 1\)</span>
-                        <span><i class="bi bi-geo-alt-fill text-primary"></i> Clínicas Candidatas \(X_i = 0\)</span>
-                    </div>
                 </div>
+            </div>
 
-                <!-- MATRIZ DE EVALUACIÓN DE VARIABLES -->
-                <div class="glass-panel p-4">
-                    <h5 class="fw-bold text-primary mb-3">
-                        <i class="bi bi-table"></i> Matriz de Evaluación del Modelo
-                    </h5>
-                    <div class="table-responsive">
-                        <table class="table table-custom align-middle">
-                            <thead>
-                                <tr class="text-muted small text-uppercase code-font">
-                                    <th>Var</th>
-                                    <th>Clínica</th>
-                                    <th>Distancia (\(d_i\))</th>
-                                    <th>Disp (\(A_i\))</th>
-                                    <th>Estado / Decisión</th>
-                                    <th>Valor (\(X_i\))</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="var : ${resultadoOptimizacion.variablesDecision}" 
-                                    th:classappend="${var.valorOptimo == 1} ? 'border-start border-4 border-success' : ''">
-                                    <td class="code-font fw-bold text-primary" th:text="${var.variableNombre}">X1</td>
-                                    <td>
-                                        <div class="fw-bold" th:text="${var.clinicaNombre}">Nombre Clínica</div>
-                                        <small class="text-muted" th:text="${var.direccion}">Dirección</small>
-                                    </td>
-                                    <td class="code-font fw-bold" th:text="${var.distanciaKm} + ' km'">2.3 km</td>
-                                    <td>
-                                        <span th:if="${var.disponible}" class="badge bg-success-subtle text-success">1 (Sí)</span>
-                                        <span th:if="${!var.disponible}" class="badge bg-danger-subtle text-danger">0 (No)</span>
-                                    </td>
-                                    <td>
-                                        <span th:if="${var.valorOptimo == 1}" class="badge-winner">
-                                            <i class="bi bi-check-circle-fill"></i> ÓPTIMA
-                                        </span>
-                                        <span th:if="${var.valorOptimo == 0 and var.esFactible}" class="badge bg-secondary-subtle text-secondary">
-                                            Factible (No Mín)
-                                        </span>
-                                        <span th:if="${!var.esFactible}" class="badge bg-warning-subtle text-dark" th:title="${var.motivoDescarte}">
-                                            Descartada
-                                        </span>
-                                    </td>
-                                    <td class="code-font fw-bold text-center">
-                                        <span th:if="${var.valorOptimo == 1}" class="fs-5 text-success">1</span>
-                                        <span th:if="${var.valorOptimo == 0}" class="text-muted">0</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <!-- LISTADO DE CLÍNICAS POR DISTANCIA -->
+            <div class="col-lg-5">
+                <div class="glass-card p-3 h-100">
+                    <h6 class="fw-bold text-primary mb-3 px-2">
+                        <i class="bi bi-list-ul"></i> Clínicas ordenadas por distancia
+                    </h6>
+
+                    <div style="max-height: 440px; overflow-y: auto; padding-right: 5px;">
+                        <div th:each="var : ${resultadoOptimizacion.variablesDecision}" 
+                             th:if="${var.disponible}"
+                             class="clinic-item" 
+                             th:classappend="${var.valorOptimo == 1} ? 'is-closest' : ''">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="fw-bold mb-0" th:text="${var.clinicaNombre}">Nombre de Clínica</h6>
+                                <span class="badge bg-primary-subtle text-primary fw-bold" th:text="${var.distanciaKm} + ' km'">2.1 km</span>
+                            </div>
+                            <p class="small text-muted mb-2 text-truncate" th:text="${var.direccion}">Dirección</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span th:if="${var.valorOptimo == 1}" class="badge bg-success text-white fw-bold">
+                                    <i class="bi bi-check-circle"></i> Más cercana
+                                </span>
+                                <span th:if="${var.valorOptimo == 0}" class="badge bg-light text-muted">
+                                    Disponible
+                                </span>
+                                <a th:href="@{/usuario/citas/solicitar(clinicaId=${var.clinicaId})}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold">
+                                    Agendar
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </main>
 
-    <!-- Script de Inicialización del Mapa y Geolocalización -->
+    <!-- Leaflet & GPS Script -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         const userLat = /*[[${resultadoOptimizacion.userLat}]]*/ 10.3910;
         const userLng = /*[[${resultadoOptimizacion.userLng}]]*/ -75.4794;
         const radioKm = /*[[${resultadoOptimizacion.radioMaxKm}]]*/ 15.0;
         const variables = /*[[${resultadoOptimizacion.variablesDecision}]]*/ [];
-        const clinicaOptima = /*[[${resultadoOptimizacion.clinicaSeleccionada}]]*/ null;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Inicializar Mapa Leaflet centrado en el usuario
             const map = L.map('mapOpt').setView([userLat, userLng], 12);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors | ClínicaApp I.O.'
+                attribution: '&copy; OpenStreetMap contributors | ClínicaApp'
             }).addTo(map);
 
-            // 2. Iconos personalizados
             const userIcon = L.divIcon({
                 className: 'custom-user-marker',
-                html: '<div style="background:#ef4444; width:22px; height:22px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(239,68,68,0.8);"></div>',
-                iconSize: [22, 22]
+                html: '<div style="background:#ef4444; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(239,68,68,0.8);"></div>',
+                iconSize: [20, 20]
             });
 
             const winnerIcon = L.divIcon({
                 className: 'custom-winner-marker',
-                html: '<div style="background:#10b981; width:28px; height:28px; border-radius:50%; border:4px solid white; box-shadow:0 0 15px rgba(16,185,129,0.9); display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">★</div>',
-                iconSize: [28, 28]
+                html: '<div style="background:#10b981; width:26px; height:26px; border-radius:50%; border:3px solid white; box-shadow:0 0 12px rgba(16,185,129,0.9); display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">★</div>',
+                iconSize: [26, 26]
             });
 
             const regularIcon = L.divIcon({
                 className: 'custom-regular-marker',
-                html: '<div style="background:#0ea5e9; width:18px; height:18px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(14,165,233,0.6);"></div>',
-                iconSize: [18, 18]
+                html: '<div style="background:#0ea5e9; width:16px; height:16px; border-radius:50%; border:2px solid white; box-shadow:0 0 8px rgba(14,165,233,0.6);"></div>',
+                iconSize: [16, 16]
             });
 
-            // 3. Marcador del Usuario
+            // Marcador usuario
             const userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
-            userMarker.bindPopup('<b>📍 Tu Ubicación</b><br>Lat: ' + userLat.toFixed(4) + '<br>Lng: ' + userLng.toFixed(4)).openPopup();
+            userMarker.bindPopup('<b>📍 Tu Ubicación Actual</b>').openPopup();
 
-            // 4. Círculo del Radio Máximo (D_max)
-            const circle = L.circle([userLat, userLng], {
+            // Círculo radio
+            L.circle([userLat, userLng], {
                 color: '#0ea5e9',
                 fillColor: '#38bdf8',
-                fillOpacity: 0.1,
-                radius: radioKm * 1000 // metros
+                fillOpacity: 0.08,
+                radius: radioKm * 1000
             }).addTo(map);
 
-            // 5. Marcadores de Clínicas
+            // Marcadores clínicas
             if (variables && variables.length > 0) {
                 variables.forEach(function(v) {
+                    if (!v.disponible) return;
                     const isWinner = (v.valorOptimo === 1);
                     const markerIcon = isWinner ? winnerIcon : regularIcon;
                     const marker = L.marker([v.latitud, v.longitud], { icon: markerIcon }).addTo(map);
 
-                    let popupContent = '<b>' + v.variableNombre + ': ' + v.clinicaNombre + '</b><br>' +
-                                       'Distancia: ' + v.distanciaKm + ' km<br>' +
-                                       'Disponible: ' + (v.disponible ? 'Sí' : 'No') + '<br>' +
-                                       '<b>Decisión: X = ' + v.valorOptimo + '</b>';
+                    let popup = '<b>' + v.clinicaNombre + '</b><br>Distancia: ' + v.distanciaKm + ' km';
                     if (isWinner) {
-                        popupContent += '<br><span style="color:#059669; font-weight:bold;">★ CLÍNICA ÓPTIMA SELECCIONADA</span>';
-                    }
-                    marker.bindPopup(popupContent);
-
-                    // Dibujar línea discontinua entre el usuario y la clínica ganadora
-                    if (isWinner) {
-                        const line = L.polyline([[userLat, userLng], [v.latitud, v.longitud]], {
-                            color: '#10b981',
-                            weight: 3,
-                            dashArray: '5, 10'
+                        popup += '<br><strong style="color:#059669;">★ La más cercana</strong>';
+                        L.polyline([[userLat, userLng], [v.latitud, v.longitud]], {
+                            color: '#10b981', weight: 3, dashArray: '5, 10'
                         }).addTo(map);
                     }
+                    marker.bindPopup(popup);
                 });
             }
 
-            // 6. Manejador de Botón GPS
+            // GPS Click
             const btnGps = document.getElementById('btnLocalizarGps');
-            const alertDiv = document.getElementById('gpsAlert');
+            const statusTxt = document.getElementById('gpsStatusText');
 
-            btnGps.addEventListener('click', function() {
-                if (!navigator.geolocation) {
-                    alertDiv.innerHTML = '<span class="text-danger">Geolocalización no soportada por el navegador.</span>';
-                    return;
-                }
-                alertDiv.innerHTML = '<span class="text-primary"><i class="bi bi-hourglass-split"></i> Obteniendo ubicación GPS...</span>';
-                
-                navigator.geolocation.getCurrentPosition(function(pos) {
-                    const lat = pos.coords.latitude.toFixed(6);
-                    const lng = pos.coords.longitude.toFixed(6);
-                    document.getElementById('inputLat').value = lat;
-                    document.getElementById('inputLng').value = lng;
-                    alertDiv.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill"></i> Coordenadas detectadas. Resolviendo modelo...</span>';
-                    document.getElementById('optForm').submit();
-                }, function(err) {
-                    alertDiv.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle"></i> ' + err.message + '</span>';
-                }, { enableHighAccuracy: true });
-            });
-
-            // 7. Guardar Ubicación en el Perfil
-            const btnGuardarPerfil = document.getElementById('btnGuardarUbicacionPerfil');
-            if (btnGuardarPerfil) {
-                btnGuardarPerfil.addEventListener('click', function() {
-                    const lat = parseFloat(document.getElementById('inputLat').value);
-                    const lng = parseFloat(document.getElementById('inputLng').value);
-
-                    fetch('/usuario/api/actualizar-ubicacion', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ latitud: lat, longitud: lng })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        alert("¡Ubicación guardada en tu perfil exitosamente!");
-                    })
-                    .catch(err => alert("Error al guardar: " + err));
+            if (btnGps) {
+                btnGps.addEventListener('click', function() {
+                    if (!navigator.geolocation) {
+                        alert('Geolocalización no soportada en este navegador.');
+                        return;
+                    }
+                    statusTxt.innerHTML = '<span class="text-primary"><i class="bi bi-hourglass-split"></i> Buscando...</span>';
+                    navigator.geolocation.getCurrentPosition(function(pos) {
+                        document.getElementById('inputLat').value = pos.coords.latitude.toFixed(6);
+                        document.getElementById('inputLng').value = pos.coords.longitude.toFixed(6);
+                        document.getElementById('optForm').submit();
+                    }, function(err) {
+                        statusTxt.innerHTML = '<span class="text-danger">' + err.message + '</span>';
+                    }, { enableHighAccuracy: true });
                 });
             }
         });
         /*]]>*/
     </script>
 
-    <!-- Scripts de Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>

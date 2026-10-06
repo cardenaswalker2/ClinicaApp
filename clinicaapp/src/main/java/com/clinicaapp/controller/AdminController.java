@@ -848,4 +848,27 @@ public class AdminController {
         }
         return "redirect:/admin/comunidad/moderacion";
     }
-}
+
+    // ==========================================================
+    // 10. INVESTIGACIÓN DE OPERACIONES (PANEL DE ADMINISTRACIÓN)
+    // ==========================================================
+    @Autowired
+    private com.clinicaapp.service.IOptimizacionService optimizacionService;
+
+    @GetMapping("/optimizacion-clinicas")
+    public String vistaOptimizacionAdmin(
+            @RequestParam(value = "lat", required = false, defaultValue = "10.3910") Double lat,
+            @RequestParam(value = "lng", required = false, defaultValue = "-75.4794") Double lng,
+            @RequestParam(value = "radio", required = false, defaultValue = "15.0") Double radio,
+            Model model) {
+
+        com.clinicaapp.dto.OptimizacionClinicaResultadoDTO resultado = optimizacionService.resolverOptimizacion(lat, lng, radio, "Cartagena de Indias (Admin)");
+        model.addAttribute("resultadoOptimizacion", resultado);
+        model.addAttribute("currentLat", lat);
+        model.addAttribute("currentLng", lng);
+        model.addAttribute("currentRadio", radio);
+
+        return "admin/optimizacion_clinicas_admin";
+    }
+}
+
