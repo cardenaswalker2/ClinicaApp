@@ -1549,64 +1549,93 @@
                         </div>
                     </div>
 
-                    <!-- ===== BANNER DEL JUEGO ===== -->
-                    <div class="game-banner" data-aos="zoom-in" data-aos-delay="150">
-                        <div class="game-grid"></div>
-                        <div class="game-content">
-                            <div class="game-text">
-                                <h3><i class="bi bi-controller"></i>Mi Mascota Virtual</h3>
-                                <p>Aprende sobre el cuidado y la responsabilidad de una manera divertida e interactiva.
-                                    ¡Cuida de tu mascota digital y descubre tips de salud!</p>
+                    <!-- ===== GRID DE ACCIONES RÁPIDAS (2x2 COMPACTO Y ELEGANTE) ===== -->
+                    <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="150">
+                        <!-- 1. Agendar Cita -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 h-100 d-flex flex-column justify-content-between text-white shadow-sm"
+                                 style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: 1px solid rgba(255,255,255,0.15);">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="p-2 rounded-3 bg-white text-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                            <i class="bi bi-calendar-plus-fill"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-0">Agendar Cita</h6>
+                                    </div>
+                                    <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+                                        Programa una consulta para tu mascota en segundos con veterinarios verificados.
+                                    </p>
+                                </div>
+                                <a th:href="@{/usuario/citas/solicitar}" class="btn btn-sm btn-light fw-bold rounded-pill text-primary px-3 align-self-start shadow-sm">
+                                    <i class="bi bi-calendar-check"></i> Agendar Ahora
+                                </a>
                             </div>
-                            <a th:href="@{/usuario/juego}" class="btn-game">
-                                Jugar ahora
-                                <i class="bi bi-arrow-right-short"></i>
                         </div>
-                    </div>
 
-                    <!-- ===== COMUNIDAD PET CARD ===== -->
-                    <div class="game-banner mb-4" data-aos="zoom-in" data-aos-delay="180" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);">
-                        <div class="game-grid" style="opacity: 0.15;"></div>
-                        <div class="game-content">
-                            <div class="game-text text-white">
-                                <h3><i class="bi bi-heart-fill"></i> Comunidad Pet</h3>
-                                <p>Encuentra mascotas buscando un hogar, publica mascotas en adopción, comunícate mediante chats seguros y ayuda a otros dueños en nuestra red social animal.</p>
+                        <!-- 2. Buscar Clínica más cercana (Ubicación) -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 h-100 d-flex flex-column justify-content-between text-white shadow-sm"
+                                 style="background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); border: 1px solid rgba(255,255,255,0.15);">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="p-2 rounded-3 bg-white text-info d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                            <i class="bi bi-geo-alt-fill text-primary"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-0">Clínica más cercana</h6>
+                                    </div>
+                                    <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+                                        Encuentra al instante la veterinaria disponible más próxima a tu ubicación GPS.
+                                    </p>
+                                </div>
+                                <a th:href="@{/usuario/optimizacion-clinicas}" class="btn btn-sm btn-light fw-bold rounded-pill text-info px-3 align-self-start shadow-sm">
+                                    <i class="bi bi-compass"></i> Buscar Cercana
+                                </a>
                             </div>
-                            <a th:href="@{/usuario/comunidad}" class="btn-game" style="background: white; color: #6366f1;">
-                                Entrar a la Comunidad
-                                <i class="bi bi-arrow-right-short"></i>
-                            </a>
                         </div>
-                    </div>
 
-                    <!-- ===== BOTÓN RÁPIDO: BUSCAR CLÍNICA MÁS CERCANA ===== -->
-                    <div class="game-banner mb-4" data-aos="zoom-in" data-aos-delay="190" style="background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);">
-                        <div class="game-grid" style="opacity: 0.15;"></div>
-                        <div class="game-content">
-                            <div class="game-text text-white">
-                                <h3><i class="bi bi-geo-alt-fill"></i> ¿Necesitas atención rápida?</h3>
-                                <p>Encuentra de inmediato la clínica veterinaria más cercana a tu ubicación actual en tiempo real.</p>
+                        <!-- 3. Comunidad Pet -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 h-100 d-flex flex-column justify-content-between text-white shadow-sm"
+                                 style="background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%); border: 1px solid rgba(255,255,255,0.15);">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="p-2 rounded-3 bg-white text-danger d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                            <i class="bi bi-heart-fill"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-0">Comunidad Pet</h6>
+                                    </div>
+                                    <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+                                        Adopciones, chats seguros y red de apoyo entre dueños de mascotas.
+                                    </p>
+                                </div>
+                                <a th:href="@{/usuario/comunidad}" class="btn btn-sm btn-light fw-bold rounded-pill text-danger px-3 align-self-start shadow-sm">
+                                    <i class="bi bi-chat-heart"></i> Entrar a Comunidad
+                                </a>
                             </div>
-                            <a th:href="@{/usuario/optimizacion-clinicas}" class="btn-game" style="background: #ffffff; color: #0284c7; font-weight: 800; box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);">
-                                <i class="bi bi-compass"></i> Buscar clínica más cercana
-                            </a>
+                        </div>
+
+                        <!-- 4. Mi Mascota Virtual (Juego) -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-4 h-100 d-flex flex-column justify-content-between text-white shadow-sm"
+                                 style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border: 1px solid rgba(255,255,255,0.15);">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <div class="p-2 rounded-3 bg-white text-warning d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                            <i class="bi bi-controller text-dark"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-0">Mi Mascota Virtual</h6>
+                                    </div>
+                                    <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+                                        Aprende sobre el cuidado diario y salud de tu mascota de forma interactiva.
+                                    </p>
+                                </div>
+                                <a th:href="@{/usuario/juego}" class="btn btn-sm btn-light fw-bold rounded-pill text-dark px-3 align-self-start shadow-sm">
+                                    <i class="bi bi-play-fill"></i> Jugar Ahora
+                                </a>
+                            </div>
                         </div>
                     </div>
 
-
-                    <!-- ===== CTA PRINCIPAL ===== -->
-                    <div class="cta-card" data-aos="fade-up" data-aos-delay="200">
-
-                        <div class="cta-text">
-                            <h4>¿Necesitas agendar una cita?</h4>
-                            <p>Programa una nueva consulta para tu mascota en segundos con nuestros veterinarios
-                                expertos</p>
-                        </div>
-                        <a th:href="@{/usuario/citas/solicitar}" class="btn-cta">
-                            <i class="bi bi-calendar-plus-fill"></i>
-                            Agendar Ahora
-                        </a>
-                    </div>
 
                     <!-- ===== PRÓXIMAS CITAS ===== -->
                     <div class="dashboard-card" data-aos="fade-up" data-aos-delay="250">

@@ -196,26 +196,28 @@ public class UsuarioController {
 
         model.addAttribute("usuario", usuario);
 
-        // 1. Buscamos todas las citas
+        // 1. Buscamos solo las últimas 5 citas del usuario de forma eficiente
         List<Cita> misCitasRaw = citaService.findByUsuarioId(usuario.getId());
-
-        // 2. Filtramos y ORDENAMOS (Aquí es donde se usa el Comparator)
-        List<CitaDisplayDTO> citasActivas = convertToDisplayDTO(misCitasRaw.stream()
-                .filter(c -> !"Cancelada".equalsIgnoreCase(c.getEstado()))
-                // Ordenar: Las más recientes primero
-                .sorted(Comparator.comparing(Cita::getFechaHora, Comparator.nullsLast(Comparator.reverseOrder())))
-                .limit(5)
-                .collect(Collectors.toList()));
+        List<CitaDisplayDTO> citasActivas = new ArrayList<>();
+        if (misCitasRaw != null && !misCitasRaw.isEmpty()) {
+            List<Cita> citasFiltradas = misCitasRaw.stream()
+                    .filter(c -> !"Cancelada".equalsIgnoreCase(c.getEstado()))
+                    .sorted(Comparator.comparing(Cita::getFechaHora, Comparator.nullsLast(Comparator.reverseOrder())))
+                    .limit(5)
+                    .collect(Collectors.toList());
+            citasActivas = convertToDisplayDTO(citasFiltradas);
+        }
 
         model.addAttribute("citasActivas", citasActivas);
 
-        // 3. Mascotas para el panel lateral
+        // 2. Mascotas para el panel lateral
         List<Mascota> misMascotas = mascotaService.findByPropietarioId(usuario.getId());
         model.addAttribute("mascotas", misMascotas);
         model.addAttribute("anunciosGlobales", anuncioGlobalRepository.findByActivoTrue());
 
         return "usuario/dashboard_usuario_privado";
     }
+
 
     // --- Gestión de Mascotas ---
     // DENTRO DE UsuarioController.java
