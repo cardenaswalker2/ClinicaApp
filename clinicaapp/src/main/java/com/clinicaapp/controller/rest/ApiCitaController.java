@@ -43,4 +43,27 @@ public class ApiCitaController {
         Cita savedCita = citaRepository.save(cita);
         return ResponseEntity.ok(savedCita);
     }
+
+    @PutMapping("/{id}/cancelar")
+    public ResponseEntity<?> cancelarCita(@PathVariable String id) {
+        return citaRepository.findById(id).map(cita -> {
+            cita.setEstado("CANCELADA");
+            return ResponseEntity.ok(citaRepository.save(cita));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}/reprogramar")
+    public ResponseEntity<?> reprogramarCita(@PathVariable String id, @RequestBody java.util.Map<String, String> payload) {
+        String nuevaFechaHora = payload.get("fechaHora");
+        if (nuevaFechaHora == null) return ResponseEntity.badRequest().body("fechaHora es requerida");
+        return citaRepository.findById(id).map(cita -> {
+            try {
+                cita.setFechaHora(java.time.LocalDateTime.parse(nuevaFechaHora));
+                cita.setEstado("Pendiente");
+                return ResponseEntity.ok(citaRepository.save(cita));
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Formato de fecha inválido");
+            }
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

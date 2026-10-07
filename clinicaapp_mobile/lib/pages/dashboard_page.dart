@@ -16,8 +16,9 @@ import 'appointments_page.dart';
 import 'clinic_explorer_page.dart';
 import 'sos_page.dart';
 import 'reminder_detail_page.dart';
-import 'shop_page.dart';
-import '../models/notificacion.dart';
+import 'my_pets_page.dart';
+import 'payments_page.dart';
+import 'clinic_optimization_page.dart';
 
 // ============================================================
 // DASHBOARD PAGE - LUXURY AURORA EDITION
@@ -542,22 +543,40 @@ class _DashboardPageState extends State<DashboardPage>
   Widget _buildQuickActions() {
     final actions = [
       {
-        "icon": Icons.add_alert_rounded,
-        "label": "Aviso",
-        "color": Colors.orangeAccent,
+        "icon": Icons.pets_rounded,
+        "label": "Mascotas",
+        "color": _auroraBase,
         "onTap": () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (c) => const AddReminderPage()),
+          MaterialPageRoute(builder: (c) => const MyPetsPage()),
         ).then((_) => _fetch()),
       },
       {
         "icon": Icons.calendar_month_rounded,
-        "label": "Cita",
+        "label": "Citas",
         "color": Colors.blueAccent,
         "onTap": () => Navigator.push(
           context,
           MaterialPageRoute(builder: (c) => const AppointmentsPage()),
         ).then((_) => _fetch()),
+      },
+      {
+        "icon": Icons.calculate_rounded,
+        "label": "PLEB Óptimo",
+        "color": Colors.greenAccent,
+        "onTap": () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (c) => const ClinicOptimizationPage()),
+        ),
+      },
+      {
+        "icon": Icons.payments_rounded,
+        "label": "Pagos",
+        "color": Colors.purpleAccent,
+        "onTap": () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (c) => const PaymentsPage()),
+        ),
       },
       {
         "icon": Icons.emergency_rounded,
@@ -566,24 +585,6 @@ class _DashboardPageState extends State<DashboardPage>
         "onTap": () => Navigator.push(
           context,
           MaterialPageRoute(builder: (c) => const SOSPage()),
-        ),
-      },
-      {
-        "icon": Icons.local_hospital_rounded,
-        "label": "Clínicas",
-        "color": Colors.greenAccent,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const ClinicExplorerPage()),
-        ),
-      },
-      {
-        "icon": Icons.shopping_bag_rounded,
-        "label": "Tienda",
-        "color": Colors.purpleAccent,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const ShopPage()),
         ),
       },
     ];

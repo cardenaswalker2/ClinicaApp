@@ -27,8 +27,15 @@ class _AIChatPageState extends State<AIChatPage>
     {
       "role": "ai",
       "content":
-          "¡Hola! Soy Guido 🤖, tu asistente experto en salud animal. ¿En qué puedo ayudarte hoy?"
+          "¡Hola! Soy Nova AI 🤖, tu asistente veterinaria inteligente de Clínica App. ¿En qué puedo ayudarte hoy?"
     }
+  ];
+  final List<String> _quickChips = [
+    "📅 Agendar Cita",
+    "🐾 Ver mis mascotas",
+    "📍 Clínica más cercana",
+    "💳 ¿Cuánto debo en mis pagos?",
+    "🕒 Horarios de atención"
   ];
   final TextEditingController _controller = TextEditingController();
   bool _isTyping = false;
@@ -191,6 +198,8 @@ class _AIChatPageState extends State<AIChatPage>
                 ),
                 // ── Indicador de escritura ──
                 if (_isTyping) _buildTypingIndicator(),
+                // ── Chips de preguntas rápidas ──
+                _buildQuickChipsBar(),
                 // ── Área de input ──
                 _buildInputArea(),
               ],
@@ -410,7 +419,7 @@ class _AIChatPageState extends State<AIChatPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Guido AI",
+                  "Nova AI",
                   style: GoogleFonts.outfit(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -662,7 +671,43 @@ class _AIChatPageState extends State<AIChatPage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════
+  Widget _buildQuickChipsBar() {
+    return Container(
+      height: 38,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: _quickChips.length,
+        itemBuilder: (context, index) {
+          final chip = _quickChips[index];
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              onTap: () {
+                _controller.text = chip.substring(2).trim();
+                _sendMessage();
+              },
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: _auroraBase.withOpacity(0.3), width: 1),
+                ),
+                child: Text(
+                  chip,
+                  style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   // ÁREA DE INPUT PREMIUM
   // ═══════════════════════════════════════════════════════════
 

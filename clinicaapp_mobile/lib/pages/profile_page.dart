@@ -6,6 +6,10 @@ import 'dart:math' as math;
 import 'dart:ui';
 import '../config/app_config.dart';
 import 'login_page.dart';
+import 'my_pets_page.dart';
+import 'payments_page.dart';
+import 'clinic_optimization_page.dart';
+import 'appointments_page.dart';
 
 // ============================================================
 // PROFILE PAGE - LUXURY AURORA EDITION
@@ -548,12 +552,35 @@ class _ProfilePageState extends State<ProfilePage>
   // ═══════════════════════════════════════════════════════════
 
   Widget _buildMenuSection(BuildContext context) {
+    final menuActions = [
+      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const MyPetsPage())),
+      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const PaymentsPage())),
+      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const ClinicOptimizationPage())),
+      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const AppointmentsPage())),
+      () {
+        showAboutDialog(
+          context: context,
+          applicationName: "Clínica App",
+          applicationVersion: "1.0.0 (Semestre 7)",
+          applicationLegalese: "© 2026 Clínica App Veterinaria. Todos los derechos reservados.",
+        );
+      },
+    ];
+
+    final menuItemsWithLabels = [
+      {"icon": Icons.pets_rounded, "title": "Mis Mascotas", "subtitle": "Administra tus peluditos e historias clínicas", "color": _auroraBase},
+      {"icon": Icons.payments_rounded, "title": "Mis Pagos y Facturas", "subtitle": "Consulta transacciones y recibos", "color": Colors.purpleAccent},
+      {"icon": Icons.calculate_rounded, "title": "Optimización de Clínicas", "subtitle": "Modelo PLEB + Haversine de cercanía", "color": Colors.greenAccent},
+      {"icon": Icons.calendar_month_rounded, "title": "Mis Citas", "subtitle": "Gestiona y reprograma turnos", "color": Colors.orangeAccent},
+      {"icon": Icons.info_outline_rounded, "title": "Sobre Clínica App", "subtitle": "Versión 1.0.0 • 7mo Semestre", "color": Colors.tealAccent},
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Configuración"),
+        _buildSectionTitle("Gestión y Configuración"),
         const SizedBox(height: 16),
-        ..._menuItems.asMap().entries.map((entry) {
+        ...menuItemsWithLabels.asMap().entries.map((entry) {
           final index = entry.key;
           final item = entry.value;
           return TweenAnimationBuilder<double>(
@@ -572,7 +599,7 @@ class _ProfilePageState extends State<ProfilePage>
                       title: item["title"] as String,
                       subtitle: item["subtitle"] as String,
                       color: item["color"] as Color,
-                      onTap: () {},
+                      onTap: menuActions[index],
                     ),
                   ),
                 ),

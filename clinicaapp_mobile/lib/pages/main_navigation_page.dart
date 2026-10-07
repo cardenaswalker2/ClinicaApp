@@ -45,7 +45,7 @@ class _MainNavigationPageState extends State<MainNavigationPage>
   final List<Map<String, dynamic>> _navItems = [
     {"icon": Icons.home_filled, "label": "Inicio", "color": Color(0xFF0EA5E9)},
     {"icon": Icons.local_hospital_rounded, "label": "Clínicas", "color": Colors.greenAccent},
-    {"icon": Icons.smart_toy_rounded, "label": "Guido AI", "color": Colors.purpleAccent},
+    {"icon": Icons.smart_toy_rounded, "label": "Nova AI", "color": Colors.purpleAccent},
     {"icon": Icons.calendar_month_rounded, "label": "Citas", "color": Colors.orangeAccent},
     {"icon": Icons.person_rounded, "label": "Perfil", "color": Colors.pinkAccent},
   ];
