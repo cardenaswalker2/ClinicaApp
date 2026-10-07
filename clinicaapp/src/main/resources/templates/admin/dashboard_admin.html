@@ -11,6 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+    <th:block th:replace="~{fragments/header :: headerStyles}"></th:block>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -1190,13 +1191,6 @@
         }
 
         /* Efecto de brillo sutil en hover para cards */
-        .kpi-card,
-        .user-card,
-        .config-panel,
-        .chart-card {
-            position: relative;
-            z-index: 1;
-        }
     </style>
 </head>
 
@@ -1204,7 +1198,6 @@
 
     <!-- Navbar Admin Unificado -->
     <div th:replace="~{fragments/header :: header-admin}"></div>
-    <link th:replace="~{fragments/header :: headerStyles}">
 
     <div class="container admin-container">
 
