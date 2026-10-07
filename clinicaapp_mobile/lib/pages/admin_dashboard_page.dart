@@ -46,6 +46,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
   final _aiPromptController = TextEditingController();
   String _aiResult = "";
   bool _techLoading = false;
+  // PLEB Optimization State
+  bool _plebLoading = false;
+  Map<String, dynamic>? _plebResult;
 
   // Supervisión State
   List<dynamic> _supervisionUsers = [];
@@ -2152,7 +2155,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   children: [
                     const Icon(Icons.fiber_manual_record_rounded, size: 8, color: _accentCyan),
                     const SizedBox(width: 8),
-                    Text("[$time] ", style: GoogleFonts.outfit(color: _accentCyan, fontSize: 10, fontFamily: 'monospace')),
+                    Text("[$time] ", style: const TextStyle(color: _accentCyan, fontSize: 10, fontFamily: 'monospace')),
                     Expanded(
                       child: Text("$acc ($sec)", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 11), overflow: TextOverflow.ellipsis),
                     ),
@@ -2314,7 +2317,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("URL: $url", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10, fontFamily: 'monospace')),
+                      Text("URL: $url", style: const TextStyle(color: Colors.white54, fontSize: 10, fontFamily: 'monospace')),
                       Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _accentGreen.withOpacity(0.2), borderRadius: BorderRadius.circular(4)), child: const Text("ACTIVO", style: TextStyle(color: _accentGreen, fontSize: 8, fontWeight: FontWeight.bold))),
                     ],
                   ),
