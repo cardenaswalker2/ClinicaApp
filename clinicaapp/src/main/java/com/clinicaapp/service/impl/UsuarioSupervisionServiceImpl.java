@@ -474,20 +474,83 @@ public class UsuarioSupervisionServiceImpl implements IUsuarioSupervisionService
             usuario.setResetPasswordTokenExpiry(LocalDateTime.now().plusHours(2));
             usuarioRepo.save(usuario);
 
-            String enlaceReset = "https://clinicaapp.com/reset-password?token=" + token;
-            String mensaje = "Estimado/a " + usuario.getNombreCompleto() + ",\n\n"
-                    + "Por solicitud administrativa del Super Administrador, se ha generado un enlace seguro para que puedas restablecer tu contraseña:\n\n"
-                    + enlaceReset + "\n\n"
-                    + "Este enlace tiene una validez de 2 horas. Si no solicitaste este cambio, por favor contáctanos.\n\n"
-                    + "Atentamente,\nEquipo de Seguridad de ClínicaApp";
+            // Detección dinámica de dominio / host de la aplicación
+            String baseUrl = "https://clinica-app-fh9j.onrender.com";
+            try {
+                org.springframework.web.context.request.ServletRequestAttributes sra = 
+                        (org.springframework.web.context.request.ServletRequestAttributes) org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+                if (sra != null && sra.getRequest() != null) {
+                    jakarta.servlet.http.HttpServletRequest req = sra.getRequest();
+                    String scheme = req.getHeader("X-Forwarded-Proto");
+                    if (scheme == null || scheme.isBlank()) scheme = req.getScheme();
+                    String host = req.getHeader("X-Forwarded-Host");
+                    if (host == null || host.isBlank()) host = req.getHeader("Host");
+                    if (host == null || host.isBlank()) host = req.getServerName() + (req.getServerPort() == 80 || req.getServerPort() == 443 ? "" : ":" + req.getServerPort());
+                    baseUrl = scheme + "://" + host;
+                }
+            } catch (Exception ignored) {}
 
-            emailService.sendSimpleMessage(usuario.getEmail(), "Restablecimiento de Contraseña Seguro - ClínicaApp", mensaje);
+            String enlaceReset = baseUrl + "/reset-password?token=" + token;
+
+            String cuerpoHtml = "<!DOCTYPE html>"
+                    + "<html lang='es'>"
+                    + "<head>"
+                    + "<meta charset='UTF-8'>"
+                    + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                    + "<title>Restablecimiento de Contraseña</title>"
+                    + "</head>"
+                    + "<body style='margin:0; padding:0; background-color:#f8fafc; font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;'>"
+                    + "<table role='presentation' width='100%' cellspacing='0' cellpadding='0' border='0' style='background-color:#f8fafc; padding: 40px 15px;'>"
+                    + "  <tr>"
+                    + "    <td align='center'>"
+                    + "      <table role='presentation' width='100%' style='max-width: 580px; background-color:#ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;' cellspacing='0' cellpadding='0' border='0'>"
+                    + "        <!-- Encabezado con degradado de marca -->"
+                    + "        <tr>"
+                    + "          <td style='background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #0284c7 100%); padding: 36px 30px; text-align: center; color: #ffffff;'>"
+                    + "            <div style='background: rgba(255,255,255,0.2); width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px; line-height: 64px; font-size: 30px; border: 2px solid rgba(255,255,255,0.35);'>🛡️</div>"
+                    + "            <h1 style='margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;'>ClínicaApp Seguridad</h1>"
+                    + "            <p style='margin: 6px 0 0; font-size: 14px; opacity: 0.9;'>Gestión de Credenciales de Acceso</p>"
+                    + "          </td>"
+                    + "        </tr>"
+                    + "        <!-- Cuerpo del mensaje -->"
+                    + "        <tr>"
+                    + "          <td style='padding: 36px 32px; color: #334155; font-size: 15px; line-height: 1.6;'>"
+                    + "            <p style='margin-top: 0; font-size: 16px; font-weight: 700; color: #0f172a;'>Estimado/a " + usuario.getNombreCompleto() + ",</p>"
+                    + "            <p>Por solicitud administrativa del <strong>Super Administrador</strong> de ClínicaApp, se ha generado una autorización segura para que puedas establecer una nueva contraseña de acceso.</p>"
+                    + "            <!-- Call to action button -->"
+                    + "            <div style='text-align: center; margin: 32px 0;'>"
+                    + "              <a href='" + enlaceReset + "' target='_blank' style='display: inline-block; background: linear-gradient(135deg, #4f46e5, #0284c7); color: #ffffff; text-decoration: none; padding: 15px 36px; border-radius: 12px; font-weight: 800; font-size: 15px; box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);'>Restablecer Mi Contraseña</a>"
+                    + "            </div>"
+                    + "            <!-- Aviso de seguridad -->"
+                    + "            <div style='background: #f1f5f9; border-left: 4px solid #0284c7; padding: 14px 16px; border-radius: 8px; margin: 24px 0 16px; font-size: 13.5px; color: #475569;'>"
+                    + "              ⏱️ <strong>Validez:</strong> Este enlace expirará automáticamente en <strong>2 horas</strong> por protocolos de ciberseguridad.<br>"
+                    + "              🔒 Si el botón no abre directamente, copia y pega la siguiente URL en tu navegador:<br>"
+                    + "              <a href='" + enlaceReset + "' style='color: #0284c7; word-break: break-all; font-size: 12px;'>" + enlaceReset + "</a>"
+                    + "            </div>"
+                    + "            <p style='font-size: 13px; color: #64748b; margin-bottom: 0;'>Si tú no solicitaste este cambio o tienes dudas, puedes ignorar este correo de forma segura o contactar al soporte de la plataforma.</p>"
+                    + "          </td>"
+                    + "        </tr>"
+                    + "        <!-- Pie de página -->"
+                    + "        <tr>"
+                    + "          <td style='background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 32px; text-align: center; color: #94a3b8; font-size: 12px;'>"
+                    + "            <p style='margin: 0;'>© 2026 ClínicaApp. Todos los derechos reservados.</p>"
+                    + "            <p style='margin: 4px 0 0;'>Servicio de autenticación y seguridad en la nube.</p>"
+                    + "          </td>"
+                    + "        </tr>"
+                    + "      </table>"
+                    + "    </td>"
+                    + "  </tr>"
+                    + "</table>"
+                    + "</body>"
+                    + "</html>";
+
+            emailService.sendSimpleMessage(usuario.getEmail(), "Restablecimiento de Contraseña Seguro - ClínicaApp", cuerpoHtml);
 
             AuditoriaSupervision audit = new AuditoriaSupervision(
                     adminEmail, "Super Administrador", usuario.getId(), usuario.getEmail(),
                     usuario.getNombreCompleto(), "RESET_PASSWORD_TRIGGER",
                     "Envío seguro de enlace de recuperación de contraseña",
-                    "Token seguro despachado al correo registrado del usuario sin exponer claves.",
+                    "Token seguro despachado al correo registrado del usuario con plantilla HTML corporativa.",
                     ip, null
             );
             auditoriaSupervisionRepo.save(audit);

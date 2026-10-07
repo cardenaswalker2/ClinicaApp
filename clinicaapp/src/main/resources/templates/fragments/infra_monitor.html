@@ -110,6 +110,46 @@
                 font-size: 1.2rem;
                 border: 1px solid rgba(255,255,255,0.2);
             }
+
+            /* Responsive Toast Notification */
+            #admin-notif-toast {
+                position: fixed;
+                top: 70px;
+                right: 18px;
+                z-index: 999999;
+                max-width: 380px;
+                width: calc(100% - 36px);
+                background: #ffffff;
+                border: 1px solid #cbd5e1;
+                border-radius: 14px;
+                padding: 12px 14px;
+                box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.08);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+                font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+                animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+            @keyframes toastSlideIn {
+                from { transform: translateY(-20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            @media (max-width: 768px) {
+                #admin-notif-toast {
+                    top: 65px !important;
+                    right: 50% !important;
+                    transform: translateX(50%) !important;
+                    width: calc(100% - 24px) !important;
+                    max-width: 420px !important;
+                    animation: toastSlideInMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+                }
+                @keyframes toastSlideInMobile {
+                    from { transform: translate(50%, -20px); opacity: 0; }
+                    to { transform: translate(50%, 0); opacity: 1; }
+                }
+            }
         </style>
 
         <script th:inline="javascript">
@@ -348,24 +388,6 @@
 
                         const toast = document.createElement('div');
                         toast.id = 'admin-notif-toast';
-                        toast.style.position = 'fixed';
-                        toast.style.top = '18px';
-                        toast.style.right = '18px';
-                        toast.style.zIndex = '999999';
-                        toast.style.maxWidth = '380px';
-                        toast.style.width = 'calc(100% - 36px)';
-                        toast.style.background = '#ffffff';
-                        toast.style.border = '1px solid #e2e8f0';
-                        toast.style.borderRadius = '14px';
-                        toast.style.padding = '12px 14px';
-                        toast.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.08)';
-                        toast.style.display = 'flex';
-                        toast.style.alignItems = 'center';
-                        toast.style.gap = '12px';
-                        toast.style.cursor = 'pointer';
-                        toast.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease';
-                        toast.style.fontFamily = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
-                        toast.style.animation = 'hexSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
 
                         const remitente = msg.remitenteNombre || 'Super Administrador';
                         const asunto = msg.asunto || 'Mensaje de la Administración';

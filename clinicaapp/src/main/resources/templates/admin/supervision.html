@@ -1002,8 +1002,8 @@
                     <!-- PESTAÑA 3: SEGURIDAD Y ACCIONES ADMINISTRATIVAS -->
                     <div id="tabContentSecurity" style="display: none;">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="card p-3 border h-100">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card p-3 border h-100 shadow-sm">
                                     <h5 class="fw-bold text-danger mb-2"><i class="fa-solid fa-user-lock"></i> Suspensión de Cuenta</h5>
                                     <p class="text-muted small">Restringe el acceso del usuario temporal o indefinidamente. En suspensión temporal, se reactiva automáticamente.</p>
                                     
@@ -1012,14 +1012,14 @@
                                             <i class="fa-solid fa-ban"></i> Suspender Cuenta
                                         </button>
                                         <button class="btn btn-outline-success btn-sm fw-bold" onclick="executeReactivation()">
-                                            <i class="fa-solid fa-unlock"></i> Reactivar Manualmente
+                                            <i class="fa-solid fa-unlock"></i> Reactivar
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card p-3 border h-100">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card p-3 border h-100 shadow-sm">
                                     <h5 class="fw-bold text-warning mb-2"><i class="fa-solid fa-power-off"></i> Cierre Forzoso de Sesiones</h5>
                                     <p class="text-muted small">Invalida todas las sesiones activas del usuario de forma inmediata en el backend y Spring Security.</p>
                                     
@@ -1031,14 +1031,53 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="card p-3 border h-100">
-                                    <h5 class="fw-bold text-primary mb-2"><i class="fa-solid fa-key"></i> Restablecimiento de Clave Seguro</h5>
-                                    <p class="text-muted small">Dispara un enlace seguro y encriptado al correo electrónico del usuario. Jamás se expone la contraseña.</p>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card p-3 border h-100 shadow-sm">
+                                    <h5 class="fw-bold text-primary mb-2"><i class="fa-solid fa-key"></i> Restablecimiento de Clave</h5>
+                                    <p class="text-muted small">Dispara un enlace seguro y encriptado con plantilla corporativa al correo electrónico del usuario.</p>
                                     
                                     <div class="mt-auto">
                                         <button class="btn btn-outline-primary btn-sm fw-bold" onclick="executeSecurePasswordReset()">
-                                            <i class="fa-solid fa-envelope"></i> Enviar Enlace de Restablecimiento
+                                            <i class="fa-solid fa-envelope"></i> Enviar Enlace Seguro
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card p-3 border h-100 shadow-sm">
+                                    <h5 class="fw-bold text-success mb-2"><i class="fa-solid fa-paper-plane"></i> Comunicación Oficial Directa</h5>
+                                    <p class="text-muted small">Envía comunicaciones oficiales con confirmación de entrega y adjuntos directamente al buzón del usuario.</p>
+                                    
+                                    <div class="mt-auto">
+                                        <button class="btn btn-success btn-sm fw-bold text-white" onclick="openEmailModal()">
+                                            <i class="fa-solid fa-envelope-open-text"></i> Redactar Correo Oficial
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card p-3 border h-100 shadow-sm">
+                                    <h5 class="fw-bold text-info mb-2"><i class="fa-solid fa-desktop"></i> Telemetría y Pantalla en Vivo</h5>
+                                    <p class="text-muted small">Inspecciona en tiempo real la ruta URL y sección donde el usuario se encuentra navegando actualmente.</p>
+                                    
+                                    <div class="mt-auto">
+                                        <button class="btn btn-info btn-sm fw-bold text-white" onclick="openSessionMirrorModal()">
+                                            <i class="fa-solid fa-eye"></i> Ver Telemetría en Vivo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card p-3 border h-100 shadow-sm">
+                                    <h5 class="fw-bold text-secondary mb-2"><i class="fa-solid fa-list-check"></i> Auditoría Forense</h5>
+                                    <p class="text-muted small">Consulta el historial inmutable de acciones administrativas aplicadas sobre esta cuenta en MongoDB.</p>
+                                    
+                                    <div class="mt-auto">
+                                        <button class="btn btn-outline-secondary btn-sm fw-bold" onclick="switchSupervisionTab('audit')">
+                                            <i class="fa-solid fa-magnifying-glass-chart"></i> Ver Registros de Auditoría
                                         </button>
                                     </div>
                                 </div>
