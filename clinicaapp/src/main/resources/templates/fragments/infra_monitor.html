@@ -337,34 +337,36 @@
                         const modalHtml = document.createElement('div');
                         modalHtml.id = 'admin-direct-modal';
                         modalHtml.style.position = 'fixed';
-                        modalHtml.style.top = '16px';
-                        modalHtml.style.right = '16px';
+                        modalHtml.style.top = '20px';
+                        modalHtml.style.left = '50%';
+                        modalHtml.style.transform = 'translateX(-50%)';
                         modalHtml.style.zIndex = '999999';
-                        modalHtml.style.maxWidth = '420px';
+                        modalHtml.style.maxWidth = '440px';
                         modalHtml.style.width = 'calc(100% - 32px)';
                         modalHtml.style.background = '#ffffff';
                         modalHtml.style.border = '1px solid #cbd5e1';
                         modalHtml.style.borderRadius = '16px';
-                        modalHtml.style.padding = '20px';
+                        modalHtml.style.padding = '18px 20px';
                         modalHtml.style.color = '#0f172a';
-                        modalHtml.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0,0,0,0.05)';
+                        modalHtml.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0,0,0,0.05)';
                         modalHtml.style.fontFamily = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
-                        modalHtml.style.animation = 'hexSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                        modalHtml.style.boxSizing = 'border-box';
+                        modalHtml.style.transition = 'all 0.3s ease';
 
                         modalHtml.innerHTML = `
                             <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-                                <div style="width: 40px; height: 40px; border-radius: 10px; background: #e0f2fe; border: 1px solid #bae6fd; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #0284c7; flex-shrink: 0;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: #e0f2fe; border: 1px solid #bae6fd; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: #0284c7; flex-shrink: 0;">
                                     <i class="fa-solid fa-shield-halved"></i>
                                 </div>
-                                <div style="flex-grow: 1;">
+                                <div style="flex-grow: 1; min-width: 0;">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #0284c7; font-weight: 800;">Mensaje de la Administración</span>
                                         <button id="close-admin-msg-btn" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
                                     </div>
-                                    <h6 style="margin: 2px 0 0; font-size: 14px; font-weight: 700; color: #0f172a;">${msg.asunto || 'Notificación Oficial'}</h6>
+                                    <h6 style="margin: 2px 0 0; font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${msg.asunto || 'Notificación Oficial'}</h6>
                                 </div>
                             </div>
-                            <div style="background: #f8fafc; padding: 12px 14px; border-radius: 10px; font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 12px; border: 1px solid #e2e8f0; word-break: break-word;">
+                            <div style="background: #f8fafc; padding: 12px 14px; border-radius: 10px; font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 12px; border: 1px solid #e2e8f0; word-break: break-word; max-height: 180px; overflow-y: auto;">
                                 ${msg.contenido}
                             </div>
                             
