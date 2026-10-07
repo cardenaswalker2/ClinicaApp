@@ -1224,17 +1224,79 @@
         // Polling en tiempo real
         async function refreshSupervisionData() {
             if (!selectedUserId) return;
+            const syncBtn = document.querySelector('.btn-nav-sync i');
+            if (syncBtn) syncBtn.classList.add('bi-spin');
+
             try {
-                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/estado`, { cache: 'no-store' });
-                if (res.status === 200) {
-                    const data = await res.json();
+                const [resEstado, resConv] = await Promise.all([
+                    fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/estado`, { cache: 'no-store' }),
+                    fetch(`/api/supervision/mensajeria/conversacion/${encodeURIComponent(selectedUserId)}`, { cache: 'no-store' })
+                ]);
+
+                if (resEstado.status === 200) {
+                    const data = await resEstado.json();
                     if (data.encontrado) {
                         updateLiveUI(data);
                     }
                 }
+
+                if (resConv.status === 200) {
+                    const convData = await resConv.json();
+                    if (Array.isArray(convData)) {
+                        updateConversationUI(convData);
+                    }
+                }
             } catch (err) {
                 console.error("Fallo al actualizar telemetría:", err);
+            } finally {
+                if (syncBtn) syncBtn.classList.remove('bi-spin');
             }
+        }
+
+        function updateConversationUI(mensajes) {
+            const container = document.getElementById('conversationListContainer');
+            if (!container) return;
+
+            if (mensajes.length === 0) {
+                container.innerHTML = '<div class="text-muted small py-4 text-center">No hay mensajes directos enviados previamente a este usuario.</div>';
+                return;
+            }
+
+            let html = '';
+            mensajes.forEach(msg => {
+                const dateStr = msg.fechaEnvio ? new Date(msg.fechaEnvio).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Reciente';
+                const badgeClass = msg.leido ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle';
+                const badgeText = msg.leido ? 'LEÍDO' : 'PENDIENTE';
+
+                html += `
+                    <div class="message-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-fill text-primary"></i>
+                                <span class="fw-bold text-dark">${escapeHtml(msg.asunto || 'Mensaje')}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge ${badgeClass}" style="font-size: 10px;">${badgeText}</span>
+                                <span class="text-muted font-monospace small">${dateStr}</span>
+                            </div>
+                        </div>
+                        <p class="m-0 text-secondary" style="font-size: 13.5px; line-height: 1.6;">${escapeHtml(msg.contenido || '')}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
         function updateLiveUI(data) {
@@ -1270,10 +1332,10 @@
                                 <div class="timeline-circle"></div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="timeline-time">${dateStr}</span>
-                                    <span class="badge bg-light text-dark border">${ev.seccion || 'Sistema'}</span>
+                                    <span class="badge bg-light text-dark border">${escapeHtml(ev.seccion || 'Sistema')}</span>
                                 </div>
-                                <div class="fw-bold text-dark mt-1" style="font-size: 14px;">${ev.accion || 'Navegación'}</div>
-                                ${ev.metadata ? `<div class="text-muted small" style="font-size: 12px;">Detalles: ${ev.metadata}</div>` : ''}
+                                <div class="fw-bold text-dark mt-1" style="font-size: 14px;">${escapeHtml(ev.accion || 'Navegación')}</div>
+                                ${ev.metadata ? `<div class="text-muted small" style="font-size: 12px;">Detalles: ${escapeHtml(ev.metadata)}</div>` : ''}
                             </div>
                         `;
                     });
@@ -1313,14 +1375,17 @@
                 const json = await res.json();
                 if (res.ok && json.success) {
                     alertBox.className = 'alert alert-success small';
-                    alertBox.textContent = '¡Mensaje despachado y notificado en la pantalla del usuario!';
+                    alertBox.textContent = '¡Mensaje despachado y notificado en tiempo real!';
                     alertBox.classList.remove('d-none');
                     document.getElementById('msgContenido').value = '';
+                    
+                    // Actualizar datos en vivo inmediatamente sin recargar la página
+                    refreshSupervisionData();
+
                     setTimeout(() => {
                         bootstrap.Modal.getInstance(document.getElementById('modalDirectMessage')).hide();
                         alertBox.classList.add('d-none');
-                        location.reload();
-                    }, 1500);
+                    }, 1200);
                 } else {
                     alertBox.className = 'alert alert-danger small';
                     alertBox.textContent = json.error || 'Error al enviar el mensaje.';
@@ -1407,6 +1472,7 @@
         }
 
         if (selectedUserId) {
+            // Polling en vivo cada 3 segundos
             setInterval(refreshSupervisionData, 3000);
         }
         /*]]>*/

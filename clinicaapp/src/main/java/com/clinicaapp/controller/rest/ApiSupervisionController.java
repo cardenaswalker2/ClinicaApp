@@ -30,6 +30,26 @@ public class ApiSupervisionController {
     @Autowired
     private UsuarioRepository usuarioRepo;
 
+    // Helper para extraer de forma segura el email del usuario desde cualquier tipo de Authentication (OAuth2, Oidc, UserDetails, Form)
+    private String extractEmailFromAuth(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return null;
+        }
+        Object principal = auth.getPrincipal();
+        if (principal instanceof org.springframework.security.oauth2.core.oidc.user.OidcUser oidcUser) {
+            String email = (String) oidcUser.getClaims().get("email");
+            if (email != null && !email.isBlank()) return email;
+        }
+        if (principal instanceof org.springframework.security.oauth2.core.user.OAuth2User oAuth2User) {
+            String email = (String) oAuth2User.getAttributes().get("email");
+            if (email != null && !email.isBlank()) return email;
+        }
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            return userDetails.getUsername();
+        }
+        return auth.getName();
+    }
+
     // Helper de validación de Super Administrador tanto por sesión como por parámetro email
     private boolean isSuperAdmin(String explicitEmail) {
         // 1. Validar por SecurityContext (web session / OAuth2 / FormLogin)
@@ -41,7 +61,7 @@ public class ApiSupervisionController {
             if (hasAdminRole) return true;
 
             // Verificar en base de datos si el usuario logueado es ROLE_ADMIN
-            String currentUsername = auth.getName();
+            String currentUsername = extractEmailFromAuth(auth);
             if (currentUsername != null && !currentUsername.isBlank()) {
                 Usuario u = usuarioRepo.findByEmail(currentUsername.trim());
                 if (u != null && u.getRole() == Role.ROLE_ADMIN && u.isActivo()) {
@@ -234,11 +254,9 @@ public class ApiSupervisionController {
             jakarta.servlet.http.HttpServletRequest request) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = null;
+        String userEmail = extractEmailFromAuth(auth);
 
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            userEmail = auth.getName();
-        } else if (payload.containsKey("email")) {
+        if ((userEmail == null || userEmail.isBlank()) && payload.containsKey("email")) {
             userEmail = payload.get("email");
         }
 
@@ -287,11 +305,11 @@ public class ApiSupervisionController {
     @GetMapping("/mis-mensajes")
     public ResponseEntity<?> getMisMensajes() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+        String email = extractEmailFromAuth(auth);
+        if (email == null || email.isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
         }
 
-        String email = auth.getName();
         List<MensajeDirecto> mensajes = mensajeDirectoService.obtenerMensajesUsuario(email);
         long noLeidos = mensajeDirectoService.contarNoLeidos(email);
 
@@ -305,7 +323,7 @@ public class ApiSupervisionController {
     @PostMapping("/mis-mensajes/{id}/leer")
     public ResponseEntity<?> marcarLeido(@PathVariable String id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = (auth != null && auth.isAuthenticated()) ? auth.getName() : null;
+        String email = extractEmailFromAuth(auth);
 
         boolean ok = mensajeDirectoService.marcarComoLeido(id, email);
         return ResponseEntity.ok(Map.of("success", ok));
