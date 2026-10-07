@@ -4,125 +4,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Centro de Supervisión de Usuarios | ClínicaApp Control Core</title>
+    <title>Supervisión y Mensajería de Usuarios | ClínicaApp</title>
     <link th:replace="~{fragments/header :: favIcon}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #060b14;
-            --bg-surface: #0b1322;
-            --bg-card: #101c30;
-            --bg-card-hover: #162540;
-            --border-color: rgba(255, 255, 255, 0.12);
-            --border-focus: #00d4ff;
-            --color-primary: #38bdf8;
-            --color-accent: #6366f1;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --text-title: #ffffff;
-            --text-body: #e2e8f0;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e1;
+            
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --primary-light: #e0f2fe;
+            
+            --accent: #4f46e5;
+            --accent-light: #eef2ff;
+            
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --text-subtle: #94a3b8;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
         }
 
         * {
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: var(--bg-page);
             color: var(--text-body);
             min-height: 100vh;
-            padding-bottom: 60px;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.05) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.05) 0%, transparent 45%);
-            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== BARRA DE NAVEGACIÓN DEDICADA DE CONTROL CORE ===== */
+        .core-nav-bar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .core-nav-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .core-brand-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        .core-logo-badge {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0284c7, #4f46e5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+        }
+
+        .core-brand-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .core-brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .core-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-nav-control-core {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-nav-control-core:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-nav-sync {
+            background: var(--primary);
+            border: none;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+        }
+
+        .btn-nav-sync:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
         }
 
         /* ===== CONTENEDOR PRINCIPAL ===== */
         .app-container {
             max-width: 1440px;
             margin: 0 auto;
-            padding: 95px 24px 40px;
+            padding: 24px;
         }
 
-        /* ===== BARRA DE CONTROL SUPERIOR ===== */
-        .page-header-card {
-            background: linear-gradient(135deg, #0d182b 0%, #0b1322 100%);
+        /* ===== TARJETA DE CABECERA INFORMATIVA ===== */
+        .header-banner {
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 24px 28px;
             margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
-        .header-title-group h1 {
-            font-size: 1.65rem;
+        .header-banner-left h1 {
+            font-size: 1.5rem;
             font-weight: 800;
-            color: var(--text-title);
-            margin: 0 0 6px 0;
-            letter-spacing: -0.5px;
+            color: var(--text-heading);
+            margin: 0 0 4px 0;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .header-title-group p {
+        .header-banner-left p {
             color: var(--text-muted);
             font-size: 0.92rem;
             margin: 0;
         }
 
-        .badge-secure-pill {
-            background: rgba(56, 189, 248, 0.12);
-            color: var(--color-primary);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-size: 11px;
+        .badge-super-admin {
+            background: var(--primary-light);
+            color: var(--primary);
             font-weight: 800;
-            letter-spacing: 0.8px;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-        }
-
-        .btn-header-action {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: #ffffff;
-            padding: 9px 18px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .btn-header-action:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-1px);
-        }
-
-        .btn-header-back {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.2));
-            border-color: rgba(56, 189, 248, 0.4);
-            color: #38bdf8;
         }
 
         /* ===== LAYOUT GRID 2 COLUMNAS ===== */
@@ -133,7 +218,7 @@
             align-items: start;
         }
 
-        @media (max-width: 1080px) {
+        @media (max-width: 1024px) {
             .supervision-layout {
                 grid-template-columns: 1fr;
             }
@@ -143,12 +228,12 @@
         .sidebar-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 22px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .sidebar-title-bar {
+        .sidebar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -158,67 +243,83 @@
         .sidebar-title {
             font-size: 1.05rem;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-heading);
             margin: 0;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .search-input-box {
+        .count-pill {
+            background: var(--bg-subtle);
+            color: var(--text-body);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-box {
             position: relative;
             margin-bottom: 16px;
         }
 
-        .search-input-box i {
+        .search-box i {
             position: absolute;
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 14px;
         }
 
-        .user-search-field {
+        .search-input {
             width: 100%;
-            background: #070d18;
+            background: #f8fafc;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 11px 16px 11px 42px;
-            color: #ffffff;
-            font-size: 13.5px;
+            border-radius: 10px;
+            padding: 10px 14px 10px 40px;
+            color: var(--text-heading);
+            font-size: 0.9rem;
+            font-weight: 500;
             outline: none;
-            transition: border 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
 
-        .user-search-field:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 12px rgba(0, 212, 255, 0.25);
+        .search-input:focus {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
-        .user-list-wrapper {
-            max-height: 680px;
+        .search-input::placeholder {
+            color: var(--text-subtle);
+        }
+
+        .user-list {
+            max-height: 620px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding-right: 4px;
+            padding-right: 2px;
         }
 
-        .user-list-wrapper::-webkit-scrollbar {
-            width: 6px;
+        .user-list::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .user-list-wrapper::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+        .user-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
             border-radius: 10px;
         }
 
-        /* TARJETA DE USUARIO EN LISTA */
-        .user-row-card {
-            background: var(--bg-card);
+        /* TARJETA DE USUARIO INDIVIDUAL */
+        .user-item-card {
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 12px 14px;
             display: flex;
             align-items: center;
@@ -229,177 +330,174 @@
             cursor: pointer;
         }
 
-        .user-row-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(56, 189, 248, 0.4);
-            transform: translateX(3px);
+        .user-item-card:hover {
+            background: #f8fafc;
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
             color: inherit;
         }
 
-        .user-row-card.active {
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.22) 0%, rgba(99, 102, 241, 0.22) 100%);
-            border: 1.5px solid var(--color-primary);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        .user-item-card.active {
+            background: #f0f9ff;
+            border: 1.5px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
         }
 
-        .avatar-box {
-            position: relative;
+        .user-avatar {
             width: 42px;
             height: 42px;
-            border-radius: 12px;
-            background: #1e2d4a;
+            border-radius: 10px;
+            background: #e0f2fe;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            color: #38bdf8;
-            font-size: 16px;
+            position: relative;
             flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid #bae6fd;
         }
 
-        .online-dot {
+        .status-dot {
             position: absolute;
             bottom: -2px;
             right: -2px;
-            width: 13px;
-            height: 13px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            border: 2px solid var(--bg-surface);
+            border: 2px solid #ffffff;
         }
 
-        .dot-green {
-            background: var(--color-success);
-            box-shadow: 0 0 8px var(--color-success);
+        .status-dot.online {
+            background: var(--success);
         }
 
-        .dot-gray {
-            background: #64748b;
+        .status-dot.offline {
+            background: #94a3b8;
         }
 
-        .user-info-text {
+        .user-info {
             flex-grow: 1;
             margin-left: 12px;
             overflow: hidden;
         }
 
-        .user-name-title {
+        .user-name {
             font-weight: 700;
-            color: #ffffff;
-            font-size: 14px;
+            font-size: 0.92rem;
+            color: var(--text-heading);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .user-email-subtitle {
+        .user-email {
+            font-size: 0.78rem;
             color: var(--text-muted);
-            font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .user-badge-status {
-            font-size: 10px;
+        .badge-status {
+            font-size: 0.68rem;
             font-weight: 800;
             padding: 3px 8px;
             border-radius: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-block;
         }
 
-        .status-badge-online {
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.35);
+        .badge-status.online {
+            background: var(--success-light);
+            color: #15803d;
+            border: 1px solid #bbf7d0;
         }
 
-        .status-badge-offline {
-            background: rgba(148, 163, 184, 0.1);
-            color: #94a3b8;
-            border: 1px solid rgba(148, 163, 184, 0.2);
+        .badge-status.offline {
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
         }
 
         /* ===== PANEL PRINCIPAL DERECHO ===== */
-        .main-monitor-card {
+        .main-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            box-shadow: var(--shadow-sm);
             min-height: 600px;
         }
 
-        .empty-selection-placeholder {
-            padding: 80px 20px;
+        .empty-placeholder {
+            padding: 90px 20px;
             text-align: center;
         }
 
-        .empty-icon-circle {
-            width: 74px;
-            height: 74px;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.25);
+        .empty-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--primary-light);
+            color: var(--primary);
             border-radius: 20px;
-            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            color: var(--color-primary);
+            font-size: 2rem;
+            margin: 0 auto 20px;
         }
 
-        /* CABECERA DEL USUARIO SELECCIONADO */
-        .selected-user-bar {
-            background: #08101e;
+        /* CABECERA DE USUARIO SELECCIONADO */
+        .user-profile-header {
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 18px 22px;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            margin-bottom: 22px;
         }
 
-        .user-main-details {
+        .profile-info-group {
             display: flex;
             align-items: center;
             gap: 16px;
         }
 
-        .user-big-avatar {
-            width: 54px;
-            height: 54px;
+        .profile-avatar-lg {
+            width: 56px;
+            height: 56px;
             border-radius: 14px;
-            background: #1e2d4a;
-            color: #38bdf8;
-            font-size: 20px;
+            background: #e0f2fe;
+            color: var(--primary);
+            font-size: 1.35rem;
             font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
             position: relative;
+            border: 1.5px solid #bae6fd;
         }
 
-        .user-title-row {
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-heading);
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .user-heading-name {
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin: 0;
-        }
-
-        .user-meta-line {
+        .profile-meta {
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 0.85rem;
             margin-top: 4px;
             display: flex;
             align-items: center;
@@ -407,124 +505,125 @@
             flex-wrap: wrap;
         }
 
-        .action-buttons-rack {
+        .action-buttons-group {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .btn-action-pill {
+        .btn-action-custom {
             padding: 9px 16px;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 0.85rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            border: none;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
+            border: 1px solid transparent;
         }
 
-        .btn-action-mirror {
-            background: linear-gradient(135deg, #0284c7, #4f46e5);
+        .btn-mirror {
+            background: #f0f9ff;
+            color: var(--primary);
+            border-color: #bae6fd;
+        }
+
+        .btn-mirror:hover {
+            background: var(--primary);
             color: #ffffff;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+            border-color: var(--primary);
         }
 
-        .btn-action-mirror:hover {
+        .btn-message {
+            background: #eef2ff;
+            color: var(--accent);
+            border-color: #c7d2fe;
+        }
+
+        .btn-message:hover {
+            background: var(--accent);
             color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+            border-color: var(--accent);
         }
 
-        .btn-action-msg {
-            background: #1e293b;
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+        .btn-email {
+            background: #f0fdf4;
+            color: var(--success);
+            border-color: #bbf7d0;
         }
 
-        .btn-action-msg:hover {
-            background: #0284c7;
+        .btn-email:hover {
+            background: var(--success);
             color: #ffffff;
-            transform: translateY(-2px);
+            border-color: var(--success);
         }
 
-        .btn-action-mail {
-            background: #1e293b;
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-action-mail:hover {
-            background: #10b981;
-            color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        /* KPIS DE TELEMETRÍA */
-        .telemetry-grid {
+        /* TELEMETRÍA KPIS */
+        .telemetry-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 14px;
             margin-bottom: 24px;
         }
 
-        .telemetry-box {
-            background: #091120;
+        .telemetry-card {
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 16px;
             display: flex;
             align-items: center;
             gap: 14px;
+            box-shadow: var(--shadow-sm);
         }
 
         .telemetry-icon-box {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 1.25rem;
             flex-shrink: 0;
         }
 
-        .t-label {
-            font-size: 11.5px;
+        .kpi-label {
+            font-size: 0.72rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             font-weight: 700;
+            letter-spacing: 0.5px;
             display: block;
         }
 
-        .t-val {
-            font-size: 14.5px;
+        .kpi-value {
+            font-size: 0.95rem;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-heading);
             margin-top: 2px;
             display: block;
         }
 
         /* PESTAÑAS */
-        .custom-tabs-bar {
+        .nav-tabs-custom {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 14px;
+            padding-bottom: 12px;
             margin-bottom: 20px;
         }
 
-        .tab-btn {
+        .tab-btn-custom {
             background: transparent;
-            border: 1px solid var(--border-color);
+            border: 1px solid transparent;
             color: var(--text-muted);
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -533,72 +632,87 @@
             gap: 8px;
         }
 
-        .tab-btn.active {
-            background: rgba(56, 189, 248, 0.15);
-            border-color: var(--color-primary);
-            color: #ffffff;
+        .tab-btn-custom:hover {
+            color: var(--text-heading);
+            background: var(--bg-subtle);
+        }
+
+        .tab-btn-custom.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: #bae6fd;
         }
 
         /* TIMELINE */
-        .timeline-scroll-area {
+        .timeline-box {
             max-height: 480px;
             overflow-y: auto;
             padding-left: 20px;
             position: relative;
         }
 
-        .timeline-scroll-area::before {
+        .timeline-box::before {
             content: '';
             position: absolute;
             left: 6px;
             top: 10px;
             bottom: 10px;
             width: 2px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--border-color);
         }
 
-        .timeline-entry {
+        .timeline-item {
             position: relative;
-            background: #091120;
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 14px 16px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
             transition: all 0.2s;
         }
 
-        .timeline-entry:hover {
-            border-color: rgba(56, 189, 248, 0.4);
+        .timeline-item:hover {
+            border-color: var(--primary);
         }
 
-        .timeline-node {
+        .timeline-circle {
             position: absolute;
             left: -19px;
             top: 18px;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: var(--color-primary);
-            border: 2px solid var(--bg-surface);
+            background: var(--primary);
+            border: 2px solid #ffffff;
         }
 
-        .timeline-time-tag {
+        .timeline-time {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: #38bdf8;
-            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
         }
 
-        /* MODALES LIMPIOS Y PROFESIONALES */
-        .clean-modal-content {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            color: #ffffff;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+        /* MENSAJES */
+        .message-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .clean-modal-header {
+        /* MODALES BLANCOS LIMPIOS */
+        .modal-white-content {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            color: var(--text-heading);
+        }
+
+        .modal-white-header {
             padding: 20px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -606,105 +720,104 @@
             justify-content: space-between;
         }
 
-        .clean-modal-body {
+        .modal-white-body {
             padding: 24px;
         }
 
-        .clean-modal-footer {
+        .modal-white-footer {
             padding: 16px 24px;
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 10px;
+            background: #f8fafc;
+            border-radius: 0 0 16px 16px;
         }
 
-        .form-label-clean {
-            font-size: 12.5px;
+        .form-label-custom {
+            font-size: 0.82rem;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--text-heading);
             margin-bottom: 6px;
             display: block;
         }
 
-        .form-control-clean {
+        .form-input-custom {
             width: 100%;
-            background: #070d18;
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px 14px;
-            color: #ffffff;
-            font-size: 14px;
+            color: var(--text-heading);
+            font-size: 0.9rem;
+            font-weight: 500;
             outline: none;
             transition: all 0.2s;
         }
 
-        .form-control-clean:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.25);
+        .form-input-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
-        .form-control-clean[readonly] {
-            background: #040811;
-            color: #94a3b8;
+        .form-input-custom[readonly] {
+            background: #f8fafc;
+            color: var(--text-muted);
         }
 
-        .file-upload-clean-box {
-            border: 2px dashed rgba(255, 255, 255, 0.15);
+        .file-dropzone-white {
+            border: 2px dashed var(--border-hover);
             border-radius: 12px;
-            padding: 18px;
+            padding: 20px;
             text-align: center;
-            background: #070d18;
+            background: #f8fafc;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .file-upload-clean-box:hover {
-            border-color: var(--color-primary);
-            background: #0a1222;
-        }
-
-        .btn-submit-clean {
-            background: linear-gradient(135deg, #0284c7, #4f46e5);
-            color: #ffffff;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 10px;
-            font-size: 13.5px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-submit-clean:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+        .file-dropzone-white:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
         }
     </style>
 </head>
 
 <body>
 
-    <header th:replace="~{fragments/header :: header-admin}"></header>
+    <!-- ===== BARRA DE NAVEGACIÓN DEDICADA DE CONTROL CORE ===== -->
+    <nav class="core-nav-bar">
+        <div class="core-nav-container">
+            <a th:href="@{/admin/centro-control}" class="core-brand-group">
+                <div class="core-logo-badge">
+                    <i class="bi bi-shield-shaded"></i>
+                </div>
+                <div>
+                    <h1 class="core-brand-title">ClínicaApp <span style="color: var(--primary);">Supervisión</span></h1>
+                    <span class="core-brand-subtitle">Módulo de Control y Telemetría</span>
+                </div>
+            </a>
+            <div class="core-nav-actions">
+                <a th:href="@{/admin/centro-control}" class="btn-nav-control-core">
+                    <i class="bi bi-arrow-left"></i> Volver a Control Core
+                </a>
+                <button class="btn-nav-sync" onclick="refreshSupervisionData()">
+                    <i class="bi bi-arrow-clockwise"></i> Sincronizar
+                </button>
+            </div>
+        </div>
+    </nav>
 
     <div class="app-container">
 
         <!-- CABECERA DE LA PÁGINA -->
-        <div class="page-header-card">
-            <div class="header-title-group">
+        <div class="header-banner">
+            <div class="header-banner-left">
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge-secure-pill"><i class="bi bi-shield-check"></i> Super Administrador</span>
-                    <span class="badge bg-secondary bg-opacity-25 text-light small">Control Core v2.4</span>
+                    <span class="badge-super-admin"><i class="bi bi-shield-lock-fill"></i> Super Administrador</span>
+                    <span class="badge bg-light text-secondary border">Control Core v2.4</span>
                 </div>
-                <h1><i class="bi bi-person-bounding-box text-primary"></i> Supervisión & Mensajería Individual</h1>
+                <h1><i class="bi bi-person-lines-fill text-primary"></i> Supervisión & Mensajería Individual</h1>
                 <p>Monitoreo activo de sesión, telemetría de navegación segura y comunicación directa con usuarios.</p>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <a th:href="@{/admin/centro-control}" class="btn-header-action btn-header-back">
-                    <i class="bi bi-cpu-fill"></i> Volver a Control Core
-                </a>
-                <button class="btn-header-action" onclick="refreshSupervisionData()">
-                    <i class="bi bi-arrow-clockwise"></i> Sincronizar
-                </button>
             </div>
         </div>
 
@@ -713,35 +826,35 @@
 
             <!-- 1. SIDEBAR: LISTA DE USUARIOS -->
             <div class="sidebar-card">
-                <div class="sidebar-title-bar">
+                <div class="sidebar-header">
                     <h2 class="sidebar-title"><i class="bi bi-people-fill text-primary"></i> Usuarios</h2>
-                    <span class="badge bg-dark text-info border border-secondary border-opacity-25" th:text="${usuarios.size()} + ' Total'">0 Total</span>
+                    <span class="count-pill" th:text="${usuarios.size()} + ' Registrados'">0 Registrados</span>
                 </div>
 
-                <div class="search-input-box">
+                <div class="search-box">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="user-search-field" id="userSearchInput" placeholder="Buscar por nombre o correo..." th:value="${query}" oninput="filterUserCards(this.value)">
+                    <input type="text" class="search-input" id="userSearchInput" placeholder="Buscar por nombre o correo..." th:value="${query}" oninput="filterUserCards(this.value)">
                 </div>
 
-                <div class="user-list-wrapper" id="userListContainer">
+                <div class="user-list" id="userListContainer">
                     <th:block th:each="user : ${usuarios}">
                         <a th:href="@{/admin/supervision(usuarioId=${user.id}, q=${query})}" 
-                           class="user-row-card" 
+                           class="user-item-card" 
                            th:classappend="${usuarioSeleccionadoId == user.id ? 'active' : ''}"
                            th:data-search="${user.nombre + ' ' + user.email}">
                             <div class="d-flex align-items-center" style="overflow: hidden;">
-                                <div class="avatar-box">
+                                <div class="user-avatar">
                                     <span th:text="${#strings.substring(user.nombre, 0, 1)}">U</span>
-                                    <span class="online-dot" th:classappend="${user.online ? 'dot-green' : 'dot-gray'}"></span>
+                                    <span class="status-dot" th:classappend="${user.online ? 'online' : 'offline'}"></span>
                                 </div>
-                                <div class="user-info-text">
-                                    <div class="user-name-title" th:text="${user.nombre}">Nombre</div>
-                                    <div class="user-email-subtitle" th:text="${user.email}">correo@ejemplo.com</div>
+                                <div class="user-info">
+                                    <div class="user-name" th:text="${user.nombre}">Nombre</div>
+                                    <div class="user-email" th:text="${user.email}">correo@ejemplo.com</div>
                                 </div>
                             </div>
                             <div class="text-end ps-2">
-                                <span class="user-badge-status" th:classappend="${user.online ? 'status-badge-online' : 'status-badge-offline'}" th:text="${user.online ? 'ONLINE' : 'OFFLINE'}">ONLINE</span>
-                                <div class="small mt-1 text-truncate" style="font-size: 11px; color: #38bdf8; max-width: 80px;" th:text="${user.seccion}">Sección</div>
+                                <span class="badge-status" th:classappend="${user.online ? 'online' : 'offline'}" th:text="${user.online ? 'ONLINE' : 'OFFLINE'}">ONLINE</span>
+                                <div class="small mt-1 text-truncate fw-semibold" style="font-size: 11px; color: var(--primary); max-width: 80px;" th:text="${user.seccion}">Sección</div>
                             </div>
                         </a>
                     </th:block>
@@ -749,16 +862,16 @@
             </div>
 
             <!-- 2. CONTENIDO PRINCIPAL: MONITOREO Y ACCIONES -->
-            <div class="main-monitor-card">
+            <div class="main-card">
 
                 <!-- Estado 1: Ningún usuario seleccionado -->
-                <div th:if="${estadoUsuario == null}" class="empty-selection-placeholder">
-                    <div class="empty-icon-circle">
-                        <i class="bi bi-person-check-fill"></i>
+                <div th:if="${estadoUsuario == null}" class="empty-placeholder">
+                    <div class="empty-icon">
+                        <i class="bi bi-person-bounding-box"></i>
                     </div>
-                    <h3 class="fw-bold text-white mb-2">Selecciona un usuario de la lista</h3>
-                    <p class="text-muted" style="max-width: 440px; margin: 0 auto; font-size: 14px;">
-                        Haz clic sobre cualquier usuario del panel izquierdo para acceder a su telemetría en tiempo real, historial de eventos y canales directos de mensajería y correo.
+                    <h3 class="fw-bold text-dark mb-2">Selecciona un usuario de la lista</h3>
+                    <p class="text-muted" style="max-width: 460px; margin: 0 auto; font-size: 14.5px;">
+                        Haz clic sobre cualquier usuario del panel izquierdo para acceder a su telemetría en tiempo real, historial de navegación y canales directos de mensajería interna y correo.
                     </p>
                 </div>
 
@@ -766,18 +879,18 @@
                 <div th:if="${estadoUsuario != null}">
 
                     <!-- Tarjeta Superior de Usuario -->
-                    <div class="selected-user-bar">
-                        <div class="user-main-details">
-                            <div class="user-big-avatar">
+                    <div class="user-profile-header">
+                        <div class="profile-info-group">
+                            <div class="profile-avatar-lg">
                                 <span th:text="${#strings.substring(estadoUsuario.nombre, 0, 1)}">U</span>
-                                <span class="online-dot" th:classappend="${estadoUsuario.online ? 'dot-green' : 'dot-gray'}" style="width: 15px; height: 15px;"></span>
+                                <span class="status-dot" th:classappend="${estadoUsuario.online ? 'online' : 'offline'}" style="width: 14px; height: 14px;"></span>
                             </div>
                             <div>
-                                <div class="user-title-row">
-                                    <h2 class="user-heading-name" th:text="${estadoUsuario.nombre}">Samuel</h2>
-                                    <span class="user-badge-status" th:classappend="${estadoUsuario.online ? 'status-badge-online' : 'status-badge-offline'}" th:text="${estadoUsuario.online ? 'EN LÍNEA' : 'DESCONECTADO'}" id="liveStatusText">EN LÍNEA</span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h2 class="profile-name" th:text="${estadoUsuario.nombre}">Samuel</h2>
+                                    <span class="badge-status" th:classappend="${estadoUsuario.online ? 'online' : 'offline'}" th:text="${estadoUsuario.online ? 'EN LÍNEA' : 'DESCONECTADO'}" id="liveStatusText">EN LÍNEA</span>
                                 </div>
-                                <div class="user-meta-line">
+                                <div class="profile-meta">
                                     <span><i class="bi bi-envelope text-primary me-1"></i> <span th:text="${estadoUsuario.email}">correo@ejemplo.com</span></span>
                                     <span>•</span>
                                     <span><i class="bi bi-telephone text-primary me-1"></i> <span th:text="${estadoUsuario.telefono}">+57 300 000 0000</span></span>
@@ -786,68 +899,68 @@
                         </div>
 
                         <!-- Botones de Acción -->
-                        <div class="action-buttons-rack">
-                            <button type="button" class="btn-action-pill btn-action-mirror" onclick="openSessionMirrorModal()">
+                        <div class="action-buttons-group">
+                            <button type="button" class="btn-action-custom btn-mirror" onclick="openSessionMirrorModal()">
                                 <i class="bi bi-display"></i> Representación Sesión
                             </button>
-                            <button type="button" class="btn-action-pill btn-action-msg" onclick="openDirectMessageModal()">
-                                <i class="bi bi-chat-dots-fill"></i> Mensaje Interno
+                            <button type="button" class="btn-action-custom btn-message" onclick="openDirectMessageModal()">
+                                <i class="bi bi-chat-left-dots-fill"></i> Mensaje Interno
                             </button>
-                            <button type="button" class="btn-action-pill btn-action-mail" onclick="openEmailModal()">
+                            <button type="button" class="btn-action-custom btn-email" onclick="openEmailModal()">
                                 <i class="bi bi-envelope-paper-fill"></i> Enviar Gmail
                             </button>
                         </div>
                     </div>
 
                     <!-- Métricas de Telemetría -->
-                    <div class="telemetry-grid">
-                        <div class="telemetry-box">
-                            <div class="telemetry-icon-box bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                    <div class="telemetry-row">
+                        <div class="telemetry-card">
+                            <div class="telemetry-icon-box bg-primary bg-opacity-10 text-primary">
                                 <i class="bi bi-geo-alt-fill"></i>
                             </div>
                             <div>
-                                <span class="t-label">Sección Actual</span>
-                                <span class="t-val text-info" id="liveSectionText" th:text="${estadoUsuario.seccionActual}">Citas</span>
+                                <span class="kpi-label">Sección Actual</span>
+                                <span class="kpi-value text-primary" id="liveSectionText" th:text="${estadoUsuario.seccionActual}">Citas</span>
                             </div>
                         </div>
 
-                        <div class="telemetry-box">
-                            <div class="telemetry-icon-box bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                        <div class="telemetry-card">
+                            <div class="telemetry-icon-box bg-info bg-opacity-10 text-info">
                                 <i class="bi bi-clock-history"></i>
                             </div>
                             <div>
-                                <span class="t-label">Última Actividad</span>
-                                <span class="t-val" id="liveTimeText" th:text="${estadoUsuario.tiempoRelativo}">Hace unos segundos</span>
+                                <span class="kpi-label">Última Actividad</span>
+                                <span class="kpi-value" id="liveTimeText" th:text="${estadoUsuario.tiempoRelativo}">Hace unos segundos</span>
                             </div>
                         </div>
 
-                        <div class="telemetry-box">
-                            <div class="telemetry-icon-box bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                        <div class="telemetry-card">
+                            <div class="telemetry-icon-box bg-success bg-opacity-10 text-success">
                                 <i class="bi bi-laptop"></i>
                             </div>
                             <div>
-                                <span class="t-label">Dispositivo & SO</span>
-                                <span class="t-val" th:text="${estadoUsuario.dispositivo + ' • ' + estadoUsuario.os}">Desktop • Windows</span>
+                                <span class="kpi-label">Dispositivo & SO</span>
+                                <span class="kpi-value" th:text="${estadoUsuario.dispositivo + ' • ' + estadoUsuario.os}">Desktop • Windows</span>
                             </div>
                         </div>
 
-                        <div class="telemetry-box">
-                            <div class="telemetry-icon-box bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">
+                        <div class="telemetry-card">
+                            <div class="telemetry-icon-box bg-warning bg-opacity-10 text-warning">
                                 <i class="bi bi-globe"></i>
                             </div>
                             <div>
-                                <span class="t-label">Dirección IP</span>
-                                <span class="t-val font-monospace" th:text="${estadoUsuario.ip}">127.0.0.1</span>
+                                <span class="kpi-label">Dirección IP</span>
+                                <span class="kpi-value font-monospace" th:text="${estadoUsuario.ip}">127.0.0.1</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Pestañas de Historial y Mensajería -->
-                    <div class="custom-tabs-bar">
-                        <button class="tab-btn active" id="tabBtnTimeline" onclick="switchTab('timeline')">
+                    <div class="nav-tabs-custom">
+                        <button class="tab-btn-custom active" id="tabBtnTimeline" onclick="switchTab('timeline')">
                             <i class="bi bi-activity"></i> Línea de Tiempo de Eventos
                         </button>
-                        <button class="tab-btn" id="tabBtnMessages" onclick="switchTab('messages')">
+                        <button class="tab-btn-custom" id="tabBtnMessages" onclick="switchTab('messages')">
                             <i class="bi bi-chat-left-text-fill"></i> Mensajes Enviados a este Usuario
                         </button>
                     </div>
@@ -855,19 +968,19 @@
                     <!-- Contenido Tab 1: Timeline -->
                     <div id="tabContentTimeline">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-muted small font-monospace">REGISTRO DE NAVEGACIÓN EN TIEMPO REAL</span>
-                            <span class="badge bg-primary bg-opacity-25 text-info border border-primary border-opacity-25">Sincronización Activa (3s)</span>
+                            <span class="text-muted small fw-bold font-monospace">REGISTRO DE NAVEGACIÓN EN TIEMPO REAL</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">Sincronización Activa (3s)</span>
                         </div>
 
-                        <div class="timeline-scroll-area" id="timelineListContainer">
+                        <div class="timeline-box" id="timelineListContainer">
                             <th:block th:each="ev : ${estadoUsuario.eventosRecientes}">
-                                <div class="timeline-entry">
-                                    <div class="timeline-node"></div>
+                                <div class="timeline-item">
+                                    <div class="timeline-circle"></div>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <span class="timeline-time-tag" th:text="${#temporals.format(ev.fechaHora, 'hh:mm:ss a')}">10:42:18 PM</span>
-                                        <span class="badge bg-dark border border-secondary border-opacity-25 text-info" th:text="${ev.seccion}">Citas</span>
+                                        <span class="timeline-time" th:text="${#temporals.format(ev.fechaHora, 'hh:mm:ss a')}">10:42:18 PM</span>
+                                        <span class="badge bg-light text-dark border" th:text="${ev.seccion}">Citas</span>
                                     </div>
-                                    <div class="fw-bold text-white mt-1" style="font-size: 14px;" th:text="${ev.accion}">Entró a Citas</div>
+                                    <div class="fw-bold text-dark mt-1" style="font-size: 14px;" th:text="${ev.accion}">Entró a Citas</div>
                                     <div class="text-muted small" style="font-size: 12px;" th:if="${ev.metadata != null and !ev.metadata.isEmpty()}" th:text="'Detalles: ' + ${ev.metadata}"></div>
                                 </div>
                             </th:block>
@@ -880,26 +993,26 @@
                     <!-- Contenido Tab 2: Mensajes -->
                     <div id="tabContentMessages" style="display: none;">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-muted small">Historial de alertas y mensajes administrativos</span>
-                            <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="openDirectMessageModal()">
+                            <span class="text-muted small fw-bold">Historial de alertas y mensajes administrativos</span>
+                            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="openDirectMessageModal()">
                                 <i class="bi bi-plus-lg me-1"></i> Nuevo Mensaje
                             </button>
                         </div>
 
                         <div class="d-flex flex-column gap-3" id="conversationListContainer">
                             <th:block th:each="msg : ${conversacion}">
-                                <div class="p-3 rounded-3" style="background: #091120; border: 1px solid var(--border-color);">
+                                <div class="message-card">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-2">
                                             <i class="bi bi-shield-fill text-primary"></i>
-                                            <span class="fw-bold text-white" th:text="${msg.asunto}">Asunto</span>
+                                            <span class="fw-bold text-dark" th:text="${msg.asunto}">Asunto</span>
                                         </div>
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="badge" th:classappend="${msg.leido ? 'bg-success bg-opacity-25 text-success' : 'bg-warning bg-opacity-25 text-warning'}" style="font-size: 10px;" th:text="${msg.leido ? 'LEÍDO' : 'PENDIENTE'}">PENDIENTE</span>
+                                            <span class="badge" th:classappend="${msg.leido ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle'}" style="font-size: 10px;" th:text="${msg.leido ? 'LEÍDO' : 'PENDIENTE'}">PENDIENTE</span>
                                             <span class="text-muted font-monospace small" th:text="${#temporals.format(msg.fechaEnvio, 'dd/MM/yyyy hh:mm a')}">Fecha</span>
                                         </div>
                                     </div>
-                                    <p class="m-0 text-light" style="font-size: 13.5px; line-height: 1.6;" th:text="${msg.contenido}">Contenido del mensaje...</p>
+                                    <p class="m-0 text-secondary" style="font-size: 13.5px; line-height: 1.6;" th:text="${msg.contenido}">Contenido del mensaje...</p>
                                 </div>
                             </th:block>
                             <div th:if="${#lists.isEmpty(conversacion)}" class="text-muted small py-4 text-center">
@@ -919,42 +1032,42 @@
     <!-- ===== MODAL 1: REPRESENTACIÓN DE SESIÓN (SCREEN MIRROR SINTÉTICO) ===== -->
     <div class="modal fade" id="modalSessionMirror" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content clean-modal-content">
-                <div class="clean-modal-header">
+            <div class="modal-content modal-white-content">
+                <div class="modal-white-header">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-display text-primary fs-5"></i>
-                        <h5 class="modal-title fw-bold text-white m-0">Representación Visual de la Sesión</h5>
+                        <h5 class="modal-title fw-bold text-dark m-0">Representación Visual de la Sesión</h5>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="clean-modal-body">
-                    <div class="alert bg-primary bg-opacity-10 border border-primary border-opacity-25 text-light small mb-3">
-                        <i class="bi bi-shield-lock-fill text-info me-1"></i>
+                <div class="modal-white-body">
+                    <div class="alert alert-info border small mb-3">
+                        <i class="bi bi-shield-lock-fill text-primary me-1"></i>
                         <b>Seguridad y Privacidad:</b> Reconstrucción sintética no invasiva basada únicamente en los módulos de ClínicaApp navegados por el usuario. No accede a hardware, escritorio ni archivos personales.
                     </div>
 
-                    <div style="background: #060b14; border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden;">
-                        <div class="p-2 px-3 d-flex justify-content-between align-items-center" style="background: #091120; border-bottom: 1px solid var(--border-color);">
+                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm);">
+                        <div class="p-2 px-3 d-flex justify-content-between align-items-center" style="background: #f8fafc; border-bottom: 1px solid var(--border-color);">
                             <div class="d-flex align-items-center gap-2 font-monospace small text-muted">
                                 <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
                                 <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
                                 <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
-                                <span id="mirrorUrlBar" class="text-light ms-2">https://clinicaapp.com/usuario/citas</span>
+                                <span id="mirrorUrlBar" class="text-dark fw-bold ms-2">https://clinicaapp.com/usuario/citas</span>
                             </div>
-                            <span class="badge bg-success bg-opacity-25 text-success small font-monospace">ACTIVO</span>
+                            <span class="badge bg-success text-white small font-monospace">ACTIVO</span>
                         </div>
-                        <div class="p-4 text-center">
-                            <div style="width: 60px; height: 60px; border-radius: 16px; background: rgba(56, 189, 248, 0.12); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                        <div class="p-5 text-center">
+                            <div style="width: 64px; height: 64px; border-radius: 16px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
                                 <i class="bi bi-window-sidebar text-primary fs-2"></i>
                             </div>
-                            <h4 class="fw-bold text-white mb-2" id="mirrorSectionTitle">Sección: Citas Médicas</h4>
+                            <h4 class="fw-bold text-dark mb-2" id="mirrorSectionTitle">Sección: Citas Médicas</h4>
                             <p class="text-muted small" style="max-width: 440px; margin: 0 auto;">
                                 El usuario está actualmente interactuando dentro del módulo correspondiente de ClínicaApp.
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="clean-modal-footer">
+                <div class="modal-white-footer">
                     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -964,32 +1077,32 @@
     <!-- ===== MODAL 2: ENVIAR MENSAJE DIRECTO INTERNO ===== -->
     <div class="modal fade" id="modalDirectMessage" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content clean-modal-content">
-                <div class="clean-modal-header">
+            <div class="modal-content modal-white-content">
+                <div class="modal-white-header">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-chat-left-dots-fill text-primary fs-5"></i>
-                        <h5 class="modal-title fw-bold text-white m-0">Enviar Mensaje Directo</h5>
+                        <h5 class="modal-title fw-bold text-dark m-0">Enviar Mensaje Directo</h5>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="clean-modal-body">
+                <div class="modal-white-body">
                     <div class="mb-3">
-                        <label class="form-label-clean">Destinatario:</label>
-                        <input type="text" class="form-control-clean" readonly th:value="${estadoUsuario != null ? estadoUsuario.nombre + ' (' + estadoUsuario.email + ')' : ''}">
+                        <label class="form-label-custom">Destinatario:</label>
+                        <input type="text" class="form-input-custom" readonly th:value="${estadoUsuario != null ? estadoUsuario.nombre + ' (' + estadoUsuario.email + ')' : ''}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label-clean">Asunto:</label>
-                        <input type="text" class="form-control-clean" id="msgAsunto" value="Mensaje de la Administración">
+                        <label class="form-label-custom">Asunto:</label>
+                        <input type="text" class="form-input-custom" id="msgAsunto" value="Mensaje de la Administración">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label-clean">Contenido del Mensaje:</label>
-                        <textarea class="form-control-clean" id="msgContenido" rows="4" placeholder="Escribe el mensaje que verá el usuario en su pantalla..."></textarea>
+                        <label class="form-label-custom">Contenido del Mensaje:</label>
+                        <textarea class="form-input-custom" id="msgContenido" rows="4" placeholder="Escribe el mensaje que verá el usuario en su pantalla..."></textarea>
                     </div>
                     <div id="msgAlertResponse" class="d-none mt-2"></div>
                 </div>
-                <div class="clean-modal-footer">
+                <div class="modal-white-footer">
                     <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn-submit-clean" id="btnSubmitDirectMessage" onclick="sendDirectMessageAction()">
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" id="btnSubmitDirectMessage" onclick="sendDirectMessageAction()">
                         <i class="bi bi-send-fill me-1"></i> Enviar a Usuario
                     </button>
                 </div>
@@ -1000,39 +1113,39 @@
     <!-- ===== MODAL 3: ENVIAR CORREO GMAIL CON ADJUNTOS ===== -->
     <div class="modal fade" id="modalEmailDirect" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content clean-modal-content">
-                <div class="clean-modal-header">
+            <div class="modal-content modal-white-content">
+                <div class="modal-white-header">
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-envelope-paper-fill text-success fs-5"></i>
-                        <h5 class="modal-title fw-bold text-white m-0">Enviar Correo Electrónico (Gmail)</h5>
+                        <h5 class="modal-title fw-bold text-dark m-0">Enviar Correo Electrónico (Gmail)</h5>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="clean-modal-body">
+                <div class="modal-white-body">
                     <div class="mb-3">
-                        <label class="form-label-clean">Destinatario:</label>
-                        <input type="email" class="form-control-clean" id="emailDestinatario" readonly th:value="${estadoUsuario != null ? estadoUsuario.email : ''}">
+                        <label class="form-label-custom">Destinatario:</label>
+                        <input type="email" class="form-input-custom" id="emailDestinatario" readonly th:value="${estadoUsuario != null ? estadoUsuario.email : ''}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label-clean">Asunto:</label>
-                        <input type="text" class="form-control-clean" id="emailAsunto" value="Notificación Oficial de ClínicaApp">
+                        <label class="form-label-custom">Asunto:</label>
+                        <input type="text" class="form-input-custom" id="emailAsunto" value="Notificación Oficial de ClínicaApp">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label-clean">Cuerpo del Correo:</label>
-                        <textarea class="form-control-clean" id="emailCuerpo" rows="4" placeholder="Escribe el mensaje oficial..."></textarea>
+                        <label class="form-label-custom">Cuerpo del Correo:</label>
+                        <textarea class="form-input-custom" id="emailCuerpo" rows="4" placeholder="Escribe el mensaje oficial..."></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label-clean">Documento o Archivo Adjunto (Opcional - PDF, DOC, XLS, Imagen):</label>
-                        <div class="file-upload-clean-box" onclick="document.getElementById('emailAttachmentInput').click()">
+                        <label class="form-label-custom">Documento o Archivo Adjunto (Opcional - PDF, DOC, XLS, Imagen):</label>
+                        <div class="file-dropzone-white" onclick="document.getElementById('emailAttachmentInput').click()">
                             <i class="bi bi-cloud-arrow-up text-primary fs-3"></i>
-                            <div class="fw-bold text-light mt-1" id="attachmentLabel">Haz clic para adjuntar un archivo</div>
-                            <div class="text-muted small" style="font-size: 11.5px;">Máximo 10MB (PDF, Word, Excel, JPG, PNG)</div>
+                            <div class="fw-bold text-dark mt-1" id="attachmentLabel">Haz clic para adjuntar un archivo</div>
+                            <div class="text-muted small">Máximo 10MB (PDF, Word, Excel, JPG, PNG)</div>
                         </div>
                         <input type="file" id="emailAttachmentInput" class="d-none" onchange="handleAttachmentSelect(this)">
                     </div>
                     <div id="emailAlertResponse" class="d-none mt-2"></div>
                 </div>
-                <div class="clean-modal-footer">
+                <div class="modal-white-footer">
                     <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" id="btnSubmitEmail" onclick="sendRealEmailAction()">
                         <i class="bi bi-send-check-fill me-1"></i> Despachar Correo
@@ -1129,9 +1242,9 @@
             if (statusEl) {
                 statusEl.textContent = data.online ? 'EN LÍNEA' : 'DESCONECTADO';
                 if (data.online) {
-                    statusEl.className = 'user-badge-status status-badge-online';
+                    statusEl.className = 'badge-status online';
                 } else {
-                    statusEl.className = 'user-badge-status status-badge-offline';
+                    statusEl.className = 'badge-status offline';
                 }
             }
 
@@ -1153,13 +1266,13 @@
                     data.eventosRecientes.forEach(ev => {
                         const dateStr = ev.fechaHora ? new Date(ev.fechaHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Reciente';
                         html += `
-                            <div class="timeline-entry">
-                                <div class="timeline-node"></div>
+                            <div class="timeline-item">
+                                <div class="timeline-circle"></div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="timeline-time-tag">${dateStr}</span>
-                                    <span class="badge bg-dark border border-secondary border-opacity-25 text-info">${ev.seccion || 'Sistema'}</span>
+                                    <span class="timeline-time">${dateStr}</span>
+                                    <span class="badge bg-light text-dark border">${ev.seccion || 'Sistema'}</span>
                                 </div>
-                                <div class="fw-bold text-white mt-1" style="font-size: 14px;">${ev.accion || 'Navegación'}</div>
+                                <div class="fw-bold text-dark mt-1" style="font-size: 14px;">${ev.accion || 'Navegación'}</div>
                                 ${ev.metadata ? `<div class="text-muted small" style="font-size: 12px;">Detalles: ${ev.metadata}</div>` : ''}
                             </div>
                         `;
