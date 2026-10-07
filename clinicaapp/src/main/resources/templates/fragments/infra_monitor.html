@@ -131,6 +131,7 @@
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
                 font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
                 animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                box-sizing: border-box;
             }
             @keyframes toastSlideIn {
                 from { transform: translateY(-20px); opacity: 0; }
@@ -139,15 +140,16 @@
             @media (max-width: 768px) {
                 #admin-notif-toast {
                     top: 65px !important;
-                    right: 50% !important;
-                    transform: translateX(50%) !important;
+                    left: 50% !important;
+                    right: auto !important;
+                    transform: translateX(-50%) !important;
                     width: calc(100% - 24px) !important;
                     max-width: 420px !important;
                     animation: toastSlideInMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
                 }
                 @keyframes toastSlideInMobile {
-                    from { transform: translate(50%, -20px); opacity: 0; }
-                    to { transform: translate(50%, 0); opacity: 1; }
+                    from { transform: translate(-50%, -20px); opacity: 0; }
+                    to { transform: translate(-50%, 0); opacity: 1; }
                 }
             }
         </style>
