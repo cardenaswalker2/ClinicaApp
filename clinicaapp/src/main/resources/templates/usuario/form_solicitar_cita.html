@@ -1535,6 +1535,14 @@
             if (clinicaHidden.value) {
                 cargarServicios(clinicaHidden.value);
             }
+
+            if (mascotaSelect.value && mascotaSelect.selectedIndex > 0) {
+                const opt = mascotaSelect.options[mascotaSelect.selectedIndex];
+                if (opt && opt.value) {
+                    resumenMascota.textContent = opt.text;
+                }
+            }
+            validarFormulario();
         });
     </script>
 

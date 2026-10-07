@@ -199,6 +199,8 @@ public class UsuarioController {
         // 1. Buscamos solo las últimas 5 citas del usuario de forma eficiente
         List<Cita> misCitasRaw = citaService.findByUsuarioId(usuario.getId());
         List<CitaDisplayDTO> citasActivas = new ArrayList<>();
+        int citasCompletadasCount = 0;
+        int pagosCount = 0;
         if (misCitasRaw != null && !misCitasRaw.isEmpty()) {
             List<Cita> citasFiltradas = misCitasRaw.stream()
                     .filter(c -> !"Cancelada".equalsIgnoreCase(c.getEstado()))
@@ -206,13 +208,23 @@ public class UsuarioController {
                     .limit(5)
                     .collect(Collectors.toList());
             citasActivas = convertToDisplayDTO(citasFiltradas);
+            
+            citasCompletadasCount = (int) misCitasRaw.stream()
+                    .filter(c -> "Completada".equalsIgnoreCase(c.getEstado()))
+                    .count();
+            pagosCount = (int) misCitasRaw.stream()
+                    .filter(c -> "PAGADO".equalsIgnoreCase(c.getEstadoPago()))
+                    .count();
         }
 
         model.addAttribute("citasActivas", citasActivas);
+        model.addAttribute("citasCompletadasCount", citasCompletadasCount);
+        model.addAttribute("pagosCount", pagosCount);
 
-        // 2. Mascotas para el panel lateral
+        // 2. Mascotas para el panel
         List<Mascota> misMascotas = mascotaService.findByPropietarioId(usuario.getId());
         model.addAttribute("mascotas", misMascotas);
+        model.addAttribute("totalClinicas", clinicaService.findAll().size());
         model.addAttribute("anunciosGlobales", anuncioGlobalRepository.findByActivoTrue());
 
         return "usuario/dashboard_usuario_privado";
@@ -220,9 +232,7 @@ public class UsuarioController {
 
 
     // --- Gestión de Mascotas ---
-    // DENTRO DE UsuarioController.java
-
-    @GetMapping("/mis-mascotas") // Antes decía "/mascotas", eso causaba el 404
+    @GetMapping({"/mis-mascotas", "/mascotas"})
     public String misMascotas(Model model, Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         if (usuario == null) return "redirect:/login?error=noauth";
@@ -230,18 +240,17 @@ public class UsuarioController {
         List<Mascota> mascotas = mascotaService.findByPropietarioId(usuario.getId());
         model.addAttribute("mascotas", mascotas);
         
-        // Retorna el archivo que tienes en templates/usuario/mis_mascotas.html
         return "usuario/mis_mascotas"; 
     }
 
-    @GetMapping("/mascotas/nueva")
+    @GetMapping({"/mascotas/nueva", "/registrar-mascota"})
     public String formNuevaMascota(Model model) {
         model.addAttribute("mascotaDTO", new MascotaDTO());
         cargarEnumsMascota(model);
         return "usuario/form_editar_mascota";
     }
 
-    @GetMapping("/mascotas/editar/{id}")
+    @GetMapping({"/mascotas/editar/{id}", "/editar-mascota/{id}"})
     public String formEditarMascota(@PathVariable String id, Model model, Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         Optional<Mascota> mascotaOpt = mascotaService.findByIdAndPropietarioId(id, usuario.getId());
@@ -256,7 +265,7 @@ public class UsuarioController {
         return "redirect:/usuario/mis-mascotas?error=noauth";
     }
 
-    @GetMapping("/historial/{id}")
+    @GetMapping({"/historial/{id}", "/mascotas/{id}/historial"})
     public String historialMascota(@PathVariable String id, Model model, Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         Optional<Mascota> mascotaOpt = mascotaService.findByIdAndPropietarioId(id, usuario.getId());
@@ -448,7 +457,7 @@ public class UsuarioController {
     }
 
     // --- Gestión de Citas (Solicitar y Ver) ---
-    @GetMapping("/citas/solicitar")
+    @GetMapping({"/citas/solicitar", "/solicitar-cita"})
     public String formSolicitarCita(
             @RequestParam(required = false) String clinicaId,
             @RequestParam(required = false) String mascotaId,
@@ -614,7 +623,7 @@ public class UsuarioController {
         return "redirect:/usuario/dashboard?perfilActualizado";
     }
 
-    @GetMapping("/historial/{id}/pdf")
+    @GetMapping({"/historial/{id}/pdf", "/historial-pdf/{id}"})
     public ResponseEntity<InputStreamResource> descargarHistorialPdf(@PathVariable String id, Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         // Verificamos que la mascota sea del usuario por seguridad
@@ -858,7 +867,7 @@ public class UsuarioController {
     }
 
     // ------------------ Pagos (Mi historial de pagos) ------------------
-    @GetMapping("/pagos")
+    @GetMapping({"/pagos", "/mis-pagos"})
     public String misPagos(Model model, Principal principal) {
         Usuario usuario = getLoggedUser(principal);
         if (usuario == null)
@@ -1050,7 +1059,7 @@ public class UsuarioController {
         return "usuario/ver_cita";
     }
 
-    @PostMapping("/mis-citas/{id}/cancelar")
+    @PostMapping({"/mis-citas/{id}/cancelar", "/cancelar-cita/{id}"})
     public String cancelarCita(@PathVariable String id, Principal principal, RedirectAttributes attributes) {
         // 1. Obtener el usuario logueado
         Usuario usuario = getLoggedUser(principal);

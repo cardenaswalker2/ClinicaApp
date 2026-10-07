@@ -1856,23 +1856,36 @@
                             <i class="bi bi-calendar3"></i>
                             <span th:text="${mascota.edad + ' años'}">3 años</span>
                         </span>
+                        <span class="meta-tag" th:if="${mascota.peso != null and mascota.peso > 0}" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+                            <i class="bi bi-speedometer2"></i>
+                            <span th:text="${mascota.peso + ' kg'}">10 kg</span>
+                        </span>
+                        <span class="meta-tag" th:if="${mascota.sexo != null}" style="background: rgba(99, 102, 241, 0.1); color: #4f46e5;">
+                            <i th:class="${mascota.sexo?.toString() == 'MACHO'} ? 'bi bi-gender-male' : 'bi bi-gender-female'"></i>
+                            <span th:text="${mascota.sexo}">MACHO</span>
+                        </span>
                     </div>
 
-                    <!-- Barra de Salud -->
+                    <!-- Barra de Bienestar -->
                     <div class="health-section">
                         <div class="health-header">
                             <span class="health-label-text">
-                                <i class="bi bi-heart-fill text-danger me-1"></i>Salud General
+                                <i class="bi bi-heart-fill text-danger me-1"></i>Estado y Cuidados
                             </span>
-                            <span class="health-status">Excelente</span>
+                            <span class="health-status text-success fw-bold">Activo</span>
                         </div>
                         <div class="health-track">
-                            <div class="health-fill" style="width: 0%;" data-width="92%"></div>
+                            <div class="health-fill" style="width: 0%;" data-width="95%"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="pet-actions-luxury">
+                    <a th:href="@{/usuario/citas/solicitar(mascotaId=${mascota.id})}" class="btn-luxury" style="background: linear-gradient(135deg, #10b981, #059669); color: white;"
+                        data-tooltip="Agendar cita para esta mascota">
+                        <i class="bi bi-calendar-plus-fill"></i>
+                        <span>Cita</span>
+                    </a>
                     <button type="button" class="btn-luxury btn-album"
                         th:data-album-photos="${mascota.albumFotos != null ? #strings.arrayJoin(mascota.albumFotos.toArray(), ',') : ''}"
                         th:data-pet-name="${mascota.nombre}" th:data-mascota-id="${mascota.id}"

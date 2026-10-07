@@ -753,7 +753,8 @@
         }
     };
 
-    // Llamarlo de inmediato porque ahora el script está al final del body
+    // Exponer globalmente para permitir activación desde chips y botones del dashboard
+    window.novaApp = novaApp;
     novaApp.init();
 </script>
 </div>

@@ -1515,9 +1515,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mt-4 mt-md-0">
-                        <div class="action-bar justify-content-md-end">
-                            <button type="button" class="btn-action btn-primary-custom" data-bs-toggle="modal"
+                    <div class="col-md-5 mt-4 mt-md-0">
+                        <div class="action-bar justify-content-md-end gap-2 flex-wrap">
+                            <a th:href="@{/usuario/citas/solicitar(mascotaId=${mascota.id})}"
+                                class="btn-action btn-primary-custom">
+                                <i class="bi bi-calendar-plus-fill"></i>
+                                <span>Agendar Cita</span>
+                            </a>
+                            <a th:href="@{/usuario/mascotas/editar/{id}(id=${mascota.id})}"
+                                class="btn-action" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99,102,241,0.2);">
+                                <i class="bi bi-pencil-fill"></i>
+                                <span>Editar</span>
+                            </a>
+                            <button type="button" class="btn-action" style="background: rgba(139, 92, 246, 0.1); color: #7c3aed; border: 1px solid rgba(139,92,246,0.2);" data-bs-toggle="modal"
                                 data-bs-target="#emailModal">
                                 <i class="bi bi-envelope-fill"></i>
                                 <span>Enviar</span>
@@ -1525,7 +1535,7 @@
                             <a th:href="@{/usuario/historial/{id}/pdf(id=${mascota.id})}"
                                 class="btn-action btn-success-custom" target="_blank">
                                 <i class="bi bi-file-earmark-pdf-fill"></i>
-                                <span>PDF</span>
+                                <span>Descargar PDF</span>
                             </a>
                         </div>
                     </div>

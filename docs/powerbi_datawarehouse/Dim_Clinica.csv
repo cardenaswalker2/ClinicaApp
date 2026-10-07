@@ -1,0 +1,7 @@
+id_clinica,nombre,direccion,barrio,ciudad,telefono,estado_operativo,capacidad_diaria,latitud,longitud
+CLN01,Veterinaria San Roque Bocagrande,"Cra. 2 # 5-40, Bocagrande",Bocagrande,Cartagena,3001234567,APROBADA,30,10.4012,-75.5534
+CLN02,Centro Médico Veterinario Manga,"Calle 25 # 21-18, Manga",Manga,Cartagena,3109876543,APROBADA,25,10.4124,-75.5342
+CLN03,Pet Care Crespo,"Av. Santander # 65-12, Crespo",Crespo,Cartagena,3157778899,APROBADA,20,10.4485,-75.5189
+CLN04,Clínica Veterinaria Los Alpes,"Diag. 32 # 71-20, Los Alpes",Los Alpes,Cartagena,3184445566,APROBADA,35,10.3956,-75.489
+CLN05,Amigos Peludos San Fernando,"Cra. 81 # 15-40, San Fernando",San Fernando,Cartagena,3012223344,APROBADA,20,10.3812,-75.4715
+CLN06,Hospital Animal Pie de la Popa,"Calle 30 # 20-55, Pie de la Popa",Pie de la Popa,Cartagena,3125556677,APROBADA,40,10.419,-75.528

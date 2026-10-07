@@ -1,0 +1,9 @@
+id_servicio,nombre,categoria,precio_base,duracion_min,requiere_veterinario
+SRV01,Consulta Médica General,Clínica,45000,30,1
+SRV02,Vacunación Múltiple / Antirrábica,Prevención,35000,20,1
+SRV03,Desparasitación Interna y Externa,Prevención,25000,15,0
+SRV04,Cirugía General y Esterilización,Quirúrgico,220000,90,1
+SRV05,Perfil Hemático y Laboratorio,Diagnóstico,85000,25,1
+SRV06,Radiografía Digital y Ecografía,Diagnóstico,120000,40,1
+SRV07,Profilaxis y Limpieza Dental,Odontología,150000,60,1
+SRV08,Peluquería y Baño Medicado,Estética,50000,60,0

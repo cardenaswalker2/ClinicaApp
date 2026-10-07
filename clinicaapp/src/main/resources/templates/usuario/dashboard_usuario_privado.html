@@ -1479,14 +1479,13 @@
             <!-- ===== HEADER SECTION ===== -->
             <div class="dashboard-header" data-aos="fade-down">
                 <div class="welcome-badge">
-                    <i class="bi bi-sparkles"></i>
-                    Bienvenido de vuelta
+                    <i class="bi bi-stars"></i>
+                    Panel del Usuario
                 </div>
                 <h1 class="welcome-title">
-                    ¡Hola, <span th:text="${usuario.nombre}">Usuario</span>! 👋
+                    ¡Hola, <span th:text="${usuario.nombre}">Usuario</span>! 🐾
                 </h1>
-                <p class="welcome-subtitle">Aquí tienes un resumen de la actividad de tus mascotas. Gestiona citas,
-                    revisa historiales y mantén a tus compañeros felices.</p>
+                <p class="welcome-subtitle">Esto es lo que está pasando con tus mascotas. Gestiona citas, monitorea su bienestar y accede a atención rápida.</p>
             </div>
 
             <!-- ===== ALERTA DE ÉXITO ===== -->
@@ -1502,13 +1501,118 @@
             <!-- ANUNCIOS GLOBALES DEL SISTEMA (SAAS) -->
             <div class="row mb-4" th:if="${anunciosGlobales != null and not #lists.isEmpty(anunciosGlobales)}">
                 <div class="col-12 animate-fade-in">
-                    <div th:each="anuncio : ${anunciosGlobales}" class="card border border-primary p-3 mb-2" style="border-radius: var(--radius-md); background-color: rgba(99, 102, 241, 0.08); border-left: 5px solid var(--primary) !important;">
-                        <div class="d-flex align-items-center gap-2 text-primary mb-2">
+                    <div th:each="anuncio : ${anunciosGlobales}" class="card border border-primary p-3 mb-2 shadow-sm" style="border-radius: var(--radius-md); background: rgba(99, 102, 241, 0.06); border-left: 5px solid var(--primary) !important;">
+                        <div class="d-flex align-items-center gap-2 text-primary mb-1">
                             <i class="bi bi-broadcast fs-5"></i>
                             <h6 class="fw-bold mb-0" th:text="${anuncio.titulo}">Comunicado de Plataforma</h6>
-                            <span class="badge bg-primary text-white ms-auto">ANUNCIO GLOBAL</span>
+                            <span class="badge bg-primary text-white ms-auto">COMUNICADO</span>
                         </div>
                         <p class="mb-0 text-secondary" style="font-size: 0.9rem;" th:text="${anuncio.contenido}">Contenido del comunicado...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RESUMEN KPI METRICS (REAL DATA) ===== -->
+            <div class="stats-row mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                    <div class="stat-value" th:text="${mascotas != null ? mascotas.size() : 0}">0</div>
+                    <div class="stat-label">Mis Mascotas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="stat-value" th:text="${citasActivas != null ? citasActivas.size() : 0}">0</div>
+                    <div class="stat-label">Próximas Citas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="bi bi-hospital"></i>
+                    </div>
+                    <div class="stat-value" th:text="${totalClinicas != null ? totalClinicas : 1}">1</div>
+                    <div class="stat-label">Clínicas Red</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="bi bi-credit-card-2-front-fill"></i>
+                    </div>
+                    <div class="stat-value" th:text="${pagosCount != null ? pagosCount : 0}">0</div>
+                    <div class="stat-label">Pagos Realizados</div>
+                </div>
+            </div>
+
+            <!-- ===== PRÓXIMA CITA SPOTLIGHT CARD ===== -->
+            <div class="mb-4" data-aos="fade-up" data-aos-delay="150" th:if="${citasActivas != null and !citasActivas.isEmpty()}">
+                <div class="p-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; border: 1px solid rgba(255,255,255,0.18);">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <span class="badge bg-white text-primary fw-bold px-3 py-1 rounded-pill shadow-sm">
+                            <i class="bi bi-clock-history me-1"></i> TU PRÓXIMA CITA
+                        </span>
+                        <span class="badge bg-white bg-opacity-25 text-white fw-semibold px-3 py-1 rounded-pill" th:text="${citasActivas[0].estado}">
+                            Confirmada
+                        </span>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h3 class="fw-bold mb-2 text-white" th:text="${citasActivas[0].nombreServicio}">Consulta General</h3>
+                            <p class="mb-3 opacity-90" style="font-size: 0.95rem;">
+                                <i class="bi bi-heart-pulse-fill me-1 text-warning"></i> Mascota: <strong th:text="${citasActivas[0].nombreMascota}">Mascota</strong> &nbsp;|&nbsp;
+                                <i class="bi bi-hospital me-1"></i> Clínica: <span th:text="${citasActivas[0].nombreClinica}">Veterinaria</span><br>
+                                <i class="bi bi-calendar3 me-1"></i> Fecha: <span th:text="${citasActivas[0].fechaHora}">10 mar, 2026</span>
+                            </p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a th:href="@{/usuario/citas/{id}(id=${citasActivas[0].id})}" class="btn btn-light fw-bold rounded-pill text-primary px-4 shadow-sm">
+                                    <i class="bi bi-eye-fill me-1"></i> Ver Detalles
+                                </a>
+                                <a th:href="@{/usuario/mis-citas}" class="btn btn-outline-light fw-semibold rounded-pill px-3">
+                                    <i class="bi bi-list-ul me-1"></i> Todas Mis Citas
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center text-lg-end mt-3 mt-lg-0">
+                            <div class="p-3 bg-white bg-opacity-10 rounded-4 d-inline-block text-center border border-white border-opacity-25" style="min-width: 200px;">
+                                <i class="bi bi-calendar-event fs-1 text-warning d-block mb-1"></i>
+                                <span class="small opacity-75 d-block text-uppercase fw-bold" style="font-size: 0.75rem;">Atención en Clínica</span>
+                                <span class="fw-bold" th:text="${citasActivas[0].nombreMascota}">Firulais</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== NOVA BRAIN HELPER BANNER ===== -->
+            <div class="mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="p-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%); border: 1.5px solid rgba(99, 102, 241, 0.2);">
+                    <div class="d-flex align-items-center gap-3 flex-wrap justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-3 d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 46px; height: 46px; background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                                <i class="bi bi-robot fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">¿Necesitas ayuda? Nova Brain está aquí para ti</h5>
+                                <small class="text-muted">Haz clic en cualquier consulta para preguntar directamente a tu asistente inteligente</small>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary rounded-pill fw-bold px-3 py-2 shadow-sm" onclick="if(window.novaApp){window.novaApp.toggle(true);}">
+                            <i class="bi bi-chat-dots-fill me-1"></i> Abrir Asistente
+                        </button>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold bg-white" onclick="if(window.novaApp){if(!window.novaApp.isOpen)window.novaApp.toggle(false);window.novaApp.processInput('Quiero agendar una cita para mi mascota');}">
+                            <i class="bi bi-calendar-plus me-1 text-primary"></i> "Quiero agendar una cita"
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold bg-white" onclick="if(window.novaApp){if(!window.novaApp.isOpen)window.novaApp.toggle(false);window.novaApp.processInput('¿Cómo consulto el historial de mi mascota?');}">
+                            <i class="bi bi-file-earmark-medical me-1 text-primary"></i> "¿Cómo consulto el historial de mi mascota?"
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold bg-white" onclick="if(window.novaApp){if(!window.novaApp.isOpen)window.novaApp.toggle(false);window.novaApp.processInput('¿Cómo encuentro una clínica cercana?');}">
+                            <i class="bi bi-geo-alt me-1 text-primary"></i> "¿Cómo encuentro una clínica cercana?"
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold bg-white" onclick="if(window.novaApp){if(!window.novaApp.isOpen)window.novaApp.toggle(false);window.novaApp.processInput('Necesito información sobre mis citas');}">
+                            <i class="bi bi-info-circle me-1 text-primary"></i> "Necesito información sobre mis citas"
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1517,40 +1621,8 @@
                 <!-- ===== COLUMNA PRINCIPAL ===== -->
                 <div class="col-lg-8">
 
-                    <!-- ===== QUICK STATS ROW ===== -->
-                    <div class="stats-row" data-aos="fade-up" data-aos-delay="100">
-                        <div class="stat-card">
-                            <div class="stat-icon blue">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                            <div class="stat-value" th:text="${citasActivas != null ? citasActivas.size() : 0}">0</div>
-                            <div class="stat-label">Citas Activas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon green">
-                                <i class="bi bi-heart-fill"></i>
-                            </div>
-                            <div class="stat-value" th:text="${mascotas != null ? mascotas.size() : 0}">0</div>
-                            <div class="stat-label">Mascotas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon purple">
-                                <i class="bi bi-shield-check"></i>
-                            </div>
-                            <div class="stat-value">100%</div>
-                            <div class="stat-label">Salud</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon orange">
-                                <i class="bi bi-star-fill"></i>
-                            </div>
-                            <div class="stat-value">4.9</div>
-                            <div class="stat-label">Rating</div>
-                        </div>
-                    </div>
-
-                    <!-- ===== GRID DE ACCIONES RÁPIDAS (2x2 COMPACTO Y ELEGANTE) ===== -->
-                    <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="150">
+                    <!-- ===== ACCIONES RÁPIDAS (2x2) ===== -->
+                    <div class="row g-3 mb-4" data-aos="fade-up" data-aos-delay="220">
                         <!-- 1. Agendar Cita -->
                         <div class="col-md-6">
                             <div class="p-3 rounded-4 h-100 d-flex flex-column justify-content-between text-white shadow-sm"
@@ -1563,16 +1635,16 @@
                                         <h6 class="fw-bold mb-0">Agendar Cita</h6>
                                     </div>
                                     <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
-                                        Programa una consulta para tu mascota en segundos con veterinarios verificados.
+                                        Programa una consulta para tu mascota con veterinarios verificados.
                                     </p>
                                 </div>
                                 <a th:href="@{/usuario/citas/solicitar}" class="btn btn-sm btn-light fw-bold rounded-pill text-primary px-3 align-self-start shadow-sm">
-                                    <i class="bi bi-calendar-check"></i> Agendar Ahora
+                                    <i class="bi bi-calendar-check me-1"></i> Agendar Ahora
                                 </a>
                             </div>
                         </div>
 
-                        <!-- 2. Buscar Clínica más cercana (Ubicación) -->
+                        <!-- 2. Buscar Clínica más cercana (PLEB + GPS) -->
                         <div class="col-md-6">
                             <div class="p-3 rounded-4 h-100 d-flex flex-column justify-content-between text-white shadow-sm"
                                  style="background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); border: 1px solid rgba(255,255,255,0.15);">
@@ -1581,14 +1653,14 @@
                                         <div class="p-2 rounded-3 bg-white text-info d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                                             <i class="bi bi-geo-alt-fill text-primary"></i>
                                         </div>
-                                        <h6 class="fw-bold mb-0">Clínica más cercana</h6>
+                                        <h6 class="fw-bold mb-0">Buscar Clínica (PLEB)</h6>
                                     </div>
                                     <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
-                                        Encuentra al instante la veterinaria disponible más próxima a tu ubicación GPS.
+                                        Optimización en tiempo real por distancia y disponibilidad cercana.
                                     </p>
                                 </div>
                                 <a th:href="@{/usuario/optimizacion-clinicas}" class="btn btn-sm btn-light fw-bold rounded-pill text-info px-3 align-self-start shadow-sm">
-                                    <i class="bi bi-compass"></i> Buscar Cercana
+                                    <i class="bi bi-compass me-1"></i> Optimizar Ubicación
                                 </a>
                             </div>
                         </div>
@@ -1605,11 +1677,11 @@
                                         <h6 class="fw-bold mb-0">Comunidad Pet</h6>
                                     </div>
                                     <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
-                                        Adopciones, chats seguros y red de apoyo entre dueños de mascotas.
+                                        Adopciones, foros y red de apoyo entre dueños de mascotas.
                                     </p>
                                 </div>
                                 <a th:href="@{/usuario/comunidad}" class="btn btn-sm btn-light fw-bold rounded-pill text-danger px-3 align-self-start shadow-sm">
-                                    <i class="bi bi-chat-heart"></i> Entrar a Comunidad
+                                    <i class="bi bi-chat-heart me-1"></i> Entrar a Comunidad
                                 </a>
                             </div>
                         </div>
@@ -1626,23 +1698,22 @@
                                         <h6 class="fw-bold mb-0">Mi Mascota Virtual</h6>
                                     </div>
                                     <p class="small opacity-90 mb-3" style="font-size: 0.85rem; line-height: 1.4;">
-                                        Aprende sobre el cuidado diario y salud de tu mascota de forma interactiva.
+                                        Aprende sobre el cuidado diario y salud de forma interactiva.
                                     </p>
                                 </div>
                                 <a th:href="@{/usuario/juego}" class="btn btn-sm btn-light fw-bold rounded-pill text-dark px-3 align-self-start shadow-sm">
-                                    <i class="bi bi-play-fill"></i> Jugar Ahora
+                                    <i class="bi bi-play-fill me-1"></i> Jugar Ahora
                                 </a>
                             </div>
                         </div>
                     </div>
 
-
-                    <!-- ===== PRÓXIMAS CITAS ===== -->
+                    <!-- ===== PRÓXIMAS CITAS LIST ===== -->
                     <div class="dashboard-card" data-aos="fade-up" data-aos-delay="250">
                         <div class="card-header-custom">
                             <h5 class="card-title-custom">
                                 <i class="bi bi-calendar2-week"></i>
-                                Próximas Citas
+                                Próximas Citas Activas
                             </h5>
                             <a th:href="@{/usuario/mis-citas}" class="btn btn-outline-primary rounded-pill px-4"
                                 style="font-weight: 600; border-width: 2px;">
@@ -1673,7 +1744,6 @@
                                                        (cita.estado == 'Confirmada' ? 'badge-confirmada' : 'badge-completada')}"
                                             th:text="${cita.estado}">Estado</span>
 
-                                        <!-- BOTÓN DE RECETA: Solo aparece si el doctor ya lo atendió -->
                                         <a th:if="${cita.estado == 'Completada'}"
                                             th:href="@{/usuario/citas/{id}/receta(id=${cita.id})}" class="btn-receta"
                                             target="_blank">
@@ -1687,61 +1757,13 @@
                                 </div>
                             </div>
                             <div th:if="${citasActivas == null or citasActivas.isEmpty()}" class="empty-state">
-                                <i class="bi bi-calendar3"></i>
-                                <h5>No tienes citas próximas</h5>
-                                <p>Programa tu primera cita y mantén a tu mascota saludable con nuestros expertos</p>
-                                <a th:href="@{/usuario/citas/solicitar}" class="btn btn-primary rounded-pill px-4 mt-3"
+                                <i class="bi bi-calendar-x text-primary"></i>
+                                <h5>Aún no tienes citas programadas</h5>
+                                <p>Agenda una cita para comenzar a cuidar la salud de tu mascota con los mejores profesionales.</p>
+                                <a th:href="@{/usuario/citas/solicitar}" class="btn btn-primary rounded-pill px-4 mt-2"
                                     style="font-weight: 600; padding: 0.75rem 2rem;">
-                                    <i class="bi bi-plus-lg me-2"></i>Agendar cita
+                                    <i class="bi bi-calendar-plus-fill me-2"></i>Agendar mi primera cita
                                 </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ===== ACTIVIDAD RECIENTE ===== -->
-                    <div class="dashboard-card" data-aos="fade-up" data-aos-delay="300">
-                        <div class="card-header-custom">
-                            <h5 class="card-title-custom">
-                                <i class="bi bi-activity"
-                                    style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);"></i>
-                                Actividad Reciente
-                            </h5>
-                        </div>
-                        <div class="card-body-custom">
-                            <div class="d-flex align-items-center gap-3 mb-3 pb-3"
-                                style="border-bottom: 1px solid var(--gray-100);">
-                                <div
-                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #2563eb; flex-shrink: 0;">
-                                    <i class="bi bi-calendar-check-fill"></i>
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; color: var(--gray-800); font-size: 0.9375rem;">Cita
-                                        programada exitosamente</div>
-                                    <div style="font-size: 0.8125rem; color: var(--gray-500);">Hace 2 horas</div>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center gap-3 mb-3 pb-3"
-                                style="border-bottom: 1px solid var(--gray-100);">
-                                <div
-                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #059669; flex-shrink: 0;">
-                                    <i class="bi bi-heart-pulse-fill"></i>
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; color: var(--gray-800); font-size: 0.9375rem;">
-                                        Revisión de salud completada</div>
-                                    <div style="font-size: 0.8125rem; color: var(--gray-500);">Hace 1 día</div>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <div
-                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #d97706; flex-shrink: 0;">
-                                    <i class="bi bi-trophy-fill"></i>
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; color: var(--gray-800); font-size: 0.9375rem;">Nivel 3
-                                        alcanzado en Mi Mascota Virtual</div>
-                                    <div style="font-size: 0.8125rem; color: var(--gray-500);">Hace 2 días</div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -1760,16 +1782,16 @@
                                 th:src="${usuario.fotoUrl}" alt="Foto de Perfil"
                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                         </div>
-                        <div class="profile-name" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Apellido
+                        <div class="profile-name" th:text="${usuario.nombre + ' ' + (usuario.apellido != null ? usuario.apellido : '')}">Nombre Apellido
                         </div>
                         <div class="profile-email" th:text="${usuario.email}">email@ejemplo.com</div>
                         <a th:href="@{/usuario/perfil}" class="btn btn-profile">
                             <i class="bi bi-pencil-square"></i>
-                            Editar Perfil
+                            Editar Mi Perfil
                         </a>
                     </div>
 
-                    <!-- ===== MASCOTAS ===== -->
+                    <!-- ===== MIS MASCOTAS ===== -->
                     <div class="dashboard-card" data-aos="fade-left" data-aos-delay="200">
                         <div class="card-header-custom">
                             <h5 class="card-title-custom">
@@ -1777,6 +1799,9 @@
                                     style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);"></i>
                                 Mis Mascotas
                             </h5>
+                            <a th:href="@{/usuario/mis-mascotas}" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5">
+                                Ver todas
+                            </a>
                         </div>
                         <div>
                             <div th:if="${mascotas != null and !mascotas.isEmpty()}">
@@ -1785,24 +1810,33 @@
                                         <div class="mascota-icon">
                                             <i class="bi bi-heart-fill"></i>
                                         </div>
-                                        <span th:text="${mascota.nombre}">Nombre Mascota</span>
+                                        <div>
+                                            <div class="fw-bold" th:text="${mascota.nombre}">Nombre Mascota</div>
+                                            <small class="text-muted" th:text="${mascota.especie != null ? mascota.especie : 'Mascota'}">Especie</small>
+                                        </div>
                                     </div>
-                                    <a th:href="@{/usuario/historial/{id}(id=${mascota.id})}" class="btn-mascota">
-                                        Historial
-                                    </a>
+                                    <div class="d-flex gap-1">
+                                        <a th:href="@{/usuario/historial/{id}(id=${mascota.id})}" class="btn-mascota" title="Historial Clínico">
+                                            <i class="bi bi-file-medical-fill me-1"></i>Historial
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                             <div th:if="${mascotas == null or mascotas.isEmpty()}" class="p-4 text-center">
-                                <i class="bi bi-heart mb-3 d-block"
-                                    style="font-size: 2.5rem; color: var(--gray-300);"></i>
-                                <small style="color: var(--gray-500); font-weight: 500;">No tienes mascotas
-                                    registradas</small>
+                                <div class="mb-3 mx-auto d-flex align-items-center justify-content-center rounded-circle bg-light" style="width: 64px; height: 64px;">
+                                    <i class="bi bi-heart" style="font-size: 1.75rem; color: var(--primary);"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1">Aún no tienes mascotas registradas</h6>
+                                <p class="text-muted small mb-3">Registra tu primera mascota para comenzar a gestionar sus citas y atención.</p>
+                                <a th:href="@{/usuario/mascotas/nueva}" class="btn btn-sm btn-primary rounded-pill fw-bold px-3 py-2 shadow-sm">
+                                    <i class="bi bi-plus-circle-fill me-1"></i> + Registrar Mascota
+                                </a>
                             </div>
                         </div>
-                        <div class="p-3">
+                        <div class="p-3" th:if="${mascotas != null and !mascotas.isEmpty()}">
                             <a th:href="@{/usuario/mascotas/nueva}" class="btn-add-mascota">
                                 <i class="bi bi-plus-circle-fill"></i>
-                                Añadir Mascota
+                                + Añadir Otra Mascota
                             </a>
                         </div>
                     </div>
@@ -1813,44 +1847,17 @@
                             <h5 class="card-title-custom">
                                 <i class="bi bi-wallet2"
                                     style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></i>
-                                Mis Pagos
+                                Historial de Pagos
                             </h5>
                         </div>
                         <div class="card-body-custom" style="position: relative; z-index: 1;">
                             <p style="color: #065f46; font-weight: 500; margin-bottom: 1.25rem; line-height: 1.6;">
-                                Consulta tus transacciones y descarga tus recibos de forma segura</p>
+                                Consulta tus transacciones realizadas y descarga tus comprobantes de forma segura.
+                            </p>
                             <a th:href="@{/usuario/pagos}" class="btn-pagos">
                                 <i class="bi bi-receipt-cutoff"></i>
                                 Ver mis pagos
                             </a>
-                        </div>
-                    </div>
-
-                    <!-- ===== TIPS DE SALUD ===== -->
-                    <div class="dashboard-card" data-aos="fade-left" data-aos-delay="400">
-                        <div class="card-header-custom">
-                            <h5 class="card-title-custom">
-                                <i class="bi bi-lightbulb-fill"
-                                    style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);"></i>
-                                Tip del Día
-                            </h5>
-                        </div>
-                        <div class="card-body-custom">
-                            <div
-                                style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 1.25rem; border: 1px solid #fcd34d;">
-                                <div style="display: flex; align-items: flex-start; gap: 0.875rem;">
-                                    <i class="bi bi-shield-plus"
-                                        style="font-size: 1.5rem; color: #d97706; flex-shrink: 0;"></i>
-                                    <div>
-                                        <div
-                                            style="font-weight: 700; color: #92400e; font-size: 0.9375rem; margin-bottom: 0.375rem;">
-                                            Vacunación al día</div>
-                                        <div style="font-size: 0.875rem; color: #b45309; line-height: 1.6;">Mantén el
-                                            calendario de vacunación de tu mascota actualizado. Las vacunas previenen
-                                            enfermedades graves.</div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 

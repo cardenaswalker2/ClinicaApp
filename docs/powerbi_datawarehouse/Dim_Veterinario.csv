@@ -1,0 +1,11 @@
+id_veterinario,nombre_completo,especialidad,experiencia_anios,id_clinica
+VET01,Dr. Carlos Mendoza,Cirugía y Ortopedia,8,CLN01
+VET02,Dra. Andrea Morales,Medicina Interna,6,CLN01
+VET03,Dr. Felipe Herrera,Diagnóstico por Imagen,10,CLN02
+VET04,Dra. Sofia Castillo,Dermatología Veterinaria,5,CLN02
+VET05,Dr. Javier Rivas,Medicina Preventiva,4,CLN03
+VET06,Dra. Valentina Lopez,Odontología y Felinos,7,CLN04
+VET07,Dr. Mateo Gomez,Cirugía General,9,CLN04
+VET08,Dra. Natalia Torres,Medicina General,3,CLN05
+VET09,Dr. Daniel Arrieta,Urgencias y Cuidados Críticos,11,CLN06
+VET10,Dra. Laura Mejia,Laboratorio y Patología,6,CLN06

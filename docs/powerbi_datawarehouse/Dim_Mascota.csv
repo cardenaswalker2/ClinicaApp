@@ -1,0 +1,151 @@
+id_mascota,nombre,especie,raza,sexo,edad_anios,tamano,peso_kg,condicion_previa
+MAS001,Mascota_1,PERRO,Labrador Retriever,HEMBRA,4,GRANDE,10.8,Dermatitis
+MAS002,Mascota_2,PERRO,Pug,HEMBRA,1,PEQUEÑO,4.0,Sano
+MAS003,Mascota_3,PERRO,Pug,MACHO,9,GRANDE,10.0,Dermatitis
+MAS004,Mascota_4,GATO,Maine Coon,MACHO,8,PEQUEÑO,5.2,Sano
+MAS005,Mascota_5,PERRO,Schnauzer,HEMBRA,3,MEDIANO,10.5,Sano
+MAS006,Mascota_6,PERRO,Criollo / Mestizo,MACHO,6,MEDIANO,32.7,Cardiopatía
+MAS007,Mascota_7,PERRO,Labrador Retriever,HEMBRA,9,GRANDE,7.4,Artritis / Displasia
+MAS008,Mascota_8,PERRO,Pug,HEMBRA,10,MEDIANO,9.7,Sano
+MAS009,Mascota_9,PERRO,Poodle,MACHO,14,MEDIANO,11.1,Sano
+MAS010,Mascota_10,GATO,Persa,HEMBRA,11,PEQUEÑO,6.3,Sano
+MAS011,Mascota_11,PERRO,Beagle,HEMBRA,12,PEQUEÑO,35.8,Dermatitis
+MAS012,Mascota_12,PERRO,Bulldog Francés,MACHO,3,GRANDE,19.2,Sano
+MAS013,Mascota_13,GATO,Siamés,HEMBRA,14,PEQUEÑO,6.0,Sano
+MAS014,Mascota_14,PERRO,Labrador Retriever,HEMBRA,5,MEDIANO,5.3,Cardiopatía
+MAS015,Mascota_15,PERRO,Poodle,HEMBRA,7,GRANDE,34.0,Dermatitis
+MAS016,Mascota_16,GATO,Siamés,HEMBRA,3,PEQUEÑO,3.6,Cardiopatía
+MAS017,Mascota_17,GATO,Persa,HEMBRA,10,PEQUEÑO,4.3,Sano
+MAS018,Mascota_18,PERRO,Pug,MACHO,13,MEDIANO,4.6,Sano
+MAS019,Mascota_19,PERRO,Bulldog Francés,HEMBRA,10,GRANDE,5.2,Artritis / Displasia
+MAS020,Mascota_20,GATO,Maine Coon,HEMBRA,9,PEQUEÑO,6.4,Sano
+MAS021,Mascota_21,PERRO,Pug,HEMBRA,2,MEDIANO,13.3,Sano
+MAS022,Mascota_22,GATO,Criollo / Mestizo,HEMBRA,9,PEQUEÑO,5.9,Cardiopatía
+MAS023,Mascota_23,PERRO,Golden Retriever,MACHO,3,GRANDE,16.1,Sano
+MAS024,Mascota_24,GATO,Angora,MACHO,10,PEQUEÑO,4.0,Sano
+MAS025,Mascota_25,PERRO,Beagle,MACHO,1,MEDIANO,11.4,Cardiopatía
+MAS026,Mascota_26,PERRO,Criollo / Mestizo,HEMBRA,14,GRANDE,5.4,Cardiopatía
+MAS027,Mascota_27,PERRO,Bulldog Francés,HEMBRA,9,GRANDE,8.8,Cardiopatía
+MAS028,Mascota_28,GATO,Maine Coon,MACHO,9,PEQUEÑO,5.9,Dermatitis
+MAS029,Mascota_29,PERRO,Golden Retriever,HEMBRA,8,MEDIANO,34.5,Artritis / Displasia
+MAS030,Mascota_30,PERRO,Poodle,MACHO,6,PEQUEÑO,3.7,Cardiopatía
+MAS031,Mascota_31,PERRO,Poodle,MACHO,12,PEQUEÑO,25.1,Sano
+MAS032,Mascota_32,PERRO,Labrador Retriever,MACHO,9,MEDIANO,11.3,Dermatitis
+MAS033,Mascota_33,GATO,Siamés,MACHO,12,PEQUEÑO,6.7,Cardiopatía
+MAS034,Mascota_34,GATO,Maine Coon,MACHO,13,PEQUEÑO,4.6,Artritis / Displasia
+MAS035,Mascota_35,PERRO,Criollo / Mestizo,HEMBRA,6,PEQUEÑO,17.8,Artritis / Displasia
+MAS036,Mascota_36,PERRO,Criollo / Mestizo,HEMBRA,12,PEQUEÑO,14.9,Sano
+MAS037,Mascota_37,PERRO,Poodle,HEMBRA,3,PEQUEÑO,17.8,Sano
+MAS038,Mascota_38,GATO,Siamés,MACHO,8,PEQUEÑO,6.1,Cardiopatía
+MAS039,Mascota_39,PERRO,Labrador Retriever,MACHO,2,GRANDE,35.4,Sano
+MAS040,Mascota_40,PERRO,Schnauzer,HEMBRA,4,MEDIANO,33.3,Sano
+MAS041,Mascota_41,PERRO,Schnauzer,HEMBRA,5,PEQUEÑO,35.4,Artritis / Displasia
+MAS042,Mascota_42,PERRO,Schnauzer,HEMBRA,3,GRANDE,9.6,Sano
+MAS043,Mascota_43,PERRO,Pug,HEMBRA,1,PEQUEÑO,4.8,Artritis / Displasia
+MAS044,Mascota_44,GATO,Angora,MACHO,1,PEQUEÑO,6.8,Sano
+MAS045,Mascota_45,PERRO,Criollo / Mestizo,MACHO,11,GRANDE,33.2,Artritis / Displasia
+MAS046,Mascota_46,PERRO,Poodle,MACHO,10,GRANDE,5.9,Dermatitis
+MAS047,Mascota_47,GATO,Angora,HEMBRA,5,PEQUEÑO,3.4,Dermatitis
+MAS048,Mascota_48,PERRO,Poodle,HEMBRA,3,MEDIANO,26.5,Sano
+MAS049,Mascota_49,GATO,Persa,MACHO,1,PEQUEÑO,4.6,Cardiopatía
+MAS050,Mascota_50,PERRO,Criollo / Mestizo,MACHO,9,GRANDE,12.3,Sano
+MAS051,Mascota_51,PERRO,Poodle,HEMBRA,3,MEDIANO,18.3,Cardiopatía
+MAS052,Mascota_52,PERRO,Pug,HEMBRA,11,PEQUEÑO,6.6,Sano
+MAS053,Mascota_53,PERRO,Criollo / Mestizo,MACHO,5,PEQUEÑO,12.9,Sano
+MAS054,Mascota_54,PERRO,Poodle,HEMBRA,9,GRANDE,20.1,Sano
+MAS055,Mascota_55,PERRO,Schnauzer,MACHO,1,MEDIANO,14.7,Sano
+MAS056,Mascota_56,PERRO,Bulldog Francés,HEMBRA,9,GRANDE,27.7,Cardiopatía
+MAS057,Mascota_57,PERRO,Criollo / Mestizo,MACHO,9,PEQUEÑO,4.3,Sano
+MAS058,Mascota_58,GATO,Angora,MACHO,7,PEQUEÑO,3.1,Sano
+MAS059,Mascota_59,PERRO,Labrador Retriever,MACHO,11,MEDIANO,11.7,Sano
+MAS060,Mascota_60,PERRO,Pug,MACHO,4,MEDIANO,33.3,Sano
+MAS061,Mascota_61,GATO,Criollo / Mestizo,MACHO,12,PEQUEÑO,6.7,Artritis / Displasia
+MAS062,Mascota_62,PERRO,Golden Retriever,MACHO,7,PEQUEÑO,33.5,Artritis / Displasia
+MAS063,Mascota_63,PERRO,Poodle,HEMBRA,5,MEDIANO,31.7,Sano
+MAS064,Mascota_64,PERRO,Labrador Retriever,MACHO,7,GRANDE,14.5,Sano
+MAS065,Mascota_65,PERRO,Beagle,HEMBRA,11,GRANDE,37.3,Cardiopatía
+MAS066,Mascota_66,PERRO,Labrador Retriever,HEMBRA,3,PEQUEÑO,23.3,Sano
+MAS067,Mascota_67,PERRO,Criollo / Mestizo,HEMBRA,6,GRANDE,28.5,Sano
+MAS068,Mascota_68,GATO,Angora,MACHO,7,PEQUEÑO,6.5,Sano
+MAS069,Mascota_69,PERRO,Labrador Retriever,HEMBRA,1,GRANDE,21.2,Cardiopatía
+MAS070,Mascota_70,PERRO,Beagle,MACHO,11,MEDIANO,35.2,Cardiopatía
+MAS071,Mascota_71,PERRO,Criollo / Mestizo,HEMBRA,9,GRANDE,13.8,Artritis / Displasia
+MAS072,Mascota_72,PERRO,Schnauzer,HEMBRA,9,GRANDE,7.5,Artritis / Displasia
+MAS073,Mascota_73,GATO,Bengala,MACHO,10,PEQUEÑO,5.1,Artritis / Displasia
+MAS074,Mascota_74,GATO,Criollo / Mestizo,HEMBRA,5,PEQUEÑO,3.4,Cardiopatía
+MAS075,Mascota_75,GATO,Bengala,HEMBRA,8,PEQUEÑO,4.5,Dermatitis
+MAS076,Mascota_76,PERRO,Pug,MACHO,11,MEDIANO,6.0,Cardiopatía
+MAS077,Mascota_77,GATO,Persa,MACHO,14,PEQUEÑO,6.8,Sano
+MAS078,Mascota_78,PERRO,Poodle,MACHO,1,PEQUEÑO,4.6,Artritis / Displasia
+MAS079,Mascota_79,GATO,Criollo / Mestizo,HEMBRA,7,PEQUEÑO,6.5,Cardiopatía
+MAS080,Mascota_80,PERRO,Schnauzer,HEMBRA,4,MEDIANO,8.2,Dermatitis
+MAS081,Mascota_81,PERRO,Criollo / Mestizo,MACHO,3,MEDIANO,31.1,Dermatitis
+MAS082,Mascota_82,GATO,Maine Coon,MACHO,9,PEQUEÑO,3.6,Sano
+MAS083,Mascota_83,GATO,Siamés,HEMBRA,11,PEQUEÑO,4.9,Cardiopatía
+MAS084,Mascota_84,GATO,Persa,HEMBRA,10,PEQUEÑO,6.2,Cardiopatía
+MAS085,Mascota_85,GATO,Angora,HEMBRA,3,PEQUEÑO,5.8,Artritis / Displasia
+MAS086,Mascota_86,GATO,Persa,MACHO,14,PEQUEÑO,5.4,Cardiopatía
+MAS087,Mascota_87,GATO,Bengala,MACHO,5,PEQUEÑO,4.5,Dermatitis
+MAS088,Mascota_88,PERRO,Poodle,HEMBRA,6,MEDIANO,34.3,Sano
+MAS089,Mascota_89,PERRO,Bulldog Francés,HEMBRA,12,PEQUEÑO,8.3,Sano
+MAS090,Mascota_90,PERRO,Schnauzer,HEMBRA,9,MEDIANO,19.3,Sano
+MAS091,Mascota_91,PERRO,Schnauzer,MACHO,14,MEDIANO,33.8,Cardiopatía
+MAS092,Mascota_92,GATO,Maine Coon,MACHO,6,PEQUEÑO,3.8,Artritis / Displasia
+MAS093,Mascota_93,GATO,Angora,MACHO,8,PEQUEÑO,3.5,Artritis / Displasia
+MAS094,Mascota_94,GATO,Criollo / Mestizo,HEMBRA,6,PEQUEÑO,5.5,Artritis / Displasia
+MAS095,Mascota_95,PERRO,Pastor Alemán,MACHO,7,PEQUEÑO,23.7,Dermatitis
+MAS096,Mascota_96,PERRO,Criollo / Mestizo,HEMBRA,3,GRANDE,33.3,Sano
+MAS097,Mascota_97,PERRO,Golden Retriever,HEMBRA,4,MEDIANO,18.9,Sano
+MAS098,Mascota_98,GATO,Persa,HEMBRA,5,PEQUEÑO,6.3,Artritis / Displasia
+MAS099,Mascota_99,PERRO,Pug,HEMBRA,4,PEQUEÑO,25.8,Dermatitis
+MAS100,Mascota_100,PERRO,Labrador Retriever,MACHO,14,PEQUEÑO,3.7,Sano
+MAS101,Mascota_101,PERRO,Bulldog Francés,MACHO,10,MEDIANO,36.2,Artritis / Displasia
+MAS102,Mascota_102,PERRO,Beagle,MACHO,13,PEQUEÑO,31.7,Sano
+MAS103,Mascota_103,PERRO,Labrador Retriever,HEMBRA,7,MEDIANO,36.0,Sano
+MAS104,Mascota_104,PERRO,Poodle,HEMBRA,14,PEQUEÑO,26.9,Sano
+MAS105,Mascota_105,GATO,Criollo / Mestizo,HEMBRA,9,PEQUEÑO,4.4,Sano
+MAS106,Mascota_106,PERRO,Pug,HEMBRA,1,GRANDE,32.7,Artritis / Displasia
+MAS107,Mascota_107,PERRO,Schnauzer,HEMBRA,12,MEDIANO,8.4,Sano
+MAS108,Mascota_108,GATO,Bengala,HEMBRA,10,PEQUEÑO,6.1,Cardiopatía
+MAS109,Mascota_109,GATO,Maine Coon,HEMBRA,14,PEQUEÑO,5.8,Sano
+MAS110,Mascota_110,PERRO,Poodle,HEMBRA,8,PEQUEÑO,11.5,Artritis / Displasia
+MAS111,Mascota_111,GATO,Angora,HEMBRA,6,PEQUEÑO,2.6,Sano
+MAS112,Mascota_112,PERRO,Pastor Alemán,HEMBRA,13,PEQUEÑO,12.0,Sano
+MAS113,Mascota_113,GATO,Bengala,HEMBRA,9,PEQUEÑO,2.5,Sano
+MAS114,Mascota_114,PERRO,Poodle,HEMBRA,8,GRANDE,22.4,Sano
+MAS115,Mascota_115,GATO,Bengala,HEMBRA,8,PEQUEÑO,6.1,Sano
+MAS116,Mascota_116,PERRO,Poodle,MACHO,5,MEDIANO,26.2,Sano
+MAS117,Mascota_117,GATO,Angora,HEMBRA,7,PEQUEÑO,7.0,Cardiopatía
+MAS118,Mascota_118,PERRO,Beagle,HEMBRA,5,GRANDE,13.7,Sano
+MAS119,Mascota_119,PERRO,Poodle,MACHO,12,MEDIANO,21.8,Dermatitis
+MAS120,Mascota_120,PERRO,Poodle,HEMBRA,5,PEQUEÑO,28.4,Cardiopatía
+MAS121,Mascota_121,GATO,Persa,MACHO,14,PEQUEÑO,3.4,Sano
+MAS122,Mascota_122,PERRO,Bulldog Francés,MACHO,12,MEDIANO,21.7,Sano
+MAS123,Mascota_123,PERRO,Labrador Retriever,HEMBRA,12,GRANDE,36.0,Dermatitis
+MAS124,Mascota_124,GATO,Criollo / Mestizo,MACHO,10,PEQUEÑO,3.8,Artritis / Displasia
+MAS125,Mascota_125,GATO,Persa,MACHO,1,PEQUEÑO,3.6,Artritis / Displasia
+MAS126,Mascota_126,PERRO,Criollo / Mestizo,HEMBRA,2,MEDIANO,23.2,Dermatitis
+MAS127,Mascota_127,PERRO,Bulldog Francés,HEMBRA,2,PEQUEÑO,37.8,Sano
+MAS128,Mascota_128,GATO,Maine Coon,MACHO,13,PEQUEÑO,4.9,Artritis / Displasia
+MAS129,Mascota_129,GATO,Persa,HEMBRA,5,PEQUEÑO,5.1,Sano
+MAS130,Mascota_130,GATO,Bengala,MACHO,13,PEQUEÑO,3.4,Sano
+MAS131,Mascota_131,PERRO,Criollo / Mestizo,MACHO,3,PEQUEÑO,22.3,Sano
+MAS132,Mascota_132,PERRO,Schnauzer,HEMBRA,5,MEDIANO,4.1,Sano
+MAS133,Mascota_133,PERRO,Pastor Alemán,MACHO,5,PEQUEÑO,30.6,Dermatitis
+MAS134,Mascota_134,GATO,Bengala,MACHO,7,PEQUEÑO,3.0,Sano
+MAS135,Mascota_135,PERRO,Golden Retriever,MACHO,1,PEQUEÑO,8.8,Sano
+MAS136,Mascota_136,GATO,Bengala,HEMBRA,8,PEQUEÑO,3.1,Dermatitis
+MAS137,Mascota_137,PERRO,Schnauzer,HEMBRA,8,MEDIANO,5.8,Sano
+MAS138,Mascota_138,GATO,Bengala,HEMBRA,10,PEQUEÑO,3.6,Sano
+MAS139,Mascota_139,PERRO,Labrador Retriever,HEMBRA,10,GRANDE,4.4,Sano
+MAS140,Mascota_140,GATO,Angora,HEMBRA,5,PEQUEÑO,3.3,Cardiopatía
+MAS141,Mascota_141,GATO,Bengala,HEMBRA,2,PEQUEÑO,4.6,Artritis / Displasia
+MAS142,Mascota_142,PERRO,Beagle,MACHO,14,GRANDE,8.6,Artritis / Displasia
+MAS143,Mascota_143,GATO,Persa,HEMBRA,14,PEQUEÑO,5.9,Sano
+MAS144,Mascota_144,GATO,Criollo / Mestizo,HEMBRA,5,PEQUEÑO,4.0,Artritis / Displasia
+MAS145,Mascota_145,GATO,Criollo / Mestizo,HEMBRA,7,PEQUEÑO,2.7,Cardiopatía
+MAS146,Mascota_146,PERRO,Pastor Alemán,HEMBRA,13,GRANDE,4.8,Sano
+MAS147,Mascota_147,GATO,Siamés,HEMBRA,8,PEQUEÑO,6.5,Artritis / Displasia
+MAS148,Mascota_148,PERRO,Labrador Retriever,MACHO,12,GRANDE,8.5,Cardiopatía
+MAS149,Mascota_149,PERRO,Pug,MACHO,4,MEDIANO,37.7,Sano
+MAS150,Mascota_150,GATO,Criollo / Mestizo,MACHO,8,PEQUEÑO,6.7,Sano

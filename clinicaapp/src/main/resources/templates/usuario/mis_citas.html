@@ -1753,8 +1753,11 @@
                 <button class="filter-pill" data-filter="upcoming">
                     <i class="bi bi-calendar-event-fill"></i> Próximas
                 </button>
-                <button class="filter-pill" data-filter="past">
-                    <i class="bi bi-clock-history"></i> Historial
+                <button class="filter-pill" data-filter="completed">
+                    <i class="bi bi-check-circle-fill"></i> Completadas
+                </button>
+                <button class="filter-pill" data-filter="cancelled">
+                    <i class="bi bi-x-circle-fill"></i> Canceladas
                 </button>
                 <button class="filter-pill" data-filter="pending-payment">
                     <i class="bi bi-credit-card"></i> Por Pagar
@@ -2057,32 +2060,30 @@
 
                 cards.forEach((card, index) => {
                     const fecha = parseDate(card.getAttribute('data-fecha'));
-                    const estado = card.getAttribute('data-estado');
+                    const estado = card.getAttribute('data-estado') || '';
+                    const estadoLower = estado.toLowerCase();
                     let show = true;
 
                     if (filter === 'upcoming') {
-                        show = fecha && fecha >= now && (
-                            estado === 'Pendiente' ||
-                            estado === 'Confirmada' ||
-                            estado === 'Pendiente de Pago'
-                        );
+                        show = estadoLower.includes('pendiente') || estadoLower.includes('confirmada');
+                    } else if (filter === 'completed') {
+                        show = estadoLower.includes('completada');
+                    } else if (filter === 'cancelled') {
+                        show = estadoLower.includes('cancelada') || estadoLower.includes('no_asistio') || estadoLower.includes('no asistió');
                     } else if (filter === 'past') {
-                        show = (fecha && fecha < now) ||
-                            estado === 'Completada' ||
-                            estado === 'Cancelada';
+                        show = (fecha && fecha < now) || estadoLower.includes('completada') || estadoLower.includes('cancelada');
                     } else if (filter === 'pending-payment') {
-                        show = estado === 'Pendiente de Pago';
+                        show = estadoLower.includes('pago');
                     }
 
                     if (show) {
                         card.style.display = '';
-                        // Re-trigger animation
                         card.style.opacity = '0';
-                        card.style.transform = 'translateY(25px)';
+                        card.style.transform = 'translateY(20px)';
                         setTimeout(() => {
                             card.style.opacity = '1';
                             card.style.transform = 'translateY(0)';
-                        }, index * 50);
+                        }, index * 40);
                         visibleCount++;
                     } else {
                         card.style.display = 'none';
