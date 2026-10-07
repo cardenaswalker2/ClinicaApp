@@ -91,21 +91,53 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
     }
 
     @Override
-    public List<MensajeDirecto> obtenerMensajesUsuario(String destinatarioEmail) {
-        if (destinatarioEmail == null) return Collections.emptyList();
-        return mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(destinatarioEmail);
+    public List<MensajeDirecto> obtenerMensajesUsuario(String destinatarioEmailOrId) {
+        if (destinatarioEmailOrId == null || destinatarioEmailOrId.isBlank()) return Collections.emptyList();
+        String term = destinatarioEmailOrId.trim();
+
+        // 1. Buscar directamente por email (insensible a mayúsculas/minúsculas)
+        List<MensajeDirecto> lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(term);
+        if (lista.isEmpty() && term.contains("@")) {
+            lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(term.toLowerCase());
+        }
+
+        // 2. Si es un ID o si no hubo resultados, buscar usuario y consultar por ID y email del usuario
+        if (lista.isEmpty()) {
+            Usuario u = null;
+            if (term.contains("@")) {
+                u = usuarioRepo.findByEmail(term);
+                if (u == null) u = usuarioRepo.findByEmail(term.toLowerCase());
+            } else {
+                u = usuarioRepo.findById(term).orElse(null);
+            }
+
+            if (u != null) {
+                if (u.getId() != null) {
+                    lista = mensajeDirectoRepo.findByDestinatarioIdOrderByFechaEnvioDesc(u.getId());
+                }
+                if (lista.isEmpty() && u.getEmail() != null) {
+                    lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(u.getEmail());
+                }
+            }
+        }
+
+        return lista;
     }
 
     @Override
-    public List<MensajeDirecto> obtenerMensajesNoLeidos(String destinatarioEmail) {
-        if (destinatarioEmail == null) return Collections.emptyList();
-        return mensajeDirectoRepo.findByDestinatarioEmailAndLeidoFalseOrderByFechaEnvioDesc(destinatarioEmail);
+    public List<MensajeDirecto> obtenerMensajesNoLeidos(String destinatarioEmailOrId) {
+        if (destinatarioEmailOrId == null || destinatarioEmailOrId.isBlank()) return Collections.emptyList();
+        List<MensajeDirecto> todos = obtenerMensajesUsuario(destinatarioEmailOrId);
+        List<MensajeDirecto> noLeidos = new ArrayList<>();
+        for (MensajeDirecto m : todos) {
+            if (!m.isLeido()) noLeidos.add(m);
+        }
+        return noLeidos;
     }
 
     @Override
-    public long contarNoLeidos(String destinatarioEmail) {
-        if (destinatarioEmail == null) return 0;
-        return mensajeDirectoRepo.countByDestinatarioEmailAndLeidoFalse(destinatarioEmail);
+    public long contarNoLeidos(String destinatarioEmailOrId) {
+        return obtenerMensajesNoLeidos(destinatarioEmailOrId).size();
     }
 
     @Override
@@ -140,6 +172,11 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
 
     @Override
     public Map<String, Object> enviarEmailDirecto(String destinatarioEmail, String asunto, String contenidoHtml) {
+        return enviarEmailDirectoConAdjunto(destinatarioEmail, asunto, contenidoHtml, null, null);
+    }
+
+    @Override
+    public Map<String, Object> enviarEmailDirectoConAdjunto(String destinatarioEmail, String asunto, String contenidoHtml, String nombreArchivo, byte[] archivoBytes) {
         Map<String, Object> respuesta = new HashMap<>();
         try {
             if (destinatarioEmail == null || destinatarioEmail.isBlank()) {
@@ -152,37 +189,45 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
                 throw new IllegalArgumentException("El cuerpo del correo no puede estar vacío.");
             }
 
-            // Construcción del template HTML corporativo y responsive
+            // Construcción del template HTML corporativo, limpio y responsive
             String plantillaHtml = 
-                "<div style='font-family: \"Plus Jakarta Sans\", \"Segoe UI\", Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; background-color: #0b1120; color: #f8fafc; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.5);'>" +
-                "  <div style='background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); padding: 35px 30px; text-align: center;'>" +
-                "    <div style='width: 54px; height: 54px; background: rgba(255,255,255,0.2); border-radius: 14px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center;'>" +
-                "      <span style='color: white; font-size: 28px;'>🛡️</span>" +
+                "<div style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; background-color: #ffffff; color: #1e293b; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.08);'>" +
+                "  <div style='background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%); padding: 32px 28px; text-align: center; color: #ffffff;'>" +
+                "    <div style='width: 52px; height: 52px; background: rgba(255,255,255,0.2); border-radius: 14px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 26px;'>" +
+                "      🛡️" +
                 "    </div>" +
-                "    <h1 style='margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;'>Comunicado de la Administración</h1>" +
-                "    <p style='margin: 8px 0 0; color: rgba(255,255,255,0.85); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px;'>Cl&iacute;nicaApp Core Platform</p>" +
+                "    <h1 style='margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;'>Comunicado Oficial de la Administración</h1>" +
+                "    <p style='margin: 6px 0 0; color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;'>Cl&iacute;nicaApp Core Platform</p>" +
                 "  </div>" +
-                "  <div style='padding: 35px 30px; background-color: #0f172a;'>" +
-                "    <p style='font-size: 15px; color: #94a3b8; margin-top: 0;'>Estimado usuario,</p>" +
-                "    <div style='margin: 25px 0; padding: 22px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); color: #f1f5f9; font-size: 15px; line-height: 1.7;'>" +
+                "  <div style='padding: 32px 28px; background-color: #ffffff;'>" +
+                "    <p style='font-size: 15px; color: #475569; margin-top: 0;'>Estimado usuario,</p>" +
+                "    <div style='margin: 20px 0; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; color: #0f172a; font-size: 15px; line-height: 1.7;'>" +
                 contenidoHtml.replace("\n", "<br>") +
                 "    </div>" +
-                "    <div style='padding: 16px 20px; background: rgba(14, 165, 233, 0.08); border-radius: 12px; border-left: 4px solid #0ea5e9; margin-top: 25px;'>" +
-                "      <p style='margin: 0; font-size: 13px; color: #7dd3fc;'><b>Atentamente:</b> Equipo de Super Administración de Cl&iacute;nicaApp.</p>" +
+                (nombreArchivo != null && !nombreArchivo.isBlank() ? 
+                    "<div style='margin: 16px 0; padding: 12px 16px; background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0; color: #166534; font-size: 13px; display: flex; align-items: center; gap: 8px;'>" +
+                    "  <span>📎 <b>Documento adjunto:</b> " + nombreArchivo + "</span>" +
+                    "</div>" : "") +
+                "    <div style='padding: 14px 18px; background: #f0f9ff; border-radius: 10px; border-left: 4px solid #0284c7; margin-top: 24px;'>" +
+                "      <p style='margin: 0; font-size: 13px; color: #0369a1;'><b>Atentamente:</b> Equipo de Super Administración de Cl&iacute;nicaApp.</p>" +
                 "    </div>" +
                 "  </div>" +
-                "  <div style='padding: 24px 30px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.06); text-align: center;'>" +
-                "    <p style='margin: 0; font-size: 12px; color: #64748b;'>&copy; " + java.time.Year.now().getValue() + " Cl&iacute;nicaApp Pro. Todos los derechos reservados.<br>Este mensaje fue emitido directamente por un Super Administrador autorizado.</p>" +
+                "  <div style='padding: 20px 28px; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;'>" +
+                "    <p style='margin: 0; font-size: 12px; color: #94a3b8;'>&copy; " + java.time.Year.now().getValue() + " Cl&iacute;nicaApp. Todos los derechos reservados.<br>Este mensaje fue emitido directamente por un Super Administrador autorizado.</p>" +
                 "  </div>" +
                 "</div>";
 
-            emailService.sendSimpleMessage(destinatarioEmail.trim(), asunto.trim(), plantillaHtml);
+            if (archivoBytes != null && archivoBytes.length > 0 && nombreArchivo != null && !nombreArchivo.isBlank()) {
+                emailService.sendMessageWithAttachment(destinatarioEmail.trim(), asunto.trim(), plantillaHtml, nombreArchivo, archivoBytes);
+            } else {
+                emailService.sendSimpleMessage(destinatarioEmail.trim(), asunto.trim(), plantillaHtml);
+            }
 
             logActividadService.registrarAuto(
                     "Correo electrónico enviado por Super Admin",
                     "MENSAJERIA",
                     "SUCCESS",
-                    "Correo emitido exitosamente a: " + destinatarioEmail + " con asunto: '" + asunto + "'"
+                    "Correo emitido exitosamente a: " + destinatarioEmail + " con asunto: '" + asunto + "'" + (nombreArchivo != null ? " [Adjunto: " + nombreArchivo + "]" : "")
             );
 
             respuesta.put("success", true);

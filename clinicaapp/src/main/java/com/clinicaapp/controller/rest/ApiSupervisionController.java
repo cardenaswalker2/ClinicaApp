@@ -162,29 +162,58 @@ public class ApiSupervisionController {
     }
 
     // ── 6. ENVIAR CORREO ELECTRÓNICO REAL (SUPER ADMIN ONLY) ──
-    @PostMapping("/email/enviar")
+    @PostMapping(value = "/email/enviar", consumes = {"multipart/form-data", "application/json"})
     public ResponseEntity<?> enviarCorreoReal(
-            @RequestBody Map<String, String> payload,
+            @RequestParam(value = "destinatarioEmail", required = false) String destinatarioEmail,
+            @RequestParam(value = "asunto", required = false) String asunto,
+            @RequestParam(value = "contenido", required = false) String contenido,
+            @RequestParam(value = "adminEmail", required = false) String adminEmail,
+            @RequestParam(value = "archivo", required = false) org.springframework.web.multipart.MultipartFile archivo,
+            @RequestBody(required = false) Map<String, String> payload,
             @RequestParam(required = false) String email) {
 
-        String adminEmail = payload.get("adminEmail") != null ? payload.get("adminEmail") : email;
-        if (!isSuperAdmin(adminEmail)) {
+        if (payload != null) {
+            if (destinatarioEmail == null) destinatarioEmail = payload.get("destinatarioEmail");
+            if (asunto == null) asunto = payload.get("asunto");
+            if (contenido == null) contenido = payload.get("contenido");
+            if (adminEmail == null) adminEmail = payload.get("adminEmail");
+        }
+
+        String senderEmail = adminEmail != null ? adminEmail : email;
+        if (!isSuperAdmin(senderEmail)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
         }
 
         try {
-            String destinatarioEmail = payload.get("destinatarioEmail");
-            String asunto = payload.get("asunto");
-            String contenido = payload.get("contenido");
-
             if (destinatarioEmail == null || destinatarioEmail.isBlank() || asunto == null || asunto.isBlank() || contenido == null || contenido.isBlank()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Destinatario, asunto y contenido son campos requeridos."));
             }
 
-            Map<String, Object> resultado = mensajeDirectoService.enviarEmailDirecto(
-                    destinatarioEmail, asunto, contenido
+            String nombreArchivo = null;
+            byte[] archivoBytes = null;
+
+            if (archivo != null && !archivo.isEmpty()) {
+                // Validar tamaño máximo (10MB)
+                if (archivo.getSize() > 10 * 1024 * 1024) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "El archivo no debe superar los 10MB."));
+                }
+
+                String origName = archivo.getOriginalFilename();
+                if (origName != null) {
+                    String lower = origName.toLowerCase();
+                    // Bloquear ejecutables peligrosos
+                    if (lower.endsWith(".exe") || lower.endsWith(".bat") || lower.endsWith(".cmd") || lower.endsWith(".sh") || lower.endsWith(".vbs") || lower.endsWith(".js") || lower.endsWith(".jar")) {
+                        return ResponseEntity.badRequest().body(Map.of("error", "Tipo de archivo no permitido por seguridad."));
+                    }
+                    nombreArchivo = origName;
+                    archivoBytes = archivo.getBytes();
+                }
+            }
+
+            Map<String, Object> resultado = mensajeDirectoService.enviarEmailDirectoConAdjunto(
+                    destinatarioEmail, asunto, contenido, nombreArchivo, archivoBytes
             );
 
             if (Boolean.TRUE.equals(resultado.get("success"))) {

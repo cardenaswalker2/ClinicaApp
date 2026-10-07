@@ -32,4 +32,7 @@ public interface IMensajeDirectoService {
 
     // Enviar correo electrónico real a través del proveedor de email configurado (Brevo/SMTP)
     Map<String, Object> enviarEmailDirecto(String destinatarioEmail, String asunto, String contenidoHtml);
+
+    // Enviar correo electrónico con archivo adjunto
+    Map<String, Object> enviarEmailDirectoConAdjunto(String destinatarioEmail, String asunto, String contenidoHtml, String nombreArchivo, byte[] archivoBytes);
 }

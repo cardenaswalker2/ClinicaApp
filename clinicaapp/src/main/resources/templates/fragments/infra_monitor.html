@@ -261,14 +261,15 @@
                     let lastKnownMsgId = null;
                     async function checkDirectAdminMessages() {
                         try {
-                            const res = await fetch('/api/supervision/mis-mensajes');
+                            const res = await fetch('/api/supervision/mis-mensajes', { cache: 'no-store' });
                             if (res.status === 200) {
                                 const data = await res.json();
                                 if (data.mensajes && data.mensajes.length > 0) {
-                                    const latest = data.mensajes[0];
-                                    if (!latest.leido && latest.id !== lastKnownMsgId) {
-                                        lastKnownMsgId = latest.id;
-                                        showAdminDirectModal(latest);
+                                    // Buscar el mensaje no leído más reciente
+                                    const unread = data.mensajes.find(m => !m.leido);
+                                    if (unread && unread.id !== lastKnownMsgId) {
+                                        lastKnownMsgId = unread.id;
+                                        showAdminDirectModal(unread);
                                     }
                                 }
                             }
@@ -285,36 +286,36 @@
                         modalHtml.style.top = '24px';
                         modalHtml.style.right = '24px';
                         modalHtml.style.zIndex = '999999';
-                        modalHtml.style.maxWidth = '420px';
+                        modalHtml.style.maxWidth = '440px';
                         modalHtml.style.width = 'calc(100% - 48px)';
-                        modalHtml.style.background = 'rgba(15, 23, 42, 0.95)';
-                        modalHtml.style.backdropFilter = 'blur(20px)';
-                        modalHtml.style.border = '1px solid #6366f1';
-                        modalHtml.style.borderRadius = '18px';
-                        modalHtml.style.padding = '20px';
+                        modalHtml.style.background = 'rgba(15, 23, 42, 0.98)';
+                        modalHtml.style.backdropFilter = 'blur(25px)';
+                        modalHtml.style.border = '1.5px solid #00d4ff';
+                        modalHtml.style.borderRadius = '20px';
+                        modalHtml.style.padding = '22px';
                         modalHtml.style.color = '#ffffff';
-                        modalHtml.style.boxShadow = '0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(99, 102, 241, 0.4)';
-                        modalHtml.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
-                        modalHtml.style.animation = 'hexSlideDown 0.5s ease forwards';
+                        modalHtml.style.boxShadow = '0 25px 60px rgba(0,0,0,0.8), 0 0 35px rgba(0, 212, 255, 0.35)';
+                        modalHtml.style.fontFamily = "'Space Grotesk', -apple-system, sans-serif";
+                        modalHtml.style.animation = 'hexSlideDown 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards';
 
                         modalHtml.innerHTML = `
-                            <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
-                                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; flex-shrink: 0;">
-                                    <i class="bi bi-shield-fill-check"></i>
+                            <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #00d4ff, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #fff; flex-shrink: 0; box-shadow: 0 0 15px rgba(0,212,255,0.4);">
+                                    <i class="bi bi-shield-lock-fill"></i>
                                 </div>
                                 <div style="flex-grow: 1;">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #818cf8; font-weight: 800;">Mensaje del Administrador</span>
-                                        <button id="close-admin-msg-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">&times;</button>
+                                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #38bdf8; font-weight: 800;">Comunicado de la Administración</span>
+                                        <button id="close-admin-msg-btn" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 0 4px;">&times;</button>
                                     </div>
                                     <h6 style="margin: 4px 0 0; font-size: 15px; font-weight: 700; color: #ffffff;">${msg.asunto || 'Notificación Oficial'}</h6>
                                 </div>
                             </div>
-                            <div style="background: rgba(255, 255, 255, 0.04); padding: 14px; border-radius: 12px; font-size: 13.5px; color: #e2e8f0; line-height: 1.6; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.06);">
+                            <div style="background: rgba(255, 255, 255, 0.04); padding: 15px 18px; border-radius: 14px; font-size: 14px; color: #f1f5f9; line-height: 1.6; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                                 ${msg.contenido}
                             </div>
-                            <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                                <button id="ack-admin-msg-btn" style="background: #6366f1; color: white; border: none; padding: 8px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <button id="ack-admin-msg-btn" style="background: linear-gradient(135deg, #00d4ff, #6366f1); color: white; border: none; padding: 9px 20px; border-radius: 100px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,212,255,0.3);">
                                     Entendido / Marcar Leído
                                 </button>
                             </div>
@@ -332,9 +333,9 @@
                         };
                     }
 
-                    // Chequear mensajes cada 10 segundos
-                    setInterval(checkDirectAdminMessages, 10000);
-                    setTimeout(checkDirectAdminMessages, 2000);
+                    // Chequear mensajes cada 5 segundos
+                    setInterval(checkDirectAdminMessages, 5000);
+                    setTimeout(checkDirectAdminMessages, 1500);
                 })();
             })();
             /*]]>*/
