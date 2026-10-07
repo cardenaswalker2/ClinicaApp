@@ -192,7 +192,14 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
         Optional<MensajeDirecto> opt = mensajeDirectoRepo.findById(mensajeId);
         if (opt.isPresent()) {
             MensajeDirecto msg = opt.get();
-            // Validar que el mensaje pertenezca al usuario (o sea Super Admin)
+            // Validar protección IDOR: debe ser el destinatario, remitente o admin
+            if (destinatarioEmail != null && !destinatarioEmail.isBlank()) {
+                boolean esDestinatario = msg.getDestinatarioEmail() != null && msg.getDestinatarioEmail().equalsIgnoreCase(destinatarioEmail.trim());
+                boolean esRemitente = msg.getRemitenteEmail() != null && msg.getRemitenteEmail().equalsIgnoreCase(destinatarioEmail.trim());
+                if (!esDestinatario && !esRemitente) {
+                    return false;
+                }
+            }
             msg.setLeido(true);
             msg.setFechaLectura(LocalDateTime.now());
             msg.setEstadoMensaje("LEIDO");
