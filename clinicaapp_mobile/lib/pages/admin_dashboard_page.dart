@@ -134,7 +134,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       }
 
       // 9. Supervisión de Usuarios
-      final resSupervision = await http.get(Uri.parse("${AppConfig.baseUrl}/api/supervision/usuarios?email=$email"));
+      final resSupervision = await http.get(Uri.parse("${AppConfig.baseUrl}/supervision/usuarios?email=$email"));
       if (resSupervision.statusCode == 200) {
         _supervisionUsers = json.decode(resSupervision.body);
       }
@@ -2022,7 +2022,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     setState(() => _supervisionLoading = true);
     final email = AppConfig.userEmail ?? "";
     try {
-      final res = await http.get(Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userIdOrEmail/estado?email=$email"));
+      final res = await http.get(Uri.parse("${AppConfig.baseUrl}/supervision/usuario/$userIdOrEmail/estado?email=$email"));
       if (res.statusCode == 200) {
         setState(() {
           _selectedUserSupervision = json.decode(res.body);
@@ -2222,7 +2222,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               final adminEmail = AppConfig.userEmail ?? "";
               try {
                 final res = await http.post(
-                  Uri.parse("${AppConfig.baseUrl}/api/supervision/mensajeria/enviar?email=$adminEmail"),
+                  Uri.parse("${AppConfig.baseUrl}/supervision/mensajeria/enviar?email=$adminEmail"),
                   headers: {"Content-Type": "application/json"},
                   body: json.encode({
                     "destinatarioId": userId,
@@ -2286,7 +2286,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               final adminEmail = AppConfig.userEmail ?? "";
               try {
                 final res = await http.post(
-                  Uri.parse("${AppConfig.baseUrl}/api/supervision/email/enviar?email=$adminEmail"),
+                  Uri.parse("${AppConfig.baseUrl}/supervision/email/enviar?email=$adminEmail"),
                   headers: {"Content-Type": "application/json"},
                   body: json.encode({
                     "destinatarioEmail": userEmail,
@@ -2380,7 +2380,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                 final adminEmail = AppConfig.userEmail ?? "";
                 try {
                   final res = await http.post(
-                    Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userId/suspender?email=$adminEmail"),
+                    Uri.parse("${AppConfig.baseUrl}/supervision/usuario/$userId/suspender?email=$adminEmail"),
                     headers: {"Content-Type": "application/json"},
                     body: json.encode({
                       "tipo": tipo,
@@ -2435,7 +2435,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               final adminEmail = AppConfig.userEmail ?? "";
               try {
                 final res = await http.post(
-                  Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userId/cerrar-sesiones?email=$adminEmail"),
+                  Uri.parse("${AppConfig.baseUrl}/supervision/usuario/$userId/cerrar-sesiones?email=$adminEmail"),
                   headers: {"Content-Type": "application/json"},
                   body: json.encode({"motivo": reasonCtrl.text.trim(), "adminEmail": adminEmail}),
                 );
@@ -2464,7 +2464,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         final adminEmail = AppConfig.userEmail ?? "";
         try {
           final res = await http.post(
-            Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userId/reactivar?email=$adminEmail"),
+            Uri.parse("${AppConfig.baseUrl}/supervision/usuario/$userId/reactivar?email=$adminEmail"),
             headers: {"Content-Type": "application/json"},
             body: json.encode({"motivo": "Reactivación desde panel móvil", "adminEmail": adminEmail}),
           );
