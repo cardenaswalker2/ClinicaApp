@@ -47,14 +47,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
   String _aiResult = "";
   bool _techLoading = false;
 
-  // PLEB Optimization state
-  Map<String, dynamic>? _plebResult;
-  bool _plebLoading = false;
+  // Supervisión State
+  List<dynamic> _supervisionUsers = [];
+  Map<String, dynamic>? _selectedUserSupervision;
+  bool _supervisionLoading = false;
+  final _supervisionSearchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this);
+    _tabController = TabController(length: 10, vsync: this);
     _loadAllAdminData();
   }
 
@@ -66,6 +68,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     _smsToController.dispose();
     _smsMsgController.dispose();
     _aiPromptController.dispose();
+    _supervisionSearchController.dispose();
     super.dispose();
   }
 
@@ -125,6 +128,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       final resServ = await http.get(Uri.parse("${AppConfig.baseUrl}/admin/servicios?email=$email"));
       if (resServ.statusCode == 200) {
         _servicios = json.decode(resServ.body);
+      }
+
+      // 9. Supervisión de Usuarios
+      final resSupervision = await http.get(Uri.parse("${AppConfig.baseUrl}/api/supervision/usuarios?email=$email"));
+      if (resSupervision.statusCode == 200) {
+        _supervisionUsers = json.decode(resSupervision.body);
       }
     } catch (e) {
       _errorMessage = "Error de sincronización con servidor administrativo: $e";
@@ -213,6 +222,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           labelStyle: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600),
           tabs: const [
             Tab(icon: Icon(Icons.dashboard_rounded, size: 18), text: "KPIs & SaaS"),
+            Tab(icon: Icon(Icons.person_pin_rounded, size: 18), text: "Supervisión"),
             Tab(icon: Icon(Icons.settings_input_component_rounded, size: 18), text: "Control Center"),
             Tab(icon: Icon(Icons.local_hospital_rounded, size: 18), text: "Clínicas & Solicitudes"),
             Tab(icon: Icon(Icons.people_alt_rounded, size: 18), text: "Usuarios"),
@@ -232,6 +242,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   controller: _tabController,
                   children: [
                     _buildKpisTab(),
+                    _buildSupervisionTab(),
                     _buildControlCenterTab(),
                     _buildClinicasTab(),
                     _buildUsuariosTab(),
@@ -1854,8 +1865,477 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
   }
 
   // ═══════════════════════════════════════════════════════════
-  // SHARED WIDGETS
+  // TAB: SUPERVISIÓN INDIVIDUAL Y MENSAJERÍA DIRECTA
   // ═══════════════════════════════════════════════════════════
+  Widget _buildSupervisionTab() {
+    final query = _supervisionSearchController.text.toLowerCase().trim();
+    final filteredUsers = _supervisionUsers.where((u) {
+      final name = (u['nombre'] ?? '').toString().toLowerCase();
+      final email = (u['email'] ?? '').toString().toLowerCase();
+      return name.contains(query) || email.contains(query);
+    }).toList();
+
+    return RefreshIndicator(
+      onRefresh: _loadAllAdminData,
+      color: _accentCyan,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildGlassBanner(
+            title: "Supervisión Individual de Usuarios",
+            value: "${_supervisionUsers.where((u) => u['online'] == true).length} Online / ${_supervisionUsers.length} Total",
+            subtitle: "Monitoreo en vivo de presencia y canal directo",
+            icon: Icons.person_pin_rounded,
+            color: _accentCyan,
+          ),
+          const SizedBox(height: 16),
+
+          // Search Box
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            decoration: BoxDecoration(
+              color: _cardDark,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.search_rounded, color: Colors.white54, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _supervisionSearchController,
+                    style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                    decoration: InputDecoration(
+                      hintText: "Buscar usuario por nombre o correo...",
+                      hintStyle: GoogleFonts.outfit(color: Colors.white38),
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (val) => setState(() {}),
+                  ),
+                ),
+                if (_supervisionSearchController.text.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.clear_rounded, color: Colors.white54, size: 18),
+                    onPressed: () {
+                      _supervisionSearchController.clear();
+                      setState(() {});
+                    },
+                  )
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Active User Live Detail (if selected)
+          if (_selectedUserSupervision != null) ...[
+            _buildSelectedUserSupervisionCard(),
+            const SizedBox(height: 20),
+          ],
+
+          Text(
+            "Seleccionar Usuario para Supervisión",
+            style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+          const SizedBox(height: 10),
+
+          if (filteredUsers.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(24),
+              alignment: Alignment.center,
+              child: Text("No se encontraron usuarios coincidentes", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 13)),
+            )
+          else
+            ...filteredUsers.map((u) {
+              final id = u['id'] ?? '';
+              final name = u['nombre'] ?? 'Usuario';
+              final email = u['email'] ?? '';
+              final online = u['online'] == true;
+              final seccion = u['seccion'] ?? 'Inactivo';
+              final isSelected = _selectedUserSupervision != null && _selectedUserSupervision!['id'] == id;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: isSelected ? _accentBlue.withOpacity(0.15) : _cardDark,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isSelected ? _accentCyan : (online ? _accentGreen.withOpacity(0.4) : Colors.white.withOpacity(0.06)),
+                    width: isSelected ? 1.5 : 1.0,
+                  ),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  leading: Stack(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: isSelected ? _accentBlue : const Color(0xFF1E293B),
+                        child: Text(
+                          name.isNotEmpty ? name.substring(0, 1).toUpperCase() : 'U',
+                          style: GoogleFonts.outfit(color: _accentCyan, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: online ? _accentGreen : Colors.grey,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: _cardDark, width: 2),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  title: Text(name, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  subtitle: Text(
+                    "$email • ${online ? '📍 $seccion' : 'Desconectado'}",
+                    style: GoogleFonts.outfit(color: online ? _accentGreen : Colors.white54, fontSize: 11),
+                  ),
+                  trailing: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: (online ? _accentGreen : Colors.grey).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      online ? "EN LÍNEA" : "OFFLINE",
+                      style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: online ? _accentGreen : Colors.grey),
+                    ),
+                  ),
+                  onTap: () => _loadIndividualUserSupervision(id),
+                ),
+              );
+            }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _loadIndividualUserSupervision(String userIdOrEmail) async {
+    setState(() => _supervisionLoading = true);
+    final email = AppConfig.userEmail ?? "";
+    try {
+      final res = await http.get(Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userIdOrEmail/estado?email=$email"));
+      if (res.statusCode == 200) {
+        setState(() {
+          _selectedUserSupervision = json.decode(res.body);
+        });
+      }
+    } catch (e) {
+      _showSnack("Error al cargar estado del usuario: $e", isError: true);
+    } finally {
+      setState(() => _supervisionLoading = false);
+    }
+  }
+
+  Widget _buildSelectedUserSupervisionCard() {
+    final u = _selectedUserSupervision!;
+    final name = u['nombre'] ?? 'Usuario';
+    final email = u['email'] ?? '';
+    final online = u['online'] == true;
+    final seccion = u['seccionActual'] ?? 'Desconocida';
+    final timeRel = u['tiempoRelativo'] ?? 'Reciente';
+    final ip = u['ip'] ?? '127.0.0.1';
+    final disp = u['dispositivo'] ?? 'Desktop';
+    final eventos = (u['eventosRecientes'] as List?) ?? [];
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _accentCyan.withOpacity(0.5), width: 1.5),
+        boxShadow: [
+          BoxShadow(color: _accentCyan.withOpacity(0.1), blurRadius: 20, spreadRadius: 2),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(color: online ? _accentGreen : Colors.grey, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 8),
+                  Text("SUPERVISIÓN ACTIVA", style: GoogleFonts.outfit(color: _accentCyan, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, color: Colors.white54, size: 18),
+                onPressed: () => setState(() => _selectedUserSupervision = null),
+              )
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(name, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(email, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+          const SizedBox(height: 14),
+
+          // KPI indicators
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Sección Actual", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10)),
+                      Text("📍 $seccion", style: GoogleFonts.outfit(color: _accentCyan, fontWeight: FontWeight.bold, fontSize: 13)),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Última Actividad", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10)),
+                      Text("⏱️ $timeRel", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text("IP: $ip • Dispositivo: $disp", style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10, fontStyle: FontStyle.italic)),
+          const SizedBox(height: 14),
+
+          // Action Buttons
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () => _showDirectMessageDialog(u['id'] ?? '', name),
+                icon: const Icon(Icons.chat_bubble_rounded, size: 14),
+                label: const Text("Enviar Mensaje"),
+                style: ElevatedButton.styleFrom(backgroundColor: _accentPurple),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _showEmailSendDialog(email, name),
+                icon: const Icon(Icons.email_rounded, size: 14),
+                label: const Text("Enviar Correo Real"),
+                style: ElevatedButton.styleFrom(backgroundColor: _accentGreen),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _showVirtualSessionDialog(name, seccion, u['urlActual'] ?? '/'),
+                icon: const Icon(Icons.remove_red_eye_rounded, size: 14, color: _accentCyan),
+                label: const Text("Ver Sesión", style: TextStyle(color: _accentCyan)),
+              ),
+            ],
+          ),
+
+          if (eventos.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text("Línea de Tiempo Reciente:", style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70)),
+            const SizedBox(height: 8),
+            ...eventos.take(5).map((ev) {
+              final sec = ev['seccion'] ?? 'Sistema';
+              final acc = ev['accion'] ?? 'Navegó';
+              final time = ev['fechaHora'] != null ? ev['fechaHora'].toString().split('T').last.split('.').first : '';
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.fiber_manual_record_rounded, size: 8, color: _accentCyan),
+                    const SizedBox(width: 8),
+                    Text("[$time] ", style: GoogleFonts.outfit(color: _accentCyan, fontSize: 10, fontFamily: 'monospace')),
+                    Expanded(
+                      child: Text("$acc ($sec)", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 11), overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ]
+        ],
+      ),
+    );
+  }
+
+  void _showDirectMessageDialog(String userId, String userName) {
+    final msgCtrl = TextEditingController();
+    final subjectCtrl = TextEditingController(text: "Mensaje del Administrador del Sistema");
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _cardDark,
+        title: Text("Mensaje a $userName", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: subjectCtrl,
+              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+              decoration: const InputDecoration(labelText: "Asunto", labelStyle: TextStyle(color: Colors.white70)),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: msgCtrl,
+              maxLines: 4,
+              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+              decoration: const InputDecoration(labelText: "Mensaje Directo", labelStyle: TextStyle(color: Colors.white70), hintText: "Escribe el contenido que recibirá en su pantalla..."),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancelar")),
+          ElevatedButton(
+            onPressed: () async {
+              if (msgCtrl.text.trim().isEmpty) return;
+              Navigator.pop(ctx);
+              final adminEmail = AppConfig.userEmail ?? "";
+              try {
+                final res = await http.post(
+                  Uri.parse("${AppConfig.baseUrl}/api/supervision/mensajeria/enviar?email=$adminEmail"),
+                  headers: {"Content-Type": "application/json"},
+                  body: json.encode({
+                    "destinatarioId": userId,
+                    "asunto": subjectCtrl.text,
+                    "contenido": msgCtrl.text,
+                    "adminEmail": adminEmail
+                  }),
+                );
+                if (res.statusCode == 200) {
+                  _showSnack("Mensaje despachado y notificado al usuario.");
+                } else {
+                  _showSnack("Error al enviar mensaje.", isError: true);
+                }
+              } catch (e) {
+                _showSnack("Error de conexión: $e", isError: true);
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: _accentPurple),
+            child: const Text("Enviar Mensaje"),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showEmailSendDialog(String userEmail, String userName) {
+    final subCtrl = TextEditingController(text: "Notificación Oficial de ClínicaApp");
+    final bodyCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _cardDark,
+        title: Text("Despachar Correo a $userName", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Destinatario: $userEmail", style: GoogleFonts.outfit(color: _accentGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: subCtrl,
+              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+              decoration: const InputDecoration(labelText: "Asunto del Correo", labelStyle: TextStyle(color: Colors.white70)),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: bodyCtrl,
+              maxLines: 4,
+              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+              decoration: const InputDecoration(labelText: "Cuerpo del Correo", labelStyle: TextStyle(color: Colors.white70), hintText: "Escribe el comunicado oficial por correo..."),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancelar")),
+          ElevatedButton(
+            onPressed: () async {
+              if (bodyCtrl.text.trim().isEmpty) return;
+              Navigator.pop(ctx);
+              final adminEmail = AppConfig.userEmail ?? "";
+              try {
+                final res = await http.post(
+                  Uri.parse("${AppConfig.baseUrl}/api/supervision/email/enviar?email=$adminEmail"),
+                  headers: {"Content-Type": "application/json"},
+                  body: json.encode({
+                    "destinatarioEmail": userEmail,
+                    "asunto": subCtrl.text,
+                    "contenido": bodyCtrl.text,
+                    "adminEmail": adminEmail
+                  }),
+                );
+                if (res.statusCode == 200) {
+                  _showSnack("Correo despachado exitosamente por la pasarela.");
+                } else {
+                  _showSnack("Error al despachar el correo.", isError: true);
+                }
+              } catch (e) {
+                _showSnack("Error de pasarela: $e", isError: true);
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: _accentGreen),
+            child: const Text("Despachar Correo"),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showVirtualSessionDialog(String userName, String seccion, String url) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _cardDark,
+        title: Row(
+          children: [
+            const Icon(Icons.display_settings_rounded, color: _accentCyan),
+            const SizedBox(width: 8),
+            Text("Visor de Sesión: $userName", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(14), border: Border.all(color: _accentCyan.withOpacity(0.3))),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("URL: $url", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10, fontFamily: 'monospace')),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _accentGreen.withOpacity(0.2), borderRadius: BorderRadius.circular(4)), child: const Text("ACTIVO", style: TextStyle(color: _accentGreen, fontSize: 8, fontWeight: FontWeight.bold))),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Icon(Icons.dashboard_customize_rounded, color: _accentCyan, size: 48),
+                  const SizedBox(height: 10),
+                  Text("Módulo: $seccion", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 6),
+                  Text("El usuario se encuentra interactuando con esta sección dentro de la aplicación.", textAlign: TextAlign.center, style: GoogleFonts.outfit(color: Colors.white54, fontSize: 11)),
+                ],
+              ),
+            )
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cerrar Visor")),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGlassBanner({
     required String title,
     required String value,
@@ -1864,15 +2344,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.25), color.withOpacity(0.05)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: _cardDark,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(color: color.withOpacity(0.08), blurRadius: 20, spreadRadius: 2),
+        ],
       ),
       child: Row(
         children: [
@@ -1948,3 +2427,4 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     );
   }
 }
+

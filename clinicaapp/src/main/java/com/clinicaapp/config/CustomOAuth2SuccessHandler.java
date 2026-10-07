@@ -27,6 +27,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     @Autowired private com.clinicaapp.repository.ConfiguracionRepository configRepo;
     @Autowired private com.clinicaapp.service.LogActividadService logActividadService;
     @Autowired private com.clinicaapp.service.UserSessionTracker sessionTracker;
+    @Autowired private com.clinicaapp.service.IUsuarioSupervisionService usuarioSupervisionService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -80,6 +81,21 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             String sessionId = request.getSession().getId();
             String userAgent = request.getHeader("User-Agent");
             sessionTracker.registerSession(sessionId, logUser, request.getRemoteAddr(), userAgent);
+
+            // Registrar en supervisión individual de usuario
+            usuarioSupervisionService.registrarActividad(
+                null,
+                logUser,
+                null,
+                "LOGIN",
+                "Autenticación",
+                "Inicio de sesión OAuth2 / Google exitoso",
+                "/login/oauth2",
+                request.getRemoteAddr(),
+                null,
+                null,
+                "Proveedor externo"
+            );
         } catch (Exception e) {
             // Ignorar
         }

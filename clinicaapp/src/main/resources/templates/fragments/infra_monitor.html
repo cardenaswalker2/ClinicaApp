@@ -190,6 +190,152 @@
                 setInterval(updateSystemStatus, 5000);
                 setTimeout(updateSystemStatus, 1000);
                 console.log("HEX CORE: Monitor inicializado correctamente.");
+
+                // ==============================================================
+                // MÓDULO DE TELEMETRÍA Y SUPERVISIÓN ACTIVA EN TIEMPO REAL
+                // ==============================================================
+                (function initTelemetryAndMessages() {
+                    const currentPath = window.location.pathname;
+                    let seccionNombre = "Inicio";
+
+                    if (currentPath.includes("/citas")) seccionNombre = "Citas";
+                    else if (currentPath.includes("/mascotas")) seccionNombre = "Mascotas";
+                    else if (currentPath.includes("/historial")) seccionNombre = "Historial Médico";
+                    else if (currentPath.includes("/perfil")) seccionNombre = "Perfil";
+                    else if (currentPath.includes("/pagos") || currentPath.includes("/checkout")) seccionNombre = "Pagos";
+                    else if (currentPath.includes("/recordatorios")) seccionNombre = "Recordatorios";
+                    else if (currentPath.includes("/comunidad")) seccionNombre = "Comunidad Adopciones";
+                    else if (currentPath.includes("/dashboard")) seccionNombre = "Dashboard";
+                    else if (currentPath.includes("/clinicas") || currentPath.includes("/buscar-clinicas")) seccionNombre = "Búsqueda de Clínicas";
+                    else if (currentPath.includes("/admin/supervision")) seccionNombre = "Supervisión de Usuarios";
+                    else if (currentPath.includes("/admin")) seccionNombre = "Panel Administrativo";
+                    else if (currentPath.includes("/recepcion")) seccionNombre = "Recepción";
+                    else if (currentPath.includes("/veterinario")) seccionNombre = "Atención Veterinaria";
+
+                    // 1. Emitir evento de entrada a sección
+                    function reportEvent(tipoEvento, accion) {
+                        try {
+                            fetch('/api/supervision/telemetria/heartbeat', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    seccion: seccionNombre,
+                                    url: currentPath,
+                                    tipoEvento: tipoEvento,
+                                    accion: accion,
+                                    metadata: document.title
+                                })
+                            }).catch(() => {});
+                        } catch (e) {}
+                    }
+
+                    // Reportar entrada a la página actual
+                    reportEvent('ENTRADA_SECCION', 'Entró a ' + seccionNombre);
+
+                    // 2. Pulso Heartbeat cada 15 segundos para presencia en vivo
+                    setInterval(function() {
+                        try {
+                            fetch('/api/supervision/telemetria/heartbeat', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    seccion: seccionNombre,
+                                    url: currentPath
+                                })
+                            }).catch(() => {});
+                        } catch (e) {}
+                    }, 15000);
+
+                    // 3. Capturar clics en enlaces o botones interactivos clave
+                    document.addEventListener('click', function(e) {
+                        const target = e.target.closest('a, button');
+                        if (target) {
+                            const txt = (target.innerText || target.getAttribute('title') || target.getAttribute('aria-label') || '').trim();
+                            if (txt && txt.length < 50 && !txt.includes('Salir') && !txt.includes('Logout')) {
+                                reportEvent('ACCION', 'Interactuó con: ' + txt + ' en ' + seccionNombre);
+                            }
+                        }
+                    }, { passive: true });
+
+                    // 4. Verificación de Mensajes Directos del Super Admin para el usuario
+                    let lastKnownMsgId = null;
+                    async function checkDirectAdminMessages() {
+                        try {
+                            const res = await fetch('/api/supervision/mis-mensajes');
+                            if (res.status === 200) {
+                                const data = await res.json();
+                                if (data.mensajes && data.mensajes.length > 0) {
+                                    const latest = data.mensajes[0];
+                                    if (!latest.leido && latest.id !== lastKnownMsgId) {
+                                        lastKnownMsgId = latest.id;
+                                        showAdminDirectModal(latest);
+                                    }
+                                }
+                            }
+                        } catch (err) {}
+                    }
+
+                    function showAdminDirectModal(msg) {
+                        let existing = document.getElementById('admin-direct-modal');
+                        if (existing) existing.remove();
+
+                        const modalHtml = document.createElement('div');
+                        modalHtml.id = 'admin-direct-modal';
+                        modalHtml.style.position = 'fixed';
+                        modalHtml.style.top = '24px';
+                        modalHtml.style.right = '24px';
+                        modalHtml.style.zIndex = '999999';
+                        modalHtml.style.maxWidth = '420px';
+                        modalHtml.style.width = 'calc(100% - 48px)';
+                        modalHtml.style.background = 'rgba(15, 23, 42, 0.95)';
+                        modalHtml.style.backdropFilter = 'blur(20px)';
+                        modalHtml.style.border = '1px solid #6366f1';
+                        modalHtml.style.borderRadius = '18px';
+                        modalHtml.style.padding = '20px';
+                        modalHtml.style.color = '#ffffff';
+                        modalHtml.style.boxShadow = '0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(99, 102, 241, 0.4)';
+                        modalHtml.style.fontFamily = "'Plus Jakarta Sans', sans-serif";
+                        modalHtml.style.animation = 'hexSlideDown 0.5s ease forwards';
+
+                        modalHtml.innerHTML = `
+                            <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
+                                <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #06b6d4); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #fff; flex-shrink: 0;">
+                                    <i class="bi bi-shield-fill-check"></i>
+                                </div>
+                                <div style="flex-grow: 1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #818cf8; font-weight: 800;">Mensaje del Administrador</span>
+                                        <button id="close-admin-msg-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">&times;</button>
+                                    </div>
+                                    <h6 style="margin: 4px 0 0; font-size: 15px; font-weight: 700; color: #ffffff;">${msg.asunto || 'Notificación Oficial'}</h6>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.04); padding: 14px; border-radius: 12px; font-size: 13.5px; color: #e2e8f0; line-height: 1.6; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.06);">
+                                ${msg.contenido}
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                <button id="ack-admin-msg-btn" style="background: #6366f1; color: white; border: none; padding: 8px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                                    Entendido / Marcar Leído
+                                </button>
+                            </div>
+                        `;
+
+                        document.body.appendChild(modalHtml);
+
+                        document.getElementById('close-admin-msg-btn').onclick = function() {
+                            modalHtml.remove();
+                        };
+
+                        document.getElementById('ack-admin-msg-btn').onclick = function() {
+                            fetch('/api/supervision/mis-mensajes/' + msg.id + '/leer', { method: 'POST' });
+                            modalHtml.remove();
+                        };
+                    }
+
+                    // Chequear mensajes cada 10 segundos
+                    setInterval(checkDirectAdminMessages, 10000);
+                    setTimeout(checkDirectAdminMessages, 2000);
+                })();
             })();
             /*]]>*/
         </script>

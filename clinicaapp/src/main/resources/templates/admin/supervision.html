@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Supervisión Individual de Usuarios | ClínicaApp Super Admin</title>
+    <link th:replace="~{fragments/header :: favIcon}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --hex-bg: #030712;
+            --hex-surface: #0b1120;
+            --hex-card: rgba(15, 23, 42, 0.75);
+            --hex-card-hover: rgba(30, 41, 59, 0.85);
+            --hex-primary: #6366f1;
+            --hex-cyan: #06b6d4;
+            --hex-accent: #0ea5e9;
+            --hex-emerald: #10b981;
+            --hex-amber: #f59e0b;
+            --hex-rose: #f43f5e;
+            --hex-border: rgba(255, 255, 255, 0.08);
+            --hex-glow: rgba(99, 102, 241, 0.25);
+            --hex-text: #f8fafc;
+            --hex-text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--hex-bg);
+            color: var(--hex-text);
+            min-height: 100vh;
+            padding-bottom: 60px;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* ===== CONTAINER & HERO ===== */
+        .supervision-wrapper {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 100px 24px 30px;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--hex-cyan), var(--hex-primary), var(--hex-emerald));
+        }
+
+        .badge-core {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .hero-subtitle {
+            color: var(--hex-text-muted);
+            font-size: 0.95rem;
+            max-width: 750px;
+            margin: 0;
+        }
+
+        /* ===== LAYOUT GRID ===== */
+        .supervision-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .supervision-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== LEFT PANEL: USER LIST & SEARCH ===== */
+        .glass-panel {
+            background: var(--hex-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--hex-border);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--hex-text-muted);
+            font-size: 14px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.6);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 11px 16px 11px 40px;
+            color: #fff;
+            font-size: 13.5px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--hex-cyan);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+
+        .user-list-scroll {
+            max-height: 680px;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-list-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .user-list-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .user-card-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--hex-border);
+            border-radius: 14px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .user-card-item:hover {
+            background: var(--hex-card-hover);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .user-card-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(6, 182, 212, 0.15) 100%);
+            border-color: var(--hex-cyan);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+
+        .user-avatar-badge {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #38bdf8;
+            font-size: 15px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-dot-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 2px solid var(--hex-surface);
+        }
+
+        .status-online {
+            background: var(--hex-emerald);
+            box-shadow: 0 0 10px var(--hex-emerald);
+            animation: pulse-dot 2s infinite;
+        }
+
+        .status-offline {
+            background: #64748b;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+        }
+
+        /* ===== RIGHT PANEL: ACTIVE MONITORING ===== */
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--hex-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .live-badge.offline {
+            background: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        .user-header-profile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--hex-border);
+            margin-bottom: 24px;
+        }
+
+        .kpi-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-stat-card {
+            background: rgba(2, 6, 23, 0.45);
+            border: 1px solid var(--hex-border);
+            border-radius: 16px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.3s;
+        }
+
+        .kpi-stat-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .kpi-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* ===== ACTIVITY TIMELINE ===== */
+        .timeline-container {
+            position: relative;
+            padding-left: 28px;
+            margin-top: 14px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--hex-primary) 0%, rgba(99, 102, 241, 0.1) 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 16px;
+            background: rgba(2, 6, 23, 0.35);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            transition: all 0.25s;
+        }
+
+        .timeline-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -25px;
+            top: 16px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--hex-primary);
+            border: 2px solid var(--hex-bg);
+            box-shadow: 0 0 8px var(--hex-primary);
+        }
+
+        .timeline-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .action-button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-super-action {
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .btn-session-view {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-session-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.5);
+            color: #fff;
+        }
+
+        .btn-msg-direct {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-msg-direct:hover {
+            background: var(--hex-primary);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .btn-email-direct {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-email-direct:hover {
+            background: var(--hex-emerald);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ===== MODALS ===== */
+        .modal-content-glass {
+            background: rgba(11, 17, 32, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            color: #fff;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .form-control-dark {
+            background: rgba(2, 6, 23, 0.6);
+            border: 1px solid var(--hex-border);
+            border-radius: 12px;
+            color: #fff;
+            padding: 12px 16px;
+            font-size: 13.5px;
+        }
+
+        .form-control-dark:focus {
+            background: rgba(2, 6, 23, 0.8);
+            border-color: var(--hex-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+
+        /* Virtual Screen Mirror Container */
+        .screen-mirror-frame {
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 16px;
+            background: #020617;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .screen-topbar {
+            background: #0f172a;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--hex-border);
+        }
+
+        .screen-viewport {
+            padding: 24px;
+            min-height: 380px;
+            background: radial-gradient(circle at 50% 50%, #090d16 0%, #020617 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header th:replace="~{fragments/header :: header-admin}"></header>
+
+    <div class="supervision-wrapper">
+
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <div class="badge-core">
+                        <i class="bi bi-shield-lock-fill"></i> Módulo Exclusivo Super Administrador
+                    </div>
+                    <h1 class="hero-title">Supervisión Individual y Mensajería de Usuarios</h1>
+                    <p class="hero-subtitle">
+                        Monitoreo en tiempo real del estado de actividad, navegación de secciones, auditoría de eventos y canal directo de comunicación con cada usuario.
+                    </p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-outline-light rounded-pill px-4 py-2 font-monospace small" onclick="refreshSupervisionData()">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Sincronizar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="supervision-grid">
+
+            <!-- 1. USER SELECTION PANEL -->
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="m-0 fw-bold" style="letter-spacing: -0.3px;">
+                        <i class="bi bi-people-fill text-cyan me-1"></i> Lista de Usuarios
+                    </h6>
+                    <span class="badge bg-dark border border-secondary text-info small" th:text="${usuarios.size()} + ' Registrados'"></span>
+                </div>
+
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="search-input" id="userSearchInput" placeholder="Buscar por nombre o correo..." th:value="${query}" oninput="filterUserCards(this.value)">
+                </div>
+
+                <div class="user-list-scroll" id="userListContainer">
+                    <th:block th:each="user : ${usuarios}">
+                        <a th:href="@{/admin/supervision(usuarioId=${user.id}, q=${query})}" 
+                           class="user-card-item" 
+                           th:classappend="${usuarioSeleccionadoId == user.id ? 'active' : ''}"
+                           th:data-search="${user.nombre + ' ' + user.email}">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar-badge">
+                                    <span th:text="${#strings.substring(user.nombre, 0, 1)}">U</span>
+                                    <span class="status-dot-indicator" th:classappend="${user.online ? 'status-online' : 'status-offline'}"></span>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-truncate" style="max-width: 180px; font-size: 14px;" th:text="${user.nombre}">Usuario</div>
+                                    <div class="text-muted small text-truncate" style="max-width: 180px; font-size: 11.5px;" th:text="${user.email}">correo@ejemplo.com</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge" th:classappend="${user.online ? 'bg-success bg-opacity-25 text-success border border-success border-opacity-25' : 'bg-dark text-muted border border-secondary border-opacity-25'}" style="font-size: 10px;" th:text="${user.online ? 'ONLINE' : 'OFFLINE'}"></span>
+                                <div class="text-muted" style="font-size: 10px; margin-top: 3px;" th:text="${user.seccion}">Sección</div>
+                            </div>
+                        </a>
+                    </th:block>
+                </div>
+            </div>
+
+            <!-- 2. MAIN ACTIVE MONITORING PANEL -->
+            <div class="glass-panel" id="mainMonitoringPanel">
+
+                <!-- Case 1: No User Selected -->
+                <div th:if="${estadoUsuario == null}" class="py-5 text-center text-muted">
+                    <div style="width: 80px; height: 80px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-person-bounding-box text-primary fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold text-white mb-2">Selecciona un usuario para supervisar</h4>
+                    <p class="small text-muted" style="max-width: 480px; margin: 0 auto;">
+                        Elige a cualquier usuario del listado lateral para monitorear en vivo su sección actual, historial de eventos, telemetría de dispositivo y comunicarte directamente.
+                    </p>
+                </div>
+
+                <!-- Case 2: User Selected -->
+                <div th:if="${estadoUsuario != null}">
+
+                    <!-- User Header -->
+                    <div class="user-header-profile">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="user-avatar-badge" style="width: 60px; height: 60px; font-size: 22px; border-radius: 16px;">
+                                <span th:text="${#strings.substring(estadoUsuario.nombre, 0, 1)}">U</span>
+                                <span class="status-dot-indicator" style="width: 16px; height: 16px;" th:classappend="${estadoUsuario.online ? 'status-online' : 'status-offline'}"></span>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h3 class="fw-bold text-white m-0" style="font-size: 1.4rem;" th:text="${estadoUsuario.nombre}">Samuel</h3>
+                                    <span class="live-badge" th:classappend="${!estadoUsuario.online ? 'offline' : ''}">
+                                        <i class="bi" th:classappend="${estadoUsuario.online ? 'bi-circle-fill' : 'bi-dash-circle-fill'}"></i>
+                                        <span id="liveStatusText" th:text="${estadoUsuario.online ? 'EN LÍNEA' : 'DESCONECTADO'}">EN LÍNEA</span>
+                                    </span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-envelope me-1"></i> <span th:text="${estadoUsuario.email}">samuel@clinicaapp.com</span>
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-telephone me-1"></i> <span th:text="${estadoUsuario.telefono}">+57 300 000 0000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-button-group">
+                            <button type="button" class="btn-super-action btn-session-view" onclick="openSessionMirrorModal()">
+                                <i class="bi bi-display"></i> Ver Sesión / Pantalla
+                            </button>
+                            <button type="button" class="btn-super-action btn-msg-direct" onclick="openDirectMessageModal()">
+                                <i class="bi bi-chat-left-dots-fill"></i> Enviar Mensaje
+                            </button>
+                            <button type="button" class="btn-super-action btn-email-direct" onclick="openEmailModal()">
+                                <i class="bi bi-envelope-paper-fill"></i> Enviar Correo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry & Live KPI Cards -->
+                    <div class="kpi-stat-grid">
+                        <div class="kpi-stat-card">
+                            <div class="kpi-icon-box bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block">Sección Actual</span>
+                                <span class="fw-bold text-white fs-6 font-monospace" id="liveSectionText" th:text="${estadoUsuario.seccionActual}">Citas</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-stat-card">
+                            <div class="kpi-icon-box bg-cyan bg-opacity-10 text-cyan border border-info border-opacity-25">
+                                <i class="bi bi-stopwatch-fill"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block">Última Actividad</span>
+                                <span class="fw-bold text-white fs-6 font-monospace" id="liveTimeText" th:text="${estadoUsuario.tiempoRelativo}">Hace unos segundos</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-stat-card">
+                            <div class="kpi-icon-box bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                <i class="bi bi-laptop"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block">Dispositivo & OS</span>
+                                <span class="fw-bold text-white fs-6" th:text="${estadoUsuario.dispositivo + ' • ' + estadoUsuario.os}">Desktop • Windows</span>
+                            </div>
+                        </div>
+
+                        <div class="kpi-stat-card">
+                            <div class="kpi-icon-box bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">
+                                <i class="bi bi-globe"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted small d-block">Dirección IP</span>
+                                <span class="fw-bold text-white fs-6 font-monospace" th:text="${estadoUsuario.ip}">127.0.0.1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs: Historial de Actividad & Conversación Directa -->
+                    <ul class="nav nav-pills mb-3 border-bottom border-secondary border-opacity-25 pb-2 gap-2" id="supervisionTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill px-4 text-white" id="tab-actividad" data-bs-toggle="pill" data-bs-target="#panel-actividad" type="button" role="tab">
+                                <i class="bi bi-activity me-1"></i> Línea de Tiempo de Actividad
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-4 text-white" id="tab-mensajes" data-bs-toggle="pill" data-bs-target="#panel-mensajes" type="button" role="tab">
+                                <i class="bi bi-chat-text-fill me-1"></i> Historial de Mensajes con este Usuario
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="supervisionTabsContent">
+
+                        <!-- Tab 1: Timeline -->
+                        <div class="tab-pane fade show active" id="panel-actividad" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small font-monospace">EVENTOS REGISTRADOS EN VIVO</span>
+                                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 small">Auto-Sync Activo (3s)</span>
+                            </div>
+
+                            <div class="timeline-container" id="timelineListContainer">
+                                <th:block th:each="ev : ${estadoUsuario.eventosRecientes}">
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="timeline-time" th:text="${#temporals.format(ev.fechaHora, 'hh:mm:ss a')}">10:42:18 PM</span>
+                                            <span class="badge bg-dark border border-secondary border-opacity-25 text-info" style="font-size: 10px;" th:text="${ev.seccion}">Citas</span>
+                                        </div>
+                                        <div class="fw-semibold text-white mt-1" style="font-size: 13.5px;" th:text="${ev.accion}">Entró a Citas</div>
+                                        <div class="text-muted small" style="font-size: 11px;" th:if="${ev.metadata != null and !ev.metadata.isEmpty()}" th:text="'Detalles: ' + ${ev.metadata}"></div>
+                                    </div>
+                                </th:block>
+                                <div th:if="${#lists.isEmpty(estadoUsuario.eventosRecientes)}" class="text-muted small py-4 text-center">
+                                    No hay eventos registrados recientemente para este usuario.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Messages -->
+                        <div class="tab-pane fade" id="panel-mensajes" role="tabpanel">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted small">Mensajes administrativos despachados directamente</span>
+                                <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="openDirectMessageModal()">
+                                    <i class="bi bi-plus-lg me-1"></i> Redactar Mensaje
+                                </button>
+                            </div>
+
+                            <div class="d-flex flex-column gap-3" id="conversationListContainer">
+                                <th:block th:each="msg : ${conversacion}">
+                                    <div class="p-3 rounded-4" style="background: rgba(2, 6, 23, 0.45); border: 1px solid var(--hex-border);">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-shield-fill text-primary"></i>
+                                                <span class="fw-bold text-white small" th:text="${msg.asunto}">Asunto del mensaje</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge" th:classappend="${msg.leido ? 'bg-success bg-opacity-20 text-success' : 'bg-warning bg-opacity-20 text-warning'}" style="font-size: 10px;" th:text="${msg.leido ? 'LEÍDO' : 'NO LEÍDO'}">NO LEÍDO</span>
+                                                <span class="text-muted font-monospace" style="font-size: 11px;" th:text="${#temporals.format(msg.fechaEnvio, 'dd/MM/yyyy hh:mm a')}">Fecha</span>
+                                            </div>
+                                        </div>
+                                        <p class="m-0 text-light small" th:text="${msg.contenido}">Contenido del mensaje...</p>
+                                    </div>
+                                </th:block>
+                                <div th:if="${#lists.isEmpty(conversacion)}" class="text-muted small py-4 text-center">
+                                    No hay mensajes previos enviados a este usuario.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== MODAL 1: VER SESIÓN / PANTALLA VIRTUAL ===== -->
+    <div class="modal fade" id="modalSessionMirror" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modal-content-glass">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.2); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
+                            <i class="bi bi-display"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold text-white m-0">Representación de Sesión en Vivo</h5>
+                            <span class="text-muted small">Inspección de interfaz basada en telemetría de aplicación segura</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Technical explanation note -->
+                    <div class="alert bg-primary bg-opacity-10 border-primary border-opacity-25 text-light small mb-3">
+                        <i class="bi bi-shield-lock-fill text-info me-1"></i>
+                        <b>Seguridad & Privacidad:</b> Por arquitectura de alta seguridad y normativas de privacidad, la sesión se visualiza mediante la reconstrucción sintética en tiempo real de los componentes y vistas de la aplicación clínica navegados por el usuario, sin acceso a hardware externo ni fuga de datos.
+                    </div>
+
+                    <div class="screen-mirror-frame">
+                        <div class="screen-topbar">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+                                <span class="text-muted small ms-2 font-monospace" id="mirrorUrlBar">https://clinicaapp.com/usuario/citas</span>
+                            </div>
+                            <span class="badge bg-success bg-opacity-25 text-success small font-monospace">EN VIVO</span>
+                        </div>
+                        <div class="screen-viewport">
+                            <div style="width: 60px; height: 60px; border-radius: 16px; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                                <i class="bi bi-window-sidebar text-primary fs-2"></i>
+                            </div>
+                            <h4 class="fw-bold text-white mb-2" id="mirrorSectionTitle">Sección: Citas Médicas</h4>
+                            <p class="text-muted small" style="max-width: 440px;" id="mirrorDesc">
+                                El usuario está actualmente interactuando con la interfaz del módulo de consultas y citas programadas.
+                            </p>
+                            <div class="p-3 mt-3 rounded-3 text-start w-100 font-monospace small" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08); max-width: 500px;">
+                                <div class="text-info"><i class="bi bi-terminal me-1"></i> Estado del Cliente:</div>
+                                <div class="text-light mt-1">• Módulo: <span id="mirrorMod" class="text-warning">Citas</span></div>
+                                <div class="text-light">• Último Evento: <span id="mirrorEvent" class="text-success">Consultó detalles de cita</span></div>
+                                <div class="text-light">• Timestamp: <span id="mirrorTime" class="text-muted">10:42:25 PM</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar Visor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL 2: ENVIAR MENSAJE DIRECTO ===== -->
+    <div class="modal fade" id="modalDirectMessage" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-glass">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.2); display: flex; align-items: center; justify-content: center; color: #a5b4fc;">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <h5 class="modal-title fw-bold text-white m-0">Mensajería Directa Administrativa</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Destinatario:</label>
+                        <input type="text" class="form-control form-control-dark" id="msgDestinatarioNombre" readonly th:value="${estadoUsuario != null ? estadoUsuario.nombre + ' (' + estadoUsuario.email + ')' : ''}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Asunto:</label>
+                        <input type="text" class="form-control form-control-dark" id="msgAsunto" value="Mensaje del Administrador del Sistema">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Contenido del Mensaje:</label>
+                        <textarea class="form-control form-control-dark" id="msgContenido" rows="4" placeholder="Escribe aquí el mensaje directo que recibirá el usuario en su pantalla..."></textarea>
+                    </div>
+                    <div id="msgAlertResponse" class="d-none"></div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" id="btnSubmitDirectMessage" onclick="sendDirectMessageAction()">
+                        <i class="bi bi-send-fill me-1"></i> Enviar Mensaje
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL 3: ENVIAR CORREO ELECTRÓNICO REAL ===== -->
+    <div class="modal fade" id="modalEmailDirect" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-glass">
+                <div class="modal-header border-secondary border-opacity-25">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; color: #6ee7b7;">
+                            <i class="bi bi-envelope-paper-fill"></i>
+                        </div>
+                        <h5 class="modal-title fw-bold text-white m-0">Enviar Correo Electrónico Real</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Destinatario:</label>
+                        <input type="email" class="form-control form-control-dark" id="emailDestinatario" readonly th:value="${estadoUsuario != null ? estadoUsuario.email : ''}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Asunto del Correo:</label>
+                        <input type="text" class="form-control form-control-dark" id="emailAsunto" value="Notificación Oficial de ClínicaApp">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Cuerpo del Mensaje (HTML/Texto):</label>
+                        <textarea class="form-control form-control-dark" id="emailCuerpo" rows="5" placeholder="Estimado usuario, nos comunicamos con usted para informarle sobre..."></textarea>
+                    </div>
+                    <div id="emailAlertResponse" class="d-none"></div>
+                </div>
+                <div class="modal-footer border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" id="btnSubmitEmail" onclick="sendRealEmailAction()">
+                        <i class="bi bi-send-check-fill me-1"></i> Despachar Correo Real
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const selectedUserId = /*[[${usuarioSeleccionadoId}]]*/ null;
+        let pollingInterval = null;
+
+        // Filtrar tarjetas de usuarios
+        function filterUserCards(query) {
+            const q = query.toLowerCase().trim();
+            const cards = document.querySelectorAll('.user-card-item');
+            cards.forEach(c => {
+                const text = c.getAttribute('data-search') || '';
+                if (text.toLowerCase().includes(q)) {
+                    c.style.display = 'flex';
+                } else {
+                    c.style.display = 'none';
+                }
+            });
+        }
+
+        // Modales
+        function openSessionMirrorModal() {
+            const myModal = new bootstrap.Modal(document.getElementById('modalSessionMirror'));
+            myModal.show();
+        }
+
+        function openDirectMessageModal() {
+            const myModal = new bootstrap.Modal(document.getElementById('modalDirectMessage'));
+            myModal.show();
+        }
+
+        function openEmailModal() {
+            const myModal = new bootstrap.Modal(document.getElementById('modalEmailDirect'));
+            myModal.show();
+        }
+
+        // Polling en tiempo real para el usuario seleccionado
+        async function refreshSupervisionData() {
+            if (!selectedUserId) return;
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/estado`);
+                if (res.status === 200) {
+                    const data = await res.json();
+                    if (data.encontrado) {
+                        updateLiveUI(data);
+                    }
+                }
+            } catch (err) {
+                console.error("Fallo al actualizar telemetría:", err);
+            }
+        }
+
+        function updateLiveUI(data) {
+            // Actualizar status badge
+            const statusEl = document.getElementById('liveStatusText');
+            if (statusEl) {
+                statusEl.textContent = data.online ? 'EN LÍNEA' : 'DESCONECTADO';
+                const parentBadge = statusEl.closest('.live-badge');
+                if (parentBadge) {
+                    if (data.online) parentBadge.classList.remove('offline');
+                    else parentBadge.classList.add('offline');
+                }
+            }
+
+            // Actualizar sección y tiempo
+            const secEl = document.getElementById('liveSectionText');
+            if (secEl) secEl.textContent = data.seccionActual || 'Desconocida';
+
+            const timeEl = document.getElementById('liveTimeText');
+            if (timeEl) timeEl.textContent = data.tiempoRelativo || 'Reciente';
+
+            // Actualizar Screen Mirror elements
+            const mirrorUrl = document.getElementById('mirrorUrlBar');
+            if (mirrorUrl) mirrorUrl.textContent = 'https://clinicaapp.com' + (data.urlActual || '/');
+            const mirrorTitle = document.getElementById('mirrorSectionTitle');
+            if (mirrorTitle) mirrorTitle.textContent = 'Sección: ' + (data.seccionActual || 'Inicio');
+            const mirrorMod = document.getElementById('mirrorMod');
+            if (mirrorMod) mirrorMod.textContent = data.seccionActual || 'Inicio';
+
+            // Actualizar timeline de actividad
+            if (data.eventosRecientes && data.eventosRecientes.length > 0) {
+                const timelineContainer = document.getElementById('timelineListContainer');
+                if (timelineContainer) {
+                    let html = '';
+                    data.eventosRecientes.forEach(ev => {
+                        const dateStr = ev.fechaHora ? new Date(ev.fechaHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Reciente';
+                        html += `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="timeline-time">${dateStr}</span>
+                                    <span class="badge bg-dark border border-secondary border-opacity-25 text-info" style="font-size: 10px;">${ev.seccion || 'Sistema'}</span>
+                                </div>
+                                <div class="fw-semibold text-white mt-1" style="font-size: 13.5px;">${ev.accion || 'Navegación'}</div>
+                                ${ev.metadata ? `<div class="text-muted small" style="font-size: 11px;">Detalles: ${ev.metadata}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    timelineContainer.innerHTML = html;
+                }
+            }
+        }
+
+        // Enviar Mensaje Directo
+        async function sendDirectMessageAction() {
+            const btn = document.getElementById('btnSubmitDirectMessage');
+            const alertBox = document.getElementById('msgAlertResponse');
+            const asunto = document.getElementById('msgAsunto').value;
+            const contenido = document.getElementById('msgContenido').value;
+
+            if (!contenido.trim()) {
+                alertBox.className = 'alert alert-danger small';
+                alertBox.textContent = 'Por favor escribe el contenido del mensaje.';
+                alertBox.classList.remove('d-none');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+
+            try {
+                const res = await fetch('/api/supervision/mensajeria/enviar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        destinatarioId: selectedUserId,
+                        asunto: asunto,
+                        contenido: contenido
+                    })
+                });
+
+                const json = await res.json();
+                if (res.ok && json.success) {
+                    alertBox.className = 'alert alert-success small';
+                    alertBox.textContent = '¡Mensaje despachado y notificado en la pantalla del usuario!';
+                    alertBox.classList.remove('d-none');
+                    document.getElementById('msgContenido').value = '';
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('modalDirectMessage')).hide();
+                        alertBox.classList.add('d-none');
+                        location.reload();
+                    }, 1500);
+                } else {
+                    alertBox.className = 'alert alert-danger small';
+                    alertBox.textContent = json.error || 'Error al enviar el mensaje.';
+                    alertBox.classList.remove('d-none');
+                }
+            } catch (e) {
+                alertBox.className = 'alert alert-danger small';
+                alertBox.textContent = 'Error de conexión con el servidor.';
+                alertBox.classList.remove('d-none');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Enviar Mensaje';
+            }
+        }
+
+        // Enviar Correo Real
+        async function sendRealEmailAction() {
+            const btn = document.getElementById('btnSubmitEmail');
+            const alertBox = document.getElementById('emailAlertResponse');
+            const email = document.getElementById('emailDestinatario').value;
+            const asunto = document.getElementById('emailAsunto').value;
+            const contenido = document.getElementById('emailCuerpo').value;
+
+            if (!contenido.trim()) {
+                alertBox.className = 'alert alert-danger small';
+                alertBox.textContent = 'Por favor escribe el cuerpo del correo.';
+                alertBox.classList.remove('d-none');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando por pasarela...';
+
+            try {
+                const res = await fetch('/api/supervision/email/enviar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        destinatarioEmail: email,
+                        asunto: asunto,
+                        contenido: contenido
+                    })
+                });
+
+                const json = await res.json();
+                if (res.ok && json.success) {
+                    alertBox.className = 'alert alert-success small';
+                    alertBox.textContent = '¡Correo electrónico enviado exitosamente al buzón del usuario!';
+                    alertBox.classList.remove('d-none');
+                    document.getElementById('emailCuerpo').value = '';
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('modalEmailDirect')).hide();
+                        alertBox.classList.add('d-none');
+                    }, 1800);
+                } else {
+                    alertBox.className = 'alert alert-danger small';
+                    alertBox.textContent = json.error || 'Fallo en el servidor de correo.';
+                    alertBox.classList.remove('d-none');
+                }
+            } catch (e) {
+                alertBox.className = 'alert alert-danger small';
+                alertBox.textContent = 'Error de conexión con el servidor.';
+                alertBox.classList.remove('d-none');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send-check-fill me-1"></i> Despachar Correo Real';
+            }
+        }
+
+        // Inicializar polling si hay un usuario seleccionado
+        if (selectedUserId) {
+            pollingInterval = setInterval(refreshSupervisionData, 3000);
+        }
+        /*]]>*/
+    </script>
+</body>
+
+</html>

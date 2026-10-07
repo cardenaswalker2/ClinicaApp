@@ -25,6 +25,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     @Autowired
     private com.clinicaapp.service.UserSessionTracker sessionTracker;
 
+    @Autowired
+    private com.clinicaapp.service.IUsuarioSupervisionService usuarioSupervisionService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -46,6 +49,21 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             String sessionId = request.getSession().getId();
             String userAgent = request.getHeader("User-Agent");
             sessionTracker.registerSession(sessionId, authentication.getName(), request.getRemoteAddr(), userAgent);
+
+            // Registrar en supervisión individual de usuario
+            usuarioSupervisionService.registrarActividad(
+                null,
+                authentication.getName(),
+                null,
+                "LOGIN",
+                "Autenticación",
+                "Inicio de sesión exitoso en la plataforma",
+                "/login",
+                request.getRemoteAddr(),
+                null,
+                null,
+                "Rol: " + rol
+            );
         } catch (Exception e) {
             // Ignorar
         }
