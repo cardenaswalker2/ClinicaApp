@@ -53,8 +53,11 @@ public class UserAccountControlFilter extends OncePerRequestFilter {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            String email = auth.getName();
-            Usuario user = usuarioRepository.findByEmail(email);
+            String email = extractEmailFromAuth(auth);
+            Usuario user = (email != null && !email.isBlank()) ? usuarioRepository.findByEmail(email) : null;
+            if (user == null && email != null) {
+                user = usuarioRepository.findByEmail(email.toLowerCase());
+            }
 
             if (user != null) {
                 HttpSession session = request.getSession(false);
@@ -125,5 +128,24 @@ public class UserAccountControlFilter extends OncePerRequestFilter {
         return uri.startsWith("/api/") || 
                (accept != null && accept.contains("application/json")) || 
                "XMLHttpRequest".equals(requestedWith);
+    }
+
+    private String extractEmailFromAuth(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return null;
+        }
+        Object principal = auth.getPrincipal();
+        if (principal instanceof org.springframework.security.oauth2.core.oidc.user.OidcUser oidcUser) {
+            String email = (String) oidcUser.getClaims().get("email");
+            if (email != null && !email.isBlank()) return email;
+        }
+        if (principal instanceof org.springframework.security.oauth2.core.user.OAuth2User oAuth2User) {
+            String email = (String) oAuth2User.getAttributes().get("email");
+            if (email != null && !email.isBlank()) return email;
+        }
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            return userDetails.getUsername();
+        }
+        return auth.getName();
     }
 }

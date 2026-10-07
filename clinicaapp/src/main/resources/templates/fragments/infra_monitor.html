@@ -312,88 +312,176 @@
                     }, { passive: true });
 
                     // 4. Verificación de Mensajes Directos del Super Admin para el usuario
-                    let lastKnownMsgId = null;
+                    let lastShownMsgId = null;
+                    let activeToast = null;
+                    let activeModal = null;
+                    let dismissedMsgIds = new Set();
+
                     async function checkDirectAdminMessages() {
                         try {
                             const res = await fetch('/api/supervision/mis-mensajes', { cache: 'no-store' });
                             if (res.status === 200) {
                                 const data = await res.json();
                                 if (data.mensajes && data.mensajes.length > 0) {
-                                    // Buscar el mensaje no leído más reciente
-                                    const unread = data.mensajes.find(m => !m.leido);
-                                    if (unread && unread.id !== lastKnownMsgId) {
-                                        lastKnownMsgId = unread.id;
-                                        showAdminDirectModal(unread);
+                                    // Filtrar mensajes no leídos que no hayan sido descartados en esta sesión
+                                    const unreadList = data.mensajes.filter(m => !m.leido && !dismissedMsgIds.has(m.id));
+                                    if (unreadList.length > 0) {
+                                        const latest = unreadList[0];
+                                        if (latest.id !== lastShownMsgId && !activeToast && !activeModal) {
+                                            lastShownMsgId = latest.id;
+                                            showAdminNotificationToast(latest, unreadList.length);
+                                        }
+                                    } else {
+                                        if (activeToast) {
+                                            activeToast.remove();
+                                            activeToast = null;
+                                        }
                                     }
                                 }
                             }
                         } catch (err) {}
                     }
 
+                    // Notificación Toast No-Intrusiva (Flotante arriba a la derecha / centro en móvil)
+                    function showAdminNotificationToast(msg, count) {
+                        if (activeToast) activeToast.remove();
+
+                        const toast = document.createElement('div');
+                        toast.id = 'admin-notif-toast';
+                        toast.style.position = 'fixed';
+                        toast.style.top = '18px';
+                        toast.style.right = '18px';
+                        toast.style.zIndex = '999999';
+                        toast.style.maxWidth = '380px';
+                        toast.style.width = 'calc(100% - 36px)';
+                        toast.style.background = '#ffffff';
+                        toast.style.border = '1px solid #e2e8f0';
+                        toast.style.borderRadius = '14px';
+                        toast.style.padding = '12px 14px';
+                        toast.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.08)';
+                        toast.style.display = 'flex';
+                        toast.style.alignItems = 'center';
+                        toast.style.gap = '12px';
+                        toast.style.cursor = 'pointer';
+                        toast.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease';
+                        toast.style.fontFamily = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+                        toast.style.animation = 'hexSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+
+                        const remitente = msg.remitenteNombre || 'Super Administrador';
+                        const asunto = msg.asunto || 'Mensaje de la Administración';
+
+                        toast.innerHTML = `
+                            <div style="width: 38px; height: 38px; border-radius: 10px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div style="flex-grow: 1; min-width: 0;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px;">Mensaje de Administración</span>
+                                    <button id="dismiss-toast-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+                                </div>
+                                <div style="font-size: 13.5px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;">${asunto}</div>
+                                <div style="font-size: 12px; color: #64748b;">Toca aquí para leer y responder</div>
+                            </div>
+                        `;
+
+                        document.body.appendChild(toast);
+                        activeToast = toast;
+
+                        // Al hacer clic en el toast se abre el diálogo de lectura/respuesta
+                        toast.onclick = function(e) {
+                            if (e.target.id === 'dismiss-toast-btn') return;
+                            toast.remove();
+                            activeToast = null;
+                            showAdminDirectModal(msg);
+                        };
+
+                        // Botón de cerrar el toast sin leer
+                        const dismissBtn = toast.querySelector('#dismiss-toast-btn');
+                        if (dismissBtn) {
+                            dismissBtn.onclick = function(e) {
+                                e.stopPropagation();
+                                dismissedMsgIds.add(msg.id);
+                                toast.style.opacity = '0';
+                                toast.style.transform = 'translateY(-10px)';
+                                setTimeout(() => {
+                                    toast.remove();
+                                    activeToast = null;
+                                }, 300);
+                            };
+                        }
+                    }
+
                     function showAdminDirectModal(msg) {
-                        let existing = document.getElementById('admin-direct-modal');
-                        if (existing) existing.remove();
+                        if (activeModal) activeModal.remove();
 
                         const modalHtml = document.createElement('div');
                         modalHtml.id = 'admin-direct-modal';
                         modalHtml.style.position = 'fixed';
-                        modalHtml.style.top = '20px';
-                        modalHtml.style.left = '50%';
-                        modalHtml.style.transform = 'translateX(-50%)';
+                        modalHtml.style.top = '0';
+                        modalHtml.style.left = '0';
+                        modalHtml.style.width = '100vw';
+                        modalHtml.style.height = '100vh';
+                        modalHtml.style.background = 'rgba(15, 23, 42, 0.4)';
+                        modalHtml.style.backdropFilter = 'blur(4px)';
                         modalHtml.style.zIndex = '999999';
-                        modalHtml.style.maxWidth = '440px';
-                        modalHtml.style.width = 'calc(100% - 32px)';
-                        modalHtml.style.background = '#ffffff';
-                        modalHtml.style.border = '1px solid #cbd5e1';
-                        modalHtml.style.borderRadius = '16px';
-                        modalHtml.style.padding = '18px 20px';
-                        modalHtml.style.color = '#0f172a';
-                        modalHtml.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0,0,0,0.05)';
-                        modalHtml.style.fontFamily = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+                        modalHtml.style.display = 'flex';
+                        modalHtml.style.alignItems = 'center';
+                        modalHtml.style.justifyContent = 'center';
+                        modalHtml.style.padding = '16px';
                         modalHtml.style.boxSizing = 'border-box';
-                        modalHtml.style.transition = 'all 0.3s ease';
+                        modalHtml.style.fontFamily = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+
+                        const remitente = msg.remitenteNombre || 'Super Administrador';
+                        const asunto = msg.asunto || 'Mensaje Oficial';
 
                         modalHtml.innerHTML = `
-                            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
-                                <div style="width: 38px; height: 38px; border-radius: 10px; background: #e0f2fe; border: 1px solid #bae6fd; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: #0284c7; flex-shrink: 0;">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                </div>
-                                <div style="flex-grow: 1; min-width: 0;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #0284c7; font-weight: 800;">Mensaje de la Administración</span>
-                                        <button id="close-admin-msg-btn" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+                            <div style="background: #ffffff; border-radius: 18px; max-width: 480px; width: 100%; padding: 22px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #cbd5e1; box-sizing: border-box; animation: hexSlideDown 0.3s ease;">
+                                <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;">
+                                    <div style="width: 42px; height: 42px; border-radius: 12px; background: #e0f2fe; border: 1px solid #bae6fd; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #0284c7; flex-shrink: 0;">
+                                        <i class="fa-solid fa-shield-halved"></i>
                                     </div>
-                                    <h6 style="margin: 2px 0 0; font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${msg.asunto || 'Notificación Oficial'}</h6>
+                                    <div style="flex-grow: 1; min-width: 0;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #0284c7; font-weight: 800;">Comunicado Oficial de Administración</span>
+                                            <button id="close-admin-modal-btn" style="background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+                                        </div>
+                                        <h6 style="margin: 2px 0 0; font-size: 15px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${asunto}</h6>
+                                    </div>
                                 </div>
-                            </div>
-                            <div style="background: #f8fafc; padding: 12px 14px; border-radius: 10px; font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 12px; border: 1px solid #e2e8f0; word-break: break-word; max-height: 180px; overflow-y: auto;">
-                                ${msg.contenido}
-                            </div>
-                            
-                            <!-- Caja de Respuesta Bidireccional Directa -->
-                            <div style="margin-bottom: 12px;">
-                                <textarea id="reply-admin-input" placeholder="Escribe tu respuesta al Administrador aquí..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; resize: none; height: 60px; outline: none; box-sizing: border-box;"></textarea>
-                            </div>
+                                <div style="background: #f8fafc; padding: 14px 16px; border-radius: 12px; font-size: 13.5px; color: #334155; line-height: 1.6; margin-bottom: 14px; border: 1px solid #e2e8f0; word-break: break-word; max-height: 200px; overflow-y: auto;">
+                                    ${msg.contenido}
+                                </div>
+                                
+                                <!-- Caja de Respuesta Bidireccional Directa -->
+                                <div style="margin-bottom: 14px;">
+                                    <textarea id="reply-admin-input" placeholder="Escribe tu respuesta al Administrador aquí..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: inherit; resize: none; height: 68px; outline: none; box-sizing: border-box;"></textarea>
+                                </div>
 
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                                <button id="ack-admin-msg-btn" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
-                                    Marcar leído
-                                </button>
-                                <button id="send-admin-reply-btn" style="background: #0284c7; color: white; border: none; padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
-                                    <i class="fa-solid fa-paper-plane" style="margin-right: 4px;"></i> Responder
-                                </button>
+                                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                                    <button id="ack-admin-msg-btn" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 10px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
+                                        Marcar como leído
+                                    </button>
+                                    <button id="send-admin-reply-btn" style="background: #0284c7; color: white; border: none; padding: 8px 20px; border-radius: 10px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+                                        <i class="fa-solid fa-paper-plane" style="margin-right: 5px;"></i> Responder
+                                    </button>
+                                </div>
                             </div>
                         `;
 
                         document.body.appendChild(modalHtml);
+                        activeModal = modalHtml;
 
-                        document.getElementById('close-admin-msg-btn').onclick = function() {
+                        document.getElementById('close-admin-modal-btn').onclick = function() {
+                            dismissedMsgIds.add(msg.id);
                             modalHtml.remove();
+                            activeModal = null;
                         };
 
                         document.getElementById('ack-admin-msg-btn').onclick = function() {
                             fetch('/api/supervision/mis-mensajes/' + msg.id + '/leer', { method: 'POST' });
+                            dismissedMsgIds.add(msg.id);
                             modalHtml.remove();
+                            activeModal = null;
                         };
 
                         document.getElementById('send-admin-reply-btn').onclick = async function() {
@@ -414,13 +502,17 @@
                                 });
                                 if (resp.ok) {
                                     fetch('/api/supervision/mis-mensajes/' + msg.id + '/leer', { method: 'POST' });
-                                    modalHtml.innerHTML = `
-                                        <div style="text-align: center; padding: 15px; color: #16a34a; font-weight: 700; font-size: 14px;">
-                                            <i class="fa-solid fa-circle-check" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                                    dismissedMsgIds.add(msg.id);
+                                    modalHtml.querySelector('div > div').innerHTML = `
+                                        <div style="text-align: center; padding: 25px 15px; color: #16a34a; font-weight: 700; font-size: 15px;">
+                                            <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
                                             ¡Respuesta enviada exitosamente al Super Administrador!
                                         </div>
                                     `;
-                                    setTimeout(() => modalHtml.remove(), 2000);
+                                    setTimeout(() => {
+                                        modalHtml.remove();
+                                        activeModal = null;
+                                    }, 1800);
                                 } else {
                                     alert("Error al enviar la respuesta.");
                                     btn.disabled = false;
@@ -434,8 +526,8 @@
                         };
                     }
 
-                    // Chequear mensajes cada 5 segundos
-                    setInterval(checkDirectAdminMessages, 5000);
+                    // Chequear mensajes cada 6 segundos
+                    setInterval(checkDirectAdminMessages, 6000);
                     setTimeout(checkDirectAdminMessages, 1500);
                 })();
             })();
