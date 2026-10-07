@@ -859,7 +859,7 @@
                                     <h2 class="profile-name" th:text="${estadoUsuario.nombre}">Samuel</h2>
                                     <span class="badge-status" th:classappend="${estadoUsuario.online ? 'online' : 'offline'}" th:text="${estadoUsuario.online ? 'EN LÍNEA' : 'DESCONECTADO'}" id="liveStatusText">EN LÍNEA</span>
                                     
-                                    <span th:if="${estadoUsuario.suspendido}" class="badge bg-danger text-white fw-bold" style="font-size: 11px;">
+                                    <span th:if="${estadoUsuario['suspendido'] == true}" class="badge bg-danger text-white fw-bold" style="font-size: 11px;">
                                         <i class="fa-solid fa-lock"></i> SUSPENDIDO
                                     </span>
                                 </div>

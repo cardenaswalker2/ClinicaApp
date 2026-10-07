@@ -135,6 +135,10 @@ public class UsuarioSupervisionServiceImpl implements IUsuarioSupervisionService
         resultado.put("telefono", usuario.getTelefono() != null ? usuario.getTelefono() : "No registrado");
         resultado.put("rol", usuario.getRole() != null ? usuario.getRole().name() : "ROLE_USER");
         resultado.put("activo", usuario.isActivo());
+        resultado.put("suspendido", usuario.isSuspendido());
+        resultado.put("tipoSuspension", usuario.getTipoSuspension());
+        resultado.put("motivoSuspension", usuario.getMotivoSuspension());
+        resultado.put("fechaFinSuspension", usuario.getFechaFinSuspension());
         resultado.put("fotoUrl", usuario.getFotoUrl() != null ? usuario.getFotoUrl() : usuario.getFotoPerfilUrl());
 
         String emailKey = usuario.getEmail().toLowerCase();
@@ -251,6 +255,8 @@ public class UsuarioSupervisionServiceImpl implements IUsuarioSupervisionService
             item.put("email", u.getEmail());
             item.put("rol", u.getRole() != null ? u.getRole().name() : "ROLE_USER");
             item.put("activo", u.isActivo());
+            item.put("suspendido", u.isSuspendido());
+            item.put("tipoSuspension", u.getTipoSuspension());
             item.put("fotoUrl", u.getFotoUrl() != null ? u.getFotoUrl() : u.getFotoPerfilUrl());
 
             // Determinar si está en línea
