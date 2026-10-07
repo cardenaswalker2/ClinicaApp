@@ -2123,14 +2123,32 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               ElevatedButton.icon(
                 onPressed: () => _showDirectMessageDialog(u['id'] ?? '', name),
                 icon: const Icon(Icons.chat_bubble_rounded, size: 14),
-                label: const Text("Enviar Mensaje"),
+                label: const Text("Mensaje"),
                 style: ElevatedButton.styleFrom(backgroundColor: _accentPurple),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _showSuspensionDialog(u['id'] ?? '', name),
+                icon: const Icon(Icons.block_rounded, size: 14),
+                label: const Text("Suspender"),
+                style: ElevatedButton.styleFrom(backgroundColor: _accentRed),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _showCloseSessionsConfirm(u['id'] ?? '', name),
+                icon: const Icon(Icons.power_settings_new_rounded, size: 14),
+                label: const Text("Cerrar Sesiones"),
+                style: ElevatedButton.styleFrom(backgroundColor: _accentGold),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _reactivateUserAccount(u['id'] ?? '', name),
+                icon: const Icon(Icons.lock_open_rounded, size: 14),
+                label: const Text("Reactivar"),
+                style: ElevatedButton.styleFrom(backgroundColor: _accentGreen),
               ),
               ElevatedButton.icon(
                 onPressed: () => _showEmailSendDialog(email, name),
                 icon: const Icon(Icons.email_rounded, size: 14),
-                label: const Text("Enviar Correo Real"),
-                style: ElevatedButton.styleFrom(backgroundColor: _accentGreen),
+                label: const Text("Correo"),
+                style: ElevatedButton.styleFrom(backgroundColor: _accentBlue),
               ),
               OutlinedButton.icon(
                 onPressed: () => _showVirtualSessionDialog(name, seccion, u['urlActual'] ?? '/'),
@@ -2291,6 +2309,175 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           )
         ],
       ),
+    );
+  }
+
+  void _showSuspensionDialog(String userId, String userName) {
+    final reasonCtrl = TextEditingController();
+    String tipo = "TEMPORAL";
+    int minutes = 60;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => AlertDialog(
+          backgroundColor: _cardDark,
+          title: Text("Suspender Cuenta: $userName", style: GoogleFonts.outfit(color: _accentRed, fontWeight: FontWeight.bold, fontSize: 16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Tipo de Sanción:", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12)),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                value: tipo,
+                dropdownColor: _cardDark,
+                style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                items: const [
+                  DropdownMenuItem(value: "TEMPORAL", child: Text("Temporal (Auto-reactivable)")),
+                  DropdownMenuItem(value: "PERMANENTE", child: Text("Permanente (Indefinida)")),
+                ],
+                onChanged: (v) {
+                  if (v != null) setModalState(() => tipo = v);
+                },
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+              ),
+              if (tipo == "TEMPORAL") ...[
+                const SizedBox(height: 10),
+                TextFormField(
+                  initialValue: "60",
+                  keyboardType: TextInputType.number,
+                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                  decoration: const InputDecoration(labelText: "Duración en Minutos", labelStyle: TextStyle(color: Colors.white70)),
+                  onChanged: (val) {
+                    final p = int.tryParse(val);
+                    if (p != null) minutes = p;
+                  },
+                ),
+              ],
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: reasonCtrl,
+                maxLines: 3,
+                style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                decoration: const InputDecoration(
+                  labelText: "Motivo Obligatorio",
+                  labelStyle: TextStyle(color: Colors.white70),
+                  hintText: "Describe la infracción o causa...",
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancelar")),
+            ElevatedButton(
+              onPressed: () async {
+                if (reasonCtrl.text.trim().isEmpty) {
+                  _showSnack("El motivo es obligatorio.", isError: true);
+                  return;
+                }
+                Navigator.pop(ctx);
+                final adminEmail = AppConfig.userEmail ?? "";
+                try {
+                  final res = await http.post(
+                    Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userId/suspender?email=$adminEmail"),
+                    headers: {"Content-Type": "application/json"},
+                    body: json.encode({
+                      "tipo": tipo,
+                      "minutos": minutes,
+                      "motivo": reasonCtrl.text.trim(),
+                      "adminEmail": adminEmail
+                    }),
+                  );
+                  if (res.statusCode == 200) {
+                    _showSnack("Usuario suspendido exitosamente.");
+                    _loadAllAdminData();
+                  } else {
+                    _showSnack("Error al suspender usuario.", isError: true);
+                  }
+                } catch (e) {
+                  _showSnack("Error de conexión: $e", isError: true);
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: _accentRed),
+              child: const Text("Confirmar Suspensión"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCloseSessionsConfirm(String userId, String userName) {
+    final reasonCtrl = TextEditingController(text: "Cierre administrativo de seguridad");
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _cardDark,
+        title: Text("Cerrar Sesiones de $userName", style: GoogleFonts.outfit(color: _accentGold, fontWeight: FontWeight.bold, fontSize: 16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Esto desconectará al usuario de cualquier app o navegador de inmediato.", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12)),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: reasonCtrl,
+              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+              decoration: const InputDecoration(labelText: "Motivo", labelStyle: TextStyle(color: Colors.white70)),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancelar")),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final adminEmail = AppConfig.userEmail ?? "";
+              try {
+                final res = await http.post(
+                  Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userId/cerrar-sesiones?email=$adminEmail"),
+                  headers: {"Content-Type": "application/json"},
+                  body: json.encode({"motivo": reasonCtrl.text.trim(), "adminEmail": adminEmail}),
+                );
+                if (res.statusCode == 200) {
+                  _showSnack("Sesiones revocadas forzosamente en el sistema.");
+                } else {
+                  _showSnack("Error al revocar sesiones.", isError: true);
+                }
+              } catch (e) {
+                _showSnack("Error de conexión: $e", isError: true);
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: _accentGold),
+            child: const Text("Cerrar Sesiones"),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _reactivateUserAccount(String userId, String userName) {
+    _confirmAction(
+      title: "Reactivar Cuenta",
+      content: "¿Estás seguro de reactivar el acceso de $userName inmediatamente?",
+      onConfirm: () async {
+        final adminEmail = AppConfig.userEmail ?? "";
+        try {
+          final res = await http.post(
+            Uri.parse("${AppConfig.baseUrl}/api/supervision/usuario/$userId/reactivar?email=$adminEmail"),
+            headers: {"Content-Type": "application/json"},
+            body: json.encode({"motivo": "Reactivación desde panel móvil", "adminEmail": adminEmail}),
+          );
+          if (res.statusCode == 200) {
+            _showSnack("Cuenta de $userName reactivada correctamente.");
+            _loadAllAdminData();
+          } else {
+            _showSnack("Error al reactivar la cuenta.", isError: true);
+          }
+        } catch (e) {
+          _showSnack("Error de conexión: $e", isError: true);
+        }
+      },
     );
   }
 
