@@ -32,12 +32,22 @@ public class ApiSupervisionController {
 
     // Helper de validación de Super Administrador tanto por sesión como por parámetro email
     private boolean isSuperAdmin(String explicitEmail) {
-        // 1. Validar por SecurityContext (web session)
+        // 1. Validar por SecurityContext (web session / OAuth2 / FormLogin)
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            // Verificar autoridades en el Authentication
             boolean hasAdminRole = auth.getAuthorities().stream()
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ADMIN".equals(a.getAuthority()));
             if (hasAdminRole) return true;
+
+            // Verificar en base de datos si el usuario logueado es ROLE_ADMIN
+            String currentUsername = auth.getName();
+            if (currentUsername != null && !currentUsername.isBlank()) {
+                Usuario u = usuarioRepo.findByEmail(currentUsername.trim());
+                if (u != null && u.getRole() == Role.ROLE_ADMIN && u.isActivo()) {
+                    return true;
+                }
+            }
         }
 
         // 2. Validar por email enviado (API móvil / llamadas autenticadas)
