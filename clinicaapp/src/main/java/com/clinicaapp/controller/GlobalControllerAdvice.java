@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.security.Principal;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalControllerAdvice {
@@ -21,6 +22,9 @@ public class GlobalControllerAdvice {
 
     @Autowired
     private IUsuarioService usuarioService;
+
+    @Autowired
+    private com.clinicaapp.service.ComunidadPetService comunidadPetService;
 
     @Autowired
     private com.clinicaapp.service.IUsuarioSupervisionService supervisionService;
