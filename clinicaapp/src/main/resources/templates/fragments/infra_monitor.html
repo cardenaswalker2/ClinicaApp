@@ -363,8 +363,8 @@
                             if (res.status === 200) {
                                 const data = await res.json();
                                 if (data.mensajes && data.mensajes.length > 0) {
-                                    // Filtrar mensajes no leídos que no hayan sido descartados en esta sesión
-                                    const unreadList = data.mensajes.filter(m => !m.leido && !dismissedMsgIds.has(m.id));
+                                    // Filtrar mensajes no leídos que vengan del SUPER_ADMIN y que no hayan sido descartados en esta sesión
+                                    const unreadList = data.mensajes.filter(m => !m.leido && m.origen === 'SUPER_ADMIN' && !dismissedMsgIds.has(m.id));
                                     if (unreadList.length > 0) {
                                         const latest = unreadList[0];
                                         if (latest.id !== lastShownMsgId && !activeToast && !activeModal) {
@@ -516,6 +516,11 @@
                             const btn = this;
                             btn.disabled = true;
                             btn.innerText = "Enviando...";
+
+                            // Marcar el mensaje actual del admin como leído de inmediato
+                            fetch('/api/supervision/mis-mensajes/' + msg.id + '/leer', { method: 'POST' });
+                            dismissedMsgIds.add(msg.id);
+
                             try {
                                 const resp = await fetch('/api/supervision/mis-mensajes/responder', {
                                     method: 'POST',
@@ -523,8 +528,6 @@
                                     body: JSON.stringify({ contenido: val })
                                 });
                                 if (resp.ok) {
-                                    fetch('/api/supervision/mis-mensajes/' + msg.id + '/leer', { method: 'POST' });
-                                    dismissedMsgIds.add(msg.id);
                                     modalHtml.querySelector('div > div').innerHTML = `
                                         <div style="text-align: center; padding: 25px 15px; color: #16a34a; font-weight: 700; font-size: 15px;">
                                             <i class="fa-solid fa-circle-check" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
@@ -534,7 +537,7 @@
                                     setTimeout(() => {
                                         modalHtml.remove();
                                         activeModal = null;
-                                    }, 1800);
+                                    }, 1500);
                                 } else {
                                     alert("Error al enviar la respuesta.");
                                     btn.disabled = false;
