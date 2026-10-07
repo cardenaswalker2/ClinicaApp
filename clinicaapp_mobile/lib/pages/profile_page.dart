@@ -10,6 +10,7 @@ import 'my_pets_page.dart';
 import 'payments_page.dart';
 import 'clinic_optimization_page.dart';
 import 'appointments_page.dart';
+import 'admin_dashboard_page.dart';
 
 // ============================================================
 // PROFILE PAGE - LUXURY AURORA EDITION
@@ -552,7 +553,10 @@ class _ProfilePageState extends State<ProfilePage>
   // ═══════════════════════════════════════════════════════════
 
   Widget _buildMenuSection(BuildContext context) {
+    final isSuperAdmin = AppConfig.userRole == "ROLE_ADMIN";
+
     final menuActions = [
+      if (isSuperAdmin) () => _showCoreVerificationDialog(context),
       () => Navigator.push(context, MaterialPageRoute(builder: (c) => const MyPetsPage())),
       () => Navigator.push(context, MaterialPageRoute(builder: (c) => const PaymentsPage())),
       () => Navigator.push(context, MaterialPageRoute(builder: (c) => const ClinicOptimizationPage())),
@@ -568,6 +572,13 @@ class _ProfilePageState extends State<ProfilePage>
     ];
 
     final menuItemsWithLabels = [
+      if (isSuperAdmin)
+        {
+          "icon": Icons.admin_panel_settings_rounded,
+          "title": "SUPER ADMINISTRADOR",
+          "subtitle": "Acceso al Núcleo de Gestión y Telemetría",
+          "color": const Color(0xFF06B6D4),
+        },
       {"icon": Icons.pets_rounded, "title": "Mis Mascotas", "subtitle": "Administra tus peluditos e historias clínicas", "color": _auroraBase},
       {"icon": Icons.payments_rounded, "title": "Mis Pagos y Facturas", "subtitle": "Consulta transacciones y recibos", "color": Colors.purpleAccent},
       {"icon": Icons.calculate_rounded, "title": "Optimización de Clínicas", "subtitle": "Modelo PLEB + Haversine de cercanía", "color": Colors.greenAccent},
@@ -609,6 +620,162 @@ class _ProfilePageState extends State<ProfilePage>
         }).toList(),
       ],
     );
+  }
+
+  void _showCoreVerificationDialog(BuildContext context) {
+    final pinController = TextEditingController();
+    bool verifying = false;
+    String? errorText;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDState) => AlertDialog(
+          backgroundColor: const Color(0xFF0F172A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: Color(0xFF06B6D4), width: 1.5),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF06B6D4).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.security_rounded, color: Color(0xFF06B6D4), size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  "Acceso Super Administrador",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Ingresa el código CORE para continuar.",
+                style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: pinController,
+                obscureText: true,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.outfit(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 8,
+                  color: const Color(0xFF06B6D4),
+                ),
+                decoration: InputDecoration(
+                  hintText: "••••",
+                  hintStyle: const TextStyle(color: Colors.white30, letterSpacing: 8),
+                  filled: true,
+                  fillColor: Colors.black38,
+                  errorText: errorText,
+                  errorStyle: GoogleFonts.outfit(color: const Color(0xFFEF4444), fontSize: 11),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF06B6D4)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: verifying ? null : () => Navigator.pop(ctx),
+              child: Text(
+                "Cancelar",
+                style: GoogleFonts.outfit(color: Colors.white60),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: verifying
+                  ? null
+                  : () async {
+                      final pin = pinController.text.trim();
+                      if (pin.isEmpty) {
+                        setDState(() => errorText = "Ingresa el código CORE");
+                        return;
+                      }
+
+                      setDState(() {
+                        verifying = true;
+                        errorText = null;
+                      });
+
+                      try {
+                        final res = await http.post(
+                          Uri.parse("${AppConfig.baseUrl}/admin/verify-core-key"),
+                          headers: {"Content-Type": "application/json"},
+                          body: json.encode({
+                            "email": AppConfig.userEmail ?? "",
+                            "coreKey": pin,
+                          }),
+                        );
+
+                        final data = json.decode(res.body);
+                        if (res.statusCode == 200 && data['success'] == true) {
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AdminDashboardPage(),
+                              ),
+                            );
+                          }
+                        } else {
+                          setDState(() {
+                            verifying = false;
+                            errorText = data['message'] ?? "Acceso denegado. Código CORE incorrecto.";
+                          });
+                        }
+                      } catch (e) {
+                        setDState(() {
+                          verifying = false;
+                          errorText = "Error de conexión con el servidor";
+                        });
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF06B6D4),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: verifying
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : Text(
+                      "Verificar",
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+
   }
 
   Widget _buildMenuItem({

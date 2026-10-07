@@ -6,4 +6,5 @@ class AppConfig {
   static String? userEmail;
   static String? userName;
   static String? userId;
+  static String? userRole;
 }

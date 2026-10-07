@@ -128,6 +128,7 @@ class _LoginPageState extends State<LoginPage>
         AppConfig.userEmail = data['email'];
         AppConfig.userName = data['nombre'];
         AppConfig.userId = data['id'];
+        AppConfig.userRole = data['role'] ?? "ROLE_USER";
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -180,6 +181,7 @@ class _LoginPageState extends State<LoginPage>
         AppConfig.userEmail = data['email'];
         AppConfig.userName = data['nombre'];
         AppConfig.userId = data['id'];
+        AppConfig.userRole = data['role'] ?? "ROLE_USER";
         if (mounted) {
           Navigator.pushReplacement(
             context,

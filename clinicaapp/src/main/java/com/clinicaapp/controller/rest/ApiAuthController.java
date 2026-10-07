@@ -38,6 +38,7 @@ public class ApiAuthController {
             response.put("email", usuario.getEmail());
             response.put("nombre", usuario.getNombre());
             response.put("id", usuario.getId());
+            response.put("role", usuario.getRole() != null ? usuario.getRole().name() : "ROLE_USER");
             return ResponseEntity.ok(response);
         } else {
             Map<String, Object> response = new HashMap<>();
@@ -107,6 +108,7 @@ public class ApiAuthController {
             response.put("email", usuario.getEmail());
             response.put("nombre", usuario.getNombre());
             response.put("id", usuario.getId());
+            response.put("role", usuario.getRole() != null ? usuario.getRole().name() : "ROLE_USER");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
