@@ -12,6 +12,9 @@ public interface IMensajeDirectoService {
     MensajeDirecto enviarMensajeAdmin(String remitenteEmail, String remitenteNombre, 
                                      String destinatarioId, String asunto, String contenido);
 
+    // Responder mensaje directo desde el Usuario hacia la Administración (Bidireccional)
+    MensajeDirecto responderMensajeUsuario(String usuarioEmail, String contenido, String asunto);
+
     // Obtener bandeja de entrada de un usuario específico
     List<MensajeDirecto> obtenerMensajesUsuario(String destinatarioEmail);
 
@@ -27,7 +30,7 @@ public interface IMensajeDirectoService {
     // Obtener historial de mensajes enviados por Super Admin
     List<MensajeDirecto> obtenerHistorialEnviadosAdmin();
 
-    // Obtener historial de comunicación entre Super Admin y un usuario específico
+    // Obtener historial de comunicación entre Super Admin y un usuario específico (Bidireccional ordenado cronológicamente)
     List<MensajeDirecto> obtenerConversacionConUsuario(String usuarioIdOrEmail);
 
     // Enviar correo electrónico real a través del proveedor de email configurado (Brevo/SMTP)

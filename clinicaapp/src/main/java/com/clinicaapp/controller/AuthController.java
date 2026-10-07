@@ -31,6 +31,21 @@ public class AuthController {
     @GetMapping("/login")
     public String login() { return "login"; }
 
+    @GetMapping("/cuenta-suspendida")
+    public String cuentaSuspendida(org.springframework.security.core.Authentication auth, Model model) {
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            Usuario u = usuarioService.findByEmail(auth.getName());
+            if (u != null) {
+                model.addAttribute("usuario", u);
+                model.addAttribute("motivo", u.getMotivoSuspension() != null ? u.getMotivoSuspension() : "Por infracción de políticas de seguridad.");
+                model.addAttribute("tipoSuspension", u.getTipoSuspension() != null ? u.getTipoSuspension() : "PERMANENTE");
+                model.addAttribute("fechaInicio", u.getFechaInicioSuspension());
+                model.addAttribute("fechaFin", u.getFechaFinSuspension());
+            }
+        }
+        return "cuenta_suspendida";
+    }
+
     @GetMapping("/registro")
     public String mostrarFormularioRegistro(Model model) {
         model.addAttribute("usuarioDto", new UsuarioRegistroDTO());

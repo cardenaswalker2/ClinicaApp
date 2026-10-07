@@ -27,4 +27,24 @@ public interface IUsuarioSupervisionService {
 
     // Obtener lista de todos los usuarios con su estado online/offline resumido
     List<Map<String, Object>> obtenerListaUsuariosSupervision(String busqueda);
+
+    // --- ACCIONES ADMINISTRATIVAS DE SEGURIDAD ---
+    Map<String, Object> cerrarSesionesUsuario(String usuarioIdOrEmail, String adminEmail, String motivo, String ip);
+
+    Map<String, Object> suspenderUsuario(String usuarioIdOrEmail, String adminEmail, String tipoSuspension, 
+                                        Integer duracionMinutos, String motivo, String ip);
+
+    Map<String, Object> reactivarUsuario(String usuarioIdOrEmail, String adminEmail, String motivo, String ip);
+
+    Map<String, Object> dispararResetPasswordSeguro(String usuarioIdOrEmail, String adminEmail, String ip);
+
+    // --- SESIÓN DELEGADA DE SOPORTE ADMINISTRATIVO (IMPERSONATION SEGURA) ---
+    Map<String, Object> iniciarSesionSoporte(String usuarioIdOrEmail, String adminEmail, String motivo, Integer duracionMinutos, String ip);
+
+    Map<String, Object> finalizarSesionSoporte(String usuarioIdOrEmail, String adminEmail, String ip);
+
+    Map<String, Object> obtenerSesionSoporteActiva(String adminEmail);
+
+    // Obtener historial de auditoría de un usuario
+    List<com.clinicaapp.model.AuditoriaSupervision> obtenerAuditoriasUsuario(String usuarioIdOrEmail);
 }

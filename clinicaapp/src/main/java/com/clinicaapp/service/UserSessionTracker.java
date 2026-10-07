@@ -86,4 +86,11 @@ public class UserSessionTracker {
     public Collection<UserSessionDetails> getAllActiveSessions() {
         return activeSessions.values();
     }
+
+    public void invalidarSesionUsuario(String username) {
+        if (username == null || username.isBlank()) return;
+        activeSessions.entrySet().removeIf(entry -> 
+            entry.getValue() != null && username.equalsIgnoreCase(entry.getValue().getUsername())
+        );
+    }
 }

@@ -37,6 +37,8 @@ public class SecurityConfig {
     private MaintenanceFilter maintenanceFilter;
     @Autowired
     private NetworkDeviceFilter networkDeviceFilter;
+    @Autowired
+    private UserAccountControlFilter userAccountControlFilter;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -53,10 +55,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Mantener deshabilitado para que los fetch de JS funcionen sin problemas
                 .addFilterBefore(networkDeviceFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(maintenanceFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(userAccountControlFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
 
                 .authorizeHttpRequests(auth -> auth
                         // --- 1. RUTAS PÚBLICAS CRÍTICAS ---
                         .requestMatchers("/clinica/registrar-clinica/**").permitAll()
+                        .requestMatchers("/cuenta-suspendida").permitAll()
 
                         // Recursos estáticos y páginas principales
                         .requestMatchers(

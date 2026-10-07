@@ -328,4 +328,209 @@ public class ApiSupervisionController {
         boolean ok = mensajeDirectoService.marcarComoLeido(id, email);
         return ResponseEntity.ok(Map.of("success", ok));
     }
+
+    // ── 10. USUARIO RESPONDE AL SUPER ADMIN (CHAT BIDIRECCIONAL REAL) ──
+    @PostMapping("/mis-mensajes/responder")
+    public ResponseEntity<?> responderSuperAdmin(@RequestBody Map<String, String> payload) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = extractEmailFromAuth(auth);
+        if (userEmail == null || userEmail.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "No autenticado"));
+        }
+
+        String contenido = payload.get("contenido");
+        if (contenido == null || contenido.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El mensaje no puede estar vacío"));
+        }
+
+        try {
+            String asunto = payload.get("asunto") != null ? payload.get("asunto") : "Respuesta a la Administración";
+            MensajeDirecto respuesta = mensajeDirectoService.responderMensajeUsuario(userEmail, contenido.trim(), asunto);
+            return ResponseEntity.ok(Map.of("success", true, "mensaje", respuesta));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ── 11. CERRAR FORZOSAMENTE SESIONES DE UN USUARIO (SUPER ADMIN ONLY) ──
+    @PostMapping("/usuario/{idOrEmail}/cerrar-sesiones")
+    public ResponseEntity<?> cerrarSesionesUsuario(
+            @PathVariable String idOrEmail,
+            @RequestBody(required = false) Map<String, String> payload,
+            @RequestParam(required = false) String email,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String adminEmail = payload != null && payload.get("adminEmail") != null ? payload.get("adminEmail") : email;
+        if (adminEmail == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            adminEmail = extractEmailFromAuth(auth);
+        }
+
+        if (!isSuperAdmin(adminEmail)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        String motivo = payload != null ? payload.get("motivo") : "Cierre administrativo de sesiones";
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
+
+        Map<String, Object> res = supervisionService.cerrarSesionesUsuario(idOrEmail, adminEmail, motivo, ip);
+        return ResponseEntity.ok(res);
+    }
+
+    // ── 12. SUSPENDER USUARIO (TEMPORAL O PERMANENTE) (SUPER ADMIN ONLY) ──
+    @PostMapping("/usuario/{idOrEmail}/suspender")
+    public ResponseEntity<?> suspenderUsuario(
+            @PathVariable String idOrEmail,
+            @RequestBody Map<String, Object> payload,
+            @RequestParam(required = false) String email,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String adminEmail = payload.get("adminEmail") != null ? payload.get("adminEmail").toString() : email;
+        if (adminEmail == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            adminEmail = extractEmailFromAuth(auth);
+        }
+
+        if (!isSuperAdmin(adminEmail)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        String tipo = payload.get("tipo") != null ? payload.get("tipo").toString() : "TEMPORAL";
+        String motivo = payload.get("motivo") != null ? payload.get("motivo").toString() : "";
+        Integer minutos = payload.get("minutos") != null ? Integer.valueOf(payload.get("minutos").toString()) : null;
+
+        if (motivo.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El motivo de la suspensión es obligatorio."));
+        }
+
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
+
+        Map<String, Object> res = supervisionService.suspenderUsuario(idOrEmail, adminEmail, tipo, minutos, motivo, ip);
+        return ResponseEntity.ok(res);
+    }
+
+    // ── 13. REACTIVAR USUARIO MANUALMENTE (SUPER ADMIN ONLY) ──
+    @PostMapping("/usuario/{idOrEmail}/reactivar")
+    public ResponseEntity<?> reactivarUsuario(
+            @PathVariable String idOrEmail,
+            @RequestBody(required = false) Map<String, String> payload,
+            @RequestParam(required = false) String email,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String adminEmail = payload != null && payload.get("adminEmail") != null ? payload.get("adminEmail") : email;
+        if (adminEmail == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            adminEmail = extractEmailFromAuth(auth);
+        }
+
+        if (!isSuperAdmin(adminEmail)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        String motivo = payload != null ? payload.get("motivo") : "Reactivación administrativa";
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
+
+        Map<String, Object> res = supervisionService.reactivarUsuario(idOrEmail, adminEmail, motivo, ip);
+        return ResponseEntity.ok(res);
+    }
+
+    // ── 14. DISPARAR RECUPERACIÓN DE CONTRASEÑA SEGURA POR EMAIL (SUPER ADMIN ONLY) ──
+    @PostMapping("/usuario/{idOrEmail}/reset-password")
+    public ResponseEntity<?> resetPasswordSeguro(
+            @PathVariable String idOrEmail,
+            @RequestBody(required = false) Map<String, String> payload,
+            @RequestParam(required = false) String email,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String adminEmail = payload != null && payload.get("adminEmail") != null ? payload.get("adminEmail") : email;
+        if (adminEmail == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            adminEmail = extractEmailFromAuth(auth);
+        }
+
+        if (!isSuperAdmin(adminEmail)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
+
+        Map<String, Object> res = supervisionService.dispararResetPasswordSeguro(idOrEmail, adminEmail, ip);
+        return ResponseEntity.ok(res);
+    }
+
+    // ── 15. INICIAR SESIÓN DELEGADA DE SOPORTE ADMINISTRATIVO (SUPER ADMIN ONLY) ──
+    @PostMapping("/usuario/{idOrEmail}/soporte/iniciar")
+    public ResponseEntity<?> iniciarSoporte(
+            @PathVariable String idOrEmail,
+            @RequestBody(required = false) Map<String, String> payload,
+            @RequestParam(required = false) String email,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String adminEmail = payload != null && payload.get("adminEmail") != null ? payload.get("adminEmail") : email;
+        if (adminEmail == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            adminEmail = extractEmailFromAuth(auth);
+        }
+
+        if (!isSuperAdmin(adminEmail)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        String motivo = payload != null && payload.get("motivo") != null ? payload.get("motivo") : "Soporte técnico administrativo";
+        Integer minutos = payload != null && payload.get("minutos") != null ? Integer.valueOf(payload.get("minutos")) : 15;
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
+
+        Map<String, Object> res = supervisionService.iniciarSesionSoporte(idOrEmail, adminEmail, motivo, minutos, ip);
+        return ResponseEntity.ok(res);
+    }
+
+    // ── 16. FINALIZAR SESIÓN DELEGADA DE SOPORTE (SUPER ADMIN ONLY) ──
+    @PostMapping("/usuario/{idOrEmail}/soporte/finalizar")
+    public ResponseEntity<?> finalizarSoporte(
+            @PathVariable String idOrEmail,
+            @RequestBody(required = false) Map<String, String> payload,
+            @RequestParam(required = false) String email,
+            jakarta.servlet.http.HttpServletRequest request) {
+
+        String adminEmail = payload != null && payload.get("adminEmail") != null ? payload.get("adminEmail") : email;
+        if (adminEmail == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            adminEmail = extractEmailFromAuth(auth);
+        }
+
+        if (!isSuperAdmin(adminEmail)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
+
+        Map<String, Object> res = supervisionService.finalizarSesionSoporte(idOrEmail, adminEmail, ip);
+        return ResponseEntity.ok(res);
+    }
+
+    // ── 17. OBTENER AUDITORÍAS DE UN USUARIO (SUPER ADMIN ONLY) ──
+    @GetMapping("/usuario/{idOrEmail}/auditorias")
+    public ResponseEntity<?> getAuditoriasUsuario(
+            @PathVariable String idOrEmail,
+            @RequestParam(required = false) String email) {
+
+        if (!isSuperAdmin(email)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Acceso denegado. Exclusivo para Super Administrador."));
+        }
+
+        return ResponseEntity.ok(supervisionService.obtenerAuditoriasUsuario(idOrEmail));
+    }
 }

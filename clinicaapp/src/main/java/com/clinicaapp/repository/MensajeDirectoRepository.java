@@ -26,4 +26,9 @@ public interface MensajeDirectoRepository extends MongoRepository<MensajeDirecto
     Page<MensajeDirecto> findByDestinatarioEmail(String destinatarioEmail, Pageable pageable);
 
     List<MensajeDirecto> findTop50ByOrderByFechaEnvioDesc();
+
+    // Hilo de conversación bi-direccional por ID de usuario o Correo
+    List<MensajeDirecto> findByConversacionUsuarioIdOrderByFechaEnvioAsc(String conversacionUsuarioId);
+
+    List<MensajeDirecto> findByDestinatarioEmailOrRemitenteEmailOrderByFechaEnvioAsc(String email1, String email2);
 }

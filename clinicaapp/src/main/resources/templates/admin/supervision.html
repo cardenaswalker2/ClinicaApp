@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Supervisión y Mensajería de Usuarios | ClínicaApp</title>
+    <title>Supervisión, Seguridad y Mensajería | ClínicaApp</title>
     <link th:replace="~{fragments/header :: favIcon}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -46,7 +46,7 @@
 
         * {
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         }
 
         body {
@@ -93,7 +93,7 @@
             align-items: center;
             justify-content: center;
             color: #ffffff;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
         }
 
@@ -102,15 +102,14 @@
             font-weight: 800;
             color: var(--text-heading);
             margin: 0;
-            line-height: 1.2;
+            letter-spacing: -0.3px;
         }
 
         .core-brand-subtitle {
             font-size: 0.75rem;
             color: var(--text-muted);
             font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            display: block;
         }
 
         .core-nav-actions {
@@ -120,111 +119,61 @@
         }
 
         .btn-nav-control-core {
-            background: #f8fafc;
+            background: #ffffff;
             border: 1px solid var(--border-color);
             color: var(--text-heading);
-            padding: 8px 16px;
-            border-radius: 10px;
+            padding: 7px 14px;
+            border-radius: 8px;
             font-size: 0.85rem;
-            font-weight: 700;
-            display: inline-flex;
+            font-weight: 600;
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
 
         .btn-nav-control-core:hover {
-            background: #f1f5f9;
-            color: var(--primary);
-            border-color: var(--primary);
+            background: var(--bg-subtle);
+            border-color: var(--border-hover);
+            color: var(--text-heading);
         }
 
         .btn-nav-sync {
-            background: var(--primary);
-            border: none;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 10px;
+            background: var(--primary-light);
+            border: 1px solid #bae6fd;
+            color: var(--primary);
+            padding: 7px 14px;
+            border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 700;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+            transition: all 0.2s;
         }
 
         .btn-nav-sync:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
+            background: var(--primary);
+            color: #ffffff;
         }
 
-        /* ===== CONTENEDOR PRINCIPAL ===== */
+        /* ===== CONTENEDOR Y LAYOUT PRINCIPAL ===== */
         .app-container {
             max-width: 1440px;
             margin: 0 auto;
             padding: 24px;
         }
 
-        /* ===== TARJETA DE CABECERA INFORMATIVA ===== */
-        .header-banner {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px 28px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .header-banner-left h1 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-heading);
-            margin: 0 0 4px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-banner-left p {
-            color: var(--text-muted);
-            font-size: 0.92rem;
-            margin: 0;
-        }
-
-        .badge-super-admin {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 8px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        /* ===== LAYOUT GRID 2 COLUMNAS ===== */
         .supervision-layout {
             display: grid;
-            grid-template-columns: 380px 1fr;
+            grid-template-columns: 360px 1fr;
             gap: 24px;
             align-items: start;
         }
 
-        @media (max-width: 1024px) {
-            .supervision-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* ===== PANEL LATERAL: USUARIOS ===== */
+        /* ===== SIDEBAR DE USUARIOS ===== */
         .sidebar-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
@@ -241,7 +190,7 @@
         }
 
         .sidebar-title {
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 800;
             color: var(--text-heading);
             margin: 0;
@@ -252,10 +201,10 @@
 
         .count-pill {
             background: var(--bg-subtle);
-            color: var(--text-body);
-            font-weight: 700;
+            color: var(--text-muted);
             font-size: 0.75rem;
-            padding: 3px 10px;
+            font-weight: 700;
+            padding: 4px 10px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
         }
@@ -270,122 +219,104 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
+            color: var(--text-subtle);
+            font-size: 0.9rem;
         }
 
         .search-input {
             width: 100%;
-            background: #f8fafc;
+            padding: 10px 14px 10px 38px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 10px 14px 10px 40px;
+            font-size: 0.88rem;
+            background: #ffffff;
             color: var(--text-heading);
-            font-size: 0.9rem;
-            font-weight: 500;
             outline: none;
             transition: all 0.2s;
         }
 
         .search-input:focus {
-            background: #ffffff;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
-        .search-input::placeholder {
-            color: var(--text-subtle);
-        }
-
         .user-list {
-            max-height: 620px;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding-right: 2px;
+            max-height: calc(100vh - 270px);
+            overflow-y: auto;
+            padding-right: 4px;
         }
 
-        .user-list::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .user-list::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 10px;
-        }
-
-        /* TARJETA DE USUARIO INDIVIDUAL */
         .user-item-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             text-decoration: none;
-            color: inherit;
+            color: var(--text-body);
             transition: all 0.2s ease;
-            cursor: pointer;
         }
 
         .user-item-card:hover {
-            background: #f8fafc;
-            border-color: var(--border-hover);
-            transform: translateY(-1px);
-            color: inherit;
+            border-color: var(--primary);
+            background: #f0f9ff;
+            color: var(--text-body);
         }
 
         .user-item-card.active {
             background: #f0f9ff;
-            border: 1.5px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
         }
 
         .user-avatar {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             background: #e0f2fe;
             color: var(--primary);
             font-weight: 800;
-            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1rem;
             position: relative;
             flex-shrink: 0;
             border: 1px solid #bae6fd;
         }
 
         .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
             position: absolute;
             bottom: -2px;
             right: -2px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
             border: 2px solid #ffffff;
         }
 
         .status-dot.online {
-            background: var(--success);
+            background-color: var(--success);
         }
 
         .status-dot.offline {
-            background: #94a3b8;
+            background-color: var(--text-subtle);
         }
 
         .user-info {
-            flex-grow: 1;
             margin-left: 12px;
-            overflow: hidden;
+            flex-grow: 1;
+            min-width: 0;
         }
 
         .user-name {
+            font-size: 0.9rem;
             font-weight: 700;
-            font-size: 0.92rem;
             color: var(--text-heading);
             white-space: nowrap;
             overflow: hidden;
@@ -429,7 +360,7 @@
             border-radius: 16px;
             padding: 24px;
             box-shadow: var(--shadow-sm);
-            min-height: 600px;
+            min-height: 650px;
         }
 
         .empty-placeholder {
@@ -450,7 +381,7 @@
             margin: 0 auto 20px;
         }
 
-        /* CABECERA DE USUARIO SELECCIONADO */
+        /* CABECERA DE PERFIL DE USUARIO */
         .user-profile-header {
             background: #ffffff;
             border: 1px solid var(--border-color);
@@ -507,129 +438,48 @@
 
         .action-buttons-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .btn-action-custom {
-            padding: 9px 16px;
-            border-radius: 10px;
-            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
             border: 1px solid transparent;
         }
 
-        .btn-mirror {
-            background: #f0f9ff;
-            color: var(--primary);
-            border-color: #bae6fd;
-        }
-
-        .btn-mirror:hover {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-        }
-
-        .btn-message {
-            background: #eef2ff;
-            color: var(--accent);
-            border-color: #c7d2fe;
-        }
-
-        .btn-message:hover {
-            background: var(--accent);
-            color: #ffffff;
-            border-color: var(--accent);
-        }
-
-        .btn-email {
-            background: #f0fdf4;
-            color: var(--success);
-            border-color: #bbf7d0;
-        }
-
-        .btn-email:hover {
-            background: var(--success);
-            color: #ffffff;
-            border-color: var(--success);
-        }
-
-        /* TELEMETRÍA KPIS */
-        .telemetry-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-
-        .telemetry-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .telemetry-icon-box {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-
-        .kpi-label {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            display: block;
-        }
-
-        .kpi-value {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-heading);
-            margin-top: 2px;
-            display: block;
-        }
-
-        /* PESTAÑAS */
+        /* PESTAÑAS MODERNAS */
         .nav-tabs-custom {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
+            padding-bottom: 10px;
             margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
         }
 
         .tab-btn-custom {
             background: transparent;
             border: 1px solid transparent;
             color: var(--text-muted);
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tab-btn-custom:hover {
@@ -641,6 +491,131 @@
             background: var(--primary-light);
             color: var(--primary);
             border-color: #bae6fd;
+        }
+
+        /* TELEMETRÍA KPIS */
+        .telemetry-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .telemetry-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .telemetry-icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            display: block;
+        }
+
+        .kpi-value {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* CHAT BIDIRECCIONAL */
+        .chat-container {
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            height: 520px;
+        }
+
+        .chat-messages-box {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-word;
+        }
+
+        .chat-bubble-admin {
+            align-self: flex-end;
+            background: #0284c7;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-bubble-user {
+            align-self: flex-start;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chat-meta {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            opacity: 0.85;
+        }
+
+        .chat-input-bar {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            border-radius: 0 0 14px 14px;
+        }
+
+        .chat-input-bar input {
+            flex-grow: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .chat-input-bar input:focus {
+            border-color: var(--primary);
         }
 
         /* TIMELINE */
@@ -666,20 +641,15 @@
             background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 14px 16px;
+            padding: 12px 14px;
             margin-bottom: 10px;
             box-shadow: var(--shadow-sm);
-            transition: all 0.2s;
-        }
-
-        .timeline-item:hover {
-            border-color: var(--primary);
         }
 
         .timeline-circle {
             position: absolute;
             left: -19px;
-            top: 18px;
+            top: 16px;
             width: 10px;
             height: 10px;
             border-radius: 50%;
@@ -689,18 +659,31 @@
 
         .timeline-time {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--primary);
             font-weight: 700;
         }
 
-        /* MENSAJES */
-        .message-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
+        /* TABLA DE AUDITORÍA */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .audit-table th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .audit-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-body);
         }
 
         /* MODALES BLANCOS LIMPIOS */
@@ -713,7 +696,7 @@
         }
 
         .modal-white-header {
-            padding: 20px 24px;
+            padding: 18px 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -721,11 +704,11 @@
         }
 
         .modal-white-body {
-            padding: 24px;
+            padding: 20px;
         }
 
         .modal-white-footer {
-            padding: 16px 24px;
+            padding: 14px 20px;
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: flex-end;
@@ -746,13 +729,12 @@
             width: 100%;
             background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px 14px;
+            border-radius: 8px;
+            padding: 8px 12px;
             color: var(--text-heading);
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.88rem;
             outline: none;
-            transition: all 0.2s;
+            box-sizing: border-box;
         }
 
         .form-input-custom:focus {
@@ -760,24 +742,23 @@
             box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
 
-        .form-input-custom[readonly] {
-            background: #f8fafc;
-            color: var(--text-muted);
-        }
-
-        .file-dropzone-white {
-            border: 2px dashed var(--border-hover);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            background: #f8fafc;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .file-dropzone-white:hover {
-            border-color: var(--primary);
-            background: #f0f9ff;
+        /* RESPONSIVE MOBILE & TABLET */
+        @media (max-width: 992px) {
+            .supervision-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-card {
+                margin-bottom: 20px;
+            }
+            .user-list {
+                max-height: 280px;
+            }
+            .app-container {
+                padding: 14px;
+            }
+            .chat-bubble {
+                max-width: 90%;
+            }
         }
     </style>
 </head>
@@ -789,19 +770,19 @@
         <div class="core-nav-container">
             <a th:href="@{/admin/centro-control}" class="core-brand-group">
                 <div class="core-logo-badge">
-                    <i class="bi bi-shield-shaded"></i>
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <div>
-                    <h1 class="core-brand-title">ClínicaApp <span style="color: var(--primary);">Supervisión</span></h1>
-                    <span class="core-brand-subtitle">Módulo de Control y Telemetría</span>
+                    <h1 class="core-brand-title">ClínicaApp <span style="color: var(--primary);">Supervisión & Seguridad</span></h1>
+                    <span class="core-brand-subtitle">Control Core v3.0 • Modo Super Administrador</span>
                 </div>
             </a>
             <div class="core-nav-actions">
                 <a th:href="@{/admin/centro-control}" class="btn-nav-control-core">
-                    <i class="bi bi-arrow-left"></i> Volver a Control Core
+                    <i class="fa-solid fa-arrow-left"></i> Volver a Control Core
                 </a>
                 <button class="btn-nav-sync" onclick="refreshSupervisionData()">
-                    <i class="bi bi-arrow-clockwise"></i> Sincronizar
+                    <i class="fa-solid fa-arrows-rotate"></i> Sincronizar
                 </button>
             </div>
         </div>
@@ -809,37 +790,25 @@
 
     <div class="app-container">
 
-        <!-- CABECERA DE LA PÁGINA -->
-        <div class="header-banner">
-            <div class="header-banner-left">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge-super-admin"><i class="bi bi-shield-lock-fill"></i> Super Administrador</span>
-                    <span class="badge bg-light text-secondary border">Control Core v2.4</span>
-                </div>
-                <h1><i class="bi bi-person-lines-fill text-primary"></i> Supervisión & Mensajería Individual</h1>
-                <p>Monitoreo activo de sesión, telemetría de navegación segura y comunicación directa con usuarios.</p>
-            </div>
-        </div>
-
         <!-- GRID PRINCIPAL -->
         <div class="supervision-layout">
 
             <!-- 1. SIDEBAR: LISTA DE USUARIOS -->
             <div class="sidebar-card">
                 <div class="sidebar-header">
-                    <h2 class="sidebar-title"><i class="bi bi-people-fill text-primary"></i> Usuarios</h2>
-                    <span class="count-pill" th:text="${usuarios.size()} + ' Registrados'">0 Registrados</span>
+                    <h2 class="sidebar-title"><i class="fa-solid fa-users text-primary"></i> Usuarios Registrados</h2>
+                    <span class="count-pill" th:text="${usuarios.size()} + ' Total'">0 Total</span>
                 </div>
 
                 <div class="search-box">
-                    <i class="bi bi-search"></i>
+                    <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" class="search-input" id="userSearchInput" placeholder="Buscar por nombre o correo..." th:value="${query}" oninput="filterUserCards(this.value)">
                 </div>
 
                 <div class="user-list" id="userListContainer">
                     <th:block th:each="user : ${usuarios}">
                         <a th:href="@{/admin/supervision(usuarioId=${user.id}, q=${query})}" 
-                           class="user-item-card" 
+                           class="user-item-card user-row-card" 
                            th:classappend="${usuarioSeleccionadoId == user.id ? 'active' : ''}"
                            th:data-search="${user.nombre + ' ' + user.email}">
                             <div class="d-flex align-items-center" style="overflow: hidden;">
@@ -861,17 +830,17 @@
                 </div>
             </div>
 
-            <!-- 2. CONTENIDO PRINCIPAL: MONITOREO Y ACCIONES -->
+            <!-- 2. PANEL PRINCIPAL DERECHO: DETALLE, CHAT Y SEGURIDAD -->
             <div class="main-card">
 
                 <!-- Estado 1: Ningún usuario seleccionado -->
                 <div th:if="${estadoUsuario == null}" class="empty-placeholder">
                     <div class="empty-icon">
-                        <i class="bi bi-person-bounding-box"></i>
+                        <i class="fa-solid fa-user-shield"></i>
                     </div>
-                    <h3 class="fw-bold text-dark mb-2">Selecciona un usuario de la lista</h3>
-                    <p class="text-muted" style="max-width: 460px; margin: 0 auto; font-size: 14.5px;">
-                        Haz clic sobre cualquier usuario del panel izquierdo para acceder a su telemetría en tiempo real, historial de navegación y canales directos de mensajería interna y correo.
+                    <h3 class="fw-bold text-dark mb-2">Selecciona un usuario para supervisar</h3>
+                    <p class="text-muted" style="max-width: 480px; margin: 0 auto; font-size: 14px;">
+                        Gestiona la seguridad integral: suspensión temporal/permanente, cierre forzoso de sesiones, chat bidireccional en vivo, telemetría y soporte administrativo seguro.
                     </p>
                 </div>
 
@@ -889,236 +858,345 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <h2 class="profile-name" th:text="${estadoUsuario.nombre}">Samuel</h2>
                                     <span class="badge-status" th:classappend="${estadoUsuario.online ? 'online' : 'offline'}" th:text="${estadoUsuario.online ? 'EN LÍNEA' : 'DESCONECTADO'}" id="liveStatusText">EN LÍNEA</span>
+                                    
+                                    <span th:if="${estadoUsuario.suspendido}" class="badge bg-danger text-white fw-bold" style="font-size: 11px;">
+                                        <i class="fa-solid fa-lock"></i> SUSPENDIDO
+                                    </span>
                                 </div>
                                 <div class="profile-meta">
-                                    <span><i class="bi bi-envelope text-primary me-1"></i> <span th:text="${estadoUsuario.email}">correo@ejemplo.com</span></span>
+                                    <span><i class="fa-solid fa-envelope text-primary me-1"></i> <span th:text="${estadoUsuario.email}">correo@ejemplo.com</span></span>
                                     <span>•</span>
-                                    <span><i class="bi bi-telephone text-primary me-1"></i> <span th:text="${estadoUsuario.telefono}">+57 300 000 0000</span></span>
+                                    <span><i class="fa-solid fa-phone text-primary me-1"></i> <span th:text="${estadoUsuario.telefono}">+57 300 000 0000</span></span>
+                                    <span>•</span>
+                                    <span><i class="fa-solid fa-id-badge text-primary me-1"></i> Rol: <strong th:text="${estadoUsuario.rol}">CLIENTE</strong></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Botones de Acción -->
+                        <!-- Botones Rápidos de Acción -->
                         <div class="action-buttons-group">
-                            <button type="button" class="btn-action-custom btn-mirror" onclick="openSessionMirrorModal()">
-                                <i class="bi bi-display"></i> Representación Sesión
+                            <button class="btn-action-custom bg-primary-subtle text-primary border-primary-subtle" onclick="openSessionMirrorModal()">
+                                <i class="fa-solid fa-desktop"></i> Pantalla en Vivo
                             </button>
-                            <button type="button" class="btn-action-custom btn-message" onclick="openDirectMessageModal()">
-                                <i class="bi bi-chat-left-dots-fill"></i> Mensaje Interno
+                            <button class="btn-action-custom bg-danger-subtle text-danger border-danger-subtle" onclick="openSuspensionModal()">
+                                <i class="fa-solid fa-ban"></i> Suspender
                             </button>
-                            <button type="button" class="btn-action-custom btn-email" onclick="openEmailModal()">
-                                <i class="bi bi-envelope-paper-fill"></i> Enviar Gmail
+                            <button class="btn-action-custom bg-warning-subtle text-warning border-warning-subtle" onclick="openCloseSessionsModal()">
+                                <i class="fa-solid fa-power-off"></i> Cerrar Sesiones
+                            </button>
+                            <button class="btn-action-custom bg-success-subtle text-success border-success-subtle" onclick="openEmailModal()">
+                                <i class="fa-solid fa-paper-plane"></i> Enviar Correo
                             </button>
                         </div>
                     </div>
 
-                    <!-- Métricas de Telemetría -->
+                    <!-- Telemetría KPIs -->
                     <div class="telemetry-row">
                         <div class="telemetry-card">
-                            <div class="telemetry-icon-box bg-primary bg-opacity-10 text-primary">
-                                <i class="bi bi-geo-alt-fill"></i>
+                            <div class="telemetry-icon-box bg-primary-subtle text-primary">
+                                <i class="fa-solid fa-compass"></i>
                             </div>
                             <div>
                                 <span class="kpi-label">Sección Actual</span>
-                                <span class="kpi-value text-primary" id="liveSectionText" th:text="${estadoUsuario.seccionActual}">Citas</span>
+                                <span class="kpi-value" id="liveSectionText" th:text="${estadoUsuario.seccionActual != null ? estadoUsuario.seccionActual : 'Inicio'}">Inicio</span>
                             </div>
                         </div>
 
                         <div class="telemetry-card">
-                            <div class="telemetry-icon-box bg-info bg-opacity-10 text-info">
-                                <i class="bi bi-clock-history"></i>
+                            <div class="telemetry-icon-box bg-success-subtle text-success">
+                                <i class="fa-solid fa-clock"></i>
                             </div>
                             <div>
                                 <span class="kpi-label">Última Actividad</span>
-                                <span class="kpi-value" id="liveTimeText" th:text="${estadoUsuario.tiempoRelativo}">Hace unos segundos</span>
+                                <span class="kpi-value" id="liveTimeText" th:text="${estadoUsuario.tiempoRelativo != null ? estadoUsuario.tiempoRelativo : 'Reciente'}">Reciente</span>
                             </div>
                         </div>
 
                         <div class="telemetry-card">
-                            <div class="telemetry-icon-box bg-success bg-opacity-10 text-success">
-                                <i class="bi bi-laptop"></i>
+                            <div class="telemetry-icon-box bg-info-subtle text-info">
+                                <i class="fa-solid fa-laptop"></i>
                             </div>
                             <div>
-                                <span class="kpi-label">Dispositivo & SO</span>
-                                <span class="kpi-value" th:text="${estadoUsuario.dispositivo + ' • ' + estadoUsuario.os}">Desktop • Windows</span>
+                                <span class="kpi-label">Dispositivo</span>
+                                <span class="kpi-value" th:text="${estadoUsuario.dispositivo != null ? estadoUsuario.dispositivo : 'Desktop'}">Desktop</span>
                             </div>
                         </div>
 
                         <div class="telemetry-card">
-                            <div class="telemetry-icon-box bg-warning bg-opacity-10 text-warning">
-                                <i class="bi bi-globe"></i>
+                            <div class="telemetry-icon-box bg-secondary-subtle text-secondary">
+                                <i class="fa-solid fa-globe"></i>
                             </div>
                             <div>
                                 <span class="kpi-label">Dirección IP</span>
-                                <span class="kpi-value font-monospace" th:text="${estadoUsuario.ip}">127.0.0.1</span>
+                                <span class="kpi-value font-monospace" style="font-size: 12px;" th:text="${estadoUsuario.ip != null ? estadoUsuario.ip : '127.0.0.1'}">127.0.0.1</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Pestañas de Historial y Mensajería -->
+                    <!-- Pestañas de Navegación -->
                     <div class="nav-tabs-custom">
-                        <button class="tab-btn-custom active" id="tabBtnTimeline" onclick="switchTab('timeline')">
-                            <i class="bi bi-activity"></i> Línea de Tiempo de Eventos
+                        <button class="tab-btn-custom active" id="tabBtnChat" onclick="switchSupervisionTab('chat')">
+                            <i class="fa-solid fa-comments"></i> Chat Bidireccional
                         </button>
-                        <button class="tab-btn-custom" id="tabBtnMessages" onclick="switchTab('messages')">
-                            <i class="bi bi-chat-left-text-fill"></i> Mensajes Enviados a este Usuario
+                        <button class="tab-btn-custom" id="tabBtnTimeline" onclick="switchSupervisionTab('timeline')">
+                            <i class="fa-solid fa-timeline"></i> Línea de Tiempo
+                        </button>
+                        <button class="tab-btn-custom" id="tabBtnSecurity" onclick="switchSupervisionTab('security')">
+                            <i class="fa-solid fa-shield-halved"></i> Seguridad & Acciones
+                        </button>
+                        <button class="tab-btn-custom" id="tabBtnSupport" onclick="switchSupervisionTab('support')">
+                            <i class="fa-solid fa-user-gear"></i> Sesión de Soporte
+                        </button>
+                        <button class="tab-btn-custom" id="tabBtnAudit" onclick="switchSupervisionTab('audit')">
+                            <i class="fa-solid fa-list-check"></i> Historial de Auditoría
                         </button>
                     </div>
 
-                    <!-- Contenido Tab 1: Timeline -->
-                    <div id="tabContentTimeline">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-muted small fw-bold font-monospace">REGISTRO DE NAVEGACIÓN EN TIEMPO REAL</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">Sincronización Activa (3s)</span>
+                    <!-- PESTAÑA 1: CHAT BIDIRECCIONAL REAL -->
+                    <div id="tabContentChat">
+                        <div class="chat-container">
+                            <div class="chat-messages-box" id="chatMessagesBox">
+                                <div th:if="${conversacion == null or conversacion.isEmpty()}" class="text-muted small py-4 text-center">
+                                    No hay mensajes previos con este usuario. Inicia una conversación directa abajo.
+                                </div>
+                                <th:block th:each="msg : ${conversacion}">
+                                    <div class="chat-bubble" th:classappend="${msg.origen == 'SUPER_ADMIN' ? 'chat-bubble-admin' : 'chat-bubble-user'}">
+                                        <div class="fw-bold mb-1" style="font-size: 12px;" th:text="${msg.origen == 'SUPER_ADMIN' ? 'Super Admin' : estadoUsuario.nombre}">Remitente</div>
+                                        <div th:text="${msg.contenido}">Contenido del mensaje</div>
+                                        <div class="chat-meta">
+                                            <span th:text="${#temporals.format(msg.fechaEnvio, 'HH:mm')}">12:00</span>
+                                            <span th:if="${msg.origen == 'SUPER_ADMIN'}">
+                                                <i class="fa-solid fa-check-double" th:if="${msg.leido}" title="Leído"></i>
+                                                <i class="fa-solid fa-check" th:unless="${msg.leido}" title="Enviado"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </th:block>
+                            </div>
+                            <div class="chat-input-bar">
+                                <input type="text" id="chatInputMessage" placeholder="Escribe un mensaje en tiempo real al usuario..." onkeypress="if(event.key === 'Enter') sendChatMessageAction()">
+                                <button class="btn btn-primary px-4 fw-bold" onclick="sendChatMessageAction()">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
+                    </div>
 
+                    <!-- PESTAÑA 2: LÍNEA DE TIEMPO / TELEMETRÍA -->
+                    <div id="tabContentTimeline" style="display: none;">
                         <div class="timeline-box" id="timelineListContainer">
                             <th:block th:each="ev : ${estadoUsuario.eventosRecientes}">
                                 <div class="timeline-item">
                                     <div class="timeline-circle"></div>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <span class="timeline-time" th:text="${#temporals.format(ev.fechaHora, 'hh:mm:ss a')}">10:42:18 PM</span>
-                                        <span class="badge bg-light text-dark border" th:text="${ev.seccion}">Citas</span>
+                                        <span class="timeline-time" th:text="${#temporals.format(ev.fechaHora, 'HH:mm:ss')}">12:00:00</span>
+                                        <span class="badge bg-light text-dark border" th:text="${ev.seccion}">Sección</span>
                                     </div>
-                                    <div class="fw-bold text-dark mt-1" style="font-size: 14px;" th:text="${ev.accion}">Entró a Citas</div>
-                                    <div class="text-muted small" style="font-size: 12px;" th:if="${ev.metadata != null and !ev.metadata.isEmpty()}" th:text="'Detalles: ' + ${ev.metadata}"></div>
+                                    <div class="fw-bold text-dark mt-1" style="font-size: 13.5px;" th:text="${ev.accion}">Acción</div>
+                                    <div th:if="${ev.metadata != null}" class="text-muted small" style="font-size: 12px;" th:text="'Detalles: ' + ${ev.metadata}">Detalles</div>
                                 </div>
                             </th:block>
-                            <div th:if="${#lists.isEmpty(estadoUsuario.eventosRecientes)}" class="text-muted small py-4 text-center">
-                                No se registran eventos recientes para este usuario.
+                        </div>
+                    </div>
+
+                    <!-- PESTAÑA 3: SEGURIDAD Y ACCIONES ADMINISTRATIVAS -->
+                    <div id="tabContentSecurity" style="display: none;">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card p-3 border h-100">
+                                    <h5 class="fw-bold text-danger mb-2"><i class="fa-solid fa-user-lock"></i> Suspensión de Cuenta</h5>
+                                    <p class="text-muted small">Restringe el acceso del usuario temporal o indefinidamente. En suspensión temporal, se reactiva automáticamente.</p>
+                                    
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-danger btn-sm fw-bold" onclick="openSuspensionModal()">
+                                            <i class="fa-solid fa-ban"></i> Suspender Cuenta
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm fw-bold" onclick="executeReactivation()">
+                                            <i class="fa-solid fa-unlock"></i> Reactivar Manualmente
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card p-3 border h-100">
+                                    <h5 class="fw-bold text-warning mb-2"><i class="fa-solid fa-power-off"></i> Cierre Forzoso de Sesiones</h5>
+                                    <p class="text-muted small">Invalida todas las sesiones activas del usuario de forma inmediata en el backend y Spring Security.</p>
+                                    
+                                    <div class="mt-auto">
+                                        <button class="btn btn-warning btn-sm fw-bold" onclick="openCloseSessionsModal()">
+                                            <i class="fa-solid fa-shield-halved"></i> Forzar Cierre de Sesiones
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card p-3 border h-100">
+                                    <h5 class="fw-bold text-primary mb-2"><i class="fa-solid fa-key"></i> Restablecimiento de Clave Seguro</h5>
+                                    <p class="text-muted small">Dispara un enlace seguro y encriptado al correo electrónico del usuario. Jamás se expone la contraseña.</p>
+                                    
+                                    <div class="mt-auto">
+                                        <button class="btn btn-outline-primary btn-sm fw-bold" onclick="executeSecurePasswordReset()">
+                                            <i class="fa-solid fa-envelope"></i> Enviar Enlace de Restablecimiento
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Contenido Tab 2: Mensajes -->
-                    <div id="tabContentMessages" style="display: none;">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-muted small fw-bold">Historial de alertas y mensajes administrativos</span>
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" onclick="openDirectMessageModal()">
-                                <i class="bi bi-plus-lg me-1"></i> Nuevo Mensaje
-                            </button>
-                        </div>
-
-                        <div class="d-flex flex-column gap-3" id="conversationListContainer">
-                            <th:block th:each="msg : ${conversacion}">
-                                <div class="message-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <i class="bi bi-shield-fill text-primary"></i>
-                                            <span class="fw-bold text-dark" th:text="${msg.asunto}">Asunto</span>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge" th:classappend="${msg.leido ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle'}" style="font-size: 10px;" th:text="${msg.leido ? 'LEÍDO' : 'PENDIENTE'}">PENDIENTE</span>
-                                            <span class="text-muted font-monospace small" th:text="${#temporals.format(msg.fechaEnvio, 'dd/MM/yyyy hh:mm a')}">Fecha</span>
-                                        </div>
-                                    </div>
-                                    <p class="m-0 text-secondary" style="font-size: 13.5px; line-height: 1.6;" th:text="${msg.contenido}">Contenido del mensaje...</p>
+                    <!-- PESTAÑA 4: SESIÓN DE SOPORTE ADMINISTRATIVO (DELEGADA) -->
+                    <div id="tabContentSupport" style="display: none;">
+                        <div class="card p-4 border">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="bg-primary-subtle text-primary p-3 rounded-circle fs-4">
+                                    <i class="fa-solid fa-user-gear"></i>
                                 </div>
-                            </th:block>
-                            <div th:if="${#lists.isEmpty(conversacion)}" class="text-muted small py-4 text-center">
-                                No hay mensajes directos enviados previamente a este usuario.
+                                <div>
+                                    <h4 class="fw-bold text-dark m-0">Sesión Delegada de Soporte Administrativo</h4>
+                                    <p class="text-muted small m-0">Permite asistir al usuario de forma segura con un límite de 15 minutos sin contraseñas ni acceso a Google OAuth.</p>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info border-info small">
+                                <i class="fa-solid fa-shield-halved me-1"></i>
+                                Esta acción es estrictamente temporal y queda 100% registrada en la auditoría con tu usuario Super Admin y dirección IP.
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary fw-bold" onclick="iniciarSesionSoporte()">
+                                    <i class="fa-solid fa-play"></i> Iniciar Sesión de Soporte (15 min)
+                                </button>
+                                <button class="btn btn-outline-secondary fw-bold" onclick="finalizarSesionSoporte()">
+                                    <i class="fa-solid fa-stop"></i> Finalizar Sesión
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PESTAÑA 5: HISTORIAL DE AUDITORÍA -->
+                    <div id="tabContentAudit" style="display: none;">
+                        <div class="card border p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold text-dark m-0"><i class="fa-solid fa-list-check text-primary"></i> Registro Inmutable de Auditoría</h5>
+                                <button class="btn btn-sm btn-outline-primary" onclick="cargarAuditorias()">
+                                    <i class="fa-solid fa-rotate"></i> Actualizar Registros
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="audit-table" id="auditTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha/Hora</th>
+                                            <th>Acción</th>
+                                            <th>Super Admin</th>
+                                            <th>Motivo / Detalles</th>
+                                            <th>IP</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="auditTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4 text-muted">Haz clic en 'Actualizar Registros' para consultar los registros en MongoDB.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
 
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    <!-- ===== MODAL 1: REPRESENTACIÓN DE SESIÓN (SCREEN MIRROR SINTÉTICO) ===== -->
+    <!-- ===== MODALES DE SEGURIDAD Y ACCIÓN ===== -->
+
+    <!-- MODAL 1: SUSPENSIÓN DE CUENTA -->
+    <div class="modal fade" id="modalSuspension" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-white-content">
+                <div class="modal-white-header">
+                    <h5 class="modal-title fw-bold text-danger m-0"><i class="fa-solid fa-ban"></i> Suspender Cuenta de Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-white-body">
+                    <div class="mb-3">
+                        <label class="form-label-custom">Tipo de Suspensión:</label>
+                        <select class="form-input-custom" id="suspensionTipo" onchange="toggleSuspensionMinutes(this.value)">
+                            <option value="TEMPORAL">Temporal (Auto-reactivable)</option>
+                            <option value="PERMANENTE">Permanente (Indefinida)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="groupSuspensionMinutos">
+                        <label class="form-label-custom">Duración (Minutos):</label>
+                        <input type="number" class="form-input-custom" id="suspensionMinutos" value="60" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Motivo de la Suspensión (Obligatorio):</label>
+                        <textarea class="form-input-custom" id="suspensionMotivo" rows="3" placeholder="Describe claramente el motivo de la sanción..."></textarea>
+                    </div>
+                    <div id="suspensionAlert" class="d-none mt-2"></div>
+                </div>
+                <div class="modal-white-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger fw-bold" onclick="executeSuspension()">Confirmar Suspensión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CIERRE FORZOSO DE SESIONES -->
+    <div class="modal fade" id="modalCloseSessions" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-white-content">
+                <div class="modal-white-header">
+                    <h5 class="modal-title fw-bold text-warning m-0"><i class="fa-solid fa-power-off"></i> Cierre Forzoso de Sesiones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-white-body">
+                    <p class="text-muted small">Esto invalidará todas las sesiones activas en navegadores y apps móviles del usuario de forma inmediata.</p>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Motivo del Cierre:</label>
+                        <input type="text" class="form-input-custom" id="closeSessionsMotivo" value="Cierre de seguridad preventivo">
+                    </div>
+                </div>
+                <div class="modal-white-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning fw-bold" onclick="executeCloseSessions()">Confirmar Cierre Forzoso</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: PANTALLA EN VIVO / TELEMETRÍA (MIRROR) -->
     <div class="modal fade" id="modalSessionMirror" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content modal-white-content">
                 <div class="modal-white-header">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-display text-primary fs-5"></i>
-                        <h5 class="modal-title fw-bold text-dark m-0">Representación Visual de la Sesión</h5>
-                    </div>
+                    <h5 class="modal-title fw-bold text-primary m-0"><i class="fa-solid fa-desktop"></i> Pantalla en Vivo del Usuario</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-white-body">
-                    <div class="alert alert-info border small mb-3">
-                        <i class="bi bi-shield-lock-fill text-primary me-1"></i>
-                        <b>Seguridad y Privacidad:</b> Reconstrucción sintética no invasiva basada únicamente en los módulos de ClínicaApp navegados por el usuario. No accede a hardware, escritorio ni archivos personales.
-                    </div>
-
-                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm);">
-                        <div class="p-2 px-3 d-flex justify-content-between align-items-center" style="background: #f8fafc; border-bottom: 1px solid var(--border-color);">
-                            <div class="d-flex align-items-center gap-2 font-monospace small text-muted">
-                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
-                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
-                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
-                                <span id="mirrorUrlBar" class="text-dark fw-bold ms-2">https://clinicaapp.com/usuario/citas</span>
-                            </div>
-                            <span class="badge bg-success text-white small font-monospace">ACTIVO</span>
+                    <div class="bg-light p-3 rounded border mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-primary">URL Actual</span>
+                            <span class="font-monospace small" id="mirrorUrlBar">https://clinicaapp.com/usuario/dashboard</span>
                         </div>
-                        <div class="p-5 text-center">
-                            <div style="width: 64px; height: 64px; border-radius: 16px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                                <i class="bi bi-window-sidebar text-primary fs-2"></i>
-                            </div>
-                            <h4 class="fw-bold text-dark mb-2" id="mirrorSectionTitle">Sección: Citas Médicas</h4>
-                            <p class="text-muted small" style="max-width: 440px; margin: 0 auto;">
-                                El usuario está actualmente interactuando dentro del módulo correspondiente de ClínicaApp.
-                            </p>
-                        </div>
+                        <h6 class="fw-bold m-0" id="mirrorSectionTitle">Sección: Dashboard</h6>
                     </div>
-                </div>
-                <div class="modal-white-footer">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+                    <p class="text-muted small">La telemetría de navegación en tiempo real replica la ruta y eventos de interacción del usuario respetando su privacidad.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== MODAL 2: ENVIAR MENSAJE DIRECTO INTERNO ===== -->
-    <div class="modal fade" id="modalDirectMessage" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-white-content">
-                <div class="modal-white-header">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-chat-left-dots-fill text-primary fs-5"></i>
-                        <h5 class="modal-title fw-bold text-dark m-0">Enviar Mensaje Directo</h5>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-white-body">
-                    <div class="mb-3">
-                        <label class="form-label-custom">Destinatario:</label>
-                        <input type="text" class="form-input-custom" readonly th:value="${estadoUsuario != null ? estadoUsuario.nombre + ' (' + estadoUsuario.email + ')' : ''}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label-custom">Asunto:</label>
-                        <input type="text" class="form-input-custom" id="msgAsunto" value="Mensaje de la Administración">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label-custom">Contenido del Mensaje:</label>
-                        <textarea class="form-input-custom" id="msgContenido" rows="4" placeholder="Escribe el mensaje que verá el usuario en su pantalla..."></textarea>
-                    </div>
-                    <div id="msgAlertResponse" class="d-none mt-2"></div>
-                </div>
-                <div class="modal-white-footer">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" id="btnSubmitDirectMessage" onclick="sendDirectMessageAction()">
-                        <i class="bi bi-send-fill me-1"></i> Enviar a Usuario
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL 3: ENVIAR CORREO GMAIL CON ADJUNTOS ===== -->
+    <!-- MODAL 4: ENVIAR CORREO CON ADJUNTOS -->
     <div class="modal fade" id="modalEmailDirect" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-white-content">
                 <div class="modal-white-header">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-envelope-paper-fill text-success fs-5"></i>
-                        <h5 class="modal-title fw-bold text-dark m-0">Enviar Correo Electrónico (Gmail)</h5>
-                    </div>
+                    <h5 class="modal-title fw-bold text-success m-0"><i class="fa-solid fa-paper-plane"></i> Enviar Correo Oficial</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-white-body">
@@ -1132,24 +1210,12 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label-custom">Cuerpo del Correo:</label>
-                        <textarea class="form-input-custom" id="emailCuerpo" rows="4" placeholder="Escribe el mensaje oficial..."></textarea>
+                        <textarea class="form-input-custom" id="emailCuerpo" rows="4" placeholder="Escribe el mensaje..."></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label-custom">Documento o Archivo Adjunto (Opcional - PDF, DOC, XLS, Imagen):</label>
-                        <div class="file-dropzone-white" onclick="document.getElementById('emailAttachmentInput').click()">
-                            <i class="bi bi-cloud-arrow-up text-primary fs-3"></i>
-                            <div class="fw-bold text-dark mt-1" id="attachmentLabel">Haz clic para adjuntar un archivo</div>
-                            <div class="text-muted small">Máximo 10MB (PDF, Word, Excel, JPG, PNG)</div>
-                        </div>
-                        <input type="file" id="emailAttachmentInput" class="d-none" onchange="handleAttachmentSelect(this)">
-                    </div>
-                    <div id="emailAlertResponse" class="d-none mt-2"></div>
                 </div>
                 <div class="modal-white-footer">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" id="btnSubmitEmail" onclick="sendRealEmailAction()">
-                        <i class="bi bi-send-check-fill me-1"></i> Despachar Correo
-                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success fw-bold" onclick="sendRealEmailAction()">Enviar Correo</button>
                 </div>
             </div>
         </div>
@@ -1161,25 +1227,24 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         const selectedUserId = /*[[${usuarioSeleccionadoId}]]*/ null;
-        let selectedFile = null;
 
         // Pestañas
-        function switchTab(tabName) {
-            const btnTimeline = document.getElementById('tabBtnTimeline');
-            const btnMessages = document.getElementById('tabBtnMessages');
-            const contentTimeline = document.getElementById('tabContentTimeline');
-            const contentMessages = document.getElementById('tabContentMessages');
+        function switchSupervisionTab(tabName) {
+            const tabs = ['chat', 'timeline', 'security', 'support', 'audit'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+                const content = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (t === tabName) {
+                    if (btn) btn.classList.add('active');
+                    if (content) content.style.display = 'block';
+                } else {
+                    if (btn) btn.classList.remove('active');
+                    if (content) content.style.display = 'none';
+                }
+            });
 
-            if (tabName === 'timeline') {
-                btnTimeline.classList.add('active');
-                btnMessages.classList.remove('active');
-                contentTimeline.style.display = 'block';
-                contentMessages.style.display = 'none';
-            } else {
-                btnMessages.classList.add('active');
-                btnTimeline.classList.remove('active');
-                contentTimeline.style.display = 'none';
-                contentMessages.style.display = 'block';
+            if (tabName === 'audit') {
+                cargarAuditorias();
             }
         }
 
@@ -1189,44 +1254,213 @@
             const cards = document.querySelectorAll('.user-row-card');
             cards.forEach(c => {
                 const text = c.getAttribute('data-search') || '';
-                if (text.toLowerCase().includes(q)) {
-                    c.style.display = 'flex';
-                } else {
-                    c.style.display = 'none';
-                }
+                c.style.display = text.toLowerCase().includes(q) ? 'flex' : 'none';
             });
         }
 
-        // Manejo de archivo adjunto
-        function handleAttachmentSelect(input) {
-            if (input.files && input.files[0]) {
-                selectedFile = input.files[0];
-                document.getElementById('attachmentLabel').innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Archivo: ${selectedFile.name} (${(selectedFile.size/1024).toFixed(1)} KB)</span>`;
-            } else {
-                selectedFile = null;
-                document.getElementById('attachmentLabel').textContent = 'Haz clic para adjuntar un archivo';
+        // Modales
+        function openSuspensionModal() { new bootstrap.Modal(document.getElementById('modalSuspension')).show(); }
+        function openCloseSessionsModal() { new bootstrap.Modal(document.getElementById('modalCloseSessions')).show(); }
+        function openSessionMirrorModal() { new bootstrap.Modal(document.getElementById('modalSessionMirror')).show(); }
+        function openEmailModal() { new bootstrap.Modal(document.getElementById('modalEmailDirect')).show(); }
+
+        function toggleSuspensionMinutes(tipo) {
+            document.getElementById('groupSuspensionMinutos').style.display = tipo === 'TEMPORAL' ? 'block' : 'none';
+        }
+
+        // Acciones Backend
+        async function executeSuspension() {
+            const tipo = document.getElementById('suspensionTipo').value;
+            const minutos = document.getElementById('suspensionMinutos').value;
+            const motivo = document.getElementById('suspensionMotivo').value.trim();
+
+            if (!motivo) {
+                alert("El motivo de la suspensión es obligatorio.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/suspender`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tipo: tipo, minutos: minutos, motivo: motivo })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Usuario suspendido exitosamente.");
+                    window.location.reload();
+                } else {
+                    alert(data.error || "Error al suspender.");
+                }
+            } catch(e) {
+                alert("Error de conexión al servidor.");
             }
         }
 
-        // Modales
-        function openSessionMirrorModal() {
-            new bootstrap.Modal(document.getElementById('modalSessionMirror')).show();
+        async function executeReactivation() {
+            if (!confirm("¿Deseas reactivar la cuenta de este usuario?")) return;
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/reactivar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ motivo: "Reactivación manual por Super Admin" })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Usuario reactivado correctamente.");
+                    window.location.reload();
+                } else {
+                    alert(data.error || "Error al reactivar.");
+                }
+            } catch(e) {
+                alert("Error de conexión al servidor.");
+            }
         }
 
-        function openDirectMessageModal() {
-            new bootstrap.Modal(document.getElementById('modalDirectMessage')).show();
+        async function executeCloseSessions() {
+            const motivo = document.getElementById('closeSessionsMotivo').value;
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/cerrar-sesiones`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ motivo: motivo })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Sesiones cerradas forzosamente en el sistema.");
+                    bootstrap.Modal.getInstance(document.getElementById('modalCloseSessions')).hide();
+                } else {
+                    alert(data.error || "Error al cerrar sesiones.");
+                }
+            } catch(e) {
+                alert("Error de conexión al servidor.");
+            }
         }
 
-        function openEmailModal() {
-            new bootstrap.Modal(document.getElementById('modalEmailDirect')).show();
+        async function executeSecurePasswordReset() {
+            if (!confirm("¿Deseas enviar un enlace seguro de restablecimiento de contraseña al correo del usuario?")) return;
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/reset-password`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Enlace seguro enviado al correo del usuario.");
+                } else {
+                    alert(data.error || "Error al enviar enlace.");
+                }
+            } catch(e) {
+                alert("Error de conexión al servidor.");
+            }
         }
 
-        // Polling en tiempo real
+        async function iniciarSesionSoporte() {
+            if (!confirm("¿Iniciar sesión de soporte administrativo (máximo 15 min)?")) return;
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/soporte/iniciar`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Sesión de soporte iniciada correctamente.");
+                } else {
+                    alert(data.error || "Error al iniciar sesión de soporte.");
+                }
+            } catch(e) {
+                alert("Error de conexión.");
+            }
+        }
+
+        async function finalizarSesionSoporte() {
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/soporte/finalizar`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Sesión de soporte finalizada.");
+                }
+            } catch(e) {}
+        }
+
+        async function cargarAuditorias() {
+            const tbody = document.getElementById('auditTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Consultando MongoDB...</td></tr>';
+            try {
+                const res = await fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/auditorias`);
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    let html = '';
+                    data.forEach(a => {
+                        const dateStr = a.fechaHora ? new Date(a.fechaHora).toLocaleString() : 'Reciente';
+                        html += `
+                            <tr>
+                                <td class="font-monospace small">${dateStr}</td>
+                                <td><span class="badge bg-primary-subtle text-primary">${a.accion || 'ACCION'}</span></td>
+                                <td class="fw-bold">${a.adminEmail || 'SuperAdmin'}</td>
+                                <td>${a.motivo || a.detalles || 'Sin observaciones'}</td>
+                                <td class="font-monospace small">${a.ip || '127.0.0.1'}</td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">No hay registros de auditoría para este usuario.</td></tr>';
+                }
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Error al cargar auditoría.</td></tr>';
+            }
+        }
+
+        // Chat bidireccional
+        async function sendChatMessageAction() {
+            const input = document.getElementById('chatInputMessage');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            try {
+                const res = await fetch('/api/supervision/mensajeria/enviar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        destinatarioId: selectedUserId,
+                        asunto: 'Mensaje de la Administración',
+                        contenido: msg
+                    })
+                });
+                if (res.ok) {
+                    input.value = '';
+                    refreshSupervisionData();
+                }
+            } catch(e) {}
+        }
+
+        async function sendRealEmailAction() {
+            const asunto = document.getElementById('emailAsunto').value;
+            const contenido = document.getElementById('emailCuerpo').value;
+            const destinatario = document.getElementById('emailDestinatario').value;
+
+            try {
+                const res = await fetch('/api/supervision/email/enviar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ destinatarioEmail: destinatario, asunto: asunto, contenido: contenido })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("Correo despachado correctamente.");
+                    bootstrap.Modal.getInstance(document.getElementById('modalEmailDirect')).hide();
+                } else {
+                    alert(data.error || "Fallo al enviar correo.");
+                }
+            } catch(e) {
+                alert("Error de conexión.");
+            }
+        }
+
+        // Sincronización en vivo
         async function refreshSupervisionData() {
             if (!selectedUserId) return;
-            const syncBtn = document.querySelector('.btn-nav-sync i');
-            if (syncBtn) syncBtn.classList.add('bi-spin');
-
             try {
                 const [resEstado, resConv] = await Promise.all([
                     fetch(`/api/supervision/usuario/${encodeURIComponent(selectedUserId)}/estado`, { cache: 'no-store' }),
@@ -1236,243 +1470,44 @@
                 if (resEstado.status === 200) {
                     const data = await resEstado.json();
                     if (data.encontrado) {
-                        updateLiveUI(data);
+                        const statusEl = document.getElementById('liveStatusText');
+                        if (statusEl) {
+                            statusEl.textContent = data.online ? 'EN LÍNEA' : 'DESCONECTADO';
+                            statusEl.className = 'badge-status ' + (data.online ? 'online' : 'offline');
+                        }
+                        const secEl = document.getElementById('liveSectionText');
+                        if (secEl) secEl.textContent = data.seccionActual || 'Inicio';
                     }
                 }
 
                 if (resConv.status === 200) {
                     const convData = await resConv.json();
                     if (Array.isArray(convData)) {
-                        updateConversationUI(convData);
+                        const chatBox = document.getElementById('chatMessagesBox');
+                        if (chatBox) {
+                            let html = '';
+                            convData.forEach(msg => {
+                                const isAdmin = msg.origen === 'SUPER_ADMIN';
+                                const timeStr = msg.fechaEnvio ? new Date(msg.fechaEnvio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                                html += `
+                                    <div class="chat-bubble ${isAdmin ? 'chat-bubble-admin' : 'chat-bubble-user'}">
+                                        <div class="fw-bold mb-1" style="font-size: 11px;">${isAdmin ? 'Super Admin' : 'Usuario'}</div>
+                                        <div>${msg.contenido}</div>
+                                        <div class="chat-meta">
+                                            <span>${timeStr}</span>
+                                            ${isAdmin ? (msg.leido ? '<i class="fa-solid fa-check-double"></i>' : '<i class="fa-solid fa-check"></i>') : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            chatBox.innerHTML = html;
+                        }
                     }
                 }
-            } catch (err) {
-                console.error("Fallo al actualizar telemetría:", err);
-            } finally {
-                if (syncBtn) syncBtn.classList.remove('bi-spin');
-            }
-        }
-
-        function updateConversationUI(mensajes) {
-            const container = document.getElementById('conversationListContainer');
-            if (!container) return;
-
-            if (mensajes.length === 0) {
-                container.innerHTML = '<div class="text-muted small py-4 text-center">No hay mensajes directos enviados previamente a este usuario.</div>';
-                return;
-            }
-
-            let html = '';
-            mensajes.forEach(msg => {
-                const dateStr = msg.fechaEnvio ? new Date(msg.fechaEnvio).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Reciente';
-                const badgeClass = msg.leido ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle';
-                const badgeText = msg.leido ? 'LEÍDO' : 'PENDIENTE';
-
-                html += `
-                    <div class="message-card">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-shield-fill text-primary"></i>
-                                <span class="fw-bold text-dark">${escapeHtml(msg.asunto || 'Mensaje')}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge ${badgeClass}" style="font-size: 10px;">${badgeText}</span>
-                                <span class="text-muted font-monospace small">${dateStr}</span>
-                            </div>
-                        </div>
-                        <p class="m-0 text-secondary" style="font-size: 13.5px; line-height: 1.6;">${escapeHtml(msg.contenido || '')}</p>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
-
-        function updateLiveUI(data) {
-            const statusEl = document.getElementById('liveStatusText');
-            if (statusEl) {
-                statusEl.textContent = data.online ? 'EN LÍNEA' : 'DESCONECTADO';
-                if (data.online) {
-                    statusEl.className = 'badge-status online';
-                } else {
-                    statusEl.className = 'badge-status offline';
-                }
-            }
-
-            const secEl = document.getElementById('liveSectionText');
-            if (secEl) secEl.textContent = data.seccionActual || 'Desconocida';
-
-            const timeEl = document.getElementById('liveTimeText');
-            if (timeEl) timeEl.textContent = data.tiempoRelativo || 'Reciente';
-
-            const mirrorUrl = document.getElementById('mirrorUrlBar');
-            if (mirrorUrl) mirrorUrl.textContent = 'https://clinicaapp.com' + (data.urlActual || '/');
-            const mirrorTitle = document.getElementById('mirrorSectionTitle');
-            if (mirrorTitle) mirrorTitle.textContent = 'Sección: ' + (data.seccionActual || 'Inicio');
-
-            if (data.eventosRecientes && data.eventosRecientes.length > 0) {
-                const timelineContainer = document.getElementById('timelineListContainer');
-                if (timelineContainer) {
-                    let html = '';
-                    data.eventosRecientes.forEach(ev => {
-                        const dateStr = ev.fechaHora ? new Date(ev.fechaHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Reciente';
-                        html += `
-                            <div class="timeline-item">
-                                <div class="timeline-circle"></div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="timeline-time">${dateStr}</span>
-                                    <span class="badge bg-light text-dark border">${escapeHtml(ev.seccion || 'Sistema')}</span>
-                                </div>
-                                <div class="fw-bold text-dark mt-1" style="font-size: 14px;">${escapeHtml(ev.accion || 'Navegación')}</div>
-                                ${ev.metadata ? `<div class="text-muted small" style="font-size: 12px;">Detalles: ${escapeHtml(ev.metadata)}</div>` : ''}
-                            </div>
-                        `;
-                    });
-                    timelineContainer.innerHTML = html;
-                }
-            }
-        }
-
-        // Enviar Mensaje Directo
-        async function sendDirectMessageAction() {
-            const btn = document.getElementById('btnSubmitDirectMessage');
-            const alertBox = document.getElementById('msgAlertResponse');
-            const asunto = document.getElementById('msgAsunto').value;
-            const contenido = document.getElementById('msgContenido').value;
-
-            if (!contenido.trim()) {
-                alertBox.className = 'alert alert-danger small';
-                alertBox.textContent = 'Por favor escribe el contenido del mensaje.';
-                alertBox.classList.remove('d-none');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
-
-            try {
-                const res = await fetch('/api/supervision/mensajeria/enviar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        destinatarioId: selectedUserId,
-                        asunto: asunto,
-                        contenido: contenido
-                    })
-                });
-
-                const json = await res.json();
-                if (res.ok && json.success) {
-                    alertBox.className = 'alert alert-success small';
-                    alertBox.textContent = '¡Mensaje despachado y notificado en tiempo real!';
-                    alertBox.classList.remove('d-none');
-                    document.getElementById('msgContenido').value = '';
-                    
-                    // Actualizar datos en vivo inmediatamente sin recargar la página
-                    refreshSupervisionData();
-
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById('modalDirectMessage')).hide();
-                        alertBox.classList.add('d-none');
-                    }, 1200);
-                } else {
-                    alertBox.className = 'alert alert-danger small';
-                    alertBox.textContent = json.error || 'Error al enviar el mensaje.';
-                    alertBox.classList.remove('d-none');
-                }
-            } catch (e) {
-                alertBox.className = 'alert alert-danger small';
-                alertBox.textContent = 'Error de conexión con el servidor.';
-                alertBox.classList.remove('d-none');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Enviar a Usuario';
-            }
-        }
-
-        // Enviar Correo con Adjuntos
-        async function sendRealEmailAction() {
-            const btn = document.getElementById('btnSubmitEmail');
-            const alertBox = document.getElementById('emailAlertResponse');
-            const email = document.getElementById('emailDestinatario').value;
-            const asunto = document.getElementById('emailAsunto').value;
-            const contenido = document.getElementById('emailCuerpo').value;
-
-            if (!contenido.trim()) {
-                alertBox.className = 'alert alert-danger small';
-                alertBox.textContent = 'Por favor escribe el cuerpo del correo.';
-                alertBox.classList.remove('d-none');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando por pasarela...';
-
-            try {
-                let res;
-                if (selectedFile) {
-                    const formData = new FormData();
-                    formData.append('destinatarioEmail', email);
-                    formData.append('asunto', asunto);
-                    formData.append('contenido', contenido);
-                    formData.append('archivo', selectedFile);
-
-                    res = await fetch('/api/supervision/email/enviar', {
-                        method: 'POST',
-                        body: formData
-                    });
-                } else {
-                    res = await fetch('/api/supervision/email/enviar', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            destinatarioEmail: email,
-                            asunto: asunto,
-                            contenido: contenido
-                        })
-                    });
-                }
-
-                const json = await res.json();
-                if (res.ok && json.success) {
-                    alertBox.className = 'alert alert-success small';
-                    alertBox.textContent = '¡Correo electrónico despachado exitosamente al buzón del usuario!';
-                    alertBox.classList.remove('d-none');
-                    document.getElementById('emailCuerpo').value = '';
-                    selectedFile = null;
-                    document.getElementById('attachmentLabel').textContent = 'Haz clic para adjuntar un archivo';
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(document.getElementById('modalEmailDirect')).hide();
-                        alertBox.classList.add('d-none');
-                    }, 1800);
-                } else {
-                    alertBox.className = 'alert alert-danger small';
-                    alertBox.textContent = json.error || 'Fallo en el servidor de correo.';
-                    alertBox.classList.remove('d-none');
-                }
-            } catch (e) {
-                alertBox.className = 'alert alert-danger small';
-                alertBox.textContent = 'Error de conexión con el servidor.';
-                alertBox.classList.remove('d-none');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-send-check-fill me-1"></i> Despachar Correo';
-            }
+            } catch(e) {}
         }
 
         if (selectedUserId) {
-            // Polling en vivo cada 3 segundos
             setInterval(refreshSupervisionData, 3000);
         }
         /*]]>*/

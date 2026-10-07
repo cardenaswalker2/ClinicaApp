@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Suspendida - ClínicaApp</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --danger-main: #dc2626;
+            --danger-subtle: #fef2f2;
+            --danger-border: #fecaca;
+            --warning-main: #d97706;
+            --warning-subtle: #fffbeb;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .suspension-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            width: 100%;
+            max-width: 560px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .icon-badge {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--danger-subtle);
+            border: 2px solid var(--danger-border);
+            color: var(--danger-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 24px auto;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .details-box {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 28px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .detail-value {
+            color: var(--text-main);
+            font-weight: 700;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .badge-type {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-temporal {
+            background: var(--warning-subtle);
+            color: var(--warning-main);
+            border: 1px solid #fde68a;
+        }
+
+        .badge-permanent {
+            background: var(--danger-subtle);
+            color: var(--danger-main);
+            border: 1px solid var(--danger-border);
+        }
+
+        .reason-box {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .reason-text {
+            color: #334155;
+            font-style: italic;
+            font-size: 14px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .countdown-box {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        .countdown-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0369a1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .countdown-timer {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0284c7;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-logout {
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-logout:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .footer-note {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 480px) {
+            .suspension-card {
+                padding: 24px 16px;
+            }
+            .detail-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .detail-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="suspension-card">
+        <div class="icon-badge">
+            <i class="fa-solid fa-user-lock"></i>
+        </div>
+
+        <h1>Cuenta Suspendida</h1>
+        <p class="subtitle">El acceso a los servicios de ClínicaApp ha sido restringido temporal o permanentemente por el equipo de supervisión y seguridad.</p>
+
+        <div class="details-box">
+            <div class="detail-row">
+                <span class="detail-label">Usuario:</span>
+                <span class="detail-value" th:text="${usuario != null ? usuario.email : 'Usuario'}">usuario@clinicaapp.com</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Tipo de sanción:</span>
+                <span class="detail-value">
+                    <span th:if="${tipoSuspension == 'TEMPORAL'}" class="badge-type badge-temporal">Suspensión Temporal</span>
+                    <span th:unless="${tipoSuspension == 'TEMPORAL'}" class="badge-type badge-permanent">Suspensión Permanente</span>
+                </span>
+            </div>
+
+            <div class="reason-box">
+                <span class="detail-label">Motivo reportado:</span>
+                <p class="reason-text" th:text="${motivo != null ? motivo : 'Infracción a los términos y condiciones de seguridad.'}">Infracción a las normativas de seguridad de la plataforma.</p>
+            </div>
+        </div>
+
+        <!-- COUNTDOWN SI ES TEMPORAL -->
+        <div class="countdown-box" id="countdownBox" th:if="${tipoSuspension == 'TEMPORAL' and fechaFin != null}">
+            <div class="countdown-title"><i class="fa-regular fa-clock"></i> Tiempo restante para reactivación</div>
+            <div class="countdown-timer" id="timerDisplay">Calculando...</div>
+        </div>
+
+        <div class="actions">
+            <a th:href="@{/logout}" class="btn btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+            </a>
+        </div>
+
+        <p class="footer-note">Si consideras que esto se trata de un error administrativo, comunícate con el soporte central de ClínicaApp.</p>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var fechaFinStr = /*[[${fechaFin}]]*/ null;
+        if (fechaFinStr) {
+            var targetDate = new Date(fechaFinStr).getTime();
+
+            function updateCountdown() {
+                var now = new Date().getTime();
+                var distance = targetDate - now;
+
+                if (distance <= 0) {
+                    document.getElementById("timerDisplay").innerHTML = "¡Reactivando cuenta!";
+                    setTimeout(function() {
+                        window.location.href = "/login";
+                    }, 2000);
+                    return;
+                }
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                var display = "";
+                if (days > 0) display += days + "d ";
+                if (hours > 0 || days > 0) display += hours + "h ";
+                display += minutes + "m " + seconds + "s";
+
+                document.getElementById("timerDisplay").innerText = display;
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>

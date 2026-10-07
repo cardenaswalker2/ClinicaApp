@@ -25,6 +25,15 @@ public class Usuario {
     // --- NUEVO CAMPO PARA CONTROL DE SEGURIDAD ---
     private boolean activo = true;
 
+    // --- CAMPOS DE SUSPENSIÓN Y SEGURIDAD AVANZADA ---
+    private boolean suspendido = false;
+    private String tipoSuspension; // TEMPORAL, PERMANENTE
+    private String motivoSuspension;
+    private LocalDateTime fechaInicioSuspension;
+    private LocalDateTime fechaFinSuspension;
+    private String suspendidoPorAdmin;
+    private LocalDateTime revokedSessionsBefore; // Cualquier sesión iniciada antes de esta fecha se invalida
+
     // --- NUEVO CAMPO PARA FOTO DE PERFIL ---
     private String fotoUrl;
 
@@ -319,5 +328,21 @@ public class Usuario {
     public void setLongitud(Double longitud) { this.longitud = longitud; }
     public String getCiudad() { return ciudad != null ? ciudad : "Cartagena"; }
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
+
+    // --- GETTERS Y SETTERS DE SUSPENSIÓN Y SEGURIDAD ---
+    public boolean isSuspendido() { return suspendido; }
+    public void setSuspendido(boolean suspendido) { this.suspendido = suspendido; }
+    public String getTipoSuspension() { return tipoSuspension; }
+    public void setTipoSuspension(String tipoSuspension) { this.tipoSuspension = tipoSuspension; }
+    public String getMotivoSuspension() { return motivoSuspension; }
+    public void setMotivoSuspension(String motivoSuspension) { this.motivoSuspension = motivoSuspension; }
+    public LocalDateTime getFechaInicioSuspension() { return fechaInicioSuspension; }
+    public void setFechaInicioSuspension(LocalDateTime fechaInicioSuspension) { this.fechaInicioSuspension = fechaInicioSuspension; }
+    public LocalDateTime getFechaFinSuspension() { return fechaFinSuspension; }
+    public void setFechaFinSuspension(LocalDateTime fechaFinSuspension) { this.fechaFinSuspension = fechaFinSuspension; }
+    public String getSuspendidoPorAdmin() { return suspendidoPorAdmin; }
+    public void setSuspendidoPorAdmin(String suspendidoPorAdmin) { this.suspendidoPorAdmin = suspendidoPorAdmin; }
+    public LocalDateTime getRevokedSessionsBefore() { return revokedSessionsBefore; }
+    public void setRevokedSessionsBefore(LocalDateTime revokedSessionsBefore) { this.revokedSessionsBefore = revokedSessionsBefore; }
 }
 

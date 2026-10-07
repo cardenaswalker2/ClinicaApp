@@ -23,7 +23,7 @@ public class GlobalControllerAdvice {
     private IUsuarioService usuarioService;
 
     @Autowired
-    private com.clinicaapp.service.ComunidadPetService comunidadPetService;
+    private com.clinicaapp.service.IUsuarioSupervisionService supervisionService;
 
     @ModelAttribute
     public void addNotificationsToModel(Model model, Principal principal) {
@@ -31,6 +31,7 @@ public class GlobalControllerAdvice {
         model.addAttribute("notificacionesUnreadCount", 0L);
         model.addAttribute("listaNotificaciones", new java.util.ArrayList<>());
         model.addAttribute("unreadChatCount", 0L);
+        model.addAttribute("sesionSoporteDelegada", null);
 
         if (principal != null) {
             Usuario usuario = getLoggedUser(principal);
@@ -38,6 +39,13 @@ public class GlobalControllerAdvice {
                 model.addAttribute("notificacionesUnreadCount", notificacionService.getConteoNoLeidas(usuario.getId()));
                 model.addAttribute("listaNotificaciones", notificacionService.getUltimasNotificaciones(usuario.getId(), 5));
                 model.addAttribute("unreadChatCount", comunidadPetService.getUnreadChatMessagesCount(usuario.getId()));
+
+                if (usuario.getRole() == com.clinicaapp.model.enums.Role.ROLE_ADMIN) {
+                    Map<String, Object> soporte = supervisionService.obtenerSesionSoporteActiva(usuario.getEmail());
+                    if (soporte != null) {
+                        model.addAttribute("sesionSoporteDelegada", soporte);
+                    }
+                }
             }
         }
     }

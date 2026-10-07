@@ -17,15 +17,22 @@ public class MensajeDirecto {
     private String destinatarioNombre;
     private String asunto;
     private String contenido;
-    private LocalDateTime fechaEnvio;
     private boolean leido;
+    private LocalDateTime fechaEnvio;
     private LocalDateTime fechaLectura;
     private String tipo; // ADMIN_ALERT, DIRECT_MESSAGE, NOTIFICATION
+    
+    // --- CAMPOS BIDIRECCIONALES Y ESTADOS DE ENTREGA ---
+    private String origen = "SUPER_ADMIN"; // "SUPER_ADMIN" o "USUARIO"
+    private String estadoMensaje = "ENVIADO"; // ENVIADO, ENTREGADO, LEIDO
+    private String conversacionUsuarioId; // ID del usuario asociado a la conversación
 
     public MensajeDirecto() {
         this.fechaEnvio = LocalDateTime.now();
         this.leido = false;
         this.tipo = "DIRECT_MESSAGE";
+        this.origen = "SUPER_ADMIN";
+        this.estadoMensaje = "ENVIADO";
     }
 
     public MensajeDirecto(String remitenteEmail, String remitenteNombre, String destinatarioId, 
@@ -41,6 +48,8 @@ public class MensajeDirecto {
         this.tipo = tipo != null ? tipo : "DIRECT_MESSAGE";
         this.fechaEnvio = LocalDateTime.now();
         this.leido = false;
+        this.origen = "SUPER_ADMIN";
+        this.estadoMensaje = "ENVIADO";
     }
 
     public String getId() {
@@ -137,5 +146,29 @@ public class MensajeDirecto {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public String getOrigen() {
+        return origen != null ? origen : "SUPER_ADMIN";
+    }
+
+    public void setOrigen(String origen) {
+        this.origen = origen;
+    }
+
+    public String getEstadoMensaje() {
+        return estadoMensaje != null ? estadoMensaje : "ENVIADO";
+    }
+
+    public void setEstadoMensaje(String estadoMensaje) {
+        this.estadoMensaje = estadoMensaje;
+    }
+
+    public String getConversacionUsuarioId() {
+        return conversacionUsuarioId;
+    }
+
+    public void setConversacionUsuarioId(String conversacionUsuarioId) {
+        this.conversacionUsuarioId = conversacionUsuarioId;
     }
 }

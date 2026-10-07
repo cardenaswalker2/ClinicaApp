@@ -59,6 +59,9 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
                 contenidoSanitizado,
                 "ADMIN_ALERT"
         );
+        mensaje.setOrigen("SUPER_ADMIN");
+        mensaje.setEstadoMensaje("ENVIADO");
+        mensaje.setConversacionUsuarioId(destinatario.getId());
 
         MensajeDirecto guardado = mensajeDirectoRepo.save(mensaje);
 
@@ -91,37 +94,81 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
     }
 
     @Override
+    public MensajeDirecto responderMensajeUsuario(String usuarioEmail, String contenido, String asunto) {
+        if (usuarioEmail == null || usuarioEmail.isBlank()) {
+            throw new IllegalArgumentException("El correo del usuario no puede estar vacío.");
+        }
+        if (contenido == null || contenido.isBlank()) {
+            throw new IllegalArgumentException("El mensaje de respuesta no puede estar vacío.");
+        }
+
+        Usuario usuario = usuarioRepo.findByEmail(usuarioEmail.trim());
+        if (usuario == null) {
+            usuario = usuarioRepo.findByEmail(usuarioEmail.toLowerCase().trim());
+        }
+        if (usuario == null) {
+            throw new RuntimeException("Usuario no encontrado para registrar la respuesta.");
+        }
+
+        String asuntoSanitizado = (asunto != null && !asunto.isBlank()) ? asunto.trim() : "Respuesta de " + usuario.getNombreCompleto();
+        String contenidoSanitizado = contenido.trim();
+
+        MensajeDirecto respuesta = new MensajeDirecto();
+        respuesta.setRemitenteEmail(usuario.getEmail());
+        respuesta.setRemitenteNombre(usuario.getNombreCompleto());
+        respuesta.setDestinatarioId("ADMIN_CORE");
+        respuesta.setDestinatarioEmail("superadmin@clinicaapp.com");
+        respuesta.setDestinatarioNombre("Super Administrador");
+        respuesta.setAsunto(asuntoSanitizado);
+        respuesta.setContenido(contenidoSanitizado);
+        respuesta.setTipo("USER_REPLY");
+        respuesta.setOrigen("USUARIO");
+        respuesta.setEstadoMensaje("ENVIADO");
+        respuesta.setConversacionUsuarioId(usuario.getId());
+        respuesta.setFechaEnvio(LocalDateTime.now());
+        respuesta.setLeido(false);
+
+        MensajeDirecto guardado = mensajeDirectoRepo.save(respuesta);
+
+        // Marcar mensajes anteriores enviados al usuario como leídos si responde
+        try {
+            List<MensajeDirecto> noLeidos = mensajeDirectoRepo.findByDestinatarioEmailAndLeidoFalseOrderByFechaEnvioDesc(usuario.getEmail());
+            for (MensajeDirecto m : noLeidos) {
+                m.setLeido(true);
+                m.setFechaLectura(LocalDateTime.now());
+                m.setEstadoMensaje("LEIDO");
+                mensajeDirectoRepo.save(m);
+            }
+        } catch (Exception e) {
+            // Continuar
+        }
+
+        return guardado;
+    }
+
+    @Override
     public List<MensajeDirecto> obtenerMensajesUsuario(String destinatarioEmailOrId) {
         if (destinatarioEmailOrId == null || destinatarioEmailOrId.isBlank()) return Collections.emptyList();
         String term = destinatarioEmailOrId.trim();
 
-        // 1. Buscar directamente por email (insensible a mayúsculas/minúsculas)
-        List<MensajeDirecto> lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(term);
-        if (lista.isEmpty() && term.contains("@")) {
-            lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(term.toLowerCase());
+        // Buscar mensajes donde el destinatario sea el usuario O donde el remitente sea el usuario (hilo completo)
+        Usuario u = null;
+        if (term.contains("@")) {
+            u = usuarioRepo.findByEmail(term);
+            if (u == null) u = usuarioRepo.findByEmail(term.toLowerCase());
+        } else {
+            u = usuarioRepo.findById(term).orElse(null);
         }
 
-        // 2. Si es un ID o si no hubo resultados, buscar usuario y consultar por ID y email del usuario
-        if (lista.isEmpty()) {
-            Usuario u = null;
-            if (term.contains("@")) {
-                u = usuarioRepo.findByEmail(term);
-                if (u == null) u = usuarioRepo.findByEmail(term.toLowerCase());
-            } else {
-                u = usuarioRepo.findById(term).orElse(null);
+        if (u != null) {
+            List<MensajeDirecto> lista = mensajeDirectoRepo.findByConversacionUsuarioIdOrderByFechaEnvioAsc(u.getId());
+            if (lista.isEmpty()) {
+                lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(u.getEmail());
             }
-
-            if (u != null) {
-                if (u.getId() != null) {
-                    lista = mensajeDirectoRepo.findByDestinatarioIdOrderByFechaEnvioDesc(u.getId());
-                }
-                if (lista.isEmpty() && u.getEmail() != null) {
-                    lista = mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(u.getEmail());
-                }
-            }
+            return lista;
         }
 
-        return lista;
+        return mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(term);
     }
 
     @Override
@@ -130,7 +177,7 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
         List<MensajeDirecto> todos = obtenerMensajesUsuario(destinatarioEmailOrId);
         List<MensajeDirecto> noLeidos = new ArrayList<>();
         for (MensajeDirecto m : todos) {
-            if (!m.isLeido()) noLeidos.add(m);
+            if (!m.isLeido() && "SUPER_ADMIN".equalsIgnoreCase(m.getOrigen())) noLeidos.add(m);
         }
         return noLeidos;
     }
@@ -146,12 +193,11 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
         if (opt.isPresent()) {
             MensajeDirecto msg = opt.get();
             // Validar que el mensaje pertenezca al usuario (o sea Super Admin)
-            if (destinatarioEmail == null || msg.getDestinatarioEmail().equalsIgnoreCase(destinatarioEmail)) {
-                msg.setLeido(true);
-                msg.setFechaLectura(LocalDateTime.now());
-                mensajeDirectoRepo.save(msg);
-                return true;
-            }
+            msg.setLeido(true);
+            msg.setFechaLectura(LocalDateTime.now());
+            msg.setEstadoMensaje("LEIDO");
+            mensajeDirectoRepo.save(msg);
+            return true;
         }
         return false;
     }
@@ -163,11 +209,36 @@ public class MensajeDirectoServiceImpl implements IMensajeDirectoService {
 
     @Override
     public List<MensajeDirecto> obtenerConversacionConUsuario(String usuarioIdOrEmail) {
+        if (usuarioIdOrEmail == null || usuarioIdOrEmail.isBlank()) return Collections.emptyList();
+        
+        Usuario usuario = null;
         if (usuarioIdOrEmail.contains("@")) {
-            return mensajeDirectoRepo.findByDestinatarioEmailOrderByFechaEnvioDesc(usuarioIdOrEmail);
+            usuario = usuarioRepo.findByEmail(usuarioIdOrEmail.trim());
+            if (usuario == null) usuario = usuarioRepo.findByEmail(usuarioIdOrEmail.toLowerCase().trim());
         } else {
-            return mensajeDirectoRepo.findByDestinatarioIdOrderByFechaEnvioDesc(usuarioIdOrEmail);
+            usuario = usuarioRepo.findById(usuarioIdOrEmail.trim()).orElse(null);
         }
+
+        List<MensajeDirecto> conversacion = new ArrayList<>();
+        if (usuario != null) {
+            // 1. Buscar por conversacionUsuarioId
+            conversacion = mensajeDirectoRepo.findByConversacionUsuarioIdOrderByFechaEnvioAsc(usuario.getId());
+
+            // 2. Si no hay por ID de conversación, buscar por emails cruzados
+            if (conversacion.isEmpty()) {
+                conversacion = mensajeDirectoRepo.findByDestinatarioEmailOrRemitenteEmailOrderByFechaEnvioAsc(
+                        usuario.getEmail(), usuario.getEmail()
+                );
+            }
+        } else if (usuarioIdOrEmail.contains("@")) {
+            conversacion = mensajeDirectoRepo.findByDestinatarioEmailOrRemitenteEmailOrderByFechaEnvioAsc(
+                    usuarioIdOrEmail, usuarioIdOrEmail
+            );
+        }
+
+        // Ordenar cronológicamente (antiguos arriba, nuevos abajo para estilo chat)
+        conversacion.sort(Comparator.comparing(MensajeDirecto::getFechaEnvio, Comparator.nullsLast(Comparator.naturalOrder())));
+        return conversacion;
     }
 
     @Override
