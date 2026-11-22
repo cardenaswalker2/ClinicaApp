@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/apple_theme.dart';
 import 'dashboard_page.dart';
@@ -49,10 +50,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   void _onNavTap(int idx) {
     if (_index == idx) return;
+    HapticFeedback.selectionClick();
     setState(() => _index = idx);
     _pageController.animateToPage(
       idx,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
     );
   }
@@ -77,13 +79,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: Container(
-          height: 70,
+          height: 68,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 24,
+                color: Colors.black.withValues(alpha: 0.09),
+                blurRadius: 26,
                 offset: const Offset(0, 8),
               ),
             ],
@@ -91,10 +93,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(28),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.90),
+                  color: Colors.white.withValues(alpha: 0.92),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(color: AppleTheme.border, width: 0.9),
                 ),
@@ -105,25 +107,30 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                     final isSelected = _index == idx;
                     final color = item["color"] as Color;
                     return Expanded(
-                      child: InkWell(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () => _onNavTap(idx),
-                        borderRadius: BorderRadius.circular(24),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 220),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? color.withValues(alpha: 0.12)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Icon(
-                                item["icon"] as IconData,
-                                color: isSelected ? color : AppleTheme.textTertiary,
-                                size: 23,
+                            AnimatedScale(
+                              scale: isSelected ? 1.08 : 1.0,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeOutBack,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 220),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? color.withValues(alpha: 0.12)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Icon(
+                                  item["icon"] as IconData,
+                                  color: isSelected ? color : AppleTheme.textTertiary,
+                                  size: 23,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 2),

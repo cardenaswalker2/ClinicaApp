@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../config/app_config.dart';
 import '../theme/apple_theme.dart';
 import '../widgets/apple_widgets.dart';
 import 'main_navigation_page.dart';
 import 'register_page.dart';
+import 'welcome_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,6 +30,17 @@ class _LoginPageState extends State<LoginPage> {
     _email.dispose();
     _pass.dispose();
     super.dispose();
+  }
+
+  void _backToWelcome() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WelcomePage()),
+      );
+    }
   }
 
   Future<void> _login() async {
@@ -52,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
         AppConfig.userName = data['nombre'];
         AppConfig.userId = data['id'];
         AppConfig.userRole = data['role'] ?? "ROLE_USER";
+        await AppConfig.saveSession();
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -61,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         if (mounted) _showSnackBar(data['message'] ?? "Error de autenticación");
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) _showSnackBar("Error de conexión con el servidor");
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -96,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
         AppConfig.userName = data['nombre'];
         AppConfig.userId = data['id'];
         AppConfig.userRole = data['role'] ?? "ROLE_USER";
+        await AppConfig.saveSession();
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -105,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         if (mounted) _showSnackBar(data['message'] ?? "Error de autenticación con Google");
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) _showSnackBar("Error al conectar con Google");
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -123,54 +138,75 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.fromLTRB(24, 10, 24, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 24),
-              // Logo estilo App Icon de Apple
+              // Botón para volver a WelcomePage
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: _backToWelcome,
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 17, color: AppleTheme.blue),
+                  label: Text(
+                    "Inicio",
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppleTheme.blue,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Logo 3D suave estilo Apple App Icon
               Container(
-                width: 76,
-                height: 76,
+                width: 82,
+                height: 82,
                 decoration: BoxDecoration(
-                  color: AppleTheme.blue,
-                  borderRadius: BorderRadius.circular(22),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppleTheme.blue, AppleTheme.indigo],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: AppleTheme.blue.withValues(alpha: 0.25),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
+                      color: AppleTheme.blue.withValues(alpha: 0.30),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-                child: const Icon(Icons.pets_rounded, color: Colors.white, size: 38),
+                child: const Icon(Icons.pets_rounded, color: Colors.white, size: 40),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               Text(
-                "Bienvenido a ClinicaApp",
+                "Bienvenido de vuelta",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
-                  fontSize: 26,
+                  fontSize: 27,
                   fontWeight: FontWeight.w800,
                   color: AppleTheme.textPrimary,
-                  letterSpacing: -0.6,
+                  letterSpacing: -0.7,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                "Inicia sesión para gestionar la salud de tu mascota",
+                "Inicia sesión en ClinicaApp para cuidar de tu mascota",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
-                  fontSize: 15,
+                  fontSize: 14.5,
                   color: AppleTheme.textSecondary,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 26),
 
               // Tarjeta blanca de formulario
               AppleCard(
                 padding: const EdgeInsets.all(22),
-                borderRadius: 24,
+                borderRadius: 26,
                 child: Column(
                   children: [
                     AppleTextField(
@@ -195,7 +231,27 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final uri = Uri.parse("${AppConfig.webBaseUrl}/forgot-password");
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        child: Text(
+                          "¿Olvidaste tu contraseña?",
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppleTheme.blue,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
                     AppleButton(
                       text: "Iniciar sesión",
                       isLoading: _loading,
@@ -231,7 +287,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 22),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -250,7 +306,7 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     },
                     child: Text(
-                      "Regístrate aquí",
+                      "Regístrate gratis",
                       style: GoogleFonts.plusJakartaSans(
                         color: AppleTheme.blue,
                         fontSize: 14,

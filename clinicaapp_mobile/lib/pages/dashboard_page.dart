@@ -8,6 +8,7 @@ import '../models/mascota.dart';
 import '../models/recordatorio.dart';
 import '../theme/apple_theme.dart';
 import '../widgets/apple_widgets.dart';
+import 'admin_dashboard_page.dart';
 import 'add_reminder_page.dart';
 import 'appointment_detail_page.dart';
 import 'appointments_page.dart';
@@ -159,6 +160,49 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
               const SizedBox(height: 20),
+
+              if ((AppConfig.userRole ?? '').toUpperCase().contains('ADMIN')) ...[
+                AppleCard(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboardPage())),
+                  padding: const EdgeInsets.all(16),
+                  borderRadius: 20,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppleTheme.indigo, AppleTheme.purple],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(Icons.admin_panel_settings_rounded, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Hub Central Super Admin",
+                              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
+                            ),
+                            Text(
+                              "KPIs, clínicas, usuarios, supervisión y control",
+                              style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.white.withValues(alpha: 0.85)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // Resumen en tarjetas blancas Apple
               Row(
@@ -325,7 +369,12 @@ class _DashboardPageState extends State<DashboardPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const AppleIconBox(icon: Icons.pets_rounded, color: AppleTheme.blue, size: 38, iconSize: 20),
+                                  AppleAvatar(
+                                    imageUrl: pet.fotoUrl,
+                                    fallbackIcon: Icons.pets_rounded,
+                                    color: AppleTheme.blue,
+                                    size: 40,
+                                  ),
                                   AppleBadge(text: pet.especie, color: AppleTheme.teal),
                                 ],
                               ),

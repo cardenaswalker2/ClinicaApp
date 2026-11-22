@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/apple_theme.dart';
 
-class AppleCard extends StatelessWidget {
+class AppleCard extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
@@ -10,6 +11,7 @@ class AppleCard extends StatelessWidget {
   final double borderRadius;
   final Color? color;
   final Border? border;
+  final Gradient? gradient;
 
   const AppleCard({
     super.key,
@@ -17,43 +19,59 @@ class AppleCard extends StatelessWidget {
     this.padding,
     this.margin,
     this.onTap,
-    this.borderRadius = 20,
+    this.borderRadius = 22,
     this.color,
     this.border,
+    this.gradient,
   });
+
+  @override
+  State<AppleCard> createState() => _AppleCardState();
+}
+
+class _AppleCardState extends State<AppleCard> {
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
-      color: color ?? AppleTheme.surface,
-      borderRadius: BorderRadius.circular(borderRadius),
-      border: border ?? Border.all(color: AppleTheme.border, width: 0.8),
+      color: widget.gradient == null ? (widget.color ?? AppleTheme.surface) : null,
+      gradient: widget.gradient,
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      border: widget.border ??
+          (widget.gradient == null
+              ? Border.all(color: AppleTheme.border, width: 0.8)
+              : null),
       boxShadow: AppleTheme.cardShadow,
     );
 
-    final content = Container(
-      margin: margin,
-      decoration: decoration,
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: onTap != null
-            ? InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(borderRadius),
-                child: Padding(
-                  padding: padding ?? const EdgeInsets.all(16),
-                  child: child,
-                ),
-              )
-            : Padding(
-                padding: padding ?? const EdgeInsets.all(16),
-                child: child,
-              ),
+    final card = AnimatedScale(
+      scale: _pressed ? 0.975 : 1.0,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOutCubic,
+      child: Container(
+        margin: widget.margin,
+        decoration: decoration,
+        child: Padding(
+          padding: widget.padding ?? const EdgeInsets.all(16),
+          child: widget.child,
+        ),
       ),
     );
 
-    return content;
+    if (widget.onTap == null) return card;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onTap!();
+      },
+      child: card,
+    );
   }
 }
 
@@ -88,7 +106,12 @@ class AppleButton extends StatelessWidget {
       width: double.infinity,
       height: height,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
+        onPressed: isLoading || onPressed == null
+            ? null
+            : () {
+                HapticFeedback.lightImpact();
+                onPressed!();
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: outlined ? AppleTheme.surface : bg,
           foregroundColor: fg,
@@ -106,10 +129,7 @@ class AppleButton extends StatelessWidget {
             ? SizedBox(
                 width: 22,
                 height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.4,
-                  color: fg,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2.4, color: fg),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -211,6 +231,7 @@ class AppleTextField extends StatelessWidget {
   }
 }
 
+/// Icono con acabado 3D suave estilo iOS App Icon
 class AppleIconBox extends StatelessWidget {
   final IconData icon;
   final Color color;
@@ -231,10 +252,81 @@ class AppleIconBox extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withValues(alpha: 0.18),
+            color.withValues(alpha: 0.08),
+          ],
+        ),
         borderRadius: BorderRadius.circular(size * 0.3),
+        border: Border.all(color: color.withValues(alpha: 0.16), width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Icon(icon, color: color, size: iconSize),
+    );
+  }
+}
+
+/// Avatar que muestra foto real si existe URL, o fallback AppleIconBox
+class AppleAvatar extends StatelessWidget {
+  final String? imageUrl;
+  final IconData fallbackIcon;
+  final Color color;
+  final double size;
+
+  const AppleAvatar({
+    super.key,
+    this.imageUrl,
+    this.fallbackIcon = Icons.pets_rounded,
+    this.color = AppleTheme.blue,
+    this.size = 52,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl != null && imageUrl!.trim().isNotEmpty) {
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size * 0.3),
+          border: Border.all(color: AppleTheme.border, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(size * 0.3),
+          child: Image.network(
+            imageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => AppleIconBox(
+              icon: fallbackIcon,
+              color: color,
+              size: size,
+              iconSize: size * 0.48,
+            ),
+          ),
+        ),
+      );
+    }
+    return AppleIconBox(
+      icon: fallbackIcon,
+      color: color,
+      size: size,
+      iconSize: size * 0.48,
     );
   }
 }
@@ -257,8 +349,8 @@ class AppleBadge extends StatelessWidget {
         text,
         style: GoogleFonts.plusJakartaSans(
           color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -286,14 +378,17 @@ class AppleSectionHeader extends StatelessWidget {
           title,
           style: GoogleFonts.plusJakartaSans(
             fontSize: 19,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w800,
             color: AppleTheme.textPrimary,
             letterSpacing: -0.4,
           ),
         ),
         if (actionText != null && onAction != null)
           GestureDetector(
-            onTap: onAction,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onAction!();
+            },
             child: Text(
               actionText!,
               style: GoogleFonts.plusJakartaSans(

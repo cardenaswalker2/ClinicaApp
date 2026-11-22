@@ -118,4 +118,47 @@ public class ApiAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    @GetMapping("/perfil/{email}")
+    public ResponseEntity<?> getPerfil(@PathVariable String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        if (usuario == null) return ResponseEntity.notFound().build();
+        Map<String, Object> res = new HashMap<>();
+        res.put("id", usuario.getId());
+        res.put("nombre", usuario.getNombre() != null ? usuario.getNombre() : "");
+        res.put("apellido", usuario.getApellido() != null ? usuario.getApellido() : "");
+        res.put("email", usuario.getEmail());
+        res.put("telefono", usuario.getTelefono() != null ? usuario.getTelefono() : "");
+        res.put("direccion", usuario.getDireccion() != null ? usuario.getDireccion() : "");
+        res.put("latitud", usuario.getLatitud());
+        res.put("longitud", usuario.getLongitud());
+        return ResponseEntity.ok(res);
+    }
+
+    @PutMapping("/perfil/{email}")
+    public ResponseEntity<?> updatePerfil(@PathVariable String email, @RequestBody Map<String, Object> payload) {
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        if (usuario == null) return ResponseEntity.notFound().build();
+
+        if (payload.get("nombre") != null) usuario.setNombre(payload.get("nombre").toString().trim());
+        if (payload.get("apellido") != null) usuario.setApellido(payload.get("apellido").toString().trim());
+        if (payload.get("telefono") != null) usuario.setTelefono(payload.get("telefono").toString().trim());
+        if (payload.get("direccion") != null) usuario.setDireccion(payload.get("direccion").toString().trim());
+        if (payload.get("latitud") != null && !payload.get("latitud").toString().isBlank()) {
+            try { usuario.setLatitud(Double.parseDouble(payload.get("latitud").toString())); } catch (Exception ignored) {}
+        }
+        if (payload.get("longitud") != null && !payload.get("longitud").toString().isBlank()) {
+            try { usuario.setLongitud(Double.parseDouble(payload.get("longitud").toString())); } catch (Exception ignored) {}
+        }
+        if (payload.get("password") != null && !payload.get("password").toString().isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(payload.get("password").toString()));
+        }
+
+        usuarioRepository.save(usuario);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", true);
+        res.put("nombre", usuario.getNombre());
+        res.put("apellido", usuario.getApellido());
+        return ResponseEntity.ok(res);
+    }
 }

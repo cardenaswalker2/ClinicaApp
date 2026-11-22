@@ -162,11 +162,11 @@ class _ClinicExplorerPageState extends State<ClinicExplorerPage> {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          const AppleIconBox(
-                            icon: Icons.local_hospital_rounded,
+                          AppleAvatar(
+                            imageUrl: cl.imagenUrl,
+                            fallbackIcon: Icons.local_hospital_rounded,
                             color: AppleTheme.green,
-                            size: 50,
-                            iconSize: 24,
+                            size: 54,
                           ),
                           const SizedBox(width: 14),
                           Expanded(

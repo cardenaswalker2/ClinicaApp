@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/app_config.dart';
 import '../models/pago_usuario.dart';
 import '../theme/apple_theme.dart';
@@ -165,6 +166,15 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: AppleCard(
+                          onTap: () async {
+                            final path = isDone
+                                ? "${AppConfig.webBaseUrl}/usuario/pagos/factura/${p.citaId}/pdf"
+                                : "${AppConfig.webBaseUrl}/usuario/pagos/${p.citaId}";
+                            final uri = Uri.parse(path);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            }
+                          },
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [

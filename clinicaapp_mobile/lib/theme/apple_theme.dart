@@ -5,7 +5,7 @@ class AppleTheme {
   // Colores base iOS / Apple Health
   static const Color bg = Color(0xFFF2F2F7);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceSecondary = Color(0xFFF9F9FB);
+  static const Color surfaceSecondary = Color(0xFFF8F9FC);
   static const Color border = Color(0xFFE5E5EA);
   static const Color divider = Color(0xFFEAEAEF);
 
@@ -16,6 +16,7 @@ class AppleTheme {
 
   // Acentos oficiales iOS
   static const Color blue = Color(0xFF007AFF);
+  static const Color blueDeep = Color(0xFF0055D4);
   static const Color indigo = Color(0xFF5856D6);
   static const Color purple = Color(0xFFAF52DE);
   static const Color green = Color(0xFF34C759);
@@ -26,12 +27,12 @@ class AppleTheme {
   static List<BoxShadow> get cardShadow => [
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.045),
-          blurRadius: 18,
-          offset: const Offset(0, 6),
+          blurRadius: 20,
+          offset: const Offset(0, 8),
         ),
         BoxShadow(
           color: Colors.black.withValues(alpha: 0.02),
-          blurRadius: 4,
+          blurRadius: 5,
           offset: const Offset(0, 1),
         ),
       ];
@@ -45,6 +46,12 @@ class AppleTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: bg,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       colorScheme: ColorScheme.fromSeed(
         seedColor: blue,
         brightness: Brightness.light,
@@ -58,7 +65,7 @@ class AppleTheme {
         displayColor: textPrimary,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: bg.withValues(alpha: 0.92),
+        backgroundColor: bg.withValues(alpha: 0.94),
         foregroundColor: textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -74,7 +81,7 @@ class AppleTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           side: const BorderSide(color: border, width: 0.8),
         ),
       ),

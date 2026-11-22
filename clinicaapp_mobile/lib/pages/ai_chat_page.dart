@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../theme/apple_theme.dart';
+import '../widgets/apple_widgets.dart';
 
 class AIChatPage extends StatefulWidget {
   const AIChatPage({super.key});
@@ -156,6 +157,21 @@ class _AIChatPageState extends State<AIChatPage> {
                       ),
                     ],
                   ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: "Nueva conversación",
+                    icon: const Icon(Icons.refresh_rounded, color: AppleTheme.textSecondary),
+                    onPressed: () {
+                      setState(() {
+                        _messages
+                          ..clear()
+                          ..add({
+                            "role": "ai",
+                            "content": "¡Hola! Soy Nova AI, tu asistente veterinario de ClinicaApp. ¿En qué puedo ayudarte hoy?"
+                          });
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -268,6 +284,47 @@ class _AIChatPageState extends State<AIChatPage> {
                           hintStyle: GoogleFonts.plusJakartaSans(color: AppleTheme.textTertiary),
                           border: InputBorder.none,
                         ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: AppleTheme.surface,
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+                          builder: (ctx) => Padding(
+                            padding: const EdgeInsets.all(22),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const AppleIconBox(icon: Icons.mic_rounded, color: AppleTheme.purple, size: 60, iconSize: 30),
+                                const SizedBox(height: 12),
+                                Text("Comandos Rápidos de Voz", style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.w800)),
+                                const SizedBox(height: 12),
+                                ...["¿Qué clínica está abierta ahora?", "¿Cómo agendo una cita de urgencia?", "Muéstrame mis citas"].map(
+                                  (cmd) => ListTile(
+                                    leading: const Icon(Icons.graphic_eq_rounded, color: AppleTheme.purple),
+                                    title: Text(cmd, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600)),
+                                    onTap: () {
+                                      Navigator.pop(ctx);
+                                      _sendMessage(cmd);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: AppleTheme.purple.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.mic_rounded, color: AppleTheme.purple, size: 19),
                       ),
                     ),
                     GestureDetector(

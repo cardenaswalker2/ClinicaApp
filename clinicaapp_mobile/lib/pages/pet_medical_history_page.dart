@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../config/app_config.dart';
 import '../models/historial_visita.dart';
 import '../models/mascota.dart';
@@ -95,6 +96,18 @@ class _PetMedicalHistoryPageState extends State<PetMedicalHistoryPage> {
                         AppleBadge(text: "${_visitas.length} visitas", color: AppleTheme.green),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 14),
+                  AppleButton(
+                    text: "Descargar Historial en PDF",
+                    icon: Icons.picture_as_pdf_rounded,
+                    outlined: true,
+                    onPressed: () async {
+                      final uri = Uri.parse("${AppConfig.webBaseUrl}/usuario/historial/${widget.mascota.id}/pdf");
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
                   ),
                   const SizedBox(height: 22),
 

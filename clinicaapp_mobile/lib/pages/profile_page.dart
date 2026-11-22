@@ -2,16 +2,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import '../config/app_config.dart';
 import '../theme/apple_theme.dart';
 import '../widgets/apple_widgets.dart';
 import 'admin_dashboard_page.dart';
 import 'appointments_page.dart';
 import 'clinic_optimization_page.dart';
+import 'community_page.dart';
 import 'login_page.dart';
 import 'my_pets_page.dart';
 import 'notifications_page.dart';
 import 'payments_page.dart';
+import 'pet_quiz_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -55,15 +58,97 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _logout() {
-    AppConfig.userEmail = null;
-    AppConfig.userName = null;
-    AppConfig.userId = null;
-    AppConfig.userRole = null;
+  Future<void> _logout() async {
+    await AppConfig.clearSession();
+    if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginPage()),
       (route) => false,
+    );
+  }
+
+  Future<void> _editProfileDialog() async {
+    final nameCtrl = TextEditingController(text: AppConfig.userName ?? '');
+    final lastCtrl = TextEditingController();
+    final phoneCtrl = TextEditingController();
+    final dirCtrl = TextEditingController();
+    final passCtrl = TextEditingController();
+
+    try {
+      final res = await http.get(Uri.parse("${AppConfig.baseUrl}/auth/perfil/${AppConfig.userEmail}"));
+      if (res.statusCode == 200) {
+        final d = json.decode(res.body);
+        nameCtrl.text = d['nombre'] ?? nameCtrl.text;
+        lastCtrl.text = d['apellido'] ?? '';
+        phoneCtrl.text = d['telefono'] ?? '';
+        dirCtrl.text = d['direccion'] ?? '';
+      }
+    } catch (_) {}
+
+    if (!mounted) return;
+    bool saving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppleTheme.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModal) => Padding(
+          padding: EdgeInsets.fromLTRB(22, 20, 22, MediaQuery.of(ctx).viewInsets.bottom + 24),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Editar Perfil", style: GoogleFonts.plusJakartaSans(fontSize: 20, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 14),
+                AppleTextField(controller: nameCtrl, label: "Nombre *", prefixIcon: Icons.person_outline_rounded),
+                const SizedBox(height: 10),
+                AppleTextField(controller: lastCtrl, label: "Apellido", prefixIcon: Icons.badge_outlined),
+                const SizedBox(height: 10),
+                AppleTextField(controller: phoneCtrl, label: "Teléfono", prefixIcon: Icons.phone_outlined, keyboardType: TextInputType.phone),
+                const SizedBox(height: 10),
+                AppleTextField(controller: dirCtrl, label: "Dirección", prefixIcon: Icons.location_on_outlined),
+                const SizedBox(height: 10),
+                AppleTextField(controller: passCtrl, label: "Nueva contraseña (opcional)", prefixIcon: Icons.lock_outline_rounded, obscureText: true),
+                const SizedBox(height: 18),
+                AppleButton(
+                  text: "Guardar en Servidor",
+                  isLoading: saving,
+                  onPressed: () async {
+                    if (nameCtrl.text.trim().isEmpty) return;
+                    setModal(() => saving = true);
+                    try {
+                      final res = await http.put(
+                        Uri.parse("${AppConfig.baseUrl}/auth/perfil/${AppConfig.userEmail}"),
+                        headers: {"Content-Type": "application/json"},
+                        body: json.encode({
+                          "nombre": nameCtrl.text.trim(),
+                          "apellido": lastCtrl.text.trim(),
+                          "telefono": phoneCtrl.text.trim(),
+                          "direccion": dirCtrl.text.trim(),
+                          if (passCtrl.text.isNotEmpty) "password": passCtrl.text,
+                        }),
+                      );
+                      if (res.statusCode == 200) {
+                        setState(() => AppConfig.userName = nameCtrl.text.trim());
+                        await AppConfig.saveSession();
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Perfil actualizado en MongoDB")));
+                        }
+                      }
+                    } catch (_) {}
+                    if (ctx.mounted) setModal(() => saving = false);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -212,6 +297,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   children: [
                     _SettingsRow(
+                      icon: Icons.person_outline_rounded,
+                      color: AppleTheme.blue,
+                      title: "Editar Perfil",
+                      onTap: _editProfileDialog,
+                    ),
+                    const Divider(height: 1, indent: 64),
+                    _SettingsRow(
                       icon: Icons.pets_rounded,
                       color: AppleTheme.blue,
                       title: "Mis Mascotas",
@@ -219,9 +311,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const Divider(height: 1, indent: 64),
                     _SettingsRow(
+                      icon: Icons.favorite_rounded,
+                      color: AppleTheme.red,
+                      title: "Comunidad Pet & Adopciones",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityPage())),
+                    ),
+                    const Divider(height: 1, indent: 64),
+                    _SettingsRow(
+                      icon: Icons.sports_esports_rounded,
+                      color: AppleTheme.teal,
+                      title: "Mascota Virtual & Quiz",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PetQuizPage())),
+                    ),
+                    const Divider(height: 1, indent: 64),
+                    _SettingsRow(
                       icon: Icons.receipt_long_rounded,
                       color: AppleTheme.indigo,
-                      title: "Historial de Pagos",
+                      title: "Historial de Pagos y Facturas",
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsPage())),
                     ),
                     const Divider(height: 1, indent: 64),
@@ -245,6 +351,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: AppleTheme.purple,
                         title: "Panel de Administración",
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboardPage())),
+                      ),
+                      const Divider(height: 1, indent: 64),
+                      _SettingsRow(
+                        icon: Icons.bar_chart_rounded,
+                        color: AppleTheme.blue,
+                        title: "Dashboard Power BI en Vivo",
+                        onTap: () async {
+                          final uri = Uri.parse("https://app.powerbi.com/view?r=eyJrIjoiMDliOWRjMWItNGFlMy00MDVjLTg2ZTUtZDFjZWE1MWU3OGYzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9");
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          }
+                        },
                       ),
                     ],
                   ],

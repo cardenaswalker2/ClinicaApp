@@ -191,7 +191,12 @@ class _MyPetsPageState extends State<MyPetsPage> {
                               children: [
                                 Row(
                                   children: [
-                                    const AppleIconBox(icon: Icons.pets_rounded, color: AppleTheme.blue, size: 52, iconSize: 26),
+                                    AppleAvatar(
+                                      imageUrl: pet.fotoUrl,
+                                      fallbackIcon: Icons.pets_rounded,
+                                      color: AppleTheme.blue,
+                                      size: 54,
+                                    ),
                                     const SizedBox(width: 14),
                                     Expanded(
                                       child: Column(
