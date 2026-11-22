@@ -1,29 +1,25 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:math' as math;
-import 'dart:ui';
 import '../config/app_config.dart';
-import '../models/recordatorio.dart';
-import '../models/mascota.dart';
 import '../models/cita.dart';
-import 'pet_detail_page.dart';
+import '../models/mascota.dart';
+import '../models/recordatorio.dart';
+import '../theme/apple_theme.dart';
+import '../widgets/apple_widgets.dart';
 import 'add_reminder_page.dart';
 import 'appointment_detail_page.dart';
-import 'notifications_page.dart';
 import 'appointments_page.dart';
 import 'clinic_explorer_page.dart';
-import 'sos_page.dart';
-import 'reminder_detail_page.dart';
-import 'my_pets_page.dart';
-import 'payments_page.dart';
 import 'clinic_optimization_page.dart';
-
-// ============================================================
-// DASHBOARD PAGE - LUXURY AURORA EDITION
-// Lógica de fetch y navegación 100% preservada
-// ============================================================
+import 'my_pets_page.dart';
+import 'notifications_page.dart';
+import 'payments_page.dart';
+import 'pet_detail_page.dart';
+import 'reminder_detail_page.dart';
+import 'shop_page.dart';
+import 'sos_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -32,1207 +28,582 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
-    with TickerProviderStateMixin {
-  // ═══════════════════════════════════════════════════════════
-  // CONTROLLERS & STATE - LÓGICA ORIGINAL PRESERVADA
-  // ═══════════════════════════════════════════════════════════
-  late AnimationController _aurora;
+class _DashboardPageState extends State<DashboardPage> {
   List<Recordatorio> _recs = [];
   List<Mascota> _pets = [];
   List<Cita> _citas = [];
   int _unreadNotifs = 0;
   bool _loading = true;
 
-  // ── Animaciones adicionales ──
-  late AnimationController _floatController;
-  late AnimationController _pulseController;
-  late AnimationController _slideController;
-  late AnimationController _glowController;
-
-  // ── Colores Luxury Aurora ──
-  static const Color _auroraBase = Color(0xFF0EA5E9);
-  static const Color _auroraDeep = Color(0xFF0284C7);
-  static const Color _auroraGlow = Color(0xFF38BDF8);
-  static const Color _bgDark = Color(0xFF020617);
-  static const Color _surfaceDark = Color(0xFF0F172A);
-
   @override
   void initState() {
     super.initState();
-    // ── Lógica original preservada ──
-    _aurora = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat();
-
-    // ── Nuevas animaciones ──
-    _floatController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat(reverse: true);
-
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-
-    _slideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..forward();
-
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
     _fetch();
   }
-
-  // ═══════════════════════════════════════════════════════════
-  // FETCH - LÓGICA ORIGINAL 100% PRESERVADA
-  // ═══════════════════════════════════════════════════════════
 
   Future<void> _fetch() async {
     if (!mounted) return;
     setState(() => _loading = true);
     try {
-      final rRes = await http.get(
-        Uri.parse("${AppConfig.baseUrl}/recordatorios/usuario/${AppConfig.userEmail}"),
-      );
-      final pRes = await http.get(
-        Uri.parse("${AppConfig.baseUrl}/mascotas/usuario/${AppConfig.userEmail}"),
-      );
-      final cRes = await http.get(
-        Uri.parse("${AppConfig.baseUrl}/citas/usuario/${AppConfig.userEmail}"),
-      );
+      final email = AppConfig.userEmail ?? '';
+      final rRes = await http.get(Uri.parse("${AppConfig.baseUrl}/recordatorios/usuario/$email"));
+      final pRes = await http.get(Uri.parse("${AppConfig.baseUrl}/mascotas/usuario/$email"));
+      final cRes = await http.get(Uri.parse("${AppConfig.baseUrl}/citas/usuario/$email"));
+
+      int unreadCount = 0;
+      try {
+        final nRes = await http.get(Uri.parse("${AppConfig.baseUrl}/notificaciones/usuario/$email/count"));
+        unreadCount = int.tryParse(nRes.body) ?? 0;
+      } catch (_) {}
 
       if (mounted) {
-        int unreadCount = 0;
-        try {
-          final nRes = await http.get(Uri.parse("${AppConfig.baseUrl}/notificaciones/usuario/${AppConfig.userEmail}/count"));
-          unreadCount = int.parse(nRes.body);
-        } catch (_) {}
-
         setState(() {
-          _recs = (json.decode(rRes.body) as List)
-              .map((e) => Recordatorio.fromJson(e))
-              .toList();
-          _pets = (json.decode(pRes.body) as List)
-              .map((e) => Mascota.fromJson(e))
-              .toList();
-          _citas = (json.decode(cRes.body) as List)
-              .map((e) => Cita.fromJson(e))
-              .toList();
-          
+          if (rRes.statusCode == 200) {
+            _recs = (json.decode(rRes.body) as List).map((e) => Recordatorio.fromJson(e)).toList();
+          }
+          if (pRes.statusCode == 200) {
+            _pets = (json.decode(pRes.body) as List).map((e) => Mascota.fromJson(e)).toList();
+          }
+          if (cRes.statusCode == 200) {
+            _citas = (json.decode(cRes.body) as List).map((e) => Cita.fromJson(e)).toList();
+          }
           _unreadNotifs = unreadCount;
           _loading = false;
         });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   @override
-  void dispose() {
-    _aurora.dispose();
-    _floatController.dispose();
-    _pulseController.dispose();
-    _slideController.dispose();
-    _glowController.dispose();
-    super.dispose();
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // BUILD PRINCIPAL
-  // ═══════════════════════════════════════════════════════════
-
-  @override
   Widget build(BuildContext context) {
+    final userName = (AppConfig.userName ?? 'Usuario').split(' ').first;
+
     return Scaffold(
-      backgroundColor: _bgDark,
-      body: Stack(
-        children: [
-          // ── Fondo Aurora Animado ──
-          _buildBackground(),
-          // ── Orbes flotantes ──
-          _buildFloatingOrbs(),
-          // ── Contenido Principal ──
-          SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _fetch,
-              color: _auroraBase,
-              backgroundColor: _surfaceDark,
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+      backgroundColor: AppleTheme.bg,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _fetch,
+          color: AppleTheme.blue,
+          backgroundColor: AppleTheme.surface,
+          child: ListView(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 110),
+            children: [
+              // Header estilo Apple Health
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(height: 16),
-                  // ── Header con perfil ──
-                  _buildHeader(),
-                  const SizedBox(height: 28),
-                  // ── Banner de bienvenida ──
-                  _buildWelcomeBanner(),
-                  const SizedBox(height: 32),
-                  // ── Acciones rápidas ──
-                  _buildQuickActions(),
-                  const SizedBox(height: 32),
-                  // ── Sección Mis Mascotas ──
-                  _buildSectionHeader("Mis Mascotas", "${_pets.length}"),
-                  const SizedBox(height: 16),
-                  _buildPetsList(),
-                  const SizedBox(height: 32),
-                  // ── Próxima Cita ──
-                  if (_citas.isNotEmpty) ...[
-                    _buildSectionHeader("Próxima Cita", ""),
-                    const SizedBox(height: 16),
-                    _buildNextAppointment(_citas.first),
-                    const SizedBox(height: 32),
-                  ],
-                  // ── Avisos Recientes ──
-                  _buildSectionHeader("Avisos Recientes", "${_recs.length}"),
-                  const SizedBox(height: 16),
-                  ..._recs.take(3).map((r) => _recItem(r)),
-                  const SizedBox(height: 32),
-                  // ── Tip de Salud ──
-                  _buildHealthTip(),
-                  const SizedBox(height: 120),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // FONDO AURORA ANIMADO
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildBackground() {
-    return Stack(
-      children: [
-        AnimatedBuilder(
-          animation: _aurora,
-          builder: (context, child) {
-            return Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF0F172A),
-                    HSLColor.fromAHSL(
-                      1.0,
-                      (_aurora.value * 360),
-                      0.6,
-                      0.15,
-                    ).toColor(),
-                    const Color(0xFF020617),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-          child: Container(color: Colors.transparent),
-        ),
-      ],
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // ORBES FLOTANTES
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildFloatingOrbs() {
-    return Stack(
-      children: [
-        _buildOrb(
-          top: -100,
-          left: -80,
-          size: 400,
-          color: _auroraBase.withOpacity(0.03),
-          blur: 80,
-        ),
-        _buildOrb(
-          bottom: 100,
-          right: -100,
-          size: 350,
-          color: const Color(0xFF818CF8).withOpacity(0.02),
-          blur: 100,
-        ),
-        _buildOrb(
-          top: 300,
-          right: -80,
-          size: 200,
-          color: _auroraGlow.withOpacity(0.02),
-          blur: 60,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrb({
-    double? top,
-    double? left,
-    double? right,
-    double? bottom,
-    required double size,
-    required Color color,
-    required double blur,
-  }) {
-    return Positioned(
-      top: top,
-      left: left,
-      right: right,
-      bottom: bottom,
-      child: AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(
-              math.sin(_floatController.value * math.pi) * 15,
-              math.cos(_floatController.value * math.pi) * 20,
-            ),
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [color, color.withOpacity(0.0)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: color,
-                    blurRadius: blur,
-                    spreadRadius: size * 0.1,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hola, $userName",
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: AppleTheme.textPrimary,
+                          letterSpacing: -0.7,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "Resumen de bienestar animal",
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          color: AppleTheme.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      _HeaderIconBtn(
+                        icon: Icons.sos_rounded,
+                        color: AppleTheme.red,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SOSPage())),
+                      ),
+                      const SizedBox(width: 10),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          _HeaderIconBtn(
+                            icon: Icons.notifications_none_rounded,
+                            color: AppleTheme.textPrimary,
+                            onTap: () async {
+                              await Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsPage()));
+                              _fetch();
+                            },
+                          ),
+                          if (_unreadNotifs > 0)
+                            Positioned(
+                              right: -2,
+                              top: -2,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppleTheme.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  "$_unreadNotifs",
+                                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+              const SizedBox(height: 20),
 
-  // ═══════════════════════════════════════════════════════════
-  // HEADER CON PERFIL Y NOTIFICACIONES
-  // ═══════════════════════════════════════════════════════════
+              // Resumen en tarjetas blancas Apple
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      label: "Mascotas",
+                      value: "${_pets.length}",
+                      icon: Icons.pets_rounded,
+                      color: AppleTheme.blue,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyPetsPage())).then((_) => _fetch()),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatCard(
+                      label: "Citas",
+                      value: "${_citas.length}",
+                      icon: Icons.calendar_month_rounded,
+                      color: AppleTheme.orange,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentsPage())).then((_) => _fetch()),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatCard(
+                      label: "Alertas",
+                      value: "${_recs.length}",
+                      icon: Icons.notifications_active_rounded,
+                      color: AppleTheme.green,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddReminderPage())).then((_) => _fetch()),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 22),
 
-  Widget _buildHeader() {
-    return AnimatedBuilder(
-      animation: _slideController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, -20 * (1 - _slideController.value)),
-          child: Opacity(
-            opacity: _slideController.value,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // ── Saludo y nombre ──
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Banner Optimizador PLEB estilo Apple
+              AppleCard(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClinicOptimizationPage())),
+                padding: const EdgeInsets.all(18),
+                borderRadius: 22,
+                child: Row(
                   children: [
-                    Text(
-                      "Hola de nuevo,",
-                      style: GoogleFonts.outfit(
-                        color: Colors.white60,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                    const AppleIconBox(icon: Icons.near_me_rounded, color: AppleTheme.blue, size: 50, iconSize: 25),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const AppleBadge(text: "Optimización PLEB", color: AppleTheme.blue),
+                          const SizedBox(height: 6),
+                          Text(
+                            "Clínica más cercana",
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppleTheme.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            "Calcula la sede abierta óptima desde tu GPS",
+                            style: GoogleFonts.plusJakartaSans(fontSize: 12.5, color: AppleTheme.textSecondary),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppConfig.userName ?? "Usuario",
-                      style: GoogleFonts.outfit(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
+                    const Icon(Icons.chevron_right_rounded, color: AppleTheme.textTertiary),
                   ],
                 ),
-                // ── Botón notificaciones con badge ──
-                Stack(
-                  children: [
-                    _buildGlassButton(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (c) => const NotificationsPage()),
-                        ).then((_) => _fetch());
-                      },
-                      child: const Icon(
-                        Icons.notifications_none_rounded,
-                        color: Colors.white,
-                        size: 24,
+              ),
+              const SizedBox(height: 22),
+
+              // Accesos Rápidos
+              const AppleSectionHeader(title: "Accesos Rápidos"),
+              const SizedBox(height: 12),
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.55,
+                children: [
+                  _QuickActionTile(
+                    title: "Mis Mascotas",
+                    subtitle: "Perfiles e historial",
+                    icon: Icons.pets_rounded,
+                    color: AppleTheme.blue,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyPetsPage())).then((_) => _fetch()),
+                  ),
+                  _QuickActionTile(
+                    title: "Explorar Clínicas",
+                    subtitle: "Red veterinaria",
+                    icon: Icons.local_hospital_rounded,
+                    color: AppleTheme.green,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClinicExplorerPage())),
+                  ),
+                  _QuickActionTile(
+                    title: "Mis Pagos",
+                    subtitle: "Facturas y Stripe",
+                    icon: Icons.receipt_long_rounded,
+                    color: AppleTheme.indigo,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsPage())),
+                  ),
+                  _QuickActionTile(
+                    title: "Tienda Pet",
+                    subtitle: "Productos y salud",
+                    icon: Icons.shopping_bag_rounded,
+                    color: AppleTheme.purple,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPage())),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Mis Mascotas
+              AppleSectionHeader(
+                title: "Mis Mascotas",
+                actionText: "Ver todas",
+                onAction: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyPetsPage())).then((_) => _fetch()),
+              ),
+              const SizedBox(height: 12),
+              if (_loading)
+                const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppleTheme.blue)))
+              else if (_pets.isEmpty)
+                AppleCard(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyPetsPage())).then((_) => _fetch()),
+                  child: Row(
+                    children: [
+                      const AppleIconBox(icon: Icons.add_circle_outline_rounded, color: AppleTheme.blue),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Text(
+                          "Aún no tienes mascotas registradas. Toca para agregar una.",
+                          style: GoogleFonts.plusJakartaSans(fontSize: 13.5, color: AppleTheme.textSecondary),
+                        ),
                       ),
-                    ),
-                    if (_unreadNotifs > 0)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: AnimatedBuilder(
-                          animation: _pulseController,
-                          builder: (context, child) {
-                            return Container(
-                              width: 12,
-                              height: 12,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.redAccent.withOpacity(
-                                      0.4 + _pulseController.value * 0.4,
+                    ],
+                  ),
+                )
+              else
+                SizedBox(
+                  height: 130,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: _pets.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final pet = _pets[index];
+                      return SizedBox(
+                        width: 160,
+                        child: AppleCard(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => PetDetailPage(mascota: pet)),
+                          ).then((_) => _fetch()),
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const AppleIconBox(icon: Icons.pets_rounded, color: AppleTheme.blue, size: 38, iconSize: 20),
+                                  AppleBadge(text: pet.especie, color: AppleTheme.teal),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    pet.nombre,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppleTheme.textPrimary,
                                     ),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
+                                  ),
+                                  Text(
+                                    pet.raza,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 12,
+                                      color: AppleTheme.textSecondary,
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: Text(
-                                _unreadNotifs > 9 ? "9+" : "$_unreadNotifs",
-                                style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          },
+                            ],
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // BANNER DE BIENVENIDA CON GLASSMORPHISM
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildWelcomeBanner() {
-    return AnimatedBuilder(
-      animation: _slideController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, 30 * (1 - _slideController.value)),
-          child: Opacity(
-            opacity: _slideController.value,
-            child: _buildGlassContainer(
-              width: double.infinity,
-              borderRadius: 28,
-              borderColor: Colors.white.withOpacity(0.06),
-              child: Stack(
-                children: [
-                  // ── Icono decorativo de fondo ──
-                  Positioned(
-                    right: -30,
-                    bottom: -30,
-                    child: Icon(
-                      Icons.pets_rounded,
-                      size: 160,
-                      color: Colors.white.withOpacity(0.03),
-                    ),
+                      );
+                    },
                   ),
-                  // ── Orbe decorativo ──
-                  Positioned(
-                    right: 20,
-                    top: 20,
-                    child: AnimatedBuilder(
-                      animation: _glowController,
-                      builder: (context, child) {
-                        return Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                _auroraBase.withOpacity(
-                                  0.1 + _glowController.value * 0.1,
+                ),
+              const SizedBox(height: 24),
+
+              // Próximas Citas
+              AppleSectionHeader(
+                title: "Próximas Citas",
+                actionText: "Ver todas",
+                onAction: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentsPage())).then((_) => _fetch()),
+              ),
+              const SizedBox(height: 12),
+              if (_citas.isEmpty && !_loading)
+                AppleCard(
+                  child: Text(
+                    "No tienes citas programadas por ahora.",
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppleTheme.textSecondary),
+                  ),
+                )
+              else
+                ..._citas.take(3).map((cita) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: AppleCard(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => AppointmentDetailPage(cita: cita)),
+                      ).then((_) => _fetch()),
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: [
+                          const AppleIconBox(icon: Icons.event_available_rounded, color: AppleTheme.orange),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  cita.motivo.isNotEmpty ? cita.motivo : "Consulta Veterinaria",
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppleTheme.textPrimary,
+                                  ),
                                 ),
-                                Colors.transparent,
+                                const SizedBox(height: 2),
+                                Text(
+                                  "${cita.mascotaNombre ?? 'Mascota'} • ${cita.fechaHora}",
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 12.5,
+                                    color: AppleTheme.textSecondary,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                  // ── Contenido ──
-                  Padding(
-                    padding: const EdgeInsets.all(28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [_auroraBase, _auroraGlow],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                "NOVA AI",
-                                style: GoogleFonts.outfit(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          "¡Nova te saluda! 🤖",
-                          style: GoogleFonts.outfit(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Hoy es un gran día para cuidar a tus peluditos. Revisa tus pendientes abajo.",
-                          style: GoogleFonts.outfit(
-                            color: Colors.white60,
-                            fontSize: 14,
-                            height: 1.5,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // ACCIONES RÁPIDAS CON ANIMACIONES
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildQuickActions() {
-    final actions = [
-      {
-        "icon": Icons.pets_rounded,
-        "label": "Mascotas",
-        "color": _auroraBase,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const MyPetsPage()),
-        ).then((_) => _fetch()),
-      },
-      {
-        "icon": Icons.calendar_month_rounded,
-        "label": "Citas",
-        "color": Colors.blueAccent,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const AppointmentsPage()),
-        ).then((_) => _fetch()),
-      },
-      {
-        "icon": Icons.calculate_rounded,
-        "label": "PLEB Óptimo",
-        "color": Colors.greenAccent,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const ClinicOptimizationPage()),
-        ),
-      },
-      {
-        "icon": Icons.payments_rounded,
-        "label": "Pagos",
-        "color": Colors.purpleAccent,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const PaymentsPage()),
-        ),
-      },
-      {
-        "icon": Icons.emergency_rounded,
-        "label": "SOS",
-        "color": Colors.redAccent,
-        "onTap": () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (c) => const SOSPage()),
-        ),
-      },
-    ];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: actions.asMap().entries.map((entry) {
-        final index = entry.key;
-        final action = entry.value;
-        return _buildActionButton(
-          icon: action["icon"] as IconData,
-          label: action["label"] as String,
-          color: action["color"] as Color,
-          onTap: action["onTap"] as VoidCallback,
-          delay: index * 100,
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-    required int delay,
-  }) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 600 + delay),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 20 * (1 - value)),
-          child: Opacity(
-            opacity: value,
-            child: Column(
-              children: [
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: onTap,
-                    borderRadius: BorderRadius.circular(22),
-                    splashColor: color.withOpacity(0.2),
-                    highlightColor: color.withOpacity(0.1),
-                    child: _buildGlassContainer(
-                      width: 68,
-                      height: 68,
-                      borderRadius: 22,
-                      borderColor: color.withOpacity(0.25),
-                      child: AnimatedBuilder(
-                        animation: _floatController,
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: Offset(
-                              0,
-                              -2 * math.sin(_floatController.value * math.pi),
-                            ),
-                            child: Icon(
-                              icon,
-                              color: color,
-                              size: 28,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  label,
-                  style: GoogleFonts.outfit(
-                    color: Colors.white60,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // HEADER DE SECCIÓN
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildSectionHeader(String title, String count) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 4,
-              height: 20,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [_auroraBase, _auroraGlow],
-                ),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: GoogleFonts.outfit(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: -0.3,
-              ),
-            ),
-          ],
-        ),
-        if (count.isNotEmpty)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.08),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              count,
-              style: GoogleFonts.outfit(
-                color: Colors.white60,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // LISTA DE MASCOTAS CON ANIMACIONES
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildPetsList() {
-    if (_loading) {
-      return SizedBox(
-        height: 120,
-        child: Center(
-          child: CircularProgressIndicator(
-            color: _auroraBase,
-            strokeWidth: 2.5,
-          ),
-        ),
-      );
-    }
-
-    if (_pets.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.pets_rounded,
-        message: "No tienes mascotas registradas",
-      );
-    }
-
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        itemCount: _pets.length,
-        itemBuilder: (context, index) {
-          return TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 500 + index * 100),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) {
-              return Transform.translate(
-                offset: Offset(20 * (1 - value), 0),
-                child: Opacity(
-                  opacity: value,
-                  child: _petItem(_pets[index]),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _petItem(Mascota m) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (c) => PetDetailPage(mascota: m),
-            ),
-          ),
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            children: [
-              AnimatedBuilder(
-                animation: _floatController,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(
-                      0,
-                      -3 * math.sin(_floatController.value * math.pi),
-                    ),
-                    child: Container(
-                      width: 76,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: _auroraBase.withOpacity(0.4),
-                          width: 2.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _auroraBase.withOpacity(0.15),
-                            blurRadius: 20,
-                            spreadRadius: 2,
+                          AppleBadge(
+                            text: cita.estado,
+                            color: cita.estado.toUpperCase().contains("COMP") ? AppleTheme.green : AppleTheme.blue,
                           ),
                         ],
-                        image: m.fotoUrl.isNotEmpty
-                            ? DecorationImage(
-                                image: NetworkImage(m.fotoUrl),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
                       ),
-                      child: m.fotoUrl.isEmpty
-                          ? const Icon(
-                              Icons.pets_rounded,
-                              color: Colors.white24,
-                              size: 32,
-                            )
-                          : null,
                     ),
                   );
-                },
+                }),
+
+              const SizedBox(height: 22),
+
+              // Recordatorios
+              AppleSectionHeader(
+                title: "Recordatorios",
+                actionText: "+ Nuevo",
+                onAction: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddReminderPage())).then((_) => _fetch()),
               ),
-              const SizedBox(height: 10),
-              Text(
-                m.nombre,
-                style: GoogleFonts.outfit(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              const SizedBox(height: 12),
+              if (_recs.isEmpty && !_loading)
+                AppleCard(
+                  child: Text(
+                    "Sin recordatorios pendientes.",
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppleTheme.textSecondary),
+                  ),
+                )
+              else
+                ..._recs.take(4).map((rec) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: AppleCard(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ReminderDetailPage(recordatorio: rec)),
+                      ).then((_) => _fetch()),
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: [
+                          const AppleIconBox(icon: Icons.alarm_rounded, color: AppleTheme.green),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  rec.titulo,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppleTheme.textPrimary,
+                                  ),
+                                ),
+                                Text(
+                                  rec.fechaHora,
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12.5, color: AppleTheme.textSecondary),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded, color: AppleTheme.textTertiary),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  // ═══════════════════════════════════════════════════════════
-  // PRÓXIMA CITA CON DISEÑO PREMIUM
-  // ═══════════════════════════════════════════════════════════
+class _HeaderIconBtn extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 
-  Widget _buildNextAppointment(Cita cita) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (c) => AppointmentDetailPage(cita: cita),
-          ),
-        ),
-        borderRadius: BorderRadius.circular(28),
-        child: _buildGlassContainer(
-          width: double.infinity,
-          borderRadius: 28,
-          borderColor: _auroraBase.withOpacity(0.15),
-          child: Padding(
-            padding: const EdgeInsets.all(22),
-            child: Row(
-              children: [
-                // ── Icono con fondo ──
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        _auroraBase.withOpacity(0.15),
-                        _auroraBase.withOpacity(0.05),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: _auroraBase.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.event_available_rounded,
-                    color: _auroraBase,
-                    size: 26,
-                  ),
-                ),
-                const SizedBox(width: 18),
-                // ── Info ──
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        cita.motivo.isEmpty ? "Cita Médica" : cita.motivo,
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today_rounded,
-                            size: 13,
-                            color: Colors.white.withOpacity(0.40),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            cita.fechaHora.split('T')[0],
-                            style: GoogleFonts.outfit(
-                              color: Colors.white.withOpacity(0.50),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // ── Flecha ──
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white30,
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+  const _HeaderIconBtn({required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppleCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(10),
+      borderRadius: 14,
+      child: Icon(icon, color: color, size: 22),
     );
   }
+}
 
-  // ═══════════════════════════════════════════════════════════
-  // ITEM DE RECORDATORIO CON ANIMACIÓN
-  // ═══════════════════════════════════════════════════════════
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 
-  Widget _recItem(Recordatorio r) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: _buildGlassContainer(
-        width: double.infinity,
-        borderRadius: 24,
-        borderColor: Colors.white.withOpacity(0.04),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (c) => ReminderDetailPage(recordatorio: r),
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(24),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                children: [
-                  // ── Avatar con icono ──
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          _getReminderColor(r.tipo).withOpacity(0.15),
-                          _getReminderColor(r.tipo).withOpacity(0.05),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      r.tipo == 'SMS'
-                          ? Icons.sms_rounded
-                          : Icons.email_rounded,
-                      color: _getReminderColor(r.tipo),
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // ── Texto ──
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          r.titulo,
-                          style: GoogleFonts.outfit(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          r.descripcion,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.outfit(
-                            color: Colors.white.withOpacity(0.40),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // ── Flecha ──
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 14,
-                    color: Colors.white10,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
 
-  Color _getReminderColor(String tipo) {
-    switch (tipo) {
-      case 'SMS':
-        return Colors.indigoAccent;
-      case 'EMAIL':
-        return Colors.blueAccent;
-      default:
-        return Colors.purpleAccent;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // TIP DE SALUD CON DISEÑO PREMIUM
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildHealthTip() {
-    return _buildGlassContainer(
-      width: double.infinity,
-      borderRadius: 28,
-      borderColor: Colors.greenAccent.withOpacity(0.15),
-      child: Stack(
+  @override
+  Widget build(BuildContext context) {
+    return AppleCard(
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      borderRadius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Decoración de fondo ──
-          Positioned(
-            right: -20,
-            bottom: -20,
-            child: Icon(
-              Icons.lightbulb_outline_rounded,
-              size: 120,
-              color: Colors.greenAccent.withOpacity(0.03),
+          AppleIconBox(icon: icon, color: color, size: 34, iconSize: 18),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppleTheme.textPrimary,
+              letterSpacing: -0.5,
             ),
           ),
-          // ── Contenido ──
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.greenAccent.withOpacity(0.15),
-                        Colors.greenAccent.withOpacity(0.05),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: Colors.greenAccent.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.lightbulb_outline_rounded,
-                    color: Colors.greenAccent,
-                    size: 26,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Tip del día",
-                        style: TextStyle(
-                          color: Colors.greenAccent,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "Mantén siempre agua fresca disponible para evitar deshidratación.",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              color: AppleTheme.textSecondary,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  // ═══════════════════════════════════════════════════════════
-  // ESTADO VACÍO
-  // ═══════════════════════════════════════════════════════════
+class _QuickActionTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 
-  Widget _buildEmptyState({
-    required IconData icon,
-    required String message,
-  }) {
-    return SizedBox(
-      height: 120,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white12, size: 40),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              style: GoogleFonts.outfit(
-                color: Colors.white30,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  const _QuickActionTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
 
-  // ═══════════════════════════════════════════════════════════
-  // UTILIDADES: Glassmorphism
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildGlassContainer({
-    required Widget child,
-    double? width,
-    double? height,
-    required double borderRadius,
-    Color borderColor = Colors.white10,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: borderColor,
-              width: 1,
-            ),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGlassButton({
-    required VoidCallback onTap,
-    required Widget child,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
-                  width: 1,
+  @override
+  Widget build(BuildContext context) {
+    return AppleCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(14),
+      borderRadius: 20,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AppleIconBox(icon: icon, color: color, size: 38, iconSize: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w700,
+                  color: AppleTheme.textPrimary,
                 ),
               ),
-              child: Center(child: child),
-            ),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11.5,
+                  color: AppleTheme.textSecondary,
+                ),
+              ),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }

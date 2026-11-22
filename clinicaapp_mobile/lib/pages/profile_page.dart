@@ -1,21 +1,17 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:math' as math;
-import 'dart:ui';
 import '../config/app_config.dart';
+import '../theme/apple_theme.dart';
+import '../widgets/apple_widgets.dart';
+import 'admin_dashboard_page.dart';
+import 'appointments_page.dart';
+import 'clinic_optimization_page.dart';
 import 'login_page.dart';
 import 'my_pets_page.dart';
+import 'notifications_page.dart';
 import 'payments_page.dart';
-import 'clinic_optimization_page.dart';
-import 'appointments_page.dart';
-import 'admin_dashboard_page.dart';
-
-// ============================================================
-// PROFILE PAGE - LUXURY AURORA EDITION
-// Lógica de datos y navegación 100% preservada
-// ============================================================
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,967 +20,289 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
-    with TickerProviderStateMixin {
-  // ═══════════════════════════════════════════════════════════
-  // LÓGICA ORIGINAL PRESERVADA
-  // AppConfig.userName, AppConfig.userEmail
-  // Navigator.pushReplacement -> LoginPage
-  // ═══════════════════════════════════════════════════════════
-
-  // ── Datos reales ──
+class _ProfilePageState extends State<ProfilePage> {
   int _petCount = 0;
   int _appointmentCount = 0;
   bool _loading = true;
 
-  // ── Animaciones ──
-  late AnimationController _aurora;
-  late AnimationController _floatController;
-  late AnimationController _pulseController;
-  late AnimationController _slideController;
-  late AnimationController _glowController;
-
-  // ── Colores Luxury Aurora ──
-  static const Color _auroraBase = Color(0xFF0EA5E9);
-  static const Color _auroraDeep = Color(0xFF0284C7);
-  static const Color _auroraGlow = Color(0xFF38BDF8);
-  static const Color _bgDark = Color(0xFF020617);
-
-  // ── Datos del menú ──
-  final List<Map<String, dynamic>> _menuItems = [
-    {"icon": Icons.person_outline_rounded, "title": "Editar Perfil", "subtitle": "Actualiza tu información personal", "color": _auroraBase},
-    {"icon": Icons.security_rounded, "title": "Seguridad", "subtitle": "Contraseña y autenticación", "color": Colors.purpleAccent},
-    {"icon": Icons.notifications_outlined, "title": "Notificaciones", "subtitle": "Configura tus alertas", "color": Colors.orangeAccent},
-    {"icon": Icons.help_outline_rounded, "title": "Soporte Técnico", "subtitle": "Centro de ayuda y contacto", "color": Colors.greenAccent},
-    {"icon": Icons.info_outline_rounded, "title": "Sobre Clínica App", "subtitle": "Versión 1.0.0", "color": Colors.tealAccent},
-  ];
-
   @override
   void initState() {
     super.initState();
-    _aurora = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 20),
-    )..repeat();
-
-    _floatController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat(reverse: true);
-
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-
-    _slideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    )..forward();
-
-    _glowController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
     _fetchStats();
   }
 
   Future<void> _fetchStats() async {
-    if (AppConfig.userEmail == null) return;
+    if (AppConfig.userEmail == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     try {
-      final petsRes = await http.get(
-        Uri.parse("${AppConfig.baseUrl}/mascotas/usuario/${AppConfig.userEmail}"),
-      );
-      final citasRes = await http.get(
-        Uri.parse("${AppConfig.baseUrl}/citas/usuario/${AppConfig.userEmail}"),
-      );
-
+      final petsRes = await http.get(Uri.parse("${AppConfig.baseUrl}/mascotas/usuario/${AppConfig.userEmail}"));
+      final citasRes = await http.get(Uri.parse("${AppConfig.baseUrl}/citas/usuario/${AppConfig.userEmail}"));
       if (mounted) {
         setState(() {
-          _petCount = (json.decode(petsRes.body) as List).length;
-          _appointmentCount = (json.decode(citasRes.body) as List).length;
+          if (petsRes.statusCode == 200) {
+            _petCount = (json.decode(petsRes.body) as List).length;
+          }
+          if (citasRes.statusCode == 200) {
+            _appointmentCount = (json.decode(citasRes.body) as List).length;
+          }
           _loading = false;
         });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  @override
-  void dispose() {
-    _aurora.dispose();
-    _floatController.dispose();
-    _pulseController.dispose();
-    _slideController.dispose();
-    _glowController.dispose();
-    super.dispose();
+  void _logout() {
+    AppConfig.userEmail = null;
+    AppConfig.userName = null;
+    AppConfig.userId = null;
+    AppConfig.userRole = null;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
   }
-
-  // ═══════════════════════════════════════════════════════════
-  // BUILD PRINCIPAL
-  // ═══════════════════════════════════════════════════════════
 
   @override
   Widget build(BuildContext context) {
+    final name = AppConfig.userName ?? "Usuario";
+    final email = AppConfig.userEmail ?? "correo@clinicaapp.com";
+    final isAdmin = (AppConfig.userRole ?? "").toUpperCase().contains("ADMIN");
+    final initials = name.isNotEmpty ? name.trim()[0].toUpperCase() : "U";
+
     return Scaffold(
-      backgroundColor: _bgDark,
-      body: Stack(
-        children: [
-          // ── Fondo Aurora Animado ──
-          _buildBackground(),
-          // ── Orbes flotantes ──
-          _buildFloatingOrbs(),
-          // ── Contenido Principal ──
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  // ── Header con avatar ──
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  // ── Stats cards ──
-                  _buildStatsSection(),
-                  const SizedBox(height: 32),
-                  // ── Sección de menú ──
-                  _buildMenuSection(context),
-                  const SizedBox(height: 32),
-                  // ── Botón logout ──
-                  _buildLogoutButton(context),
-                  const SizedBox(height: 50),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // FONDO AURORA ANIMADO
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildBackground() {
-    return AnimatedBuilder(
-      animation: _aurora,
-      builder: (context, child) {
-        final hue = (_aurora.value * 360) % 360;
-        return Container(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: Alignment(
-                math.sin(_aurora.value * math.pi * 2) * 0.3,
-                math.cos(_aurora.value * math.pi * 2) * 0.3,
-              ),
-              radius: 1.8,
-              colors: [
-                HSLColor.fromAHSL(1.0, hue, 0.6, 0.12).toColor(),
-                HSLColor.fromAHSL(1.0, (hue + 30) % 360, 0.5, 0.08).toColor(),
-                _bgDark,
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // ORBES FLOTANTES
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildFloatingOrbs() {
-    return Stack(
-      children: [
-        _buildOrb(
-          top: -80,
-          left: -60,
-          size: 350,
-          color: _auroraBase.withOpacity(0.04),
-          blur: 80,
-        ),
-        _buildOrb(
-          bottom: -80,
-          right: -60,
-          size: 400,
-          color: const Color(0xFF818CF8).withOpacity(0.03),
-          blur: 100,
-        ),
-        _buildOrb(
-          top: 300,
-          right: -80,
-          size: 200,
-          color: _auroraGlow.withOpacity(0.02),
-          blur: 60,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrb({
-    double? top,
-    double? left,
-    double? right,
-    double? bottom,
-    required double size,
-    required Color color,
-    required double blur,
-  }) {
-    return Positioned(
-      top: top,
-      left: left,
-      right: right,
-      bottom: bottom,
-      child: AnimatedBuilder(
-        animation: _floatController,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(
-              math.sin(_floatController.value * math.pi) * 15,
-              math.cos(_floatController.value * math.pi) * 20,
-            ),
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [color, color.withOpacity(0.0)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: color,
-                    blurRadius: blur,
-                    spreadRadius: size * 0.1,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // HEADER CON AVATAR ANIMADO
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildHeader() {
-    return AnimatedBuilder(
-      animation: _slideController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, -20 * (1 - _slideController.value)),
-          child: Opacity(
-            opacity: _slideController.value,
-            child: Center(
-              child: Column(
-                children: [
-                  // ── Avatar con halo ──
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Halo exterior pulsante
-                      AnimatedBuilder(
-                        animation: _pulseController,
-                        builder: (context, child) {
-                          return Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: _auroraBase.withOpacity(
-                                  0.15 + _pulseController.value * 0.15,
-                                ),
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _auroraBase.withOpacity(
-                                    0.1 * _pulseController.value,
-                                  ),
-                                  blurRadius: 40,
-                                  spreadRadius: 10,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      // Halo intermedio
-                      Container(
-                        width: 124,
-                        height: 124,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: _auroraBase.withOpacity(0.1),
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      // Avatar principal
-                      _buildGlassContainer(
-                        width: 110,
-                        height: 110,
-                        borderRadius: 55,
-                        borderColor: Colors.white.withOpacity(0.1),
-                        child: Center(
-                          child: Text(
-                            AppConfig.userName != null
-                                ? AppConfig.userName![0].toUpperCase()
-                                : "U",
-                            style: GoogleFonts.outfit(
-                              fontSize: 44,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Badge de verificado
-                      Positioned(
-                        bottom: 4,
-                        right: 4,
-                        child: Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [_auroraBase, _auroraGlow],
-                            ),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: _bgDark,
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: _auroraBase.withOpacity(0.4),
-                                blurRadius: 10,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.verified_rounded,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // ── Nombre ──
-                  Text(
-                    AppConfig.userName ?? "Usuario",
-                    style: GoogleFonts.outfit(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  // ── Email ──
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.04),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.06),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      AppConfig.userEmail ?? "email@clinicaapp.com",
-                      style: GoogleFonts.outfit(
-                        color: Colors.white.withOpacity(0.50),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // ── Badge de plan ──
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [_auroraBase, _auroraGlow],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      "PLAN PREMIUM",
-                      style: GoogleFonts.outfit(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // SECCIÓN DE STATS
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildStatsSection() {
-    return AnimatedBuilder(
-      animation: _slideController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, 20 * (1 - _slideController.value)),
-          child: Opacity(
-            opacity: _slideController.value,
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.pets_rounded,
-                    label: "Mascotas",
-                    value: _loading ? "..." : "$_petCount",
-                    color: _auroraBase,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.notifications_active_rounded,
-                    label: "Avisos",
-                    value: "0", // Avisos aún no implementados en backend
-                    color: Colors.orangeAccent,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.calendar_month_rounded,
-                    label: "Citas",
-                    value: _loading ? "..." : "$_appointmentCount",
-                    color: Colors.greenAccent,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return _buildGlassContainer(
-      height: 100,
-      borderRadius: 22,
-      borderColor: Colors.white.withOpacity(0.04),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withOpacity(0.15),
-                  color.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.outfit(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: GoogleFonts.outfit(
-              color: Colors.white.withOpacity(0.40),
-              fontSize: 11,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // SECCIÓN DE MENÚ
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildMenuSection(BuildContext context) {
-    final isSuperAdmin = AppConfig.userRole == "ROLE_ADMIN";
-
-    final menuActions = [
-      if (isSuperAdmin) () => _showCoreVerificationDialog(context),
-      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const MyPetsPage())),
-      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const PaymentsPage())),
-      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const ClinicOptimizationPage())),
-      () => Navigator.push(context, MaterialPageRoute(builder: (c) => const AppointmentsPage())),
-      () {
-        showAboutDialog(
-          context: context,
-          applicationName: "Clínica App",
-          applicationVersion: "1.0.0 (Semestre 7)",
-          applicationLegalese: "© 2026 Clínica App Veterinaria. Todos los derechos reservados.",
-        );
-      },
-    ];
-
-    final menuItemsWithLabels = [
-      if (isSuperAdmin)
-        {
-          "icon": Icons.admin_panel_settings_rounded,
-          "title": "SUPER ADMINISTRADOR",
-          "subtitle": "Acceso al Núcleo de Gestión y Telemetría",
-          "color": const Color(0xFF06B6D4),
-        },
-      {"icon": Icons.pets_rounded, "title": "Mis Mascotas", "subtitle": "Administra tus peluditos e historias clínicas", "color": _auroraBase},
-      {"icon": Icons.payments_rounded, "title": "Mis Pagos y Facturas", "subtitle": "Consulta transacciones y recibos", "color": Colors.purpleAccent},
-      {"icon": Icons.calculate_rounded, "title": "Optimización de Clínicas", "subtitle": "Modelo PLEB + Haversine de cercanía", "color": Colors.greenAccent},
-      {"icon": Icons.calendar_month_rounded, "title": "Mis Citas", "subtitle": "Gestiona y reprograma turnos", "color": Colors.orangeAccent},
-      {"icon": Icons.info_outline_rounded, "title": "Sobre Clínica App", "subtitle": "Versión 1.0.0 • 7mo Semestre", "color": Colors.tealAccent},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle("Gestión y Configuración"),
-        const SizedBox(height: 16),
-        ...menuItemsWithLabels.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          return TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 500 + index * 80),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) {
-              return Transform.translate(
-                offset: Offset(20 * (1 - value), 0),
-                child: Opacity(
-                  opacity: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildMenuItem(
-                      icon: item["icon"] as IconData,
-                      title: item["title"] as String,
-                      subtitle: item["subtitle"] as String,
-                      color: item["color"] as Color,
-                      onTap: menuActions[index],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        }).toList(),
-      ],
-    );
-  }
-
-  void _showCoreVerificationDialog(BuildContext context) {
-    final pinController = TextEditingController();
-    bool verifying = false;
-    String? errorText;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDState) => AlertDialog(
-          backgroundColor: const Color(0xFF0F172A),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Color(0xFF06B6D4), width: 1.5),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF06B6D4).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.security_rounded, color: Color(0xFF06B6D4), size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  "Acceso Super Administrador",
-                  style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+      backgroundColor: AppleTheme.bg,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Ingresa el código CORE para continuar.",
-                style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
+                "Perfil",
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w800,
+                  color: AppleTheme.textPrimary,
+                  letterSpacing: -0.7,
+                ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: pinController,
-                obscureText: true,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 8,
-                  color: const Color(0xFF06B6D4),
-                ),
-                decoration: InputDecoration(
-                  hintText: "••••",
-                  hintStyle: const TextStyle(color: Colors.white30, letterSpacing: 8),
-                  filled: true,
-                  fillColor: Colors.black38,
-                  errorText: errorText,
-                  errorStyle: GoogleFonts.outfit(color: const Color(0xFFEF4444), fontSize: 11),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF06B6D4)),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: verifying ? null : () => Navigator.pop(ctx),
-              child: Text(
-                "Cancelar",
-                style: GoogleFonts.outfit(color: Colors.white60),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: verifying
-                  ? null
-                  : () async {
-                      final pin = pinController.text.trim();
-                      if (pin.isEmpty) {
-                        setDState(() => errorText = "Ingresa el código CORE");
-                        return;
-                      }
 
-                      setDState(() {
-                        verifying = true;
-                        errorText = null;
-                      });
-
-                      try {
-                        final res = await http.post(
-                          Uri.parse("${AppConfig.baseUrl}/admin/verify-core-key"),
-                          headers: {"Content-Type": "application/json"},
-                          body: json.encode({
-                            "email": AppConfig.userEmail ?? "",
-                            "coreKey": pin,
-                          }),
-                        );
-
-                        final data = json.decode(res.body);
-                        if (res.statusCode == 200 && data['success'] == true) {
-                          if (ctx.mounted) Navigator.pop(ctx);
-                          if (context.mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AdminDashboardPage(),
-                              ),
-                            );
-                          }
-                        } else {
-                          setDState(() {
-                            verifying = false;
-                            errorText = data['message'] ?? "Acceso denegado. Código CORE incorrecto.";
-                          });
-                        }
-                      } catch (e) {
-                        setDState(() {
-                          verifying = false;
-                          errorText = "Error de conexión con el servidor";
-                        });
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF06B6D4),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: verifying
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
-                  : Text(
-                      "Verificar",
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-  }
-
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return _buildGlassContainer(
-      width: double.infinity,
-      height: 76,
-      borderRadius: 20,
-      borderColor: Colors.white.withOpacity(0.04),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          splashColor: color.withOpacity(0.1),
-          highlightColor: color.withOpacity(0.05),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        color.withOpacity(0.15),
-                        color.withOpacity(0.05),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(icon, color: color, size: 22),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        subtitle,
-                        style: GoogleFonts.outfit(
-                          color: Colors.white.withOpacity(0.35),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.04),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white.withOpacity(0.20),
-                    size: 18,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // BOTÓN LOGOUT PREMIUM
-  // ═══════════════════════════════════════════════════════════
-
-  Widget _buildLogoutButton(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _glowController,
-      builder: (context, child) {
-        return Container(
-          width: double.infinity,
-          height: 62,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: LinearGradient(
-              colors: [
-                Colors.redAccent.withOpacity(0.8),
-                Colors.redAccent.withOpacity(0.6),
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.redAccent.withOpacity(
-                  0.2 + _glowController.value * 0.15,
-                ),
-                blurRadius: 20 + _glowController.value * 10,
-                offset: const Offset(0, 10),
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (c) => const LoginPage()),
-              ),
-              borderRadius: BorderRadius.circular(22),
-              splashColor: Colors.white24,
-              highlightColor: Colors.white10,
-              child: Center(
+              // Tarjeta de usuario estilo Apple ID
+              AppleCard(
+                padding: const EdgeInsets.all(18),
+                borderRadius: 22,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.logout_rounded,
-                      color: Colors.white,
-                      size: 20,
+                    Container(
+                      width: 62,
+                      height: 62,
+                      decoration: BoxDecoration(
+                        color: AppleTheme.blue.withValues(alpha: 0.14),
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        initials,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          color: AppleTheme.blue,
+                        ),
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      "Cerrar Sesión",
-                      style: GoogleFonts.outfit(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppleTheme.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            email,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13.5,
+                              color: AppleTheme.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          AppleBadge(
+                            text: isAdmin ? "Administrador" : "Tutor Activo",
+                            color: isAdmin ? AppleTheme.purple : AppleTheme.green,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+              const SizedBox(height: 16),
 
-  // ═══════════════════════════════════════════════════════════
-  // UTILIDADES
-  // ═══════════════════════════════════════════════════════════
+              // Stats
+              Row(
+                children: [
+                  Expanded(
+                    child: AppleCard(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyPetsPage())),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Text(
+                            _loading ? "-" : "$_petCount",
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: AppleTheme.blue,
+                            ),
+                          ),
+                          Text(
+                            "Mascotas",
+                            style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppleTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppleCard(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentsPage())),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Text(
+                            _loading ? "-" : "$_appointmentCount",
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: AppleTheme.orange,
+                            ),
+                          ),
+                          Text(
+                            "Citas",
+                            style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppleTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
 
-  Widget _buildSectionTitle(String title) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 20,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [_auroraBase, _auroraGlow],
-            ),
-            borderRadius: BorderRadius.circular(2),
+              // Lista agrupada estilo iOS Settings
+              const AppleSectionHeader(title: "Mi Cuenta y Servicios"),
+              const SizedBox(height: 10),
+              AppleCard(
+                padding: EdgeInsets.zero,
+                borderRadius: 20,
+                child: Column(
+                  children: [
+                    _SettingsRow(
+                      icon: Icons.pets_rounded,
+                      color: AppleTheme.blue,
+                      title: "Mis Mascotas",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyPetsPage())),
+                    ),
+                    const Divider(height: 1, indent: 64),
+                    _SettingsRow(
+                      icon: Icons.receipt_long_rounded,
+                      color: AppleTheme.indigo,
+                      title: "Historial de Pagos",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsPage())),
+                    ),
+                    const Divider(height: 1, indent: 64),
+                    _SettingsRow(
+                      icon: Icons.near_me_rounded,
+                      color: AppleTheme.green,
+                      title: "Optimizador de Clínicas (PLEB)",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClinicOptimizationPage())),
+                    ),
+                    const Divider(height: 1, indent: 64),
+                    _SettingsRow(
+                      icon: Icons.notifications_rounded,
+                      color: AppleTheme.orange,
+                      title: "Notificaciones",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsPage())),
+                    ),
+                    if (isAdmin) ...[
+                      const Divider(height: 1, indent: 64),
+                      _SettingsRow(
+                        icon: Icons.admin_panel_settings_rounded,
+                        color: AppleTheme.purple,
+                        title: "Panel de Administración",
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboardPage())),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              AppleButton(
+                text: "Cerrar sesión",
+                icon: Icons.logout_rounded,
+                backgroundColor: AppleTheme.red,
+                outlined: true,
+                onPressed: _logout,
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 12),
-        Text(
-          title,
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: -0.3,
-          ),
-        ),
-      ],
+      ),
     );
   }
+}
 
-  Widget _buildGlassContainer({
-    required Widget child,
-    double? width,
-    double? height,
-    required double borderRadius,
-    Color borderColor = Colors.white10,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: borderColor,
-              width: 1,
+class _SettingsRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final VoidCallback onTap;
+
+  const _SettingsRow({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          children: [
+            AppleIconBox(icon: icon, color: color, size: 36, iconSize: 19),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppleTheme.textPrimary,
+                ),
+              ),
             ),
-          ),
-          child: child,
+            const Icon(Icons.chevron_right_rounded, color: AppleTheme.textTertiary),
+          ],
         ),
       ),
     );

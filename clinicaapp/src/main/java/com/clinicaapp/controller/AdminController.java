@@ -870,5 +870,27 @@ public class AdminController {
 
         return "admin/optimizacion_clinicas_admin";
     }
+
+    // ==========================================================
+    // 11. VISUALIZACIÓN DE DATOS II — DASHBOARD POWER BI
+    // ==========================================================
+    @org.springframework.beans.factory.annotation.Value("${powerbi.embed.url:https://app.powerbi.com/view?r=eyJrIjoiMDliOWRjMWItNGFlMy00MDVjLTg2ZTUtZDFjZWE1MWU3OGYzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9}")
+    private String powerBiEmbedUrl;
+
+    @GetMapping("/powerbi")
+    public String vistaPowerBiAdmin(Model model) {
+        List<Cita> citas = citaService.findAll();
+        double ingresos = citas.stream()
+                .filter(c -> "PAGADO".equalsIgnoreCase(c.getEstadoPago()))
+                .mapToDouble(c -> c.getCosto() != null ? c.getCosto() : 0.0)
+                .sum();
+
+        model.addAttribute("totalCitas", citas.size());
+        model.addAttribute("totalClinicas", clinicaService.findAll().size());
+        model.addAttribute("totalMascotas", mascotaService.findAll().size());
+        model.addAttribute("ingresosTotales", ingresos);
+        model.addAttribute("powerBiEmbedUrl", powerBiEmbedUrl);
+        return "admin/powerbi_dashboard";
+    }
 }
 

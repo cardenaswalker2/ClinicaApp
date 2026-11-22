@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analítica &amp; Power BI — ClinicaApp Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f2f4f8;
+            color: #1e293b;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .bi-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+        }
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0a3d82;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-2">
+                <i class="bi bi-bar-chart-fill me-1"></i> Visualización de Datos II — Esquema Estrella Kimball
+            </span>
+            <h2 class="fw-bold mb-0">Centro de Analítica &amp; Power BI</h2>
+            <small class="text-muted">Integración del Data Warehouse (3.469 hechos) y métricas en tiempo real de ClinicaApp</small>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:if="${powerBiEmbedUrl != null and !#strings.isEmpty(powerBiEmbedUrl)}"
+               th:href="${powerBiEmbedUrl}" target="_blank" rel="noopener"
+               class="btn btn-outline-primary rounded-pill px-3">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en Power BI
+            </a>
+            <a th:href="@{/admin/control-center}" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Centro de Control
+            </a>
+            <a th:href="@{/admin/dashboard}" class="btn btn-primary rounded-pill px-3">
+                <i class="bi bi-speedometer2 me-1"></i> Dashboard Admin
+            </a>
+        </div>
+    </div>
+
+    <!-- KPIs operacionales conectados a MongoDB -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="bi-card p-3">
+                <div class="text-muted small fw-semibold">Citas Registradas (OLTP)</div>
+                <div class="kpi-value" th:text="${totalCitas}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="bi-card p-3">
+                <div class="text-muted small fw-semibold">Mascotas Activas</div>
+                <div class="kpi-value" th:text="${totalMascotas}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="bi-card p-3">
+                <div class="text-muted small fw-semibold">Clínicas en Red</div>
+                <div class="kpi-value" th:text="${totalClinicas}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="bi-card p-3">
+                <div class="text-muted small fw-semibold">Ingresos Pagados (COP)</div>
+                <div class="kpi-value" th:text="'$' + ${#numbers.formatDecimal(ingresosTotales, 0, 'POINT', 0, 'COMMA')}">$0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor del Dashboard Power BI -->
+    <div class="bi-card p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <div>
+                <h5 class="fw-bold mb-0"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Dashboard Gerencial Power BI</h5>
+                <small class="text-muted">Fuente: Fact_Atenciones_Citas + 5 Dimensiones (Dim_Tiempo, Dim_Clinica, Dim_Servicio, Dim_Mascota, Dim_Veterinario)</small>
+            </div>
+            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                <i class="bi bi-check-circle-fill me-1"></i> Conectado al Módulo Admin
+            </span>
+        </div>
+
+        <!-- Si existe URL de Power BI Service embebida -->
+        <div th:if="${powerBiEmbedUrl != null and !#strings.isEmpty(powerBiEmbedUrl)}" class="ratio ratio-16x9 rounded-4 overflow-hidden border">
+            <iframe th:src="${powerBiEmbedUrl}" frameborder="0" allowfullscreen="true"></iframe>
+        </div>
+
+        <!-- Vista integrada del dashboard Power BI Desktop -->
+        <div th:if="${powerBiEmbedUrl == null or #strings.isEmpty(powerBiEmbedUrl)}" class="text-center">
+            <img th:src="@{/images/powerbi_dashboard_clinicaapp.png}"
+                 alt="Dashboard Gerencial Power BI - ClinicaApp"
+                 class="img-fluid rounded-4 border shadow-sm">
+            <p class="text-muted small mt-3 mb-0">
+                Archivo fuente: <code>ClinicaApp_Dashboard.pbix</code> • Para inserción en vivo desde Power BI Service, configure la propiedad <code>powerbi.embed.url</code>.
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

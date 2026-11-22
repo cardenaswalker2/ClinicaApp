@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:intl/intl.dart';
 import '../config/app_config.dart';
 import '../models/pago_usuario.dart';
+import '../theme/apple_theme.dart';
+import '../widgets/apple_widgets.dart';
 
 class PaymentsPage extends StatefulWidget {
   const PaymentsPage({super.key});
@@ -17,10 +20,6 @@ class _PaymentsPageState extends State<PaymentsPage> {
   bool _loading = true;
   String _selectedFilter = "Todos";
   final List<String> _filters = ["Todos", "COMPLETADO", "PENDIENTE"];
-
-  static const Color _auroraBase = Color(0xFF0EA5E9);
-  static const Color _bgDark = Color(0xFF020617);
-  static const Color _surfaceDark = Color(0xFF0F172A);
 
   @override
   void initState() {
@@ -40,10 +39,10 @@ class _PaymentsPageState extends State<PaymentsPage> {
           _pagos = list.map((e) => PagoUsuario.fromJson(e)).toList();
           _loading = false;
         });
-      } else {
-        if (mounted) setState(() => _loading = false);
+      } else if (mounted) {
+        setState(() => _loading = false);
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -55,219 +54,168 @@ class _PaymentsPageState extends State<PaymentsPage> {
 
   @override
   Widget build(BuildContext context) {
-    double totalPagado = _pagos
+    final totalPagado = _pagos
         .where((p) => p.estado.toUpperCase() == "COMPLETADO")
         .fold(0.0, (acc, p) => acc + p.monto);
+    final fmt = NumberFormat.currency(locale: 'es_CO', symbol: '\$', decimalDigits: 0);
+    final list = _filteredPagos;
 
     return Scaffold(
-      backgroundColor: _bgDark,
+      backgroundColor: AppleTheme.bg,
       appBar: AppBar(
-        title: Text("Mis Pagos y Facturas", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text("Mis Pagos"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: _auroraBase))
+          ? const Center(child: CircularProgressIndicator(color: AppleTheme.blue))
           : RefreshIndicator(
               onRefresh: _fetchPagos,
-              color: _auroraBase,
-              backgroundColor: _surfaceDark,
+              color: AppleTheme.blue,
               child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(24),
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
                 children: [
-                  _buildBalanceCard(totalPagado),
-                  const SizedBox(height: 24),
-                  _buildFilters(),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Historial de Transacciones", style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                      Text("${_filteredPagos.length} items", style: GoogleFonts.outfit(color: Colors.white38, fontSize: 13)),
-                    ],
+                  // Balance Card estilo Apple Wallet
+                  AppleCard(
+                    padding: const EdgeInsets.all(22),
+                    borderRadius: 24,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const AppleBadge(text: "Apple Pay / Stripe", color: AppleTheme.indigo),
+                            const AppleIconBox(icon: Icons.account_balance_wallet_rounded, color: AppleTheme.indigo),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Total Pagado",
+                          style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppleTheme.textSecondary),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          fmt.format(totalPagado),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            color: AppleTheme.textPrimary,
+                            letterSpacing: -0.8,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  if (_filteredPagos.isEmpty)
-                    _buildEmptyState()
+                  const SizedBox(height: 18),
+
+                  // Filtros
+                  SizedBox(
+                    height: 38,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _filters.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, idx) {
+                        final f = _filters[idx];
+                        final selected = _selectedFilter == f;
+                        return ChoiceChip(
+                          label: Text(
+                            f == "COMPLETADO" ? "Completados" : (f == "PENDIENTE" ? "Pendientes" : "Todos"),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: selected ? Colors.white : AppleTheme.textSecondary,
+                            ),
+                          ),
+                          selected: selected,
+                          selectedColor: AppleTheme.blue,
+                          backgroundColor: AppleTheme.surface,
+                          side: BorderSide(color: selected ? AppleTheme.blue : AppleTheme.border),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          onSelected: (_) => setState(() => _selectedFilter = f),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  AppleSectionHeader(title: "Transacciones (${list.length})"),
+                  const SizedBox(height: 12),
+
+                  if (list.isEmpty)
+                    AppleCard(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(
+                            "No hay pagos registrados.",
+                            style: GoogleFonts.plusJakartaSans(color: AppleTheme.textSecondary),
+                          ),
+                        ),
+                      ),
+                    )
                   else
-                    ..._filteredPagos.map((p) => _buildPagoCard(p)),
+                    ...list.map((p) {
+                      final isDone = p.estado.toUpperCase() == "COMPLETADO";
+                      final color = isDone ? AppleTheme.green : AppleTheme.orange;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: AppleCard(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              AppleIconBox(
+                                icon: isDone ? Icons.check_circle_rounded : Icons.schedule_rounded,
+                                color: color,
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      p.nombreServicio ?? p.nombreClinica ?? "Consulta Veterinaria",
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppleTheme.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      p.fecha,
+                                      style: GoogleFonts.plusJakartaSans(fontSize: 12.5, color: AppleTheme.textSecondary),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    fmt.format(p.monto),
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppleTheme.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  AppleBadge(text: p.estado, color: color),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildBalanceCard(double total) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [_auroraBase.withOpacity(0.2), _surfaceDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _auroraBase.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Total Invertido en Salud Animal", style: GoogleFonts.outfit(color: Colors.white60, fontSize: 13)),
-          const SizedBox(height: 8),
-          Text(
-            "\$${total.toStringAsFixed(0)} COP",
-            style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.shield_outlined, color: Colors.greenAccent, size: 16),
-              const SizedBox(width: 6),
-              Text("Pagos seguros cifrados con Stripe", style: GoogleFonts.outfit(color: Colors.greenAccent, fontSize: 12, fontWeight: FontWeight.w500)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilters() {
-    return SizedBox(
-      height: 38,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final isSelected = _selectedFilter == filter;
-          return Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: InkWell(
-              onTap: () => setState(() => _selectedFilter = filter),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? _auroraBase : Colors.white.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isSelected ? _auroraBase : Colors.white10),
-                ),
-                child: Text(
-                  filter == "COMPLETADO" ? "Completados" : (filter == "PENDIENTE" ? "Pendientes" : "Todos"),
-                  style: GoogleFonts.outfit(
-                    color: isSelected ? Colors.white : Colors.white60,
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildPagoCard(PagoUsuario p) {
-    final isCompletado = p.estado.toUpperCase() == "COMPLETADO" || p.estado.toUpperCase() == "PAGADO";
-    final color = isCompletado ? Colors.greenAccent : Colors.orangeAccent;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: _surfaceDark,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              isCompletado ? Icons.check_circle_outline_rounded : Icons.pending_outlined,
-              color: color,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.nombreServicio ?? "Consulta Veterinaria",
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  "${p.nombreMascota ?? 'Mascota'} • ${p.nombreClinica ?? 'Clínica'}",
-                  style: GoogleFonts.outfit(color: Colors.white60, fontSize: 12),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  p.fecha.isNotEmpty ? p.fecha.split('T')[0] : "Fecha pendiente",
-                  style: GoogleFonts.outfit(color: Colors.white38, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                "\$${p.monto.toStringAsFixed(0)}",
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  isCompletado ? "PAGADO" : "PENDIENTE",
-                  style: GoogleFonts.outfit(color: color, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40),
-        child: Column(
-          children: [
-            Icon(Icons.receipt_long_outlined, size: 60, color: Colors.white24),
-            const SizedBox(height: 16),
-            Text(
-              "No hay registros de pago",
-              style: GoogleFonts.outfit(color: Colors.white60, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              "Tus facturas y recibos de pago aparecerán en esta sección.",
-              style: GoogleFonts.outfit(color: Colors.white30, fontSize: 13),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

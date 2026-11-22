@@ -18,14 +18,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
   String? _errorMessage;
 
   // ── Theme colors ──
-  static const Color _bgDark = Color(0xFF030712);
-  static const Color _cardDark = Color(0xFF0F172A);
-  static const Color _accentCyan = Color(0xFF06B6D4);
-  static const Color _accentBlue = Color(0xFF3B82F6);
-  static const Color _accentPurple = Color(0xFF8B5CF6);
-  static const Color _accentGold = Color(0xFFF59E0B);
-  static const Color _accentGreen = Color(0xFF10B981);
-  static const Color _accentRed = Color(0xFFEF4444);
+  static const Color _bgDark = Color(0xFFF2F2F7);
+  static const Color _cardDark = Color(0xFFFFFFFF);
+  static const Color _accentCyan = Color(0xFF007AFF);
+  static const Color _accentBlue = Color(0xFF007AFF);
+  static const Color _accentPurple = Color(0xFFAF52DE);
+  static const Color _accentGold = Color(0xFFFF9500);
+  static const Color _accentGreen = Color(0xFF34C759);
+  static const Color _accentRed = Color(0xFFFF3B30);
 
   // ── State data ──
   Map<String, dynamic> _metrics = {};
@@ -168,7 +168,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         backgroundColor: const Color(0xFF0B1120),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1C1C1E), size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -184,19 +184,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   ),
                   child: Text(
                     "SUPER ADMIN",
-                    style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+                    style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF1C1C1E)),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   "Hub Central",
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1E)),
                 ),
               ],
             ),
             Text(
               AppConfig.userName ?? "Super Administrador",
-              style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54),
+              style: GoogleFonts.outfit(fontSize: 11, color: Color(0xFF8E8E93)),
             ),
           ],
         ),
@@ -221,7 +221,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           indicatorColor: _accentCyan,
           indicatorWeight: 3,
           labelColor: _accentCyan,
-          unselectedLabelColor: Colors.white54,
+          unselectedLabelColor: Color(0xFF8E8E93),
           labelStyle: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600),
           tabs: const [
             Tab(icon: Icon(Icons.dashboard_rounded, size: 18), text: "KPIs & SaaS"),
@@ -270,13 +270,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             const SizedBox(height: 16),
             Text(
               "Error de Carga",
-              style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+              style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E)),
             ),
             const SizedBox(height: 8),
             Text(
               _errorMessage ?? "",
               textAlign: TextAlign.center,
-              style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
+              style: GoogleFonts.outfit(fontSize: 13, color: Color(0xFF6E6E73)),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -373,7 +373,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           const SizedBox(height: 20),
           Text(
             "Distribución de Suscripciones SaaS",
-            style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+            style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1E)),
           ),
           const SizedBox(height: 12),
           _buildPlanRow("Starter (\$49/mes)", _metrics['countStarter'] ?? 0, _accentCyan),
@@ -384,7 +384,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           const SizedBox(height: 20),
           Text(
             "Alertas y Moderación",
-            style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+            style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1E)),
           ),
           const SizedBox(height: 12),
           _buildAlertCard("Solicitudes de Sedes Pendientes", "$solPend clínicas esperando revisión", Icons.domain_verification_rounded, solPend > 0 ? _accentGold : _accentGreen),
@@ -401,7 +401,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       decoration: BoxDecoration(
         color: _cardDark,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -410,7 +410,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             children: [
               Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
               const SizedBox(width: 12),
-              Text(planName, style: GoogleFonts.outfit(fontSize: 14, color: Colors.white)),
+              Text(planName, style: GoogleFonts.outfit(fontSize: 14, color: Color(0xFF1C1C1E))),
             ],
           ),
           Container(
@@ -439,8 +439,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-                Text(subtitle, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+                Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1C1C1E))),
+                Text(subtitle, style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
               ],
             ),
           ),
@@ -461,7 +461,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text("Infraestructura y Modos Globales", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text("Infraestructura y Modos Globales", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
         const SizedBox(height: 12),
         _buildSwitchTile(
           title: "Modo Mantenimiento",
@@ -495,19 +495,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           decoration: BoxDecoration(
             color: _cardDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.06)),
+            border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Mensaje de Notificación Broadcast", style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+              Text("Mensaje de Notificación Broadcast", style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1C1C1E))),
               const SizedBox(height: 8),
               TextFormField(
                 initialValue: mensajeGlobal,
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
                 decoration: InputDecoration(
                   hintText: "Escribe el comunicado global para todos los usuarios...",
-                  hintStyle: GoogleFonts.outfit(color: Colors.white38),
+                  hintStyle: GoogleFonts.outfit(color: Color(0xFFAEAEB2)),
                   filled: true,
                   fillColor: Colors.black26,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
@@ -564,7 +564,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       decoration: BoxDecoration(
         color: _cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
       ),
       child: Row(
         children: [
@@ -578,8 +578,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-                Text(subtitle, style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54)),
+                Text(title, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
+                Text(subtitle, style: GoogleFonts.outfit(fontSize: 11, color: Color(0xFF8E8E93))),
               ],
             ),
           ),
@@ -602,14 +602,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       child: Column(
         children: [
           Container(
-            color: const Color(0xFF0F172A),
+            color: const Color(0xFFFFFFFF),
             child: Row(
               children: [
                 const Expanded(
                   child: TabBar(
                     indicatorColor: _accentCyan,
                     labelColor: _accentCyan,
-                    unselectedLabelColor: Colors.white54,
+                    unselectedLabelColor: Color(0xFF8E8E93),
                     tabs: [
                       Tab(text: "Todas las Clínicas"),
                       Tab(text: "Solicitudes Pendientes"),
@@ -631,7 +631,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             child: TabBarView(
               children: [
                 _clinicas.isEmpty
-                    ? Center(child: Text("No hay clínicas registradas", style: GoogleFonts.outfit(color: Colors.white54)))
+                    ? Center(child: Text("No hay clínicas registradas", style: GoogleFonts.outfit(color: Color(0xFF8E8E93))))
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: _clinicas.length,
@@ -648,7 +648,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                             decoration: BoxDecoration(
                               color: _cardDark,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.white.withOpacity(0.06)),
+                              border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -659,7 +659,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                                     Expanded(
                                       child: Text(
                                         nombre,
-                                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E)),
                                       ),
                                     ),
                                     Container(
@@ -673,7 +673,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                                   ],
                                 ),
                                 const SizedBox(height: 6),
-                                Text(direccion, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+                                Text(direccion, style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
                                 const SizedBox(height: 12),
                                 Wrap(
                                   spacing: 8,
@@ -720,7 +720,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                       ),
 
                 _solicitudes.isEmpty
-                    ? Center(child: Text("No hay solicitudes pendientes", style: GoogleFonts.outfit(color: Colors.white54)))
+                    ? Center(child: Text("No hay solicitudes pendientes", style: GoogleFonts.outfit(color: Color(0xFF8E8E93))))
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: _solicitudes.length,
@@ -746,7 +746,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
-                                      child: Text(nombre, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                                      child: Text(nombre, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -756,7 +756,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                                   ],
                                 ),
                                 const SizedBox(height: 4),
-                                Text("Email: $email • Tel: $telefono", style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+                                Text("Email: $email • Tel: $telefono", style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
                                 const SizedBox(height: 14),
                                 Row(
                                   children: [
@@ -814,21 +814,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _cardDark,
-        title: Text(isEdit ? "Editar Clínica" : "Nueva Clínica", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(isEdit ? "Editar Clínica" : "Nueva Clínica", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nombreCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Nombre")),
-              TextField(controller: dirCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Dirección")),
-              TextField(controller: telCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Teléfono")),
-              TextField(controller: emailCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Email de contacto")),
-              TextField(controller: descCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Descripción")),
+              TextField(controller: nombreCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Nombre")),
+              TextField(controller: dirCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Dirección")),
+              TextField(controller: telCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Teléfono")),
+              TextField(controller: emailCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Email de contacto")),
+              TextField(controller: descCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Descripción")),
               Row(
                 children: [
-                  Expanded(child: TextField(controller: latCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Latitud"))),
+                  Expanded(child: TextField(controller: latCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Latitud"))),
                   const SizedBox(width: 8),
-                  Expanded(child: TextField(controller: lonCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Longitud"))),
+                  Expanded(child: TextField(controller: lonCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Longitud"))),
                 ],
               ),
             ],
@@ -910,12 +910,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDState) => AlertDialog(
           backgroundColor: _cardDark,
-          title: Text("Modificar Plan SaaS: $nombre", style: GoogleFonts.outfit(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text("Modificar Plan SaaS: $nombre", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: ["Starter", "Professional", "Enterprise"].map((p) {
               return RadioListTile<String>(
-                title: Text(p, style: GoogleFonts.outfit(color: Colors.white)),
+                title: Text(p, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E))),
                 value: p,
                 groupValue: selected,
                 activeColor: _accentCyan,
@@ -954,12 +954,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _cardDark,
-        title: Text("Otorgar Días Gratis: $nombre", style: GoogleFonts.outfit(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        title: Text("Otorgar Días Gratis: $nombre", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: daysController,
           keyboardType: TextInputType.number,
-          style: GoogleFonts.outfit(color: Colors.white),
-          decoration: const InputDecoration(labelText: "Cantidad de días extra", labelStyle: TextStyle(color: Colors.white70)),
+          style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)),
+          decoration: const InputDecoration(labelText: "Cantidad de días extra", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancelar")),
@@ -996,7 +996,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Directorio de Cuentas (${_usuarios.length})", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold)),
+              Text("Directorio de Cuentas (${_usuarios.length})", style: GoogleFonts.outfit(color: Color(0xFF6E6E73), fontSize: 14, fontWeight: FontWeight.bold)),
               ElevatedButton.icon(
                 onPressed: () => _showAddEditUserDialog(),
                 icon: const Icon(Icons.person_add_alt_1_rounded, size: 16),
@@ -1008,7 +1008,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         ),
         Expanded(
           child: _usuarios.isEmpty
-              ? Center(child: Text("No hay usuarios registrados", style: GoogleFonts.outfit(color: Colors.white54)))
+              ? Center(child: Text("No hay usuarios registrados", style: GoogleFonts.outfit(color: Color(0xFF8E8E93))))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: _usuarios.length,
@@ -1026,7 +1026,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                       decoration: BoxDecoration(
                         color: _cardDark,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withOpacity(0.06)),
+                        border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
                       ),
                       child: Row(
                         children: [
@@ -1039,12 +1039,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(nombre, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
-                                Text(email, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+                                Text(nombre, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
+                                Text(email, style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
                                 const SizedBox(height: 4),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(4)),
+                                  decoration: BoxDecoration(color: Color(0xFFE5E5EA), borderRadius: BorderRadius.circular(4)),
                                   child: Text(role, style: GoogleFonts.outfit(fontSize: 10, color: _accentCyan, fontWeight: FontWeight.bold)),
                                 )
                               ],
@@ -1111,21 +1111,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDState) => AlertDialog(
           backgroundColor: _cardDark,
-          title: Text(isEdit ? "Editar Usuario" : "Nuevo Usuario", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+          title: Text(isEdit ? "Editar Usuario" : "Nuevo Usuario", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: nombreCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Nombre")),
-                TextField(controller: apellidoCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Apellido")),
-                if (!isEdit) TextField(controller: emailCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Correo Electrónico")),
-                TextField(controller: telCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Teléfono")),
-                TextField(controller: dirCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Dirección")),
+                TextField(controller: nombreCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Nombre")),
+                TextField(controller: apellidoCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Apellido")),
+                if (!isEdit) TextField(controller: emailCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Correo Electrónico")),
+                TextField(controller: telCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Teléfono")),
+                TextField(controller: dirCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Dirección")),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: selectedRole,
                   dropdownColor: _cardDark,
-                  style: GoogleFonts.outfit(color: Colors.white),
+                  style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)),
                   decoration: const InputDecoration(labelText: "Rol del Sistema"),
                   items: const [
                     DropdownMenuItem(value: "ROLE_USER", child: Text("ROLE_USER (Paciente/Dueño)")),
@@ -1189,7 +1189,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Catálogo de Servicios (${_servicios.length})", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold)),
+              Text("Catálogo de Servicios (${_servicios.length})", style: GoogleFonts.outfit(color: Color(0xFF6E6E73), fontSize: 14, fontWeight: FontWeight.bold)),
               ElevatedButton.icon(
                 onPressed: () => _showAddEditServicioDialog(),
                 icon: const Icon(Icons.add_rounded, size: 16),
@@ -1201,7 +1201,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         ),
         Expanded(
           child: _servicios.isEmpty
-              ? Center(child: Text("No hay servicios maestros creados", style: GoogleFonts.outfit(color: Colors.white54)))
+              ? Center(child: Text("No hay servicios maestros creados", style: GoogleFonts.outfit(color: Color(0xFF8E8E93))))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: _servicios.length,
@@ -1219,7 +1219,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                       decoration: BoxDecoration(
                         color: _cardDark,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withOpacity(0.06)),
+                        border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
                       ),
                       child: Row(
                         children: [
@@ -1233,8 +1233,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(nombre, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
-                                Text(desc, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                Text(nombre, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
+                                Text(desc, style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73)), maxLines: 2, overflow: TextOverflow.ellipsis),
                                 const SizedBox(height: 4),
                                 Text("\$$precio USD • $duracion min", style: GoogleFonts.outfit(fontSize: 12, color: _accentGreen, fontWeight: FontWeight.bold)),
                               ],
@@ -1280,15 +1280,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _cardDark,
-        title: Text(isEdit ? "Editar Servicio" : "Nuevo Servicio Maestro", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(isEdit ? "Editar Servicio" : "Nuevo Servicio Maestro", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nombreCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Nombre del Servicio")),
-              TextField(controller: descCtrl, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Descripción")),
-              TextField(controller: precioCtrl, keyboardType: TextInputType.number, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Precio sugerido (\$ USD)")),
-              TextField(controller: durCtrl, keyboardType: TextInputType.number, style: GoogleFonts.outfit(color: Colors.white), decoration: const InputDecoration(labelText: "Duración en minutos")),
+              TextField(controller: nombreCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Nombre del Servicio")),
+              TextField(controller: descCtrl, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Descripción")),
+              TextField(controller: precioCtrl, keyboardType: TextInputType.number, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Precio sugerido (\$ USD)")),
+              TextField(controller: durCtrl, keyboardType: TextInputType.number, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E)), decoration: const InputDecoration(labelText: "Duración en minutos")),
             ],
           ),
         ),
@@ -1336,9 +1336,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.pets_rounded, color: Colors.white24, size: 64),
+                const Icon(Icons.pets_rounded, color: Color(0xFF6E6E73), size: 64),
                 const SizedBox(height: 12),
-                Text("No hay adopciones pendientes de moderación", style: GoogleFonts.outfit(color: Colors.white54)),
+                Text("No hay adopciones pendientes de moderación", style: GoogleFonts.outfit(color: Color(0xFF8E8E93))),
               ],
             ),
           )
@@ -1368,7 +1368,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(titulo, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                          child: Text(titulo, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1378,9 +1378,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text("Publicado por: $usuario • $ciudad", style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+                    Text("Publicado por: $usuario • $ciudad", style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
                     const SizedBox(height: 8),
-                    Text(desc, style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70)),
+                    Text(desc, style: GoogleFonts.outfit(fontSize: 13, color: Color(0xFF6E6E73))),
                     const SizedBox(height: 14),
                     Row(
                       children: [
@@ -1452,23 +1452,23 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           decoration: BoxDecoration(
             color: _cardDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.06)),
+            border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Ejecución del Algoritmo Global", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text("Ejecución del Algoritmo Global", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
               const SizedBox(height: 6),
               Text(
                 "Resuelve la matriz de cobertura binaria min Sum(di * Xi) sujeto a Xi in {0,1} y radio máximo de 50km.",
-                style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60),
+                style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73)),
               ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: _plebLoading ? null : _runPlebOptimization,
-                  icon: _plebLoading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.play_arrow_rounded),
+                  icon: _plebLoading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF1C1C1E))) : const Icon(Icons.play_arrow_rounded),
                   label: const Text("Ejecutar Optimización PLEB"),
                   style: ElevatedButton.styleFrom(backgroundColor: _accentCyan, padding: const EdgeInsets.symmetric(vertical: 14)),
                 ),
@@ -1492,15 +1492,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   children: [
                     const Icon(Icons.check_circle_rounded, color: _accentGreen, size: 20),
                     const SizedBox(width: 8),
-                    Text("Resultado del Modelo Matemático", style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text("Resultado del Modelo Matemático", style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text("Clínica Óptima Seleccionada: ${_plebResult!['clinicaSeleccionada']?['nombre'] ?? 'Sede Principal'}", style: GoogleFonts.outfit(fontSize: 14, color: Colors.cyanAccent, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text("Distancia Haversine: ${(_plebResult!['distanciaKm'] ?? 0.0).toStringAsFixed(2)} km", style: GoogleFonts.outfit(fontSize: 13, color: Colors.white)),
-                Text("Estado de Factibilidad: ${_plebResult!['estadoFactibilidad'] ?? 'ÓPTIMO'}", style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70)),
-                Text("Total Sedes Evaluadas: ${_plebResult!['totalClinicasEvaluadas'] ?? _clinicas.length}", style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70)),
+                Text("Distancia Haversine: ${(_plebResult!['distanciaKm'] ?? 0.0).toStringAsFixed(2)} km", style: GoogleFonts.outfit(fontSize: 13, color: Color(0xFF1C1C1E))),
+                Text("Estado de Factibilidad: ${_plebResult!['estadoFactibilidad'] ?? 'ÓPTIMO'}", style: GoogleFonts.outfit(fontSize: 13, color: Color(0xFF6E6E73))),
+                Text("Total Sedes Evaluadas: ${_plebResult!['totalClinicasEvaluadas'] ?? _clinicas.length}", style: GoogleFonts.outfit(fontSize: 13, color: Color(0xFF6E6E73))),
               ],
             ),
           )
@@ -1540,7 +1540,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text("Telemetría y Estado de Infraestructura", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text("Telemetría y Estado de Infraestructura", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -1561,7 +1561,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Registros de Auditoría", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text("Registros de Auditoría", style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
             TextButton.icon(
               onPressed: () => _confirmAction(
                 title: "Limpiar Auditoría",
@@ -1580,7 +1580,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         ),
         const SizedBox(height: 8),
         _auditorias.isEmpty
-            ? Center(child: Padding(padding: const EdgeInsets.all(16), child: Text("No hay registros recientes", style: GoogleFonts.outfit(color: Colors.white54))))
+            ? Center(child: Padding(padding: const EdgeInsets.all(16), child: Text("No hay registros recientes", style: GoogleFonts.outfit(color: Color(0xFF8E8E93)))))
             : Column(
                 children: _auditorias.map((log) {
                   final desc = log['descripcion'] ?? '';
@@ -1599,7 +1599,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                     decoration: BoxDecoration(
                       color: _cardDark,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white.withOpacity(0.04)),
+                      border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.04)),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1614,8 +1614,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(desc, style: GoogleFonts.outfit(fontSize: 13, color: Colors.white)),
-                              Text("$modulo • $fecha", style: GoogleFonts.outfit(fontSize: 11, color: Colors.white38)),
+                              Text(desc, style: GoogleFonts.outfit(fontSize: 13, color: Color(0xFF1C1C1E))),
+                              Text("$modulo • $fecha", style: GoogleFonts.outfit(fontSize: 11, color: Color(0xFFAEAEB2))),
                             ],
                           ),
                         ),
@@ -1650,14 +1650,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           children: [
             TextField(
               controller: _emailToController,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Destinatario (email)", labelStyle: TextStyle(color: Colors.white60)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Destinatario (email)", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _emailMsgController,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Cuerpo del Mensaje", labelStyle: TextStyle(color: Colors.white60)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Cuerpo del Mensaje", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
             const SizedBox(height: 12),
             SizedBox(
@@ -1680,14 +1680,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             TextField(
               controller: _smsToController,
               keyboardType: TextInputType.phone,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Número telefónico (+57...)", labelStyle: TextStyle(color: Colors.white60)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Número telefónico (+57...)", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _smsMsgController,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Texto del mensaje", labelStyle: TextStyle(color: Colors.white60)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Texto del mensaje", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
             const SizedBox(height: 12),
             Row(
@@ -1722,11 +1722,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             TextField(
               controller: _aiPromptController,
               maxLines: 2,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
               decoration: const InputDecoration(
                 labelText: "Prompt / Síntomas clínicos",
                 hintText: "Ej: Perro Golden de 3 años con tos persistente...",
-                labelStyle: TextStyle(color: Colors.white60),
+                labelStyle: TextStyle(color: Color(0xFF6E6E73)),
               ),
             ),
             const SizedBox(height: 12),
@@ -1734,7 +1734,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _techLoading ? null : _analyzeAi,
-                icon: _techLoading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.bolt_rounded, size: 16),
+                icon: _techLoading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF1C1C1E))) : const Icon(Icons.bolt_rounded, size: 16),
                 label: const Text("Consultar Motor IA 1428"),
                 style: ElevatedButton.styleFrom(backgroundColor: _accentPurple),
               ),
@@ -1743,7 +1743,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: Color(0xFF6E6E73), borderRadius: BorderRadius.circular(10)),
                 child: Text(_aiResult, style: GoogleFonts.outfit(fontSize: 12, color: Colors.cyanAccent)),
               )
             ]
@@ -1773,7 +1773,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             children: [
               Icon(icon, color: color, size: 20),
               const SizedBox(width: 10),
-              Text(title, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text(title, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
             ],
           ),
           const SizedBox(height: 14),
@@ -1899,19 +1899,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             decoration: BoxDecoration(
               color: _cardDark,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withOpacity(0.08)),
+              border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.08)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.search_rounded, color: Colors.white54, size: 20),
+                const Icon(Icons.search_rounded, color: Color(0xFF8E8E93), size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: _supervisionSearchController,
-                    style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                    style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
                     decoration: InputDecoration(
                       hintText: "Buscar usuario por nombre o correo...",
-                      hintStyle: GoogleFonts.outfit(color: Colors.white38),
+                      hintStyle: GoogleFonts.outfit(color: Color(0xFFAEAEB2)),
                       border: InputBorder.none,
                     ),
                     onChanged: (val) => setState(() {}),
@@ -1919,7 +1919,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                 ),
                 if (_supervisionSearchController.text.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.clear_rounded, color: Colors.white54, size: 18),
+                    icon: const Icon(Icons.clear_rounded, color: Color(0xFF8E8E93), size: 18),
                     onPressed: () {
                       _supervisionSearchController.clear();
                       setState(() {});
@@ -1938,7 +1938,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
 
           Text(
             "Seleccionar Usuario para Supervisión",
-            style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+            style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1C1C1E)),
           ),
           const SizedBox(height: 10),
 
@@ -1946,7 +1946,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             Container(
               padding: const EdgeInsets.all(24),
               alignment: Alignment.center,
-              child: Text("No se encontraron usuarios coincidentes", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 13)),
+              child: Text("No se encontraron usuarios coincidentes", style: GoogleFonts.outfit(color: Color(0xFF8E8E93), fontSize: 13)),
             )
           else
             ...filteredUsers.map((u) {
@@ -1972,7 +1972,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   leading: Stack(
                     children: [
                       CircleAvatar(
-                        backgroundColor: isSelected ? _accentBlue : const Color(0xFF1E293B),
+                        backgroundColor: isSelected ? _accentBlue : const Color(0xFFF9F9FB),
                         child: Text(
                           name.isNotEmpty ? name.substring(0, 1).toUpperCase() : 'U',
                           style: GoogleFonts.outfit(color: _accentCyan, fontWeight: FontWeight.bold),
@@ -1993,10 +1993,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                       )
                     ],
                   ),
-                  title: Text(name, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  title: Text(name, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: Text(
                     "$email • ${online ? '📍 $seccion' : 'Desconectado'}",
-                    style: GoogleFonts.outfit(color: online ? _accentGreen : Colors.white54, fontSize: 11),
+                    style: GoogleFonts.outfit(color: online ? _accentGreen : Color(0xFF8E8E93), fontSize: 11),
                   ),
                   trailing: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -2049,7 +2049,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _accentCyan.withOpacity(0.5), width: 1.5),
         boxShadow: [
@@ -2074,27 +2074,27 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                 ],
               ),
               IconButton(
-                icon: const Icon(Icons.close_rounded, color: Colors.white54, size: 18),
+                icon: const Icon(Icons.close_rounded, color: Color(0xFF8E8E93), size: 18),
                 onPressed: () => setState(() => _selectedUserSupervision = null),
               )
             ],
           ),
           const SizedBox(height: 10),
-          Text(name, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          Text(email, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60)),
+          Text(name, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
+          Text(email, style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
           const SizedBox(height: 14),
 
           // KPI indicators
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.black38, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: Color(0xFF6E6E73), borderRadius: BorderRadius.circular(12)),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Sección Actual", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10)),
+                      Text("Sección Actual", style: GoogleFonts.outfit(color: Color(0xFF8E8E93), fontSize: 10)),
                       Text("📍 $seccion", style: GoogleFonts.outfit(color: _accentCyan, fontWeight: FontWeight.bold, fontSize: 13)),
                     ],
                   ),
@@ -2103,8 +2103,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Última Actividad", style: GoogleFonts.outfit(color: Colors.white54, fontSize: 10)),
-                      Text("⏱️ $timeRel", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                      Text("Última Actividad", style: GoogleFonts.outfit(color: Color(0xFF8E8E93), fontSize: 10)),
+                      Text("⏱️ $timeRel", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -2112,7 +2112,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             ),
           ),
           const SizedBox(height: 8),
-          Text("IP: $ip • Dispositivo: $disp", style: GoogleFonts.outfit(color: Colors.white38, fontSize: 10, fontStyle: FontStyle.italic)),
+          Text("IP: $ip • Dispositivo: $disp", style: GoogleFonts.outfit(color: Color(0xFFAEAEB2), fontSize: 10, fontStyle: FontStyle.italic)),
           const SizedBox(height: 14),
 
           // Action Buttons
@@ -2160,7 +2160,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
 
           if (eventos.isNotEmpty) ...[
             const SizedBox(height: 16),
-            Text("Línea de Tiempo Reciente:", style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70)),
+            Text("Línea de Tiempo Reciente:", style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF6E6E73))),
             const SizedBox(height: 8),
             ...eventos.take(5).map((ev) {
               final sec = ev['seccion'] ?? 'Sistema';
@@ -2175,7 +2175,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                     const SizedBox(width: 8),
                     Text("[$time] ", style: const TextStyle(color: _accentCyan, fontSize: 10, fontFamily: 'monospace')),
                     Expanded(
-                      child: Text("$acc ($sec)", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 11), overflow: TextOverflow.ellipsis),
+                      child: Text("$acc ($sec)", style: GoogleFonts.outfit(color: Color(0xFF6E6E73), fontSize: 11), overflow: TextOverflow.ellipsis),
                     ),
                   ],
                 ),
@@ -2195,21 +2195,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _cardDark,
-        title: Text("Mensaje a $userName", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text("Mensaje a $userName", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
               controller: subjectCtrl,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Asunto", labelStyle: TextStyle(color: Colors.white70)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Asunto", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
             const SizedBox(height: 10),
             TextFormField(
               controller: msgCtrl,
               maxLines: 4,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Mensaje Directo", labelStyle: TextStyle(color: Colors.white70), hintText: "Escribe el contenido que recibirá en su pantalla..."),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Mensaje Directo", labelStyle: TextStyle(color: Color(0xFF6E6E73)), hintText: "Escribe el contenido que recibirá en su pantalla..."),
             ),
           ],
         ),
@@ -2256,7 +2256,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _cardDark,
-        title: Text("Despachar Correo a $userName", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text("Despachar Correo a $userName", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2265,15 +2265,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             const SizedBox(height: 10),
             TextFormField(
               controller: subCtrl,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Asunto del Correo", labelStyle: TextStyle(color: Colors.white70)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Asunto del Correo", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
             const SizedBox(height: 10),
             TextFormField(
               controller: bodyCtrl,
               maxLines: 4,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Cuerpo del Correo", labelStyle: TextStyle(color: Colors.white70), hintText: "Escribe el comunicado oficial por correo..."),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Cuerpo del Correo", labelStyle: TextStyle(color: Color(0xFF6E6E73)), hintText: "Escribe el comunicado oficial por correo..."),
             ),
           ],
         ),
@@ -2327,12 +2327,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Tipo de Sanción:", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12)),
+              Text("Tipo de Sanción:", style: GoogleFonts.outfit(color: Color(0xFF6E6E73), fontSize: 12)),
               const SizedBox(height: 6),
               DropdownButtonFormField<String>(
                 value: tipo,
                 dropdownColor: _cardDark,
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
                 items: const [
                   DropdownMenuItem(value: "TEMPORAL", child: Text("Temporal (Auto-reactivable)")),
                   DropdownMenuItem(value: "PERMANENTE", child: Text("Permanente (Indefinida)")),
@@ -2347,8 +2347,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
                 TextFormField(
                   initialValue: "60",
                   keyboardType: TextInputType.number,
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-                  decoration: const InputDecoration(labelText: "Duración en Minutos", labelStyle: TextStyle(color: Colors.white70)),
+                  style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+                  decoration: const InputDecoration(labelText: "Duración en Minutos", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
                   onChanged: (val) {
                     final p = int.tryParse(val);
                     if (p != null) minutes = p;
@@ -2359,10 +2359,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
               TextFormField(
                 controller: reasonCtrl,
                 maxLines: 3,
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
+                style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
                 decoration: const InputDecoration(
                   labelText: "Motivo Obligatorio",
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: TextStyle(color: Color(0xFF6E6E73)),
                   hintText: "Describe la infracción o causa...",
                 ),
               ),
@@ -2418,12 +2418,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Esto desconectará al usuario de cualquier app o navegador de inmediato.", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12)),
+            Text("Esto desconectará al usuario de cualquier app o navegador de inmediato.", style: GoogleFonts.outfit(color: Color(0xFF6E6E73), fontSize: 12)),
             const SizedBox(height: 10),
             TextFormField(
               controller: reasonCtrl,
-              style: GoogleFonts.outfit(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(labelText: "Motivo", labelStyle: TextStyle(color: Colors.white70)),
+              style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontSize: 13),
+              decoration: const InputDecoration(labelText: "Motivo", labelStyle: TextStyle(color: Color(0xFF6E6E73))),
             ),
           ],
         ),
@@ -2490,7 +2490,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           children: [
             const Icon(Icons.display_settings_rounded, color: _accentCyan),
             const SizedBox(width: 8),
-            Text("Visor de Sesión: $userName", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+            Text("Visor de Sesión: $userName", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold, fontSize: 15)),
           ],
         ),
         content: Column(
@@ -2498,22 +2498,22 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(14), border: Border.all(color: _accentCyan.withOpacity(0.3))),
+              decoration: BoxDecoration(color: Color(0xFF1C1C1E), borderRadius: BorderRadius.circular(14), border: Border.all(color: _accentCyan.withOpacity(0.3))),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("URL: $url", style: const TextStyle(color: Colors.white54, fontSize: 10, fontFamily: 'monospace')),
+                      Text("URL: $url", style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontFamily: 'monospace')),
                       Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _accentGreen.withOpacity(0.2), borderRadius: BorderRadius.circular(4)), child: const Text("ACTIVO", style: TextStyle(color: _accentGreen, fontSize: 8, fontWeight: FontWeight.bold))),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Icon(Icons.dashboard_customize_rounded, color: _accentCyan, size: 48),
                   const SizedBox(height: 10),
-                  Text("Módulo: $seccion", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text("Módulo: $seccion", style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 6),
-                  Text("El usuario se encuentra interactuando con esta sección dentro de la aplicación.", textAlign: TextAlign.center, style: GoogleFonts.outfit(color: Colors.white54, fontSize: 11)),
+                  Text("El usuario se encuentra interactuando con esta sección dentro de la aplicación.", textAlign: TextAlign.center, style: GoogleFonts.outfit(color: Color(0xFF8E8E93), fontSize: 11)),
                 ],
               ),
             )
@@ -2555,9 +2555,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: GoogleFonts.outfit(fontSize: 12, color: Colors.white70)),
-                Text(value, style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white)),
-                Text(subtitle, style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54)),
+                Text(title, style: GoogleFonts.outfit(fontSize: 12, color: Color(0xFF6E6E73))),
+                Text(value, style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF1C1C1E))),
+                Text(subtitle, style: GoogleFonts.outfit(fontSize: 11, color: Color(0xFF8E8E93))),
               ],
             ),
           ),
@@ -2577,15 +2577,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       decoration: BoxDecoration(
         color: _cardDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Color(0xFF1C1C1E).withOpacity(0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(height: 8),
-          Text(value, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-          Text(title, style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54)),
+          Text(value, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1E))),
+          Text(title, style: GoogleFonts.outfit(fontSize: 11, color: Color(0xFF8E8E93))),
         ],
       ),
     );
@@ -2600,8 +2600,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: _cardDark,
-        title: Text(title, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text(content, style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13)),
+        title: Text(title, style: GoogleFonts.outfit(color: Color(0xFF1C1C1E), fontWeight: FontWeight.bold)),
+        content: Text(content, style: GoogleFonts.outfit(color: Color(0xFF6E6E73), fontSize: 13)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancelar")),
           ElevatedButton(
