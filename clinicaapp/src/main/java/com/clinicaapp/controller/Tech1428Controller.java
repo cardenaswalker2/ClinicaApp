@@ -55,36 +55,41 @@ public class Tech1428Controller {
     public ResponseEntity<?> sendEmail(@RequestBody Map<String, String> payload) {
         try {
             String to = payload.get("to");
-            String body = payload.get("body");
-            
-            String customBody = 
-                "<div style='font-family: \"Plus Jakarta Sans\", \"Segoe UI\", sans-serif; max-width: 600px; margin: 0 auto; background-color: #030712; color: #f8fafc; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);'>" +
-                "  <div style='background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); padding: 40px 30px; text-align: center;'>" +
-                "    <div style='width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 15px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;'>" +
-                "      <span style='color: white; font-size: 30px;'>🧪</span>" +
+            String body = payload.getOrDefault("body", "");
+            String subject = payload.getOrDefault("subject", "Notificación Oficial — ClinicaApp");
+            if (subject.isBlank()) subject = "Notificación Oficial — ClinicaApp";
+            String recipientName = payload.getOrDefault("recipientName", "Tutor");
+            if (recipientName.isBlank()) recipientName = "Tutor";
+            String category = payload.getOrDefault("category", "Comunicado");
+            if (category.isBlank()) category = "Comunicado";
+
+            String safeBody = body.replace("\n", "<br>");
+
+            String customBody =
+                "<div style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; background-color: #f2f2f7; padding: 32px 16px;'>" +
+                "  <div style='max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; border: 1px solid #e5e5ea; box-shadow: 0 12px 30px rgba(0,0,0,0.06);'>" +
+                "    <div style='background: linear-gradient(135deg, #007aff 0%, #5856d6 100%); padding: 32px 28px; text-align: center;'>" +
+                "      <div style='display: inline-block; padding: 10px 14px; background: rgba(255,255,255,0.18); border-radius: 14px; margin-bottom: 12px; font-size: 24px;'>🐾</div>" +
+                "      <h1 style='margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;'>ClinicaApp</h1>" +
+                "      <p style='margin: 6px 0 0; color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600;'>Plataforma Integral de Gestión Veterinaria</p>" +
                 "    </div>" +
-                "    <h1 style='margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -1px;'>Ecosistema Tech 1428</h1>" +
-                "    <p style='margin: 10px 0 0; color: rgba(255,255,255,0.8); font-size: 14px; text-transform: uppercase; tracking-widest: 2px;'>Notificaci&oacute;n de Sistema Inteligente</p>" +
-                "  </div>" +
-                "  <div style='padding: 40px 30px;'>" +
-                "    <p style='font-size: 16px; color: #94a3b8; line-height: 1.6;'>Hola,</p>" +
-                "    <p style='font-size: 16px; color: #e2e8f0; line-height: 1.6;'>Has recibido una notificaci&oacute;n generada por el motor de automatizaci&oacute;n de <b>ClinicaApp Pro</b>. Este es el contenido procesado:</p>" +
-                "    <div style='margin: 30px 0; padding: 25px; background: rgba(255,255,255,0.03); border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);'>" +
-                "      <p style='margin: 0; color: #38bdf8; font-family: \"Courier New\", monospace; font-size: 14px; margin-bottom: 10px;'>[CONTENIDO DEL EVENTO]</p>" +
-                "      <p style='margin: 0; color: #f8fafc; font-size: 18px; font-weight: 500;'>" + body + "</p>" +
+                "    <div style='padding: 30px 28px;'>" +
+                "      <span style='display: inline-block; background-color: #e8f2ff; color: #007aff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;'>" + category + "</span>" +
+                "      <p style='margin: 0 0 12px; font-size: 17px; font-weight: 700; color: #1c1c1e;'>Hola, " + recipientName + ":</p>" +
+                "      <div style='margin: 18px 0; padding: 20px; background-color: #f8f9fc; border-radius: 16px; border: 1px solid #e5e5ea; border-left: 4px solid #007aff;'>" +
+                "        <p style='margin: 0; color: #1c1c1e; font-size: 15px; line-height: 1.6;'>" + safeBody + "</p>" +
+                "      </div>" +
+                "      <p style='margin: 20px 0 0; font-size: 13px; color: #6e6e73; line-height: 1.5;'>Si tienes dudas, puedes responder desde el asistente inteligente <b>Nova AI</b> dentro de la aplicación móvil o web de ClinicaApp.</p>" +
                 "    </div>" +
-                "    <div style='padding: 20px; background: rgba(14, 165, 233, 0.1); border-radius: 12px; border-left: 4px solid #0ea5e9;'>" +
-                "      <p style='margin: 0; font-size: 13px; color: #7dd3fc;'><b>Nota T&eacute;cnica:</b> Esta notificaci&oacute;n fue enviada a trav&eacute;s del protocolo seguro 1428 en tiempo real (45ms latencia).</p>" +
+                "    <div style='padding: 20px 28px; background-color: #f9f9fb; border-top: 1px solid #e5e5ea; text-align: center;'>" +
+                "      <p style='margin: 0; font-size: 12px; color: #8e8e93;'>&copy; 2026 ClinicaApp • Cartagena de Indias, Colombia</p>" +
                 "    </div>" +
-                "  </div>" +
-                "  <div style='padding: 30px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); text-align: center;'>" +
-                "    <p style='margin: 0; font-size: 12px; color: #475569;'>&copy; 2026 ClinicaApp Ecosystem | 1428 Tech Stack <br> Este es un correo de simulaci&oacute;n para demostraci&oacute;n comercial.</p>" +
                 "  </div>" +
                 "</div>";
-            
-            emailService.sendSimpleMessage(to, "Simulaci&oacute;n de Funcionamiento - ClinicaApp", customBody);
-            
-            return ResponseEntity.ok(Map.of("message", "Simulación enviada con éxito a " + to));
+
+            emailService.sendSimpleMessage(to, subject, customBody);
+
+            return ResponseEntity.ok(Map.of("message", "Correo enviado exitosamente a " + to));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
