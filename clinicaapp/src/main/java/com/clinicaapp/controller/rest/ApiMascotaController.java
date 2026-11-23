@@ -94,6 +94,9 @@ public class ApiMascotaController {
     @Autowired
     private com.clinicaapp.service.IClinicaService clinicaService;
 
+    @Autowired
+    private com.clinicaapp.service.IEmailService emailService;
+
     @GetMapping("/{id}/historial")
     public ResponseEntity<?> getHistorialMascota(@PathVariable String id) {
         return mascotaRepository.findById(id).map(m -> {
@@ -117,6 +120,37 @@ public class ApiMascotaController {
                 return map;
             }).collect(java.util.stream.Collectors.toList());
             return ResponseEntity.ok(visitasEnriquecidas);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/historial/enviar-email")
+    public ResponseEntity<?> enviarHistorialEmail(@PathVariable String id, @RequestBody java.util.Map<String, String> payload) {
+        String email = payload.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "Correo requerido"));
+        }
+        return mascotaRepository.findById(id).map(m -> {
+            List<com.clinicaapp.model.Visita> visitas = visitaService.findByMascotaId(m.getId());
+            StringBuilder sb = new StringBuilder();
+            sb.append("<div style='font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 600px; margin: 0 auto; padding: 28px; border: 1px solid #E5E5EA; border-radius: 16px;'>");
+            sb.append("<h2 style='color: #1C1C1E; margin-top: 0;'>Historial Clínico de ").append(m.getNombre()).append("</h2>");
+            sb.append("<p style='color: #6E6E73;'>Especie: ").append(m.getEspecie()).append(" | Raza: ").append(m.getRaza() != null ? m.getRaza() : "N/A").append("</p>");
+            if (visitas.isEmpty()) {
+                sb.append("<p style='color: #3A3A3C;'>No hay consultas registradas aún.</p>");
+            } else {
+                for (com.clinicaapp.model.Visita v : visitas) {
+                    sb.append("<div style='background: #F2F2F7; padding: 14px; border-radius: 12px; margin-bottom: 12px;'>");
+                    sb.append("<div style='font-weight: 700; color: #007AFF;'>").append(v.getFechaVisita() != null ? v.getFechaVisita().toString() : "").append("</div>");
+                    sb.append("<div style='margin-top: 4px;'><strong>Diagnóstico:</strong> ").append(v.getDiagnostico() != null ? v.getDiagnostico() : "N/A").append("</div>");
+                    sb.append("<div><strong>Tratamiento:</strong> ").append(v.getTratamiento() != null ? v.getTratamiento() : "N/A").append("</div>");
+                    sb.append("</div>");
+                }
+            }
+            sb.append("</div>");
+            try {
+                emailService.sendSimpleMessage(email.trim(), "Historial Médico de " + m.getNombre() + " - ClinicaApp", sb.toString());
+            } catch (Exception ignored) {}
+            return ResponseEntity.ok(java.util.Map.of("success", true, "message", "Historial enviado a " + email));
         }).orElse(ResponseEntity.notFound().build());
     }
 }

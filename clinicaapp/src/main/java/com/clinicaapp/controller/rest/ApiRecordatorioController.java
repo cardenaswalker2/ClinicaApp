@@ -38,4 +38,30 @@ public class ApiRecordatorioController {
         Recordatorio nuevo = recordatorioRepository.save(recordatorio);
         return ResponseEntity.ok(nuevo);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRecordatorio(@PathVariable String id, @RequestBody java.util.Map<String, Object> payload) {
+        return recordatorioRepository.findById(id).map(r -> {
+            if (payload.get("titulo") != null) r.setTitulo(payload.get("titulo").toString());
+            if (payload.get("descripcion") != null) r.setDescripcion(payload.get("descripcion").toString());
+            if (payload.get("tipo") != null) {
+                try { r.setTipo(Recordatorio.TipoRecordatorio.valueOf(payload.get("tipo").toString().toUpperCase())); } catch (Exception ignored) {}
+            }
+            if (payload.get("estado") != null) {
+                try { r.setEstado(Recordatorio.EstadoRecordatorio.valueOf(payload.get("estado").toString().toUpperCase())); } catch (Exception ignored) {}
+            }
+            if (payload.get("fechaHora") != null) {
+                try { r.setFechaHora(java.time.LocalDateTime.parse(payload.get("fechaHora").toString())); } catch (Exception ignored) {}
+            }
+            return ResponseEntity.ok(recordatorioRepository.save(r));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRecordatorio(@PathVariable String id) {
+        return recordatorioRepository.findById(id).map(r -> {
+            recordatorioRepository.delete(r);
+            return ResponseEntity.ok(java.util.Map.of("success", true));
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

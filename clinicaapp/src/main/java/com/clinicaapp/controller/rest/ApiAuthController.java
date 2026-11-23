@@ -25,6 +25,9 @@ public class ApiAuthController {
     @Autowired
     private com.clinicaapp.service.IUsuarioService usuarioService;
 
+    @Autowired
+    private com.clinicaapp.service.IEmailService emailService;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String email = credentials.get("email");
@@ -160,5 +163,52 @@ public class ApiAuthController {
         res.put("nombre", usuario.getNombre());
         res.put("apellido", usuario.getApellido());
         return ResponseEntity.ok(res);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "El correo es requerido"));
+        }
+        Usuario user = usuarioRepository.findByEmail(email.trim());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", "No existe ninguna cuenta con ese correo"));
+        }
+        String token = java.util.UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        usuarioService.createPasswordResetTokenForUser(user, token);
+
+        String subject = "Código de Recuperación - ClinicaApp";
+        String body = "<div style='font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 520px; margin: 0 auto; padding: 28px; border: 1px solid #E5E5EA; border-radius: 16px;'>"
+                + "<h2 style='color: #1C1C1E; margin-top: 0;'>Recuperar Contraseña</h2>"
+                + "<p style='color: #3A3A3C;'>Hola <strong>" + user.getNombre() + "</strong>, usa este código en tu app móvil para restablecer tu contraseña:</p>"
+                + "<div style='background: #F2F2F7; padding: 16px; border-radius: 12px; text-align: center; font-size: 28px; font-weight: 800; letter-spacing: 4px; color: #007AFF; margin: 20px 0;'>" + token + "</div>"
+                + "<p style='color: #8E8E93; font-size: 13px;'>Si no solicitaste este código, puedes ignorar este mensaje.</p>"
+                + "</div>";
+        try {
+            emailService.sendSimpleMessage(user.getEmail(), subject, body);
+        } catch (Exception ignored) {}
+
+        return ResponseEntity.ok(Map.of("success", true, "message", "Código enviado a tu correo electrónico"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> payload) {
+        String token = payload.get("token");
+        String newPassword = payload.get("password");
+        if (token == null || token.isBlank() || newPassword == null || newPassword.length() < 4) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Código y contraseña válida requeridos"));
+        }
+        Usuario user = usuarioService.validatePasswordResetToken(token.trim().toUpperCase());
+        if (user == null) {
+            user = usuarioService.validatePasswordResetToken(token.trim());
+        }
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "message", "El código es inválido o ha expirado"));
+        }
+        usuarioService.changeUserPassword(user, newPassword);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Contraseña actualizada correctamente"));
     }
 }

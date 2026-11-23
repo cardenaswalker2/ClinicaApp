@@ -82,4 +82,57 @@ public class ApiPagoController {
 
         return ResponseEntity.ok(pagos);
     }
+
+    @GetMapping("/recibo/{citaId}")
+    public ResponseEntity<?> getRecibo(@PathVariable String citaId) {
+        return citaRepository.findById(citaId).map(cita -> {
+            java.util.Map<String, Object> res = new java.util.HashMap<>();
+            res.put("citaId", cita.getId());
+            res.put("fecha", cita.getFechaHora() != null ? cita.getFechaHora().toString() : "");
+            res.put("monto", cita.getCosto() != null ? cita.getCosto() : 0.0);
+            res.put("estadoPago", cita.getEstadoPago() != null ? cita.getEstadoPago() : "PENDIENTE");
+            res.put("paymentIntentId", cita.getPaymentIntentId() != null ? cita.getPaymentIntentId() : "N/A");
+            res.put("motivo", cita.getMotivo() != null ? cita.getMotivo() : "Consulta Veterinaria");
+
+            clinicaService.findById(cita.getClinicaId() != null ? cita.getClinicaId() : "")
+                    .ifPresent(c -> {
+                        res.put("clinicaNombre", c.getNombre());
+                        res.put("clinicaDireccion", c.getDireccion());
+                    });
+
+            mascotaService.findById(cita.getMascotaId() != null ? cita.getMascotaId() : "")
+                    .ifPresent(m -> res.put("mascotaNombre", m.getNombre()));
+
+            if (cita.getUsuarioId() != null) {
+                usuarioRepository.findById(cita.getUsuarioId())
+                        .ifPresent(u -> res.put("usuarioNombre", u.getNombre() + (u.getApellido() != null ? " " + u.getApellido() : "")));
+            }
+
+            List<String> servicios = new ArrayList<>();
+            if (cita.getServiciosIds() != null) {
+                for (String sId : cita.getServiciosIds()) {
+                    servicioService.findById(sId).ifPresent(s -> servicios.add(s.getNombre()));
+                }
+            }
+            res.put("servicios", servicios);
+            return ResponseEntity.ok(res);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/pagar/{citaId}")
+    public ResponseEntity<?> pagarCitaMobile(@PathVariable String citaId, @RequestBody(required = false) java.util.Map<String, Object> payload) {
+        return citaRepository.findById(citaId).map(cita -> {
+            cita.setEstadoPago("PAGADO");
+            if (cita.getPaymentIntentId() == null || cita.getPaymentIntentId().isBlank()) {
+                cita.setPaymentIntentId("PAY-MOB-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            }
+            citaRepository.save(cita);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "success", true,
+                    "estadoPago", "PAGADO",
+                    "paymentIntentId", cita.getPaymentIntentId(),
+                    "monto", cita.getCosto() != null ? cita.getCosto() : 0.0
+            ));
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }
